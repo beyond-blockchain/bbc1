@@ -1,0 +1,838 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbclib module &mdash; BBc1 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="BBc1 0.7 documentation" href="index.html"/>
+        <link rel="next" title="ledger_subsystem module" href="ledger_subsystem.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="bbc_app.html">bbc_app module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_config.html">bbc_config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_core.html">bbc_core module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_error.html">bbc_error module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_ledger.html">bbc_ledger module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_network.html">bbc_network module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_storage.html">bbc_storage module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">bbclib module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ledger_subsystem.html">ledger_subsystem module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="message_key_types.html">message_key_types module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="p2p_domain0.html">p2p_domain0 module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="query_management.html">query_management module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple_cluster.html">simple_cluster module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logger.html">logger module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command.html">command module</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BBc1</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>bbclib module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/bbclib.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-bbclib">
+<span id="bbclib-module"></span><h1>bbclib module<a class="headerlink" href="#module-bbclib" title="Permalink to this headline">¶</a></h1>
+<p>Copyright (c) 2017 beyond-blockchain.org.</p>
+<p>Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#8220;AS IS&#8221; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+</tbody>
+</table>
+<dl class="class">
+<dt id="bbclib.BBcAsset">
+<em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">BBcAsset</code><a class="reference internal" href="_modules/bbclib.html#BBcAsset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcAsset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="bbclib.BBcAsset.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>user_id=None</em>, <em>asset_file=None</em>, <em>asset_body=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcAsset.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcAsset.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcAsset.deserialize">
+<code class="descname">deserialize</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcAsset.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcAsset.deserialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcAsset.digest">
+<code class="descname">digest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcAsset.digest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcAsset.digest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcAsset.get_asset_file">
+<code class="descname">get_asset_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcAsset.get_asset_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcAsset.get_asset_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcAsset.recover_asset_file">
+<code class="descname">recover_asset_file</code><span class="sig-paren">(</span><em>asset_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcAsset.recover_asset_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcAsset.recover_asset_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcAsset.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>for_digest_calculation=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcAsset.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcAsset.serialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbclib.BBcCrossRef">
+<em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">BBcCrossRef</code><span class="sig-paren">(</span><em>asset_group_id=None</em>, <em>transaction_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcCrossRef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcCrossRef" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="bbclib.BBcCrossRef.deserialize">
+<code class="descname">deserialize</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcCrossRef.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcCrossRef.deserialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcCrossRef.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcCrossRef.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcCrossRef.serialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbclib.BBcEvent">
+<em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">BBcEvent</code><span class="sig-paren">(</span><em>asset_group_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="bbclib.BBcEvent.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>asset_group_id=None</em>, <em>reference_index=None</em>, <em>mandatory_approver=None</em>, <em>option_approver_num_numerator=0</em>, <em>option_approver_num_denominator=0</em>, <em>option_approver=None</em>, <em>asset=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcEvent.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcEvent.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcEvent.deserialize">
+<code class="descname">deserialize</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcEvent.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcEvent.deserialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcEvent.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcEvent.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcEvent.serialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbclib.BBcReference">
+<em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">BBcReference</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>transaction</em>, <em>ref_transaction=None</em>, <em>event_index_in_ref=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcReference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcReference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="bbclib.BBcReference.add_signature">
+<code class="descname">add_signature</code><span class="sig-paren">(</span><em>user_id=None</em>, <em>signature=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcReference.add_signature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcReference.add_signature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcReference.deserialize">
+<code class="descname">deserialize</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcReference.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcReference.deserialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcReference.get_destinations">
+<code class="descname">get_destinations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcReference.get_destinations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcReference.get_destinations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcReference.get_referred_transaction">
+<code class="descname">get_referred_transaction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcReference.get_referred_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcReference.get_referred_transaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcReference.prepare_reference">
+<code class="descname">prepare_reference</code><span class="sig-paren">(</span><em>ref_transaction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcReference.prepare_reference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcReference.prepare_reference" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcReference.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcReference.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcReference.serialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbclib.BBcSignature">
+<em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">BBcSignature</code><span class="sig-paren">(</span><em>key_type=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcSignature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcSignature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="bbclib.BBcSignature.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>signature=None</em>, <em>pubkey=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcSignature.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcSignature.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcSignature.deserialize">
+<code class="descname">deserialize</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcSignature.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcSignature.deserialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcSignature.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcSignature.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcSignature.serialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcSignature.verify">
+<code class="descname">verify</code><span class="sig-paren">(</span><em>digest</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcSignature.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcSignature.verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbclib.BBcTransaction">
+<em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">BBcTransaction</code><span class="sig-paren">(</span><em>version=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcTransaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcTransaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="bbclib.BBcTransaction.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>event=None</em>, <em>reference=None</em>, <em>cross_ref=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcTransaction.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcTransaction.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcTransaction.add_signature">
+<code class="descname">add_signature</code><span class="sig-paren">(</span><em>user_id=None</em>, <em>signature=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcTransaction.add_signature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcTransaction.add_signature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcTransaction.deserialize">
+<code class="descname">deserialize</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcTransaction.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcTransaction.deserialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcTransaction.digest">
+<code class="descname">digest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcTransaction.digest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcTransaction.digest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcTransaction.dump">
+<code class="descname">dump</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcTransaction.dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcTransaction.dump" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcTransaction.get_sig_index">
+<code class="descname">get_sig_index</code><span class="sig-paren">(</span><em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcTransaction.get_sig_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcTransaction.get_sig_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcTransaction.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>for_id=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcTransaction.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcTransaction.serialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.BBcTransaction.sign">
+<code class="descname">sign</code><span class="sig-paren">(</span><em>key_type=1</em>, <em>private_key=None</em>, <em>public_key=None</em>, <em>keypair=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcTransaction.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcTransaction.sign" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sign transaction
+:param key_type: KeyType.ECDSA_SECP256k1_XY/X
+:param private_key: bytes format
+:param public_key: bytes format
+:return: BBcSignature object</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbclib.KeyPair">
+<em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">KeyPair</code><span class="sig-paren">(</span><em>type=1</em>, <em>privkey=None</em>, <em>pubkey=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="bbclib.KeyPair.generate">
+<code class="descname">generate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.generate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.generate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.KeyPair.get_private_key_in_der">
+<code class="descname">get_private_key_in_der</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.get_private_key_in_der"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.get_private_key_in_der" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.KeyPair.get_private_key_in_pem">
+<code class="descname">get_private_key_in_pem</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.get_private_key_in_pem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.get_private_key_in_pem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.KeyPair.mk_keyobj_from_private_key">
+<code class="descname">mk_keyobj_from_private_key</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.mk_keyobj_from_private_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.mk_keyobj_from_private_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.KeyPair.mk_keyobj_from_private_key_pem">
+<code class="descname">mk_keyobj_from_private_key_pem</code><span class="sig-paren">(</span><em>pemdat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.mk_keyobj_from_private_key_pem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.mk_keyobj_from_private_key_pem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.KeyPair.mk_public_keyobj">
+<code class="descname">mk_public_keyobj</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.mk_public_keyobj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.mk_public_keyobj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.KeyPair.to_bigint">
+<code class="descname">to_bigint</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.to_bigint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.to_bigint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.KeyPair.to_binary">
+<code class="descname">to_binary</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.to_binary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.to_binary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbclib.KeyType">
+<em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">KeyType</code><a class="reference internal" href="_modules/bbclib.html#KeyType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="bbclib.KeyType.ECDSA_SECP256k1_X">
+<code class="descname">ECDSA_SECP256k1_X</code><em class="property"> = 2</em><a class="headerlink" href="#bbclib.KeyType.ECDSA_SECP256k1_X" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.KeyType.ECDSA_SECP256k1_XY">
+<code class="descname">ECDSA_SECP256k1_XY</code><em class="property"> = 1</em><a class="headerlink" href="#bbclib.KeyType.ECDSA_SECP256k1_XY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbclib.NodeInfo">
+<em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">NodeInfo</code><span class="sig-paren">(</span><em>node_id=b'x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00'</em>, <em>ipv4=None</em>, <em>ipv6=None</em>, <em>port=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#NodeInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.NodeInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>node information entry (socket info)</p>
+<dl class="method">
+<dt id="bbclib.NodeInfo.detect_disconnect">
+<code class="descname">detect_disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#NodeInfo.detect_disconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.NodeInfo.detect_disconnect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.NodeInfo.get_nodeinfo">
+<code class="descname">get_nodeinfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#NodeInfo.get_nodeinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.NodeInfo.get_nodeinfo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.NodeInfo.recover_nodeinfo">
+<code class="descname">recover_nodeinfo</code><span class="sig-paren">(</span><em>node_id</em>, <em>ipv4</em>, <em>ipv6</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#NodeInfo.recover_nodeinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.NodeInfo.recover_nodeinfo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.NodeInfo.touch">
+<code class="descname">touch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#NodeInfo.touch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.NodeInfo.touch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.NodeInfo.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>ipv4=None</em>, <em>ipv6=None</em>, <em>port=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#NodeInfo.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.NodeInfo.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbclib.ServiceMessageType">
+<em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">ServiceMessageType</code><a class="reference internal" href="_modules/bbclib.html#ServiceMessageType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.ServiceMessageType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.DOMAIN_PING">
+<code class="descname">DOMAIN_PING</code><em class="property"> = 12</em><a class="headerlink" href="#bbclib.ServiceMessageType.DOMAIN_PING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.MESSAGE">
+<code class="descname">MESSAGE</code><em class="property"> = 34</em><a class="headerlink" href="#bbclib.ServiceMessageType.MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REGISTER">
+<code class="descname">REGISTER</code><em class="property"> = 32</em><a class="headerlink" href="#bbclib.ServiceMessageType.REGISTER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_CROSS_REF">
+<code class="descname">REQUEST_CROSS_REF</code><em class="property"> = 70</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_CROSS_REF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_GATHER_SIGNATURE">
+<code class="descname">REQUEST_GATHER_SIGNATURE</code><em class="property"> = 35</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_GATHER_SIGNATURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_GET_CONFIG">
+<code class="descname">REQUEST_GET_CONFIG</code><em class="property"> = 8</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_GET_CONFIG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_GET_DOMAINLIST">
+<code class="descname">REQUEST_GET_DOMAINLIST</code><em class="property"> = 13</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_GET_DOMAINLIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_GET_PEERLIST">
+<code class="descname">REQUEST_GET_PEERLIST</code><em class="property"> = 2</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_GET_PEERLIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_INSERT">
+<code class="descname">REQUEST_INSERT</code><em class="property"> = 39</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_INSERT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_MANIP_LEDGER_SUBSYS">
+<code class="descname">REQUEST_MANIP_LEDGER_SUBSYS</code><em class="property"> = 10</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_MANIP_LEDGER_SUBSYS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_REGISTER_HASH_IN_SUBSYS">
+<code class="descname">REQUEST_REGISTER_HASH_IN_SUBSYS</code><em class="property"> = 128</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_REGISTER_HASH_IN_SUBSYS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_SEARCH_ASSET">
+<code class="descname">REQUEST_SEARCH_ASSET</code><em class="property"> = 66</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_SEARCH_ASSET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_SEARCH_TRANSACTION">
+<code class="descname">REQUEST_SEARCH_TRANSACTION</code><em class="property"> = 68</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_SEARCH_TRANSACTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_SETUP_ASSET_GROUP">
+<code class="descname">REQUEST_SETUP_ASSET_GROUP</code><em class="property"> = 6</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_SETUP_ASSET_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_SETUP_DOMAIN">
+<code class="descname">REQUEST_SETUP_DOMAIN</code><em class="property"> = 0</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_SETUP_DOMAIN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_SET_STATIC_NODE">
+<code class="descname">REQUEST_SET_STATIC_NODE</code><em class="property"> = 4</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_SET_STATIC_NODE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_SIGNATURE">
+<code class="descname">REQUEST_SIGNATURE</code><em class="property"> = 37</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_SIGNATURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_VERIFY_HASH_IN_SUBSYS">
+<code class="descname">REQUEST_VERIFY_HASH_IN_SUBSYS</code><em class="property"> = 130</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_VERIFY_HASH_IN_SUBSYS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_CROSS_REF">
+<code class="descname">RESPONSE_CROSS_REF</code><em class="property"> = 71</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_CROSS_REF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_GATHER_SIGNATURE">
+<code class="descname">RESPONSE_GATHER_SIGNATURE</code><em class="property"> = 36</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_GATHER_SIGNATURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_GET_CONFIG">
+<code class="descname">RESPONSE_GET_CONFIG</code><em class="property"> = 9</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_GET_CONFIG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_GET_DOMAINLIST">
+<code class="descname">RESPONSE_GET_DOMAINLIST</code><em class="property"> = 14</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_GET_DOMAINLIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_GET_PEERLIST">
+<code class="descname">RESPONSE_GET_PEERLIST</code><em class="property"> = 3</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_GET_PEERLIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_INSERT">
+<code class="descname">RESPONSE_INSERT</code><em class="property"> = 40</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_INSERT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_MANIP_LEDGER_SUBSYS">
+<code class="descname">RESPONSE_MANIP_LEDGER_SUBSYS</code><em class="property"> = 11</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_MANIP_LEDGER_SUBSYS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_REGISTER_HASH_IN_SUBSYS">
+<code class="descname">RESPONSE_REGISTER_HASH_IN_SUBSYS</code><em class="property"> = 129</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_REGISTER_HASH_IN_SUBSYS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_SEARCH_ASSET">
+<code class="descname">RESPONSE_SEARCH_ASSET</code><em class="property"> = 67</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_SEARCH_ASSET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION">
+<code class="descname">RESPONSE_SEARCH_TRANSACTION</code><em class="property"> = 69</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_SETUP_ASSET_GROUP">
+<code class="descname">RESPONSE_SETUP_ASSET_GROUP</code><em class="property"> = 7</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_SETUP_ASSET_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_SETUP_DOMAIN">
+<code class="descname">RESPONSE_SETUP_DOMAIN</code><em class="property"> = 1</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_SETUP_DOMAIN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_SET_STATIC_NODE">
+<code class="descname">RESPONSE_SET_STATIC_NODE</code><em class="property"> = 5</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_SET_STATIC_NODE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_SIGNATURE">
+<code class="descname">RESPONSE_SIGNATURE</code><em class="property"> = 38</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_SIGNATURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_VERIFY_HASH_IN_SUBSYS">
+<code class="descname">RESPONSE_VERIFY_HASH_IN_SUBSYS</code><em class="property"> = 131</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_VERIFY_HASH_IN_SUBSYS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.UNREGISTER">
+<code class="descname">UNREGISTER</code><em class="property"> = 33</em><a class="headerlink" href="#bbclib.ServiceMessageType.UNREGISTER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbclib.StorageType">
+<em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">StorageType</code><a class="reference internal" href="_modules/bbclib.html#StorageType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.StorageType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="bbclib.StorageType.FILESYSTEM">
+<code class="descname">FILESYSTEM</code><em class="property"> = 1</em><a class="headerlink" href="#bbclib.StorageType.FILESYSTEM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.StorageType.NONE">
+<code class="descname">NONE</code><em class="property"> = 0</em><a class="headerlink" href="#bbclib.StorageType.NONE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="bbclib.add_reference_to_transaction">
+<code class="descclassname">bbclib.</code><code class="descname">add_reference_to_transaction</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>transaction</em>, <em>ref_transaction_obj</em>, <em>event_index_in_ref</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#add_reference_to_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.add_reference_to_transaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.convert_id_to_string">
+<code class="descclassname">bbclib.</code><code class="descname">convert_id_to_string</code><span class="sig-paren">(</span><em>data</em>, <em>bytelen=32</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#convert_id_to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.convert_id_to_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.convert_idstring_to_bytes">
+<code class="descclassname">bbclib.</code><code class="descname">convert_idstring_to_bytes</code><span class="sig-paren">(</span><em>datastr</em>, <em>bytelen=32</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#convert_idstring_to_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.convert_idstring_to_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.get_bigint">
+<code class="descclassname">bbclib.</code><code class="descname">get_bigint</code><span class="sig-paren">(</span><em>ptr</em>, <em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#get_bigint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.get_bigint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.get_n_byte_int">
+<code class="descclassname">bbclib.</code><code class="descname">get_n_byte_int</code><span class="sig-paren">(</span><em>ptr</em>, <em>n</em>, <em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#get_n_byte_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.get_n_byte_int" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.get_n_bytes">
+<code class="descclassname">bbclib.</code><code class="descname">get_n_bytes</code><span class="sig-paren">(</span><em>ptr</em>, <em>n</em>, <em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#get_n_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.get_n_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.get_new_id">
+<code class="descclassname">bbclib.</code><code class="descname">get_new_id</code><span class="sig-paren">(</span><em>seed_str=None</em>, <em>include_timestamp=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#get_new_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.get_new_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.get_random_id">
+<code class="descclassname">bbclib.</code><code class="descname">get_random_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#get_random_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.get_random_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.get_random_value">
+<code class="descclassname">bbclib.</code><code class="descname">get_random_value</code><span class="sig-paren">(</span><em>length=8</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#get_random_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.get_random_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.is_less_than">
+<code class="descclassname">bbclib.</code><code class="descname">is_less_than</code><span class="sig-paren">(</span><em>val_a</em>, <em>val_b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#is_less_than"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.is_less_than" title="Permalink to this definition">¶</a></dt>
+<dd><p>return True if val_a is less than val_b (evaluate as integer)
+:param val_a:
+:param val_b:
+:return:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bbclib.make_transaction_for_base_asset">
+<code class="descclassname">bbclib.</code><code class="descname">make_transaction_for_base_asset</code><span class="sig-paren">(</span><em>asset_group_id=None</em>, <em>event_num=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#make_transaction_for_base_asset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.make_transaction_for_base_asset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.recover_signature_object">
+<code class="descclassname">bbclib.</code><code class="descname">recover_signature_object</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#recover_signature_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.recover_signature_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.recover_transaction_object_from_rawdata">
+<code class="descclassname">bbclib.</code><code class="descname">recover_transaction_object_from_rawdata</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#recover_transaction_object_from_rawdata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.recover_transaction_object_from_rawdata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.reset_error">
+<code class="descclassname">bbclib.</code><code class="descname">reset_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#reset_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.reset_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.set_error">
+<code class="descclassname">bbclib.</code><code class="descname">set_error</code><span class="sig-paren">(</span><em>code=-1</em>, <em>txt=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#set_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.set_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.to_2byte">
+<code class="descclassname">bbclib.</code><code class="descname">to_2byte</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#to_2byte"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.to_2byte" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.to_4byte">
+<code class="descclassname">bbclib.</code><code class="descname">to_4byte</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#to_4byte"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.to_4byte" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.to_8byte">
+<code class="descclassname">bbclib.</code><code class="descname">to_8byte</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#to_8byte"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.to_8byte" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.to_bigint">
+<code class="descclassname">bbclib.</code><code class="descname">to_bigint</code><span class="sig-paren">(</span><em>val</em>, <em>size=32</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#to_bigint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.to_bigint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ledger_subsystem.html" class="btn btn-neutral float-right" title="ledger_subsystem module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
