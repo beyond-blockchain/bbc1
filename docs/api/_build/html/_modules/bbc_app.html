@@ -1,0 +1,892 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc_app &mdash; BBc1 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="BBc1 0.7 documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_app.html">bbc_app module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_config.html">bbc_config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_core.html">bbc_core module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_error.html">bbc_error module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_ledger.html">bbc_ledger module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_network.html">bbc_network module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_storage.html">bbc_storage module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbclib.html">bbclib module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ledger_subsystem.html">ledger_subsystem module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../message_key_types.html">message_key_types module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../p2p_domain0.html">p2p_domain0 module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../query_management.html">query_management module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../simple_cluster.html">simple_cluster module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logger.html">logger module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command.html">command module</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">BBc1</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>bbc_app</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bbc_app</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Copyright (c) 2017 beyond-blockchain.org.</span>
+
+<span class="sd">Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="sd">you may not use this file except in compliance with the License.</span>
+<span class="sd">You may obtain a copy of the License at</span>
+
+<span class="sd">    http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="sd">Unless required by applicable law or agreed to in writing, software</span>
+<span class="sd">distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="sd">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="sd">See the License for the specific language governing permissions and</span>
+<span class="sd">limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">gevent</span>
+<span class="kn">from</span> <span class="nn">gevent</span> <span class="k">import</span> <span class="n">monkey</span>
+<span class="n">monkey</span><span class="o">.</span><span class="n">patch_all</span><span class="p">()</span>
+<span class="kn">from</span> <span class="nn">gevent</span> <span class="k">import</span> <span class="n">socket</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">queue</span>
+<span class="kn">import</span> <span class="nn">binascii</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;../../&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">bbc1.common</span> <span class="k">import</span> <span class="n">bbclib</span><span class="p">,</span> <span class="n">message_key_types</span>
+<span class="kn">from</span> <span class="nn">bbc1.common.bbclib</span> <span class="k">import</span> <span class="n">NodeInfo</span><span class="p">,</span> <span class="n">ServiceMessageType</span> <span class="k">as</span> <span class="n">MsgType</span><span class="p">,</span> <span class="n">StorageType</span>
+<span class="kn">from</span> <span class="nn">bbc1.common.message_key_types</span> <span class="k">import</span> <span class="n">KeyType</span><span class="p">,</span> <span class="n">PayloadType</span>
+<span class="kn">from</span> <span class="nn">bbc1.common.bbc_error</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">bbc1.common</span> <span class="k">import</span> <span class="n">logger</span>
+
+<span class="n">DEFAULT_CORE_PORT</span> <span class="o">=</span> <span class="mi">9000</span>
+<span class="n">MAPPING_FILE</span> <span class="o">=</span> <span class="s2">&quot;.bbc_id_mappings&quot;</span>
+
+
+<div class="viewcode-block" id="store_id_mappings"><a class="viewcode-back" href="../bbc_app.html#bbc_app.store_id_mappings">[docs]</a><span class="k">def</span> <span class="nf">store_id_mappings</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">transaction_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">asset_ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">asset_group_id_str</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">MAPPING_FILE</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">MAPPING_FILE</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">mapping</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">mapping</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">asset_group_id_str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">transaction_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mapping</span><span class="p">[</span><span class="n">asset_group_id_str</span><span class="p">][</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;transaction_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">transaction_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">asset_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">asset_ids</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">ast</span> <span class="ow">in</span> <span class="n">asset_ids</span><span class="p">:</span>
+                <span class="n">entry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">ast</span><span class="p">))</span>
+            <span class="n">mapping</span><span class="p">[</span><span class="n">asset_group_id_str</span><span class="p">][</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;asset_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mapping</span><span class="p">[</span><span class="n">asset_group_id_str</span><span class="p">][</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;asset_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asset_ids</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">MAPPING_FILE</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="remove_id_mappings"><a class="viewcode-back" href="../bbc_app.html#bbc_app.remove_id_mappings">[docs]</a><span class="k">def</span> <span class="nf">remove_id_mappings</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">):</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">asset_group_id_str</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">MAPPING_FILE</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">MAPPING_FILE</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">mapping</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">asset_group_id_str</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">:</span>
+        <span class="n">mapping</span><span class="p">[</span><span class="n">asset_group_id_str</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mapping</span><span class="p">[</span><span class="n">asset_group_id_str</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">mapping</span><span class="p">[</span><span class="n">asset_group_id_str</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">MAPPING_FILE</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_id_from_mappings"><a class="viewcode-back" href="../bbc_app.html#bbc_app.get_id_from_mappings">[docs]</a><span class="k">def</span> <span class="nf">get_id_from_mappings</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">MAPPING_FILE</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">asset_group_id_str</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">MAPPING_FILE</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mapping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">asset_group_id_str</span> <span class="ow">in</span> <span class="n">mapping</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">[</span><span class="n">asset_group_id_str</span><span class="p">]:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;transaction_id&#39;</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">[</span><span class="n">asset_group_id_str</span><span class="p">][</span><span class="n">name</span><span class="p">]:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;transaction_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="n">mapping</span><span class="p">[</span><span class="n">asset_group_id_str</span><span class="p">][</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;transaction_id&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s1">&#39;asset_id&#39;</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">[</span><span class="n">asset_group_id_str</span><span class="p">][</span><span class="n">name</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mapping</span><span class="p">[</span><span class="n">asset_group_id_str</span><span class="p">][</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;asset_id&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">ast</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">[</span><span class="n">asset_group_id_str</span><span class="p">][</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;asset_id&#39;</span><span class="p">]:</span>
+                    <span class="n">entry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="n">ast</span><span class="p">))</span>
+                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;asset_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;asset_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="n">mapping</span><span class="p">[</span><span class="n">asset_group_id_str</span><span class="p">][</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;asset_id&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="BBcAppClient"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient">[docs]</a><span class="k">class</span> <span class="nc">BBcAppClient</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">DEFAULT_CORE_PORT</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;bbc_app&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">loglevel</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="n">logname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">create_connection</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="n">Callback</span><span class="p">(</span><span class="n">log</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_groups</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_id</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_receiver_loop</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BBcAppClient.set_callback"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.set_callback">[docs]</a>    <span class="k">def</span> <span class="nf">set_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set callback object that implements message processing functions</span>
+
+<span class="sd">        :param callback_obj:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="n">callback_obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">set_logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.set_user_id"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.set_user_id">[docs]</a>    <span class="k">def</span> <span class="nf">set_user_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set user_id of the object</span>
+
+<span class="sd">        :param identifier:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="n">identifier</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.set_asset_group_id"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.set_asset_group_id">[docs]</a>    <span class="k">def</span> <span class="nf">set_asset_group_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set asset_group_id (before register_to_core)</span>
+
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_groups</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.make_message_structure"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.make_message_structure">[docs]</a>    <span class="k">def</span> <span class="nf">make_message_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        (internal use) make a base message structure for sending to the core node</span>
+
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :param cmd:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_id</span> <span class="o">=</span> <span class="p">((</span><span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query_id</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">65536</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">:</span> <span class="n">cmd</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">:</span> <span class="n">asset_group_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">source_user_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">status</span><span class="p">:</span> <span class="n">ESUCCESS</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.send_msg"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.send_msg">[docs]</a>    <span class="k">def</span> <span class="nf">send_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        (internal use) send the message to the core node</span>
+
+<span class="sd">        :param dat:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span> <span class="ow">or</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">source_user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Message must include asset_group_id and source_id&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">make_message</span><span class="p">(</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_msgpack</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.domain_setup"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.domain_setup">[docs]</a>    <span class="k">def</span> <span class="nf">domain_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">module_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set up domain with the specified network module (maybe used by a system administrator)</span>
+
+<span class="sd">        :param domain_id:</span>
+<span class="sd">        :param module_name:</span>
+<span class="sd">        :param storage_type: StorageType value</span>
+<span class="sd">        :param storage_path:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_SETUP_DOMAIN</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain_id</span>
+        <span class="k">if</span> <span class="n">module_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">network_module</span><span class="p">]</span> <span class="o">=</span> <span class="n">module_name</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.get_domain_peerlist"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.get_domain_peerlist">[docs]</a>    <span class="k">def</span> <span class="nf">get_domain_peerlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get peer list of the domain from the core node (maybe used by a system administrator)</span>
+
+<span class="sd">        :param domain_id:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GET_PEERLIST</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.set_domain_static_node"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.set_domain_static_node">[docs]</a>    <span class="k">def</span> <span class="nf">set_domain_static_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set static node to the core node (maybe used by a system administrator)</span>
+
+<span class="sd">        :param domain_id:</span>
+<span class="sd">        :param node_id:</span>
+<span class="sd">        :param ipv4:</span>
+<span class="sd">        :param ipv6:</span>
+<span class="sd">        :param port:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_SET_STATIC_NODE</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">peer_info</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.send_domain_ping"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.send_domain_ping">[docs]</a>    <span class="k">def</span> <span class="nf">send_domain_ping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send domain ping to notify the existence of the node (maybe used by a system administrator)</span>
+
+<span class="sd">        :param domain_id:</span>
+<span class="sd">        :param ipv4:</span>
+<span class="sd">        :param ipv6:</span>
+<span class="sd">        :param port:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">DOMAIN_PING</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ipv4_address</span><span class="p">]</span> <span class="o">=</span> <span class="n">ipv4</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ipv6_address</span><span class="p">]</span> <span class="o">=</span> <span class="n">ipv6</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">port_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">port</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.register_asset_group"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.register_asset_group">[docs]</a>    <span class="k">def</span> <span class="nf">register_asset_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span>
+                             <span class="n">storage_type</span><span class="o">=</span><span class="n">StorageType</span><span class="o">.</span><span class="n">FILESYSTEM</span><span class="p">,</span> <span class="n">storage_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">advertise_in_domain0</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Register an asset_group in the core node (maybe used by a system administrator)</span>
+
+<span class="sd">        :param domain_id:</span>
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :param storage_type:</span>
+<span class="sd">        :param storage_path:</span>
+<span class="sd">        :param advertise_in_domain0:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_SETUP_ASSET_GROUP</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">storage_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">storage_type</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">advertise_in_domain0</span><span class="p">]</span> <span class="o">=</span> <span class="n">advertise_in_domain0</span>
+        <span class="k">if</span> <span class="n">storage_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">storage_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">storage_path</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.get_bbc_config"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.get_bbc_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_bbc_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get config file of bbc_core (maybe used by a system administrator)</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GET_CONFIG</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.get_domain_list"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.get_domain_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_domain_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get domain_id list in bbc_core (maybe used by a system administrator)</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GET_DOMAINLIST</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.manipulate_ledger_subsystem"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.manipulate_ledger_subsystem">[docs]</a>    <span class="k">def</span> <span class="nf">manipulate_ledger_subsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enable</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        start/stop ledger_subsystem on the bbc_core (maybe used by a system administrator)</span>
+
+<span class="sd">        :param enable: True-&gt;start, False-&gt;stop</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_MANIP_LEDGER_SUBSYS</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ledger_subsys_manip</span><span class="p">]</span> <span class="o">=</span> <span class="n">enable</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.register_to_core"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.register_to_core">[docs]</a>    <span class="k">def</span> <span class="nf">register_to_core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Register the client (user_id) to the core node. After that, the client can communicate with the core node</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">asset_group_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_groups</span><span class="p">:</span>
+            <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REGISTER</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.unregister_from_core"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.unregister_from_core">[docs]</a>    <span class="k">def</span> <span class="nf">unregister_from_core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Unregister and disconnect from the core node</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">UNREGISTER</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.get_cross_refs"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.get_cross_refs">[docs]</a>    <span class="k">def</span> <span class="nf">get_cross_refs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get cross_refs</span>
+
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :param number:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_CROSS_REF</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">number</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.gather_signatures"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.gather_signatures">[docs]</a>    <span class="k">def</span> <span class="nf">gather_signatures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">tx_obj</span><span class="p">,</span> <span class="n">reference_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">destinations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Request to gather signatures from the specified user_ids</span>
+
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :param tx_obj:</span>
+<span class="sd">        :param reference_obj: BBcReference object</span>
+<span class="sd">        :param destinations: list of destination user_ids</span>
+<span class="sd">        :param asset_files: dictionary of {asset_id: file_content}</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reference_obj</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">destinations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GATHER_SIGNATURE</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">reference_obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">reference_obj</span><span class="o">.</span><span class="n">get_destinations</span><span class="p">()</span>
+            <span class="n">referred_transactions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">referred_transactions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">reference_obj</span><span class="o">.</span><span class="n">get_referred_transaction</span><span class="p">())</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">referred_transactions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transactions</span><span class="p">]</span> <span class="o">=</span> <span class="n">referred_transactions</span>
+        <span class="k">elif</span> <span class="n">destinations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">destinations</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">asset_files</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_files</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.sendback_signature"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.sendback_signature">[docs]</a>    <span class="k">def</span> <span class="nf">sendback_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">ref_index</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send back the signed transaction to the source</span>
+
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :param dst:</span>
+<span class="sd">        :param ref_index: Which reference in transaction the signature is for</span>
+<span class="sd">        :param sig:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SIGNATURE</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dst</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ref_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref_index</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.sendback_denial_of_sign"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.sendback_denial_of_sign">[docs]</a>    <span class="k">def</span> <span class="nf">sendback_denial_of_sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">reason_text</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send back the denial of sign the transaction</span>
+
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :param dst:</span>
+<span class="sd">        :param reason_text:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SIGNATURE</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dst</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">status</span><span class="p">]</span> <span class="o">=</span> <span class="n">EOTHER</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">reason</span><span class="p">]</span> <span class="o">=</span> <span class="n">reason_text</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.insert_transaction"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.insert_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">insert_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">tx_obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Request to insert a legitimate transaction</span>
+
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :param tx_obj: Transaction object (not deserialized one)</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">transaction_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tx_obj</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_INSERT</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+        <span class="n">ast</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">evt</span> <span class="ow">in</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">evt</span><span class="o">.</span><span class="n">asset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">asset_digest</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">evt</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">get_asset_file</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ast</span><span class="p">[</span><span class="n">evt</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.search_asset"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.search_asset">[docs]</a>    <span class="k">def</span> <span class="nf">search_asset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Search request for the specified asset. This would return transaction_data (and asset_file file content)</span>
+
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :param asset_id:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_SEARCH_ASSET</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.search_transaction"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.search_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Search request for transaction_data</span>
+
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :param transaction_id:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_SEARCH_TRANSACTION</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.register_in_ledger_subsystem"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.register_in_ledger_subsystem">[docs]</a>    <span class="k">def</span> <span class="nf">register_in_ledger_subsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Register transaction_id in the ledger_subsystem</span>
+
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :param transaction_id:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_REGISTER_HASH_IN_SUBSYS</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.verify_in_ledger_subsystem"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.verify_in_ledger_subsystem">[docs]</a>    <span class="k">def</span> <span class="nf">verify_in_ledger_subsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verify transaction_id in the ledger_subsystem</span>
+
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :param transaction_id:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_VERIFY_HASH_IN_SUBSYS</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.send_message"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">dst_user_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send peer-to-peer message to the specified user_id</span>
+
+<span class="sd">        :param msg:</span>
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :param dst_user_id:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message_structure</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">MESSAGE</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dst_user_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">message</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.start_receiver_loop"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.start_receiver_loop">[docs]</a>    <span class="k">def</span> <span class="nf">start_receiver_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">jobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">gevent</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_loop</span><span class="p">)]</span></div>
+        <span class="c1">#gevent.joinall(jobs)</span>
+
+<div class="viewcode-block" id="BBcAppClient.receiver_loop"><a class="viewcode-back" href="../bbc_app.html#bbc_app.BBcAppClient.receiver_loop">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">msg_parser</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">Message</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">8192</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">msg_parser</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="n">msg_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">msg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">msg_parser</span><span class="o">.</span><span class="n">payload_type</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TCP disconnect: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="Callback"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback">[docs]</a><span class="k">class</span> <span class="nc">Callback</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set of callback functions for processing received message</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">log</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Callback.set_logger"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.set_logger">[docs]</a>    <span class="k">def</span> <span class="nf">set_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">log</span></div>
+
+<div class="viewcode-block" id="Callback.dispatch"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.dispatch">[docs]</a>    <span class="k">def</span> <span class="nf">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">payload_type</span><span class="p">):</span>
+        <span class="c1">#self.logger.debug(&quot;Received: %s&quot; % dat)</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">command</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No command exists&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SEARCH_TRANSACTION</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_search_transaction</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SEARCH_ASSET</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_search_asset</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GATHER_SIGNATURE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_gather_signature</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_SIGNATURE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_cmd_sign_request</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SIGNATURE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_sign_request</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_INSERT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_insert</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_CROSS_REF</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_cross_ref</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">MESSAGE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_user_message</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_REGISTER_HASH_IN_SUBSYS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_register_hash</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_VERIFY_HASH_IN_SUBSYS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_verify_hash</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SETUP_ASSET_GROUP</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_asset_group_setup</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SETUP_DOMAIN</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_domain_setup</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GET_PEERLIST</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_get_peerlist</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GET_DOMAINLIST</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_get_domainlist</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SET_STATIC_NODE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_set_peer</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GET_CONFIG</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_get_config</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_MANIP_LEDGER_SUBSYS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_ledger_subsystem</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No method to process for command=</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Callback.synchronize"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.synchronize">[docs]</a>    <span class="k">def</span> <span class="nf">synchronize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wait for receiving message</span>
+
+<span class="sd">        :param timeout: timeout second for waiting</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_cross_ref"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_cross_ref">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="n">cross_refs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cross_ref</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">cross_refs</span><span class="p">]:</span>
+            <span class="n">cross</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcCrossRef</span><span class="p">(</span><span class="n">cross_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cross_ref</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">cross_refs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cross</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">cross_refs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_cmd_sign_request"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_cmd_sign_request">[docs]</a>    <span class="k">def</span> <span class="nf">proc_cmd_sign_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_sign_request"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_sign_request">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_sign_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_gather_signature"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_gather_signature">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_gather_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span> <span class="ow">or</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">status</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">ESUCCESS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">recover_signature_object</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">({</span><span class="n">KeyType</span><span class="o">.</span><span class="n">status</span><span class="p">:</span> <span class="n">ESUCCESS</span><span class="p">,</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">result</span><span class="p">:</span> <span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ref_index</span><span class="p">],</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">source_user_id</span><span class="p">],</span> <span class="n">sig</span><span class="p">)})</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_insert"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_insert">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_search_asset"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_search_asset">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_search_asset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_search_transaction"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_search_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_search_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="n">tx_obj</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">recover_transaction_object_from_rawdata</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">])</span>
+            <span class="n">tx_obj</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+            <span class="n">digest</span> <span class="o">=</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tx_obj</span><span class="o">.</span><span class="n">signatures</span><span class="p">)):</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">signatures</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">digest</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="n">dat</span> <span class="o">=</span> <span class="p">{</span><span class="n">KeyType</span><span class="o">.</span><span class="n">status</span><span class="p">:</span> <span class="n">EBADTXSIGNATURE</span><span class="p">,</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">reason</span><span class="p">:</span> <span class="s2">&quot;Verify failure&quot;</span><span class="p">,</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">:</span> <span class="n">tx_obj</span><span class="p">}</span>
+                    <span class="k">break</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_user_message"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_user_message">[docs]</a>    <span class="k">def</span> <span class="nf">proc_user_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_register_hash"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_register_hash">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_register_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_verify_hash"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_verify_hash">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_verify_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_asset_group_setup"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_asset_group_setup">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_asset_group_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_domain_setup"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_domain_setup">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_domain_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_get_peerlist"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_get_peerlist">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_get_peerlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return node info</span>
+
+<span class="sd">        :param dat:</span>
+<span class="sd">        :return: list of node info (the first one is that of the connecting core)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">peer_list</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">peerlist</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">peer_list</span><span class="p">]</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">peerlist</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">i</span><span class="o">*</span><span class="p">(</span><span class="mi">32</span><span class="o">+</span><span class="mi">4</span><span class="o">+</span><span class="mi">16</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">node_id</span> <span class="o">=</span> <span class="n">peerlist</span><span class="p">[</span><span class="n">base</span><span class="p">:</span><span class="n">base</span><span class="o">+</span><span class="mi">32</span><span class="p">]</span>
+            <span class="n">ipv4</span> <span class="o">=</span> <span class="n">peerlist</span><span class="p">[</span><span class="n">base</span><span class="o">+</span><span class="mi">32</span><span class="p">:</span><span class="n">base</span><span class="o">+</span><span class="mi">36</span><span class="p">]</span>
+            <span class="n">ipv6</span> <span class="o">=</span> <span class="n">peerlist</span><span class="p">[</span><span class="n">base</span><span class="o">+</span><span class="mi">36</span><span class="p">:</span><span class="n">base</span><span class="o">+</span><span class="mi">52</span><span class="p">]</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="n">peerlist</span><span class="p">[</span><span class="n">base</span><span class="o">+</span><span class="mi">52</span><span class="p">:</span><span class="n">base</span><span class="o">+</span><span class="mi">54</span><span class="p">]</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">NodeInfo</span><span class="p">()</span>
+            <span class="n">info</span><span class="o">.</span><span class="n">recover_nodeinfo</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">info</span><span class="o">.</span><span class="n">node_id</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">ipv4</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">ipv6</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">port</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_get_domainlist"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_get_domainlist">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_get_domainlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return domain_ids</span>
+
+<span class="sd">        :param dat:</span>
+<span class="sd">        :return: list of domain_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">domain_list</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">domainlist</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_list</span><span class="p">]</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">domainlist</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">32</span><span class="o">*</span><span class="n">i</span>
+            <span class="n">domain_id</span> <span class="o">=</span> <span class="n">domainlist</span><span class="p">[</span><span class="n">base</span><span class="p">:</span><span class="n">base</span><span class="o">+</span><span class="mi">32</span><span class="p">]</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">domain_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_set_peer"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_set_peer">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_set_peer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_get_config"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_get_config">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_ledger_subsystem"><a class="viewcode-back" href="../bbc_app.html#bbc_app.Callback.proc_resp_ledger_subsystem">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_ledger_subsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div></div>
+
+
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

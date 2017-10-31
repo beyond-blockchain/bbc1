@@ -1,0 +1,709 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc_core module &mdash; BBc1 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="BBc1 0.7 documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="bbc_app.html">bbc_app module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_config.html">bbc_config module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">bbc_core module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_error.html">bbc_error module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_ledger.html">bbc_ledger module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_network.html">bbc_network module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_storage.html">bbc_storage module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbclib.html">bbclib module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ledger_subsystem.html">ledger_subsystem module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="message_key_types.html">message_key_types module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="p2p_domain0.html">p2p_domain0 module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="query_management.html">query_management module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple_cluster.html">simple_cluster module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logger.html">logger module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command.html">command module</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BBc1</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>bbc_core module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/bbc_core.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-bbc_core">
+<span id="bbc-core-module"></span><h1>bbc_core module<a class="headerlink" href="#module-bbc_core" title="Permalink to this headline">¶</a></h1>
+<p>Copyright (c) 2017 beyond-blockchain.org.</p>
+<p>Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#8220;AS IS&#8221; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#bbc_core.BBcCoreService" title="bbc_core.BBcCoreService"><code class="xref py py-obj docutils literal"><span class="pre">BBcCoreService</span></code></a>([ipv6,&nbsp;p2p_port,&nbsp;core_port,&nbsp;...])</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="bbc_core.BBcCoreService">
+<em class="property">class </em><code class="descclassname">bbc_core.</code><code class="descname">BBcCoreService</code><span class="sig-paren">(</span><em>ipv6=None</em>, <em>p2p_port=None</em>, <em>core_port=None</em>, <em>use_global=False</em>, <em>workingdir='.bbc1'</em>, <em>configfile=None</em>, <em>loglevel='all'</em>, <em>logname='-'</em>, <em>server_start=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.add_cross_ref_into_list">
+<code class="descname">add_cross_ref_into_list</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>txid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.add_cross_ref_into_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.add_cross_ref_into_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>(internal use) register cross_ref info in the list</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> &#8211; </li>
+<li><strong>txid</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.asset_group_setup">
+<code class="descname">asset_group_setup</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>storage_type=1</em>, <em>storage_path=None</em>, <em>advertise_in_domain0=False</em>, <em>config_update=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.asset_group_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.asset_group_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup asset_group in a specified domain</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>domain_id</strong> &#8211; </li>
+<li><strong>asset_group_id</strong> &#8211; </li>
+<li><strong>storage_type</strong> &#8211; </li>
+<li><strong>storage_path</strong> &#8211; </li>
+<li><strong>advertise_in_domain0</strong> &#8211; </li>
+<li><strong>config_update</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.check_asset_in_response">
+<code class="descname">check_asset_in_response</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.check_asset_in_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.check_asset_in_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>(internal use) Check asset in the transaction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.distribute_transaction_to_gather_signatures">
+<code class="descname">distribute_transaction_to_gather_signatures</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.distribute_transaction_to_gather_signatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.distribute_transaction_to_gather_signatures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request to distribute sign_request to users</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> &#8211; </li>
+<li><strong>dat</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.error_reply">
+<code class="descname">error_reply</code><span class="sig-paren">(</span><em>msg=None</em>, <em>err_code=-1</em>, <em>txt=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.error_reply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.error_reply" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.failure_response">
+<code class="descname">failure_response</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.failure_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.failure_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>(internal use) Called when transaction search fails</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.handler">
+<code class="descname">handler</code><span class="sig-paren">(</span><em>socket</em>, <em>address</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Message wait loop</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>socket</strong> &#8211; </li>
+<li><strong>address</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.insert_transaction">
+<code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>txdata</em>, <em>asset_files</em>, <em>no_network_put=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.insert_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert transaction into ledger subsystem</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>asset_group_id</strong> &#8211; asset_group_id to insert into</li>
+<li><strong>txdata</strong> &#8211; BBcTransaction data</li>
+<li><strong>asset_files</strong> &#8211; dictionary of { asid=&gt;asset_content,,, }</li>
+<li><strong>no_network_put</strong> &#8211; If false, skip networking.put()</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.param_check">
+<code class="descname">param_check</code><span class="sig-paren">(</span><em>param</em>, <em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.param_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.param_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the param is included</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>param</strong> &#8211; string or list of strings</li>
+<li><strong>dat</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.pop_cross_refs">
+<code class="descname">pop_cross_refs</code><span class="sig-paren">(</span><em>num=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.pop_cross_refs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.pop_cross_refs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return TxIDs for cross_refs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>num</strong> &#8211; The number of set of (txid, domain_id) to return</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.process">
+<code class="descname">process</code><span class="sig-paren">(</span><em>socket</em>, <em>dat</em>, <em>payload_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process received message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>socket</strong> &#8211; </li>
+<li><strong>dat</strong> &#8211; </li>
+<li><strong>payload_type</strong> &#8211; PayloadType value of msg</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.quit_program">
+<code class="descname">quit_program</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.quit_program"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.quit_program" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.search_asset_by_asid">
+<code class="descname">search_asset_by_asid</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asid</em>, <em>source_id</em>, <em>query_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.search_asset_by_asid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.search_asset_by_asid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search asset in the storage by asset_id. If not found, search it in the network</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> &#8211; asset_group_id to search in</li>
+<li><strong>asid</strong> &#8211; asset_id in byte format</li>
+<li><strong>source_id</strong> &#8211; the user_id of the sender</li>
+<li><strong>query_id</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dictionary data of transaction_data, asset_file (if exists)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.search_transaction_by_txid">
+<code class="descname">search_transaction_by_txid</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>txid</em>, <em>source_id</em>, <em>query_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.search_transaction_by_txid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.search_transaction_by_txid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search transaction_data by transaction_id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> &#8211; asset_group_id to search in</li>
+<li><strong>txid</strong> &#8211; transaction_id</li>
+<li><strong>source_id</strong> &#8211; the user_id of the sender</li>
+<li><strong>query_id</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dictionary data of transaction_data</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.search_transaction_for_asset">
+<code class="descname">search_transaction_for_asset</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.search_transaction_for_asset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.search_transaction_for_asset" title="Permalink to this definition">¶</a></dt>
+<dd><p>(internal use) Search transaction that includes the specified asset_id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.send_error_response">
+<code class="descname">send_error_response</code><span class="sig-paren">(</span><em>response_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.send_error_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.send_error_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>(internal use) send error response</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>response_info</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.send_message">
+<code class="descname">send_message</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.send_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.send_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send message to bbc_app (TCP client)
+:param dat:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.send_raw_message">
+<code class="descname">send_raw_message</code><span class="sig-paren">(</span><em>socket</em>, <em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.send_raw_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.send_raw_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.send_response">
+<code class="descname">send_response</code><span class="sig-paren">(</span><em>response_info</em>, <em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.send_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.send_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>(internal use) send response message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>response_info</strong> &#8211; </li>
+<li><strong>dat</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.send_to_other_user">
+<code class="descname">send_to_other_user</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>dst_user_id</em>, <em>src_user_id</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.send_to_other_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.send_to_other_user" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.start_server">
+<code class="descname">start_server</code><span class="sig-paren">(</span><em>port</em>, <em>ipv6=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.start_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.start_server" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.succeed_to_find_transaction">
+<code class="descname">succeed_to_find_transaction</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.succeed_to_find_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.succeed_to_find_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>(internal use) Called when transaction search is successful</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.validate_asset_file">
+<code class="descname">validate_asset_file</code><span class="sig-paren">(</span><em>txobj</em>, <em>asid</em>, <em>asset_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.validate_asset_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.validate_asset_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate asset in storage by verifying SHA256 digest</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>txobj</strong> &#8211; </li>
+<li><strong>asset_file</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_core.BBcCoreService.validate_transaction">
+<code class="descname">validate_transaction</code><span class="sig-paren">(</span><em>txid</em>, <em>txdata</em>, <em>asset_files</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#BBcCoreService.validate_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.BBcCoreService.validate_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate transaction by verifying signature</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>txid</strong> &#8211; transaction_id</li>
+<li><strong>txdata</strong> &#8211; BBcTransaction data</li>
+<li><strong>asset_files</strong> &#8211; dictionary of { asid=&gt;asset_content,,, }</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc_core.check_transaction_if_having_asset_file">
+<code class="descclassname">bbc_core.</code><code class="descname">check_transaction_if_having_asset_file</code><span class="sig-paren">(</span><em>txdata</em>, <em>asid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#check_transaction_if_having_asset_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.check_transaction_if_having_asset_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbc_core.daemonize">
+<code class="descclassname">bbc_core.</code><code class="descname">daemonize</code><span class="sig-paren">(</span><em>pidfile='/tmp/bbc1.pid'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#daemonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.daemonize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbc_core.error_response">
+<code class="descclassname">bbc_core.</code><code class="descname">error_response</code><span class="sig-paren">(</span><em>err_code=-255</em>, <em>txt=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#error_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.error_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>(internal use) Create error response with reason text</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>err_code</strong> &#8211; error code (defined in bbc_error.py)</li>
+<li><strong>txt</strong> &#8211; reason text</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dictionary type data</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc_core.make_message_structure">
+<code class="descclassname">bbc_core.</code><code class="descname">make_message_structure</code><span class="sig-paren">(</span><em>cmd</em>, <em>asgid</em>, <em>dstid</em>, <em>qid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_core.html#make_message_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_core.make_message_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>(internal use) Create a base structure of message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cmd</strong> &#8211; </li>
+<li><strong>asgid</strong> &#8211; asset_group_id</li>
+<li><strong>dstid</strong> &#8211; destination_user_id</li>
+<li><strong>qid</strong> &#8211; query_id</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,380 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc_storage module &mdash; BBc1 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="BBc1 0.7 documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="bbc_app.html">bbc_app module</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BBc1</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>bbc_storage module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/bbc_storage.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-bbc_storage">
+<span id="bbc-storage-module"></span><h1>bbc_storage module<a class="headerlink" href="#module-bbc_storage" title="Permalink to this headline">¶</a></h1>
+<p>Copyright (c) 2017 beyond-blockchain.org.</p>
+<p>Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#8220;AS IS&#8221; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#bbc_storage.BBcStorage" title="bbc_storage.BBcStorage"><code class="xref py py-obj docutils literal"><span class="pre">BBcStorage</span></code></a>(config[,&nbsp;core,&nbsp;loglevel,&nbsp;logname])</td>
+<td>Storage manager</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="bbc_storage.BBcStorage">
+<em class="property">class </em><code class="descclassname">bbc_storage.</code><code class="descname">BBcStorage</code><span class="sig-paren">(</span><em>config</em>, <em>core=None</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_storage.html#BBcStorage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_storage.BBcStorage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Storage manager</p>
+<dl class="method">
+<dt id="bbc_storage.BBcStorage.get_in_filesystem">
+<code class="descname">get_in_filesystem</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>asid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_storage.html#BBcStorage.get_in_filesystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_storage.BBcStorage.get_in_filesystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file with the asset_id in a file system</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> &#8211; domain to search in</td>
+</tr>
+</tbody>
+</table>
+<p>:param asset_group_id
+:param asid:   file name
+:return:       the file content (None if not found)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_storage.BBcStorage.get_locally">
+<code class="descname">get_locally</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>asid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_storage.html#BBcStorage.get_locally"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_storage.BBcStorage.get_locally" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file with the asset_id from local storage</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> &#8211; domain to search in</td>
+</tr>
+</tbody>
+</table>
+<p>:param asset_group_id
+:param asid:   file name
+:return:       the file content (None if not found)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_storage.BBcStorage.get_storage_type">
+<code class="descname">get_storage_type</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_storage.html#BBcStorage.get_storage_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_storage.BBcStorage.get_storage_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get storage type for the domain</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>domain_id</strong> &#8211; </li>
+<li><strong>asset_group_id</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_storage.BBcStorage.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>asid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_storage.html#BBcStorage.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_storage.BBcStorage.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the file with the asset_id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+<p>:param asset_group_id
+:param asid:   file name
+:return:       True if succeeded</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_storage.BBcStorage.set_storage_path">
+<code class="descname">set_storage_path</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>from_config=False</em>, <em>storage_type=1</em>, <em>storage_path=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_storage.html#BBcStorage.set_storage_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_storage.BBcStorage.set_storage_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set storage path for the domain</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+<p>:param asset_group_id
+:param from_config:  If True, read setting from config and ignore storage_type and storage_path param
+:param storage_type: filesystem/HTTP-PUT/HTTP-POST/NONE
+:param storage_path:    directory path or URL
+:return: True if make dir is successful</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_storage.BBcStorage.store_in_filesystem">
+<code class="descname">store_in_filesystem</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>asid</em>, <em>content</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_storage.html#BBcStorage.store_in_filesystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_storage.BBcStorage.store_in_filesystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store data in a file system</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> &#8211; domain to put in</td>
+</tr>
+</tbody>
+</table>
+<p>:param asset_group_id
+:param asid:
+:param content:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_storage.BBcStorage.store_locally">
+<code class="descname">store_locally</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>asid</em>, <em>content</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_storage.html#BBcStorage.store_locally"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_storage.BBcStorage.store_locally" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store data in local storage</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> &#8211; domain to put in</td>
+</tr>
+</tbody>
+</table>
+<p>:param asset_group_id
+:param asid:
+:param content:
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

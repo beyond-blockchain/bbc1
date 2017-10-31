@@ -1,0 +1,434 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>query_management module &mdash; BBc1 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="BBc1 0.7 documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="bbc_app.html">bbc_app module</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BBc1</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>query_management module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/query_management.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-query_management">
+<span id="query-management-module"></span><h1>query_management module<a class="headerlink" href="#module-query_management" title="Permalink to this headline">¶</a></h1>
+<p>Copyright (c) 2017 beyond-blockchain.org.</p>
+<p>Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#8220;AS IS&#8221; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#query_management.Ticker" title="query_management.Ticker"><code class="xref py py-obj docutils literal"><span class="pre">Ticker</span></code></a>([tick_interval])</td>
+<td>Clock ticker for query timers</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#query_management.QueryEntry" title="query_management.QueryEntry"><code class="xref py py-obj docutils literal"><span class="pre">QueryEntry</span></code></a>([expire_after,&nbsp;callback_expire,&nbsp;...])</td>
+<td>Querying entry</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="query_management.QueryEntry">
+<em class="property">class </em><code class="descclassname">query_management.</code><code class="descname">QueryEntry</code><span class="sig-paren">(</span><em>expire_after=30</em>, <em>callback_expire=None</em>, <em>callback=None</em>, <em>callback_error=None</em>, <em>interval=0</em>, <em>data={}</em>, <em>retry_count=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#QueryEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.QueryEntry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Querying entry</p>
+<dl class="method">
+<dt id="query_management.QueryEntry.callback">
+<code class="descname">callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#QueryEntry.callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.QueryEntry.callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call a callback function for successful case</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="query_management.QueryEntry.callback_error">
+<code class="descname">callback_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#QueryEntry.callback_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.QueryEntry.callback_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call a callback function for failure case</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="query_management.QueryEntry.deactivate">
+<code class="descname">deactivate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#QueryEntry.deactivate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.QueryEntry.deactivate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deactivate the entry</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="query_management.QueryEntry.fire">
+<code class="descname">fire</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#QueryEntry.fire"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.QueryEntry.fire" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fire the entry</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="query_management.QueryEntry.force_expire">
+<code class="descname">force_expire</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#QueryEntry.force_expire"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.QueryEntry.force_expire" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forcibly make the entry expire</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="query_management.QueryEntry.rest_of_time_to_expire">
+<code class="descname">rest_of_time_to_expire</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#QueryEntry.rest_of_time_to_expire"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.QueryEntry.rest_of_time_to_expire" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the rest of time to expire
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="query_management.QueryEntry.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>fire_after=None</em>, <em>callback=None</em>, <em>callback_error=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#QueryEntry.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.QueryEntry.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the entry information</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fire_after</strong> &#8211; </li>
+<li><strong>callback</strong> &#8211; </li>
+<li><strong>callback_error</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="query_management.QueryEntry.update_expiration_time">
+<code class="descname">update_expiration_time</code><span class="sig-paren">(</span><em>expire_after</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#QueryEntry.update_expiration_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.QueryEntry.update_expiration_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the expire timer</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>expire_after</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="query_management.Ticker">
+<em class="property">class </em><code class="descclassname">query_management.</code><code class="descname">Ticker</code><span class="sig-paren">(</span><em>tick_interval=0.049</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#Ticker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.Ticker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Clock ticker for query timers</p>
+<dl class="method">
+<dt id="query_management.Ticker.add_entry">
+<code class="descname">add_entry</code><span class="sig-paren">(</span><em>entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#Ticker.add_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.Ticker.add_entry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="query_management.Ticker.del_entry">
+<code class="descname">del_entry</code><span class="sig-paren">(</span><em>nonce</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#Ticker.del_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.Ticker.del_entry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="query_management.Ticker.get_entry">
+<code class="descname">get_entry</code><span class="sig-paren">(</span><em>nonce</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#Ticker.get_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.Ticker.get_entry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="query_management.Ticker.refresh_timer">
+<code class="descname">refresh_timer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#Ticker.refresh_timer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.Ticker.refresh_timer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="query_management.Ticker.tick_loop">
+<code class="descname">tick_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#Ticker.tick_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.Ticker.tick_loop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="query_management.Ticker.update_timer">
+<code class="descname">update_timer</code><span class="sig-paren">(</span><em>nonce</em>, <em>append_new_flag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#Ticker.update_timer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.Ticker.update_timer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="query_management.exec_func_after">
+<code class="descclassname">query_management.</code><code class="descname">exec_func_after</code><span class="sig-paren">(</span><em>func</em>, <em>after</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#exec_func_after"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.exec_func_after" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple timer utility to call function after specified time (second)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func</strong> &#8211; </li>
+<li><strong>after</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="query_management.get_ticker">
+<code class="descclassname">query_management.</code><code class="descname">get_ticker</code><span class="sig-paren">(</span><em>tick_interval=0.049</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/query_management.html#get_ticker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#query_management.get_ticker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,705 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ledger_subsystem &mdash; BBc1 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="BBc1 0.7 documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_app.html">bbc_app module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_config.html">bbc_config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_core.html">bbc_core module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_error.html">bbc_error module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_ledger.html">bbc_ledger module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_network.html">bbc_network module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_storage.html">bbc_storage module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbclib.html">bbclib module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ledger_subsystem.html">ledger_subsystem module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../message_key_types.html">message_key_types module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../p2p_domain0.html">p2p_domain0 module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../query_management.html">query_management module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../simple_cluster.html">simple_cluster module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logger.html">logger module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command.html">command module</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">BBc1</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>ledger_subsystem</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ledger_subsystem</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Copyright (c) 2017 beyond-blockchain.org.</span>
+
+<span class="sd">Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="sd">you may not use this file except in compliance with the License.</span>
+<span class="sd">You may obtain a copy of the License at</span>
+
+<span class="sd">    http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="sd">Unless required by applicable law or agreed to in writing, software</span>
+<span class="sd">distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="sd">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="sd">See the License for the specific language governing permissions and</span>
+<span class="sd">limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">binascii</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;../../&quot;</span><span class="p">])</span>
+<span class="kn">from</span> <span class="nn">bbc1.common</span> <span class="k">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">bbc1.core.ethereum</span> <span class="k">import</span> <span class="n">bbc_ethereum</span>
+
+
+<span class="n">merkle_branch_db_definition</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;digest&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="n">merkle_leaf_db_definition</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;digest&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;prev&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> 
+<span class="p">]</span>
+
+<span class="n">merkle_root_db_definition</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;root&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;spec&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="n">temp_json</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;digest&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;left&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;right&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;prev&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="Queue"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.Queue">[docs]</a><span class="k">class</span> <span class="nc">Queue</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Queue.wait_msg"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.Queue.wait_msg">[docs]</a>    <span class="k">def</span> <span class="nf">wait_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flash_others</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">while</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">flash_others</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">ret</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="Queue.append_msg"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.Queue.append_msg">[docs]</a>    <span class="k">def</span> <span class="nf">append_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem">[docs]</a><span class="k">class</span> <span class="nc">LedgerSubsystem</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dbtype</span><span class="o">=</span><span class="s2">&quot;sqlite&quot;</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+                 <span class="n">logname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;ledger_subsystem&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">loglevel</span><span class="p">,</span>
+                                        <span class="n">logname</span><span class="o">=</span><span class="n">logname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="n">enabled</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eth</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_file</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;workingdir&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/ledger_subsystem.json&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;ledger_subsystem&#39;</span><span class="p">][</span><span class="s1">&#39;max_transactions&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;ledger_subsystem&#39;</span><span class="p">][</span><span class="s1">&#39;max_seconds&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbtype</span> <span class="o">=</span> <span class="n">dbtype</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">enable</span><span class="p">()</span>
+        <span class="n">thread_loop</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subsystem_loop</span><span class="p">)</span>
+        <span class="n">thread_loop</span><span class="o">.</span><span class="n">setDaemon</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">thread_loop</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.append_msg"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.append_msg">[docs]</a>    <span class="k">def</span> <span class="nf">append_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">append_msg</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.check_table_existence"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.check_table_existence">[docs]</a>    <span class="k">def</span> <span class="nf">check_table_existence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">dbname</span><span class="p">,</span>
+                   <span class="s2">&quot;select * from sqlite_master where type=&#39;table&#39; and name=?&quot;</span><span class="p">,</span>
+                   <span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.close_db"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.close_db">[docs]</a>    <span class="k">def</span> <span class="nf">close_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dbname</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_cur</span><span class="p">[</span><span class="n">dbname</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">dbname</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.close_merkle_tree"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.close_merkle_tree">[docs]</a>    <span class="k">def</span> <span class="nf">close_merkle_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jTemp</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;closing a merkle tree&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">subsystem_timer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">digest</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">]</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">])</span>
+            <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">msg</span> <span class="o">+</span> <span class="n">msg</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+            <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;digest&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">digest</span><span class="p">),</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_leaf</span><span class="p">(</span><span class="n">jTemp</span><span class="p">,</span> <span class="n">digest</span><span class="o">=</span><span class="n">digest</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;prev&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">digest</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;prev&#39;</span><span class="p">])</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">temp_json</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">digest</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;nothing to close&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">lBase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_merkle_base</span><span class="p">(</span><span class="n">digest</span><span class="p">)</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">dLeft</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">lTop</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">digest</span> <span class="ow">in</span> <span class="n">lBase</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dLeft</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">dLeft</span> <span class="o">=</span> <span class="n">digest</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dRight</span> <span class="o">=</span> <span class="n">digest</span>
+                    <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">dLeft</span> <span class="o">+</span> <span class="n">dRight</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">write_branch</span><span class="p">(</span><span class="n">digest</span><span class="o">=</span><span class="n">digest</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="n">dLeft</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">dRight</span><span class="p">)</span>
+                    <span class="n">lTop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">digest</span><span class="p">)</span>
+                    <span class="n">dLeft</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">dLeft</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">dRight</span> <span class="o">=</span> <span class="n">dLeft</span>
+                <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">dLeft</span> <span class="o">+</span> <span class="n">dRight</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_branch</span><span class="p">(</span><span class="n">digest</span><span class="o">=</span><span class="n">digest</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="n">dLeft</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">dRight</span><span class="p">)</span>
+                <span class="n">lTop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">digest</span><span class="p">)</span>
+            <span class="n">lBase</span> <span class="o">=</span> <span class="n">lTop</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;ledger_subsystem&#39;</span><span class="p">][</span><span class="s1">&#39;subsystem&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ethereum&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_merkle_root</span><span class="p">(</span><span class="n">lBase</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.create_table_in_db"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.create_table_in_db">[docs]</a>    <span class="k">def</span> <span class="nf">create_table_in_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">,</span>
+                           <span class="n">primary_keys</span><span class="o">=</span><span class="p">[],</span> <span class="n">indices</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_table_existence</span><span class="p">(</span><span class="n">dbname</span><span class="p">,</span> <span class="n">tbl</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;CREATE TABLE </span><span class="si">%s</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="n">tbl</span>
+        <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;(&quot;</span>
+        <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">tbl_definition</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">primary_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;, PRIMARY KEY (&quot;</span>
+            <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tbl_definition</span><span class="p">[</span><span class="n">p</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">primary_keys</span><span class="p">)</span>
+            <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;)&quot;</span>
+        <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;);&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">dbname</span><span class="p">,</span> <span class="n">sql</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">dbname</span><span class="p">,</span>
+                          <span class="s2">&quot;CREATE INDEX </span><span class="si">%s</span><span class="s2">_idx_</span><span class="si">%d</span><span class="s2"> ON </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">);&quot;</span> <span class="o">%</span>
+                          <span class="p">(</span><span class="n">tbl</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.enable"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.enable">[docs]</a>    <span class="k">def</span> <span class="nf">enable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;ledger_subsystem&#39;</span><span class="p">][</span><span class="s1">&#39;subsystem&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ethereum&#39;</span><span class="p">:</span>
+            <span class="n">prevdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s1">&#39;ethereum&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eth</span> <span class="o">=</span> <span class="n">bbc_ethereum</span><span class="o">.</span><span class="n">BBcEthereum</span><span class="p">(</span>
+                <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;ethereum&#39;</span><span class="p">][</span><span class="s1">&#39;account&#39;</span><span class="p">],</span>
+                <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;ethereum&#39;</span><span class="p">][</span><span class="s1">&#39;passphrase&#39;</span><span class="p">],</span>
+                <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;ethereum&#39;</span><span class="p">][</span><span class="s1">&#39;contract_address&#39;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">prevdir</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Currently, Ethereum only is supported.&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">subsystem_timer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="LedgerSubsystem.disable"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.disable">[docs]</a>    <span class="k">def</span> <span class="nf">disable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Disable the ledger subsystem</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="LedgerSubsystem.exec_sql"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.exec_sql">[docs]</a>    <span class="k">def</span> <span class="nf">exec_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="o">*</span><span class="n">dat</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dbname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="n">dbname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_cur</span><span class="p">[</span><span class="n">dbname</span><span class="p">]</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="p">(</span><span class="o">*</span><span class="n">dat</span><span class="p">,))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_cur</span><span class="p">[</span><span class="n">dbname</span><span class="p">]</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.exec_sql_fetchone"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.exec_sql_fetchone">[docs]</a>    <span class="k">def</span> <span class="nf">exec_sql_fetchone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="o">*</span><span class="n">dat</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dbname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="n">dbname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_cur</span><span class="p">[</span><span class="n">dbname</span><span class="p">]</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="p">(</span><span class="o">*</span><span class="n">dat</span><span class="p">,))</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_cur</span><span class="p">[</span><span class="n">dbname</span><span class="p">]</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.get_merkle_base"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.get_merkle_base">[docs]</a>    <span class="k">def</span> <span class="nf">get_merkle_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digest</span><span class="p">):</span>
+        <span class="n">lBase</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span>
+                <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;select * from merkle_leaf_table where digest=?&#39;</span><span class="p">,</span>
+                <span class="n">digest</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">lBase</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">digest</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">lBase</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.open_db"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.open_db">[docs]</a>    <span class="k">def</span> <span class="nf">open_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dbname</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">dbname</span><span class="p">]</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbname</span><span class="p">[</span><span class="n">dbname</span><span class="p">],</span>
+                                          <span class="n">isolation_level</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_cur</span><span class="p">[</span><span class="n">dbname</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">dbname</span><span class="p">]</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.register_transaction"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.register_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">register_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">append_msg</span><span class="p">(</span><span class="n">transaction_id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;ledger subsystem not enabled&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.subsystem_loop"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.subsystem_loop">[docs]</a>    <span class="k">def</span> <span class="nf">subsystem_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Start subsystem_loop&quot;</span><span class="p">)</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbname</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbname</span><span class="p">[</span><span class="s1">&#39;auxiliary_db&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;workingdir&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> \
+                                      <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;ledger&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span>
+                                                         <span class="s1">&#39;bbc_aux.sqlite3&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_cur</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_table_in_db</span><span class="p">(</span><span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span> <span class="s1">&#39;merkle_leaf_table&#39;</span><span class="p">,</span>
+                                <span class="n">merkle_leaf_db_definition</span><span class="p">,</span>
+                                <span class="n">primary_keys</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_table_in_db</span><span class="p">(</span><span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span> <span class="s1">&#39;merkle_branch_table&#39;</span><span class="p">,</span>
+                                <span class="n">merkle_branch_db_definition</span><span class="p">,</span>
+                                <span class="n">primary_keys</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_table_in_db</span><span class="p">(</span><span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span> <span class="s1">&#39;merkle_root_table&#39;</span><span class="p">,</span>
+                                <span class="n">merkle_root_db_definition</span><span class="p">,</span>
+                                <span class="n">primary_keys</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">wait_msg</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_file</span><span class="p">):</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+                <span class="n">jTemp</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">jTemp</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">temp_json</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;timer&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;got message: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">close_merkle_tree</span><span class="p">(</span><span class="n">jTemp</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;verify&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;got message: </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">verify_digest</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                    <span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;got message: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
+                <span class="n">digest</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                    <span class="n">target</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">msg</span>
+                    <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+                    <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;digest&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">digest</span><span class="p">),</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">jTemp</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;digest&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">write_leaf</span><span class="p">(</span><span class="n">jTemp</span><span class="p">,</span> <span class="n">digest</span><span class="o">=</span><span class="n">digest</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">close_merkle_tree</span><span class="p">(</span><span class="n">jTemp</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.subsystem_timer"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.subsystem_timer">[docs]</a>    <span class="k">def</span> <span class="nf">subsystem_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_msg</span><span class="p">((</span><span class="s1">&#39;timer&#39;</span><span class="p">,))</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.verify_transaction"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.verify_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">verify_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="n">dic</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">append_msg</span><span class="p">((</span><span class="s1">&#39;verify&#39;</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">dic</span><span class="p">))</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;ledger subsystem not enabled&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dic</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.verify_digest"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.verify_digest">[docs]</a>    <span class="k">def</span> <span class="nf">verify_digest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">dic</span><span class="p">):</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span>
+            <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;select * from merkle_leaf_table where left=? or right=?&#39;</span><span class="p">,</span>
+            <span class="n">digest</span><span class="p">,</span>
+            <span class="n">digest</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;transaction not found&quot;</span><span class="p">)</span>
+            <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;result&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span>
+        <span class="n">subtree</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">subtree</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="s1">&#39;left&#39;</span> <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">digest</span> <span class="k">else</span> <span class="s1">&#39;right&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span>
+                    <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">digest</span> <span class="k">else</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="p">),</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="p">})</span>
+            <span class="n">digest</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span>
+                <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;select * from merkle_branch_table where left=? or right=?&#39;</span><span class="p">,</span>
+                <span class="n">digest</span><span class="p">,</span>
+                <span class="n">digest</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span>
+            <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;select * from merkle_root_table where root=?&#39;</span><span class="p">,</span>
+            <span class="n">digest</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;merkle root not found&quot;</span><span class="p">)</span>
+            <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;result&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span>
+        <span class="n">specList</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eth</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">digest</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">block</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;merkle root not anchored&quot;</span><span class="p">)</span>
+            <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;result&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;subsystem&#39;</span><span class="p">:</span> <span class="n">specList</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s1">&#39;chain_id&#39;</span><span class="p">:</span> <span class="n">specList</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s1">&#39;contract&#39;</span><span class="p">:</span> <span class="n">specList</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="s1">&#39;contract_address&#39;</span><span class="p">:</span> <span class="n">specList</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+            <span class="s1">&#39;block&#39;</span><span class="p">:</span> <span class="n">block</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;result&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;spec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spec</span>
+        <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;subtree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subtree</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.write_branch"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.write_branch">[docs]</a>    <span class="k">def</span> <span class="nf">write_branch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span>
+            <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;select * from merkle_branch_table where digest=?&#39;</span><span class="p">,</span>
+            <span class="n">digest</span>
+        <span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;collision of digests detected&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span>
+                <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;insert into merkle_branch_table values (?, ?, ?)&#39;</span><span class="p">,</span>
+                <span class="n">digest</span><span class="p">,</span>
+                <span class="n">left</span><span class="p">,</span>
+                <span class="n">right</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.write_leaf"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.write_leaf">[docs]</a>    <span class="k">def</span> <span class="nf">write_leaf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jTemp</span><span class="p">,</span> <span class="n">digest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">digest</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">digest</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;digest&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;prev&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">prev</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">prev</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;prev&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span>
+            <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;select * from merkle_leaf_table where digest=?&#39;</span><span class="p">,</span>
+            <span class="n">digest</span>
+        <span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;collision of digests detected&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span>
+                <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;insert into merkle_leaf_table values (?, ?, ?, ?)&#39;</span><span class="p">,</span>
+                <span class="n">digest</span><span class="p">,</span>
+                <span class="n">left</span> <span class="k">if</span> <span class="n">left</span> <span class="o">!=</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">]),</span>
+                <span class="n">right</span> <span class="k">if</span> <span class="n">right</span> <span class="o">!=</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]),</span>
+                <span class="n">prev</span>
+            <span class="p">)</span>
+        <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;prev&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;digest&#39;</span><span class="p">]</span>
+        <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;digest&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">jTemp</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">2</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">jTemp</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.write_merkle_root"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.write_merkle_root">[docs]</a>    <span class="k">def</span> <span class="nf">write_merkle_root</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_root</span><span class="p">(</span>
+            <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span>
+            <span class="n">spec</span><span class="o">=</span><span class="s1">&#39;ethereum:</span><span class="si">%d</span><span class="s1">:BBcAnchor:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                 <span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;ethereum&#39;</span><span class="p">][</span><span class="s1">&#39;chain_id&#39;</span><span class="p">],</span>
+                  <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;ethereum&#39;</span><span class="p">][</span><span class="s1">&#39;contract_address&#39;</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eth</span><span class="o">.</span><span class="n">blockingSet</span><span class="p">(</span><span class="n">root</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LedgerSubsystem.write_root"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.write_root">[docs]</a>    <span class="k">def</span> <span class="nf">write_root</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span>
+            <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;select * from merkle_root_table where root=?&#39;</span><span class="p">,</span>
+            <span class="n">root</span>
+        <span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;collision of digests detected&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span>
+                <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;insert into merkle_root_table values (?, ?)&#39;</span><span class="p">,</span>
+                <span class="n">root</span><span class="p">,</span>
+                <span class="n">spec</span>
+            <span class="p">)</span></div></div>
+
+
+<span class="c1"># end of core/ledger_subsystem.py</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

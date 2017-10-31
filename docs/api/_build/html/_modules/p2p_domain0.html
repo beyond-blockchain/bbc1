@@ -1,0 +1,396 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>p2p_domain0 &mdash; BBc1 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="BBc1 0.7 documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_app.html">bbc_app module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_config.html">bbc_config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_core.html">bbc_core module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_error.html">bbc_error module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_ledger.html">bbc_ledger module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_network.html">bbc_network module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_storage.html">bbc_storage module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbclib.html">bbclib module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ledger_subsystem.html">ledger_subsystem module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../message_key_types.html">message_key_types module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../p2p_domain0.html">p2p_domain0 module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../query_management.html">query_management module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../simple_cluster.html">simple_cluster module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logger.html">logger module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command.html">command module</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">BBc1</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>p2p_domain0</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for p2p_domain0</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Copyright (c) 2017 beyond-blockchain.org.</span>
+
+<span class="sd">Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="sd">you may not use this file except in compliance with the License.</span>
+<span class="sd">You may obtain a copy of the License at</span>
+
+<span class="sd">    http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="sd">Unless required by applicable law or agreed to in writing, software</span>
+<span class="sd">distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="sd">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="sd">See the License for the specific language governing permissions and</span>
+<span class="sd">limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">binascii</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;../../&quot;</span><span class="p">])</span>
+<span class="kn">from</span> <span class="nn">bbc1.common.message_key_types</span> <span class="k">import</span> <span class="n">to_2byte</span><span class="p">,</span> <span class="n">PayloadType</span><span class="p">,</span> <span class="n">KeyType</span>
+<span class="kn">from</span> <span class="nn">bbc1.core.bbc_network</span> <span class="k">import</span> <span class="n">InfraMessageTypeBase</span>
+<span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">query_management</span><span class="p">,</span> <span class="n">simple_cluster</span>
+
+
+<span class="n">INTERVAL_RETRY</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">FORWARD_CACHE_SIZE</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">ZEROS</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)</span>
+
+<span class="n">ASSET_GROUP_INFO_LIFETIME</span> <span class="o">=</span> <span class="mi">1800</span>
+
+<span class="n">ticker</span> <span class="o">=</span> <span class="n">query_management</span><span class="o">.</span><span class="n">get_ticker</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="AssetGroupInfo"><a class="viewcode-back" href="../p2p_domain0.html#p2p_domain0.AssetGroupInfo">[docs]</a><span class="k">class</span> <span class="nc">AssetGroupInfo</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">del_func</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">asset_group_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_groups</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">del_func</span> <span class="o">=</span> <span class="n">del_func</span>
+
+<div class="viewcode-block" id="AssetGroupInfo.get_nodes"><a class="viewcode-back" href="../p2p_domain0.html#p2p_domain0.AssetGroupInfo.get_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">get_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_groups</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="AssetGroupInfo.add_node"><a class="viewcode-back" href="../p2p_domain0.html#p2p_domain0.AssetGroupInfo.add_node">[docs]</a>    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_groups</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset_groups</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_management</span><span class="o">.</span><span class="n">QueryEntry</span><span class="p">(</span><span class="n">expire_after</span><span class="o">=</span><span class="n">ASSET_GROUP_INFO_LIFETIME</span><span class="p">,</span>
+                                                                     <span class="n">callback_expire</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">remove_entry</span><span class="p">,</span>
+                                                                     <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="n">KeyType</span><span class="o">.</span><span class="n">node_id</span><span class="p">:</span> <span class="n">node_id</span><span class="p">},</span>
+                                                                     <span class="n">retry_count</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset_groups</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span><span class="o">.</span><span class="n">update_expiration_time</span><span class="p">(</span><span class="n">ASSET_GROUP_INFO_LIFETIME</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AssetGroupInfo.remove_entry"><a class="viewcode-back" href="../p2p_domain0.html#p2p_domain0.AssetGroupInfo.remove_entry">[docs]</a>    <span class="k">def</span> <span class="nf">remove_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_entry</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_groups</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">query_entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">node_id</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">del_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="NetworkDomain"><a class="viewcode-back" href="../p2p_domain0.html#p2p_domain0.NetworkDomain">[docs]</a><span class="k">class</span> <span class="nc">NetworkDomain</span><span class="p">(</span><span class="n">simple_cluster</span><span class="o">.</span><span class="n">NetworkDomain</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compose a simple core node cluster</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NetworkDomain</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">loglevel</span><span class="p">,</span> <span class="n">logname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module_name</span> <span class="o">=</span> <span class="s2">&quot;simple_cluster&quot;</span>  <span class="c1"># TODO: this is temporary module</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_list</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">periodic_advertising_asset_group_info</span><span class="p">()</span>
+
+<div class="viewcode-block" id="NetworkDomain.domain_manager_loop"><a class="viewcode-back" href="../p2p_domain0.html#p2p_domain0.NetworkDomain.domain_manager_loop">[docs]</a>    <span class="k">def</span> <span class="nf">domain_manager_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        (internal use) maintain domain (e.g., updating peer list and topology)</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="NetworkDomain.periodic_advertising_asset_group_info"><a class="viewcode-back" href="../p2p_domain0.html#p2p_domain0.NetworkDomain.periodic_advertising_asset_group_info">[docs]</a>    <span class="k">def</span> <span class="nf">periodic_advertising_asset_group_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_entry</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">advertise_asset_group_info</span><span class="p">()</span>
+        <span class="n">query_management</span><span class="o">.</span><span class="n">exec_func_after</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">periodic_advertising_asset_group_info</span><span class="p">,</span>
+                                         <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">ASSET_GROUP_INFO_LIFETIME</span> <span class="o">*</span> <span class="mf">0.4</span><span class="p">),</span>
+                                                        <span class="nb">int</span><span class="p">(</span><span class="n">ASSET_GROUP_INFO_LIFETIME</span> <span class="o">*</span> <span class="mf">0.6</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="NetworkDomain.advertise_asset_group_info"><a class="viewcode-back" href="../p2p_domain0.html#p2p_domain0.NetworkDomain.advertise_asset_group_info">[docs]</a>    <span class="k">def</span> <span class="nf">advertise_asset_group_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Advertise domain information in domain_global_0</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">asset_groups_to_advertise</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="n">count</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">asset_group_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">asset_groups_to_advertise</span><span class="p">:</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_message</span><span class="p">(</span><span class="n">dst_node_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_type</span><span class="o">=</span><span class="n">InfraMessageTypeBase</span><span class="o">.</span><span class="n">ADVERTISE_ASSET_GROUP</span><span class="p">)</span>
+        <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_list</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_ip_mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_node_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">nd</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_message_to_peer</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NetworkDomain.update_asset_group_info"><a class="viewcode-back" href="../p2p_domain0.html#p2p_domain0.NetworkDomain.update_asset_group_info">[docs]</a>    <span class="k">def</span> <span class="nf">update_asset_group_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_node_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        (internal use) update asset_group info (self.asset_group_list)</span>
+
+<span class="sd">        :param source_node_id:</span>
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">asset_group_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_list</span><span class="p">[</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">AssetGroupInfo</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delete_asset_group_from_info</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_list</span><span class="p">[</span><span class="n">asset_group_id</span><span class="p">]</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">source_node_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NetworkDomain.delete_asset_group_from_info"><a class="viewcode-back" href="../p2p_domain0.html#p2p_domain0.NetworkDomain.delete_asset_group_from_info">[docs]</a>    <span class="k">def</span> <span class="nf">delete_asset_group_from_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        (internal use) delete asset_group_id</span>
+
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset_group_list</span><span class="p">[</span><span class="n">asset_group_id</span><span class="p">]</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NetworkDomain.print_asset_group_info"><a class="viewcode-back" href="../p2p_domain0.html#p2p_domain0.NetworkDomain.print_asset_group_info">[docs]</a>    <span class="k">def</span> <span class="nf">print_asset_group_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;** No asset_group_id..&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;========================&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">asset_group_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_list</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;AssetGroup: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">[:</span><span class="mi">4</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_list</span><span class="p">[</span><span class="n">asset_group_id</span><span class="p">]</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  * node_id: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">nd</span><span class="p">[:</span><span class="mi">4</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;========================&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NetworkDomain.process_message"><a class="viewcode-back" href="../p2p_domain0.html#p2p_domain0.NetworkDomain.process_message">[docs]</a>    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip4</span><span class="p">,</span> <span class="n">from_addr</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        process received message</span>
+
+<span class="sd">        :param ip4:       True (from IPv4) / False (from IPv6)</span>
+<span class="sd">        :param from_addr: sender address and port (None if TCP)</span>
+<span class="sd">        :param msg:       the message body (already deserialized)</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NetworkDomain</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">process_message</span><span class="p">(</span><span class="n">ip4</span><span class="p">,</span> <span class="n">from_addr</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">p2p_msg_type</span><span class="p">]</span> <span class="o">==</span> <span class="n">InfraMessageTypeBase</span><span class="o">.</span><span class="n">ADVERTISE_ASSET_GROUP</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_list</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">source_node_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_peer_node</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">source_node_id</span><span class="p">],</span> <span class="n">ip4</span><span class="p">,</span> <span class="n">from_addr</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_ADVERTISE_ASSET_GROUP</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NetworkDomain.process_ADVERTISE_ASSET_GROUP"><a class="viewcode-back" href="../p2p_domain0.html#p2p_domain0.NetworkDomain.process_ADVERTISE_ASSET_GROUP">[docs]</a>    <span class="k">def</span> <span class="nf">process_ADVERTISE_ASSET_GROUP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="n">source_node_id</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">source_node_id</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_list</span><span class="p">]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;H&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">[:</span><span class="mi">2</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+            <span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">ptr</span><span class="p">:</span><span class="n">ptr</span><span class="o">+</span><span class="mi">32</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_asset_group_info</span><span class="p">(</span><span class="n">source_node_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

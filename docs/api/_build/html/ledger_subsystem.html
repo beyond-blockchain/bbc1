@@ -1,0 +1,370 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ledger_subsystem module &mdash; BBc1 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="BBc1 0.7 documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="bbc_app.html">bbc_app module</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BBc1</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>ledger_subsystem module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/ledger_subsystem.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ledger_subsystem">
+<span id="ledger-subsystem-module"></span><h1>ledger_subsystem module<a class="headerlink" href="#module-ledger_subsystem" title="Permalink to this headline">¶</a></h1>
+<p>Copyright (c) 2017 beyond-blockchain.org.</p>
+<p>Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#8220;AS IS&#8221; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#ledger_subsystem.LedgerSubsystem" title="ledger_subsystem.LedgerSubsystem"><code class="xref py py-obj docutils literal"><span class="pre">LedgerSubsystem</span></code></a>(config[,&nbsp;enabled,&nbsp;dbtype,&nbsp;...])</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="ledger_subsystem.LedgerSubsystem">
+<em class="property">class </em><code class="descclassname">ledger_subsystem.</code><code class="descname">LedgerSubsystem</code><span class="sig-paren">(</span><em>config</em>, <em>enabled=False</em>, <em>dbtype='sqlite'</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.append_msg">
+<code class="descname">append_msg</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.append_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.append_msg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.check_table_existence">
+<code class="descname">check_table_existence</code><span class="sig-paren">(</span><em>dbname</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.check_table_existence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.check_table_existence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.close_db">
+<code class="descname">close_db</code><span class="sig-paren">(</span><em>dbname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.close_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.close_db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.close_merkle_tree">
+<code class="descname">close_merkle_tree</code><span class="sig-paren">(</span><em>jTemp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.close_merkle_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.close_merkle_tree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.create_table_in_db">
+<code class="descname">create_table_in_db</code><span class="sig-paren">(</span><em>dbname</em>, <em>tbl</em>, <em>tbl_definition</em>, <em>primary_keys=[]</em>, <em>indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.create_table_in_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.create_table_in_db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.disable">
+<code class="descname">disable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.disable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.disable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disable the ledger subsystem
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.enable">
+<code class="descname">enable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.enable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.exec_sql">
+<code class="descname">exec_sql</code><span class="sig-paren">(</span><em>dbname</em>, <em>sql</em>, <em>*dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.exec_sql"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.exec_sql" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.exec_sql_fetchone">
+<code class="descname">exec_sql_fetchone</code><span class="sig-paren">(</span><em>dbname</em>, <em>sql</em>, <em>*dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.exec_sql_fetchone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.exec_sql_fetchone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.get_merkle_base">
+<code class="descname">get_merkle_base</code><span class="sig-paren">(</span><em>digest</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.get_merkle_base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.get_merkle_base" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.open_db">
+<code class="descname">open_db</code><span class="sig-paren">(</span><em>dbname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.open_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.open_db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.register_transaction">
+<code class="descname">register_transaction</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.register_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.register_transaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.subsystem_loop">
+<code class="descname">subsystem_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.subsystem_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.subsystem_loop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.subsystem_timer">
+<code class="descname">subsystem_timer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.subsystem_timer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.subsystem_timer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.verify_digest">
+<code class="descname">verify_digest</code><span class="sig-paren">(</span><em>digest</em>, <em>dic</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.verify_digest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.verify_digest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.verify_transaction">
+<code class="descname">verify_transaction</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.verify_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.verify_transaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.write_branch">
+<code class="descname">write_branch</code><span class="sig-paren">(</span><em>digest=None</em>, <em>left=None</em>, <em>right=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.write_branch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.write_branch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.write_leaf">
+<code class="descname">write_leaf</code><span class="sig-paren">(</span><em>jTemp</em>, <em>digest=None</em>, <em>left=None</em>, <em>right=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.write_leaf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.write_leaf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.write_merkle_root">
+<code class="descname">write_merkle_root</code><span class="sig-paren">(</span><em>root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.write_merkle_root"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.write_merkle_root" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.write_root">
+<code class="descname">write_root</code><span class="sig-paren">(</span><em>root=None</em>, <em>spec=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.write_root"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.write_root" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ledger_subsystem.Queue">
+<em class="property">class </em><code class="descclassname">ledger_subsystem.</code><code class="descname">Queue</code><a class="reference internal" href="_modules/ledger_subsystem.html#Queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.Queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="ledger_subsystem.Queue.append_msg">
+<code class="descname">append_msg</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#Queue.append_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.Queue.append_msg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.Queue.wait_msg">
+<code class="descname">wait_msg</code><span class="sig-paren">(</span><em>flash_others=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#Queue.wait_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.Queue.wait_msg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
