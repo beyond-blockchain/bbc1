@@ -256,9 +256,24 @@
 
 
 <div class="viewcode-block" id="LedgerSubsystem"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem">[docs]</a><span class="k">class</span> <span class="nc">LedgerSubsystem</span><span class="p">:</span>
-
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstraction of an underlying ledger subsystem that is typically a</span>
+<span class="sd">    blockchain. This takes one transaction each to record and verifies its</span>
+<span class="sd">    existence. It forms some Merkle trees of transaction IDs, and writes their</span>
+<span class="sd">    root digests only to the underlying ledger.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dbtype</span><span class="o">=</span><span class="s2">&quot;sqlite&quot;</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
                  <span class="n">logname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs a ledger subsystem. Just supports sqlite3.</span>
+
+<span class="sd">        :param config: configuration object</span>
+<span class="sd">        :param enabled: if communication with the underlying ledger is enabled</span>
+<span class="sd">        :param dbtype: type of database system</span>
+<span class="sd">        :param loglevel: loggging level</span>
+<span class="sd">        :param logname: name of log</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;ledger_subsystem&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">loglevel</span><span class="p">,</span>
                                         <span class="n">logname</span><span class="o">=</span><span class="n">logname</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
@@ -361,6 +376,11 @@
 
 
 <div class="viewcode-block" id="LedgerSubsystem.enable"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.enable">[docs]</a>    <span class="k">def</span> <span class="nf">enable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Enables communication with the underlying ledger.</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;ledger_subsystem&#39;</span><span class="p">][</span><span class="s1">&#39;subsystem&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ethereum&#39;</span><span class="p">:</span>
             <span class="n">prevdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
@@ -380,7 +400,8 @@
 
 <div class="viewcode-block" id="LedgerSubsystem.disable"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.disable">[docs]</a>    <span class="k">def</span> <span class="nf">disable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Disable the ledger subsystem</span>
+<span class="sd">        Disables communication with the underlying ledger.</span>
+
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
@@ -432,6 +453,13 @@
 
 
 <div class="viewcode-block" id="LedgerSubsystem.register_transaction"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.register_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">register_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Registers a transaction.</span>
+
+<span class="sd">        :param asset_group_id: asset group</span>
+<span class="sd">        :param transaction_id: transaction to register</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">append_msg</span><span class="p">(</span><span class="n">transaction_id</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -496,6 +524,13 @@
 
 
 <div class="viewcode-block" id="LedgerSubsystem.verify_transaction"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.verify_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">verify_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verifies whether the specified transaction is registered or not.</span>
+
+<span class="sd">        :param asset_group_id: asset group</span>
+<span class="sd">        :param transaction_id: transaction to verify its existence</span>
+<span class="sd">        :return: dictionary containing the result (and a Merkle subtree)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dic</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
             <span class="n">e</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>

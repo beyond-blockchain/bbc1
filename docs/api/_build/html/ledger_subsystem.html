@@ -35,7 +35,8 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="BBc1 0.7 documentation" href="index.html"/> 
+    <link rel="top" title="BBc1 0.7 documentation" href="index.html"/>
+        <link rel="prev" title="bbclib module" href="bbclib.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -89,8 +90,24 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="bbc_app.html">bbc_app module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_config.html">bbc_config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_core.html">bbc_core module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_error.html">bbc_error module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_ledger.html">bbc_ledger module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_network.html">bbc_network module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_storage.html">bbc_storage module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbclib.html">bbclib module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ledger_subsystem module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="message_key_types.html">message_key_types module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="p2p_domain0.html">p2p_domain0 module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="query_management.html">query_management module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple_cluster.html">simple_cluster module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logger.html">logger module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command.html">command module</a></li>
 </ul>
 
             
@@ -174,7 +191,7 @@ limitations under the License.</p>
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="#ledger_subsystem.LedgerSubsystem" title="ledger_subsystem.LedgerSubsystem"><code class="xref py py-obj docutils literal"><span class="pre">LedgerSubsystem</span></code></a>(config[,&nbsp;enabled,&nbsp;dbtype,&nbsp;...])</td>
-<td></td>
+<td>Abstraction of an underlying ledger subsystem that is typically a blockchain.</td>
 </tr>
 </tbody>
 </table>
@@ -182,6 +199,10 @@ limitations under the License.</p>
 <dt id="ledger_subsystem.LedgerSubsystem">
 <em class="property">class </em><code class="descclassname">ledger_subsystem.</code><code class="descname">LedgerSubsystem</code><span class="sig-paren">(</span><em>config</em>, <em>enabled=False</em>, <em>dbtype='sqlite'</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Abstraction of an underlying ledger subsystem that is typically a
+blockchain. This takes one transaction each to record and verifies its
+existence. It forms some Merkle trees of transaction IDs, and writes their
+root digests only to the underlying ledger.</p>
 <dl class="method">
 <dt id="ledger_subsystem.LedgerSubsystem.append_msg">
 <code class="descname">append_msg</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.append_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.append_msg" title="Permalink to this definition">¶</a></dt>
@@ -210,14 +231,30 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="ledger_subsystem.LedgerSubsystem.disable">
 <code class="descname">disable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.disable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.disable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Disable the ledger subsystem
-:return:</p>
+<dd><p>Disables communication with the underlying ledger.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="ledger_subsystem.LedgerSubsystem.enable">
 <code class="descname">enable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.enable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.enable" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Enables communication with the underlying ledger.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="ledger_subsystem.LedgerSubsystem.exec_sql">
@@ -242,7 +279,23 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="ledger_subsystem.LedgerSubsystem.register_transaction">
 <code class="descname">register_transaction</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.register_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.register_transaction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Registers a transaction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> &#8211; asset group</li>
+<li><strong>transaction_id</strong> &#8211; transaction to register</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="ledger_subsystem.LedgerSubsystem.subsystem_loop">
@@ -262,7 +315,23 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="ledger_subsystem.LedgerSubsystem.verify_transaction">
 <code class="descname">verify_transaction</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.verify_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.verify_transaction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Verifies whether the specified transaction is registered or not.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> &#8211; asset group</li>
+<li><strong>transaction_id</strong> &#8211; transaction to verify its existence</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dictionary containing the result (and a Merkle subtree)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="ledger_subsystem.LedgerSubsystem.write_branch">
@@ -311,6 +380,13 @@ limitations under the License.</p>
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="bbclib.html" class="btn btn-neutral" title="bbclib module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
