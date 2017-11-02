@@ -51,11 +51,6 @@ Every directory includes README.md. Please read it for the details. Furthermore,
     pip install bbc1
     ```
 
-* currently, stored in testPyPI for testing
-    ```
-    $ pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple bbc1
-    ```
-
 ## Use docker (See README.md in docker/)
 0. Install docker on your host
 1. Clone this project
