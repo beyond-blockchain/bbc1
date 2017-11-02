@@ -595,8 +595,7 @@ class BBcNetwork:
         :return:
         """
         self.logger.debug("Start tcpserver_loop")
-        msg_parser = message_key_types.Message()
-        # readfds = set([self.listen_socket, self.listen_socket6])
+        msg_parsers = dict()
         readfds = set()
         if self.listen_socket:
             readfds.add(self.listen_socket)
@@ -609,26 +608,29 @@ class BBcNetwork:
                     if sock is self.listen_socket:
                         conn, address = self.listen_socket.accept()
                         readfds.add(conn)
+                        msg_parsers[conn] = message_key_types.Message()
                     elif sock is self.listen_socket6:
                         conn, address = self.listen_socket6.accept()
                         readfds.add(conn)
+                        msg_parsers[conn] = message_key_types.Message()
                     else:
                         buf = sock.recv(8192)
                         if len(buf) == 0:
+                            del msg_parsers[sock]
                             sock.close()
                             readfds.remove(sock)
                         else:
-                            msg_parser.recv(buf)
+                            msg_parsers[sock].recv(buf)
                             while True:
-                                msg = msg_parser.parse()
+                                msg = msg_parsers[sock].parse()
                                 if msg is None:
                                     break
                                 #self.logger.debug("Recv_TCP at %s: data=%s" % (sock.getsockname(), msg))
-                                if msg_parser.payload_type == PayloadType.Type_msgpack:
+                                if msg_parsers[sock].payload_type == PayloadType.Type_msgpack:
                                     if KeyType.destination_node_id not in msg or KeyType.domain_id not in msg:
                                         continue
                                 self.domains[msg[KeyType.domain_id]].process_message_base(True, None, msg,
-                                                                                          msg_parser.payload_type)
+                                                                                          msg_parsers[sock].payload_type)
         finally:
             for sock in readfds:
                 sock.close()
