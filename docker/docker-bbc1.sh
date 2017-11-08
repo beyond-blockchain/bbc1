@@ -32,7 +32,7 @@ case $1 in
 
     gitbuild)
     	cp ../requirements.txt .
-	    cd .. && git archive HEAD -o bbc1.tar.gz && cd docker
+	    cd .. && git archive-all bbc1.tar.gz && cd docker
 	    mv ../bbc1.tar.gz .
 	    docker build -t ${CONTAINER_NAME} -f Dockerfile_git .
 	    rm requirements.txt bbc1.tar.gz
