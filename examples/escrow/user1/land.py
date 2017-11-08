@@ -76,12 +76,12 @@ def store_proc(data, approver_id,txid=None):
             sys.exit(0)
         prev_tx = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
         reference = bbclib.add_reference_to_transaction(asset_group_id, store_transaction, prev_tx, 0)
-        sig = store_transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1_XY,
+        sig = store_transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
                                      private_key=key_pair.private_key,
                                      public_key=key_pair.public_key)
         store_transaction.references[0].add_signature(user_id=user_id, signature=sig)
     else:
-        sig = store_transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1_XY,
+        sig = store_transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
                                      private_key=key_pair.private_key,
                                      public_key=key_pair.public_key)
         store_transaction.add_signature(signature=sig)
