@@ -27,16 +27,20 @@ Every directory includes README.md. Please read it for the details. Furthermore,
 1. Install tools (libtool, automake)
 2. Install python and pip
 3. Clone this project
-4. Install dependencies by the following command.
+4. Prepare OpenSSL-based library in the root directory
+    ```
+    sh prepare.sh
+    ```
+5. Install dependencies by the following command.
     ```
     pip install -r requirements.txt
     ```
-5. Start bbc_core.py on a terminal
+6. Start bbc_core.py on a terminal
     ```
     cd core
     python bbc_core.py
     ```
-6. Start a sample app in another terminal
+7. Start a sample app in another terminal
     ```
     cd examples
     python file_proof.py arg1 arg2..
