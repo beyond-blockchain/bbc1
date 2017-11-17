@@ -28,7 +28,7 @@ asset_content = b'abcdefg'
 
 print("\n")
 print("private_key:", binascii.b2a_hex(keypair1.private_key))
-print("private_key(pem):\n", keypair1.get_private_key_in_pem().decode())
+print("private_key(pem):\n", keypair1.get_private_key_in_pem())
 print("public_key:", binascii.b2a_hex(keypair1.public_key))
 
 

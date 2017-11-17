@@ -28,7 +28,7 @@ from bbc1.common.bbc_error import *
 
 directory, filename = os.path.split(os.path.realpath(__file__))
 from ctypes import *
-libbbcsig = cdll.LoadLibrary("%s/libbbcsig.so" % directory)
+libbbcsig = CDLL("%s/libbbcsig.so" % directory)
 
 
 domain_global_0 = binascii.a2b_hex("0000000000000000000000000000000000000000000000000000000000000000")
