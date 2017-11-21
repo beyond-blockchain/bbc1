@@ -436,7 +436,6 @@ class BBcTransaction:
             signature = (c_byte * 64)()
             libbbcsig.sign(keypair.private_key_len, keypair.private_key, 32, self.digest(), signature)
             s = bytes(signature)
-            print(s)
         else:
             set_error(code=EOTHER, txt="sig_type %d is not supported" % keypair.type)
             return None

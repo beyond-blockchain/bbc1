@@ -1,3 +1,4 @@
+git-archive-all==1.16.4
 pyOpenSSL>=16.2.0
 jinja2==2.8.1
 ecdsa==0.13
@@ -7,4 +8,5 @@ pytest>=3.0.5
 gevent>=1.2.1
 msgpack-python>=0.4.8
 populus
+bbc1
 

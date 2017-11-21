@@ -30,9 +30,9 @@ RUN /bin/bash -c "python3 -m venv ${VENV_DIR} && source ${VENV_DIR}/bin/activate
 
 RUN mkdir -p ${SHARE_DIR}
 
-ADD bbc1.tar.gz /root/bbc1/
+ADD bbc1.tar.gz /root/
 
-WORKDIR /root/bbc1/bbc1/
+WORKDIR /root/bbc1/
 
 RUN sh prepare.sh
 
