@@ -16,7 +16,7 @@ asset_group_id = bbclib.get_new_id("asset_group_1")
 keypair1 = bbclib.KeyPair()
 keypair1.generate()
 
-transaction1 = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id)
+transaction1 = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=0)
 transaction1.digest()
 print("**** transaction_id:", transaction1.transaction_id)
 

@@ -767,8 +767,7 @@
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Start tcpserver_loop&quot;</span><span class="p">)</span>
-        <span class="n">msg_parser</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">Message</span><span class="p">()</span>
-        <span class="c1"># readfds = set([self.listen_socket, self.listen_socket6])</span>
+        <span class="n">msg_parsers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">readfds</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">listen_socket</span><span class="p">:</span>
             <span class="n">readfds</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_socket</span><span class="p">)</span>
@@ -781,26 +780,29 @@
                     <span class="k">if</span> <span class="n">sock</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">listen_socket</span><span class="p">:</span>
                         <span class="n">conn</span><span class="p">,</span> <span class="n">address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">listen_socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
                         <span class="n">readfds</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+                        <span class="n">msg_parsers</span><span class="p">[</span><span class="n">conn</span><span class="p">]</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">Message</span><span class="p">()</span>
                     <span class="k">elif</span> <span class="n">sock</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">listen_socket6</span><span class="p">:</span>
                         <span class="n">conn</span><span class="p">,</span> <span class="n">address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">listen_socket6</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
                         <span class="n">readfds</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+                        <span class="n">msg_parsers</span><span class="p">[</span><span class="n">conn</span><span class="p">]</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">Message</span><span class="p">()</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">buf</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">8192</span><span class="p">)</span>
                         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="k">del</span> <span class="n">msg_parsers</span><span class="p">[</span><span class="n">sock</span><span class="p">]</span>
                             <span class="n">sock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
                             <span class="n">readfds</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">sock</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">msg_parser</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+                            <span class="n">msg_parsers</span><span class="p">[</span><span class="n">sock</span><span class="p">]</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
                             <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-                                <span class="n">msg</span> <span class="o">=</span> <span class="n">msg_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
+                                <span class="n">msg</span> <span class="o">=</span> <span class="n">msg_parsers</span><span class="p">[</span><span class="n">sock</span><span class="p">]</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
                                 <span class="k">if</span> <span class="n">msg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                                     <span class="k">break</span>
                                 <span class="c1">#self.logger.debug(&quot;Recv_TCP at %s: data=%s&quot; % (sock.getsockname(), msg))</span>
-                                <span class="k">if</span> <span class="n">msg_parser</span><span class="o">.</span><span class="n">payload_type</span> <span class="o">==</span> <span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_msgpack</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">msg_parsers</span><span class="p">[</span><span class="n">sock</span><span class="p">]</span><span class="o">.</span><span class="n">payload_type</span> <span class="o">==</span> <span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_msgpack</span><span class="p">:</span>
                                     <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">destination_node_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
                                         <span class="k">continue</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">]]</span><span class="o">.</span><span class="n">process_message_base</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span>
-                                                                                          <span class="n">msg_parser</span><span class="o">.</span><span class="n">payload_type</span><span class="p">)</span>
+                                                                                          <span class="n">msg_parsers</span><span class="p">[</span><span class="n">sock</span><span class="p">]</span><span class="o">.</span><span class="n">payload_type</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">sock</span> <span class="ow">in</span> <span class="n">readfds</span><span class="p">:</span>
                 <span class="n">sock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>

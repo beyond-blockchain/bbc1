@@ -9,6 +9,9 @@ Message class is also defined in this library. This is internal use only for mes
 
 The library includes some utilities for generating key pairs (KeyPair class) and so on. KeyPair class at this point supports Elliptic Curve Cryptography (ECDSA) only. This class provides some methods for generating, encoding and decoding key pairs.
 
+### libbbcsig/libbbcsig.c
+This is a utility for signing/verifying a transaction and generating a keypair. The functions are called through ctypes of python.
+
 ### message_key_types.py
 This library is for building/parsing a message. Currently, BBc-1 uses [msgpack](https://msgpack.org) for serialization/deserialization of message because of ease of implementation. However, in the near future, we will move to general Type-Length-Value-based binary format. Such functions will be also included in this script.
 

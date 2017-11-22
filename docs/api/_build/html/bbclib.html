@@ -370,7 +370,7 @@ limitations under the License.</p>
 <dt id="bbclib.BBcTransaction.sign">
 <code class="descname">sign</code><span class="sig-paren">(</span><em>key_type=1</em>, <em>private_key=None</em>, <em>public_key=None</em>, <em>keypair=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcTransaction.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcTransaction.sign" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sign transaction
-:param key_type: KeyType.ECDSA_SECP256k1_XY/X
+:param key_type: KeyType.ECDSA_SECP256k1
 :param private_key: bytes format
 :param public_key: bytes format
 :return: BBcSignature object</p>
@@ -403,13 +403,8 @@ limitations under the License.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="bbclib.KeyPair.mk_keyobj_from_private_key_pem">
-<code class="descname">mk_keyobj_from_private_key_pem</code><span class="sig-paren">(</span><em>pemdat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.mk_keyobj_from_private_key_pem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.mk_keyobj_from_private_key_pem" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbclib.KeyPair.mk_public_keyobj">
-<code class="descname">mk_public_keyobj</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.mk_public_keyobj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.mk_public_keyobj" title="Permalink to this definition">¶</a></dt>
+<dt id="bbclib.KeyPair.mk_keyobj_from_private_key_der">
+<code class="descname">mk_keyobj_from_private_key_der</code><span class="sig-paren">(</span><em>derdat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.mk_keyobj_from_private_key_der"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.mk_keyobj_from_private_key_der" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -429,13 +424,8 @@ limitations under the License.</p>
 <em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">KeyType</code><a class="reference internal" href="_modules/bbclib.html#KeyType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="attribute">
-<dt id="bbclib.KeyType.ECDSA_SECP256k1_X">
-<code class="descname">ECDSA_SECP256k1_X</code><em class="property"> = 2</em><a class="headerlink" href="#bbclib.KeyType.ECDSA_SECP256k1_X" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbclib.KeyType.ECDSA_SECP256k1_XY">
-<code class="descname">ECDSA_SECP256k1_XY</code><em class="property"> = 1</em><a class="headerlink" href="#bbclib.KeyType.ECDSA_SECP256k1_XY" title="Permalink to this definition">¶</a></dt>
+<dt id="bbclib.KeyType.ECDSA_SECP256k1">
+<code class="descname">ECDSA_SECP256k1</code><em class="property"> = 1</em><a class="headerlink" href="#bbclib.KeyType.ECDSA_SECP256k1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

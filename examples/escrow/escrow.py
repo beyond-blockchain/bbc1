@@ -76,7 +76,7 @@ def add_ref_tx(asset_group,transaction,ref_tx,ref_index):
         sys.exit(0)
     prev_tx = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
     reference = bbclib.add_reference_to_transaction(asset_group, transaction, prev_tx,0)
-    sig = transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1_XY,
+    sig = transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
                                  private_key=key_pair.private_key,
                                  public_key=key_pair.public_key)
     transaction.references[ref_index].add_signature(user_id=user_id, signature=sig)
@@ -186,7 +186,7 @@ def execute_escrow():
 
     # Add signature
     print("Add signature to escrow TX")
-    sig = transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1_XY,
+    sig = transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
                                  private_key=key_pair.private_key,
                                  public_key=key_pair.public_key)
     transaction.references[0].add_signature(user_id=user_id, signature=sig)

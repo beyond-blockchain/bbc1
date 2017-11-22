@@ -16,10 +16,16 @@ Every directory includes README.md. Please read it for the details. Furthermore,
 * Python
     - Python 3.6.0 or later
 
-* tools (for macOS by Homebrew)
-    - libtool
-    - automake
-    - geth and solidity are required if Ethereum ledger subsystem is to be used
+* tools for macOS by Homebrew
+    ```
+    brew install libtool automake geth solidity pkg-config
+    ```
+
+* tools for Linux (Ubuntu 16.04 LTS)
+    ```
+    sudo apt-get install -y git tzdata openssh-server python3 python3-dev python3-venv libffi-dev net-tools autoconf automake libtool libssl-dev make
+    ```
+
 
 # Quick start
 
@@ -27,16 +33,20 @@ Every directory includes README.md. Please read it for the details. Furthermore,
 1. Install tools (libtool, automake)
 2. Install python and pip
 3. Clone this project
-4. Install dependencies by the following command.
+4. Prepare OpenSSL-based library in the root directory
+    ```
+    sh prepare.sh
+    ```
+5. Install dependencies by the following command.
     ```
     pip install -r requirements.txt
     ```
-5. Start bbc_core.py on a terminal
+6. Start bbc_core.py on a terminal
     ```
     cd core
     python bbc_core.py
     ```
-6. Start a sample app in another terminal
+7. Start a sample app in another terminal
     ```
     cd examples
     python file_proof.py arg1 arg2..
