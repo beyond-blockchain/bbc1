@@ -69,7 +69,7 @@ def create_transaction_object_and_send_sign_req(idx, receiver_user_id, ref_txids
         prev_tx = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
         bbclib.add_reference_to_transaction(asset_group_id, txobj, prev_tx, 0)
 
-    sig_mine = txobj.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1_XY,
+    sig_mine = txobj.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
                           private_key=keypairs[idx].private_key,
                           public_key=keypairs[idx].public_key)
     txobj.references[0].add_signature(user_id=user_ids[idx], signature=sig_mine)
@@ -181,7 +181,7 @@ class TestFileProofClient(object):
                                               asset_body="Owner is 0",
                                               asset_file=large_data)
 
-        sig = store_transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1_XY,
+        sig = store_transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
                                      private_key=keypairs[0].private_key,
                                      public_key=keypairs[0].public_key)
         store_transaction.get_sig_index(user_ids[0])
