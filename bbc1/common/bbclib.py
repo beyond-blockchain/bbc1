@@ -28,7 +28,7 @@ from bbc1.common.bbc_error import *
 
 directory, filename = os.path.split(os.path.realpath(__file__))
 from ctypes import *
-libbbcsig = cdll.LoadLibrary("%s/libbbcsig.so" % directory)
+libbbcsig = CDLL("%s/libbbcsig.so" % directory)
 
 
 domain_global_0 = binascii.a2b_hex("0000000000000000000000000000000000000000000000000000000000000000")
@@ -436,7 +436,6 @@ class BBcTransaction:
             signature = (c_byte * 64)()
             libbbcsig.sign(keypair.private_key_len, keypair.private_key, 32, self.digest(), signature)
             s = bytes(signature)
-            print(s)
         else:
             set_error(code=EOTHER, txt="sig_type %d is not supported" % keypair.type)
             return None

@@ -5,6 +5,11 @@ include LICENSE.python
 include MANIFEST.in
 include package.json
 include *.rst
+include prepare.sh
+recursive-include third_party/openssl *
+recursive-include bbc1/common/libbbcsig *
+recursive-include bbc1/common *
+recursive-include bbc1/core/ethereum *
 graft django
 prune django/contrib/admin/bin
 graft docs
