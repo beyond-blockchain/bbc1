@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Copyright (c) 2017 beyond-blockchain.org.
@@ -122,6 +121,7 @@ class BBcCoreService:
         self.test_tx_obj = BBcTransaction()
         self.user_id_sock_mapping = dict()
         self.asset_group_domain_mapping = dict()
+        self.need_insert_completion_notification = dict()
         self.cross_ref_list = []
         self.ledger_manager = BBcLedger(self.config)
         self.storage_manager = bbc_storage.BBcStorage(self.config)
@@ -490,6 +490,16 @@ class BBcCoreService:
                 self.ledger_subsystem.disable()
             self.send_raw_message(socket, retmsg)
 
+        elif cmd == MsgType.REQUEST_INSERT_NOTIFICATION:
+            asset_group_id = dat[KeyType.asset_group_id]
+            self.need_insert_completion_notification.setdefault(asset_group_id, set())
+            self.need_insert_completion_notification[asset_group_id].add(dat[KeyType.source_user_id])
+
+        elif cmd == MsgType.CANCEL_INSERT_NOTIFICATION:
+            asset_group_id = dat[KeyType.asset_group_id]
+            if asset_group_id in self.need_insert_completion_notification:
+                self.need_insert_completion_notification.remove(asset_group_id)
+
         else:
             self.logger.error("Bad command/response: %s" % cmd)
         return False, None
@@ -657,6 +667,12 @@ class BBcCoreService:
             for asid in registered_asset_ids_in_storage:
                 self.storage_manager.remove(domain_id, asset_group_id, asid)
             return "Failed to register asset"
+
+        if asset_group_id in self.need_insert_completion_notification:
+            for user_id in self.need_insert_completion_notification[asset_group_id]:
+                notifmsg = make_message_structure(MsgType.NOTIFY_INSERTED, asset_group_id, user_id, None)
+                notifmsg[KeyType.transaction_id] = txobj.transaction_id
+                self.send_message(notifmsg)
 
         if no_network_put:
             return None
