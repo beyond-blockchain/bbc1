@@ -14,8 +14,7 @@ source /root/.pythonenv/bin/activate
 if [ -e /root/bbc1 ]; then
   cd /root/bbc1/bbc1/core
   exec python bbc_core.py -w /root/.bbc1
-#  /usr/sbin/sshd -D -e 
 else
+  pip install bbc1
   exec bbc_core.py -w /root/.bbc1
-#  /usr/sbin/sshd -D -e 
 fi
