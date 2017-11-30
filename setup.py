@@ -1,7 +1,6 @@
-import tempfile, sys, os, shutil
 import subprocess
 from os import path
-from setuptools import setup, find_packages
+from setuptools import setup
 from setuptools.command.install import install
 
 
@@ -9,6 +8,7 @@ here = path.abspath(path.dirname(__file__))
 
 with open('README.rst') as f:
     readme = f.read()
+
 
 class MyInstall(install):
     def run(self):
@@ -20,6 +20,7 @@ class MyInstall(install):
             exit(1)
         else:
             install.run(self)
+
 
 bbc1_requires = [
                  'pyOpenSSL>=16.2.0',
@@ -61,6 +62,6 @@ setup(
     packages=bbc1_packages,
     scripts=bbc1_commands,
     install_requires=bbc1_requires,
-    data_files = [("/bbc1/common", ["bbc1/common/libbbcsig.so"])],
+    data_files = [("bbc1/common", ["bbc1/common/libbbcsig.so"])],
     zip_safe=False)
 
