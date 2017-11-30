@@ -61,6 +61,6 @@ setup(
     packages=bbc1_packages,
     scripts=bbc1_commands,
     install_requires=bbc1_requires,
-    data_files = [("/bbc1/common", ["bbc1/common/libbbcsig.so"])],
+    data_files = [("bbc1/common", ["bbc1/common/libbbcsig.so"])],
     zip_safe=False)
 
