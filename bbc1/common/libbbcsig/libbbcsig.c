@@ -16,12 +16,15 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <strings.h>
 
 #include <openssl/ec.h>      // for EC_GROUP_new_by_curve_name, EC_GROUP_free, EC_KEY_new, EC_KEY_set_group, EC_KEY_generate_key, EC_KEY_free
 #include <openssl/ecdsa.h>   // for ECDSA_do_sign, ECDSA_do_verify
 #include <openssl/bn.h>
 #include <openssl/obj_mac.h> // for NID_secp192k1
 #include <openssl/pem.h>
+#include <openssl/evp.h>
+#include <openssl/bio.h>
 
 #include <crypto/ec/ec_lcl.h>
 
@@ -264,6 +267,60 @@ bool convert_from_der(long der_len, const unsigned char *der,
     return true;
 }
 
+
+bool convert_from_pem(const char *pem,
+                      uint8_t pubkey_type,
+                      int *pubkey_len, uint8_t *pubkey,
+                      int *privkey_len, uint8_t *privkey)
+{
+    BIO* bo = BIO_new( BIO_s_mem() );
+    BIO_write(bo, pem, strlen(pem));
+    EVP_PKEY *privateKey = NULL;
+    if (PEM_read_bio_PrivateKey( bo, &privateKey, 0, 0 ) == NULL) {
+        BIO_free(bo);
+        return false;
+    }
+    BIO_free(bo);
+
+    BN_CTX *ctx = BN_CTX_new();
+    EC_KEY *eckey = EC_KEY_new();
+    if (NULL == eckey) {
+        return false;
+    }
+    EC_GROUP *ecgroup = EC_GROUP_new_by_curve_name(NID_secp256k1);
+    if (NULL == ecgroup) {
+        EC_KEY_free(eckey);
+        return false;
+    }
+    if (EC_KEY_set_group(eckey, ecgroup) != 1) {
+        EC_GROUP_free(ecgroup);
+        EC_KEY_free(eckey);
+        return false;
+    }
+
+    eckey = EVP_PKEY_get1_EC_KEY(privateKey);
+    const BIGNUM *private_key = EC_KEY_get0_private_key(eckey);
+    *privkey_len = BN_num_bytes(private_key);
+    BN_bn2bin(private_key, privkey);
+
+    EC_POINT *pubkey_point = EC_POINT_new(ecgroup);
+    EC_POINT_mul(ecgroup, pubkey_point, private_key, NULL, NULL, ctx);
+
+    if (pubkey_type == 0) {
+        *pubkey_len = 65;
+        EC_POINT_point2oct(ecgroup, pubkey_point, POINT_CONVERSION_UNCOMPRESSED, pubkey, *pubkey_len, ctx);
+    } else {
+        *pubkey_len = 33;
+        EC_POINT_point2oct(ecgroup, pubkey_point, POINT_CONVERSION_COMPRESSED, pubkey, *pubkey_len, ctx);
+    }
+
+    BN_free((BIGNUM *)private_key);
+    EC_POINT_free(pubkey_point);
+    EC_GROUP_free(ecgroup);
+    //EC_KEY_free(eckey);
+    BN_CTX_free(ctx);
+    return true;
+}
 
 int output_der(int privkey_len, uint8_t *privkey, uint8_t *der_out)
 {
