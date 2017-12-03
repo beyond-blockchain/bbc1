@@ -40,6 +40,7 @@ python setup.py new_account <passphrase>
 python setup.py run
 ```
 For the first execution, this would take some tens of minutes for mining to be started.
+
 5. Deploy BBcAnchor smart contract
 ```
 python setup.py deploy
