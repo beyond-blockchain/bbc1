@@ -125,6 +125,7 @@ class KeyType:
     query_id = to_4byte(12)      # query_id from bbc_app
     nonce = to_4byte(13)
     count = to_4byte(14)
+    stats = to_4byte(15)
 
     ledger_subsys_manip = to_4byte(0, 0x20)     # enable/disable ledger_subsystem
     ledger_subsys_register = to_4byte(1, 0x20)
