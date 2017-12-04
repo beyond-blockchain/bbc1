@@ -14,6 +14,7 @@ Currently supports local geth chain only.
 * ../core/ledger_subsystem.py
   * enable() to enable writing to the subsystem (or initialize with enabled=True).
   * disable() to disable writing to the subsystem.
+  * set_domain(domain_id) to set relevant domain_id.
   * register_transaction(asset_group_id, transaction_id) to write the transaction_id into a Merkle tree.
   * verify_transaction(asset_group_id, transaction_id) to verify that the transaction exists and to receive the Merkle subtree.
 

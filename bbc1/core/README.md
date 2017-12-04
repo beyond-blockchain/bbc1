@@ -19,7 +19,7 @@ The files in this directory is the main codes of BBc-1.
     - DomainBase class is a base class for networking functions. By overriding it, any kind of networking layer can be implemented. This project includes a simple networking function with full-mesh topology (see [Network module below](#nwmodule)).
 * ledger_subsystem.py
     - Anchoring to an existing blockchain system like Ethereum and Bitcoin
-    - If ledger_subsystem is enabled, hash values (Markle trees) of transactions are automatically registered to a blockchain system.
+    - If ledger_subsystem is enabled, hash values (Merkle trees) of transactions are automatically registered to a blockchain system.
     - Currently, it supports registering hash values to Ethereum via smart contracts.
 
 ## <a name="nwmodule"> Network modules
