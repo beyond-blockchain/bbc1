@@ -82,7 +82,7 @@ def convert_id_to_string(data, bytelen=32):
 def convert_idstring_to_bytes(datastr, bytelen=32):
     res = bytearray(binascii.a2b_hex(datastr))
     if len(res) < bytelen:
-        res = bytearray([0]*(bytelen-len(res))).extend(res)
+        res = bytearray([0]*(bytelen-len(res)))+res
     return bytes(res)
 
 
@@ -189,6 +189,11 @@ class KeyPair:
                                    byref(self.public_key_len), self.public_key,
                                    byref(self.private_key_len), self.private_key)
 
+    def mk_keyobj_from_private_key_pem(self, pemdat_string):
+        libbbcsig.convert_from_pem(create_string_buffer(pemdat_string.encode()), 0,
+                                   byref(self.public_key_len), self.public_key,
+                                   byref(self.private_key_len), self.private_key)
+
     def to_binary(self, dat):
         byteval = bytearray()
         if self.public_key_len > 0:
@@ -218,6 +223,18 @@ class KeyPair:
         pem_data = (c_char * 256)()
         pem_len = libbbcsig.output_pem(self.private_key_len, self.private_key, byref(pem_data))
         return pem_data.value
+
+    def sign(self, digest):
+        if self.type == KeyType.ECDSA_SECP256k1:
+            signature = (c_byte * 64)()
+            libbbcsig.sign(self.private_key_len, self.private_key, 32, digest, signature)
+            return bytes(signature)
+        else:
+            set_error(code=EOTHER, txt="sig_type %d is not supported" % self.type)
+            return None
+
+    def verify(self, digest, sig):
+        return libbbcsig.verify(self.public_key_len, self.public_key, len(digest), digest, len(sig), sig)
 
 
 class BBcSignature:
@@ -266,8 +283,7 @@ class BBcSignature:
             set_error(code=EBADKEYPAIR, txt="Bad private_key/public_key")
             return False
         try:
-            flag = libbbcsig.verify(self.keypair.public_key_len, self.keypair.public_key,
-                                    len(digest), digest, len(self.signature), self.signature)
+            flag = self.keypair.verify(digest, self.signature)
         except:
             traceback.print_exc()
             return False
@@ -432,11 +448,8 @@ class BBcTransaction:
                 return None
 
         sig = BBcSignature(key_type=keypair.type)
-        if keypair.type == KeyType.ECDSA_SECP256k1:
-            signature = (c_byte * 64)()
-            libbbcsig.sign(keypair.private_key_len, keypair.private_key, 32, self.digest(), signature)
-            s = bytes(signature)
-        else:
+        s = keypair.sign(self.digest())
+        if s is None:
             set_error(code=EOTHER, txt="sig_type %d is not supported" % keypair.type)
             return None
         sig.add(signature=s, pubkey=keypair.public_key)
