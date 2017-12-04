@@ -193,6 +193,7 @@ class BBcNetwork:
                                                           loglevel=self.logger.level, logname=self.logname)
         if domain_id != bbclib.domain_global_0:
             self.core.ledger_manager.add_domain(domain_id)
+        self.core.stats.update_stats_increment("network", "num_domains", 1)
         return True
 
     def remove_domain(self, domain_id=ZEROS):
@@ -210,6 +211,7 @@ class BBcNetwork:
             self.asset_groups_to_advertise.remove(domain_id)
         if self.use_global:
             self.domains[bbclib.domain_global_0].advertise_asset_group_info()
+        self.core.stats.update_stats_decrement("network", "num_domains", 1)
 
     def add_static_node_to_domain(self, domain_id, node_id, ipv4, ipv6, port):
         """
@@ -232,6 +234,7 @@ class BBcNetwork:
             if not isinstance(ipv6, str):
                 ipv6 = ipv6.decode()
             conf['static_nodes'][bbclib.convert_id_to_string(node_id)] = [ipv4, ipv6, port]
+            self.core.stats.update_stats_increment("network", "peer_num", 1)
 
     def save_all_peer_lists(self):
         """
@@ -281,6 +284,7 @@ class BBcNetwork:
         self.logger.debug("Send domain_ping to %s:%d" % (query_entry.data[KeyType.peer_info].ipv4,
                                                          query_entry.data[KeyType.peer_info].port))
         query_entry.update(fire_after=1)
+        self.core.stats.update_stats_increment("network", "domain_ping_send", 1)
         self.send_message_in_network(query_entry.data[KeyType.peer_info], PayloadType.Type_msgpack, msg)
 
     def receive_domain_ping(self, ip4, from_addr, msg):
@@ -295,6 +299,7 @@ class BBcNetwork:
         """
         if KeyType.domain_id not in msg or KeyType.node_id not in msg:
             return
+        self.core.stats.update_stats_increment("network", "domain_ping_receive", 1)
         domain_id = msg[KeyType.domain_id]
         node_id = msg[KeyType.node_id]
         self.logger.debug("Receive domain_ping to domain %s" % (binascii.b2a_hex(domain_id[:4])))
@@ -393,6 +398,7 @@ class BBcNetwork:
                                                         'msg_to_send': msg_to_send},
                                                   retry_count=ROUTE_RETRY_COUNT)
         self.domains[domain_id].send_p2p_message(query_entry)
+        self.core.stats.update_stats_increment("network", "p2p_message_count", 1)
         return True
 
     def forward_message(self, query_entry):
@@ -425,7 +431,6 @@ class BBcNetwork:
         :return:
         """
         dat = query_entry.data['msg_to_send']
-        print(dat)
         msg = bbc_core.make_message_structure(dat[KeyType.command], query_entry.data[KeyType.asset_group_id],
                                               query_entry.data[KeyType.source_node_id], dat[KeyType.query_id])
         self.core.error_reply(msg=msg, err_code=ENODESTINATION, txt="cannot find core node")
@@ -439,6 +444,7 @@ class BBcNetwork:
         :param user_id:
         :return:
         """
+        self.core.stats.update_stats_increment("network", "user_num", 1)
         self.domains[domain_id].register_user_id(asset_group_id, user_id)
 
     def remove_user_id(self, asset_group_id, user_id):
@@ -451,6 +457,7 @@ class BBcNetwork:
         """
         for domain_id in self.domains:
             self.domains[domain_id].unregister_user_id(asset_group_id, user_id)
+            self.core.stats.update_stats_decrement("network", "user_num", 1)
 
     def disseminate_cross_ref(self, transaction_id, asset_group_id):
         """
@@ -487,9 +494,11 @@ class BBcNetwork:
             return
         if nodeinfo.ipv4 != "":
             self.socket_udp.sendto(data_to_send, (nodeinfo.ipv4, nodeinfo.port))
+            self.core.stats.update_stats_increment("network", "message_size_sent_by_udp", len(data_to_send))
             return
         if nodeinfo.ipv6 != "":
             self.socket_udp6.sendto(data_to_send, (nodeinfo.ipv6, nodeinfo.port))
+            self.core.stats.update_stats_increment("network", "packets_sent_by_udp", 1)
 
     def setup_udp_socket(self):
         """
@@ -542,6 +551,7 @@ class BBcNetwork:
                         data, addr = self.socket_udp6.recvfrom(1500)
                         ip4 = False
                     if data is not None:
+                        self.core.stats.update_stats_increment("network", "packets_received_by_udp", 1)
                         msg_parser.recv(data)
                         msg = msg_parser.parse()
                         #self.logger.debug("Recv_UDP from %s: data=%s" % (addr, msg))
@@ -621,6 +631,7 @@ class BBcNetwork:
                             readfds.remove(sock)
                         else:
                             msg_parsers[sock].recv(buf)
+                            self.core.stats.update_stats_increment("network", "message_size_received_by_tcy", len(buf))
                             while True:
                                 msg = msg_parsers[sock].parse()
                                 if msg is None:

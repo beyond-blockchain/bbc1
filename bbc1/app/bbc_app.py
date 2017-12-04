@@ -457,6 +457,14 @@ class BBcAppClient:
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
+    def get_stats(self):
+        """
+        Get statistics of bbc_core
+        :return:
+        """
+        dat = self.make_message_structure(None, MsgType.REQUEST_GET_STATS)
+        return self.send_msg(dat)
+
     def send_message(self, msg, asset_group_id, dst_user_id):
         """
         Send peer-to-peer message to the specified user_id
@@ -546,6 +554,8 @@ class Callback:
             self.proc_resp_get_config(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_MANIP_LEDGER_SUBSYS:
             self.proc_resp_ledger_subsystem(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_GET_STATS:
+            self.proc_resp_get_stats(dat)
         else:
             self.logger.warn("No method to process for command=%d" % dat[KeyType.command])
 
@@ -669,4 +679,5 @@ class Callback:
     def proc_resp_ledger_subsystem(self, dat):
         self.queue.put(dat)
 
-
+    def proc_resp_get_stats(self, dat):
+        self.queue.put(dat)
