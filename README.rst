@@ -16,10 +16,16 @@ Every directory includes README.md. Please read it for the details. Furthermore,
 * Python
     - Python 3.6.0 or later
 
-* tools (for macOS by Homebrew)
-    - libtool
-    - automake
-    - geth and solidity are required if Ethereum ledger subsystem is to be used
+* tools for macOS by Homebrew
+    ```
+    brew install libtool automake geth solidity pkg-config
+    ```
+
+* tools for Linux (Ubuntu 16.04 LTS)
+    ```
+    sudo apt-get install -y git tzdata openssh-server python3 python3-dev python3-venv libffi-dev net-tools autoconf automake libtool libssl-dev make
+    ```
+
 
 # Quick start
 
@@ -107,7 +113,8 @@ The working directory of BBc-1 on the docker container is mounted on docker/data
 * somewhere/.bbc1/
     - default working directory name of bbc_core.py
 * requirements.txt
-    - for pip install
+    - python modules to be required
 * setup.py
 * MANIFEST.in
+* prepare.py
     - for creatign python modules
