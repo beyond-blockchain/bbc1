@@ -19,7 +19,7 @@ Currently supports local geth chain only.
   * verify_transaction(asset_group_id, transaction_id) to verify that the transaction exists and to receive the Merkle subtree.
 
 ## Dependencies
-* populus 1.10.1 (note that rlp==0.5.1), 1.11.0
+* populus 1.10.1 (note that rlp==0.5.1), 1.11.0-2.1.0, 2.2.0 (requires project.json from older environment)
 * geth (go ethereum) 1.7.2, 1.7.3
 * solc (solidity) 0.4.17, 0.4.18
 
