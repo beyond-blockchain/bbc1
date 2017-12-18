@@ -129,7 +129,7 @@ class KeyType:
     ledger_subsys_manip = to_4byte(0, 0x20)     # enable/disable ledger_subsystem
     ledger_subsys_register = to_4byte(1, 0x20)
     ledger_subsys_verify = to_4byte(2, 0x20)
-    markle_tree = to_4byte(3, 0x20)
+    merkle_tree = to_4byte(3, 0x20)
 
     network_module = to_4byte(0, 0x30)
     storage_type = to_4byte(1, 0x30)

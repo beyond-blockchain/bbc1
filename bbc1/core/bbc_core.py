@@ -127,7 +127,7 @@ class BBcCoreService:
         self.storage_manager = bbc_storage.BBcStorage(self.config)
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port, use_global=use_global,
                                                  loglevel=loglevel, logname=logname)
-        self.ledger_subsystem = ledger_subsystem.LedgerSubsystem(self.config, loglevel=loglevel, logname=logname)
+        self.ledger_subsystem = ledger_subsystem.LedgerSubsystem(self.config, core=self, loglevel=loglevel, logname=logname)
 
         gevent.signal(signal.SIGINT, self.quit_program)
         if server_start:
@@ -372,7 +372,7 @@ class BBcCoreService:
                                             dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
             result = self.ledger_subsystem.verify_transaction(asset_group_id=asset_group_id,
                                                               transaction_id=transaction_id)
-            retmsg[KeyType.markle_tree] = result
+            retmsg[KeyType.merkle_tree] = result
             self.send_message(retmsg)
 
         elif cmd == MsgType.REGISTER:
@@ -488,6 +488,7 @@ class BBcCoreService:
                 self.ledger_subsystem.enable()
             else:
                 self.ledger_subsystem.disable()
+            self.ledger_subsystem.set_domain(dat[KeyType.domain_id])
             self.send_raw_message(socket, retmsg)
 
         else:
