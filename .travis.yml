@@ -22,9 +22,10 @@ before_install:
       ln -s ../opt/openssl/include/openssl;
       cd $TRAVIS_BUILD_DIR;
     fi
+  - pip install --upgrade pip
+  - pip install --upgrade pytest
 install:
   - sh prepare.sh
-  - pip install --upgrade pip
   - pip install -r requirements.txt
 script:
   - cd tests
