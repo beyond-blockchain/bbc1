@@ -11,8 +11,18 @@ matrix:
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       brew update;
-      brew install python3;
-      brew install libtool automake geth solidity pkg-config;
+
+      brew install pyenv;
+      cat << 'EOS' >> ~/.bash_profile
+      export PYENV_ROOT=/usr/local/var/pyenv
+      if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
+      EOS
+      source ~/.bash_profile;
+      pyenv install 3.6.0;
+      pyenv global 3.6.0;
+
+      #brew install libtool automake geth solidity pkg-config;
+      brew install libtool automake geth pkg-config;
     fi
 install:
   - sh prepare.sh
