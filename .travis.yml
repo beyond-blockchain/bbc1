@@ -5,7 +5,11 @@ os:
 python:
   - 3.6
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install libtool automake geth solidity pkg-config ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew update
+      brew install python
+      brew install libtool automake geth solidity pkg-config
+    fi
 install:
   - sh prepare.sh
   - pip install -r requirements.txt
