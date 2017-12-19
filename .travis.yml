@@ -17,6 +17,9 @@ before_install:
       pyenv install 3.6.0;
       pyenv global 3.6.0;
       brew install libtool automake geth pkg-config;
+      brew install openssl;
+      cd /usr/local/include;
+      ln -s ../opt/openssl/include/openssl;
     fi
 install:
   - sh prepare.sh
