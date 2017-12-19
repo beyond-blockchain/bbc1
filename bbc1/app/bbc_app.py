@@ -101,6 +101,22 @@ def get_id_from_mappings(name, asset_group_id):
     return None
 
 
+def get_list_from_mappings(asset_group_id):
+    if not os.path.exists(MAPPING_FILE):
+        return None
+    asset_group_id_str = binascii.b2a_hex(asset_group_id).decode()
+    with open(MAPPING_FILE, "r") as f:
+        mapping = json.load(f)
+    if mapping is None:
+        return None
+    if asset_group_id_str in mapping:
+        result  = []
+        for name in mapping[asset_group_id_str]:
+            result.append(name)
+        return result
+    return None
+
+
 class BBcAppClient:
     def __init__(self, host='127.0.0.1', port=DEFAULT_CORE_PORT, logname="-", loglevel="none"):
         self.logger = logger.get_logger(key="bbc_app", level=loglevel, logname=logname)
