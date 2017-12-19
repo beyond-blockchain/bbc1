@@ -23,7 +23,7 @@ before_install:
       cd $TRAVIS_BUILD_DIR;
     fi
   - pip install --upgrade pip
-  - pip list -o | awk '{print $1}' | xargs pip install -U
+  - pip list --outdated --format=legacy | awk '{print $1}' | xargs pip install -U
 install:
   - sh prepare.sh
   - pip install -r requirements.txt
