@@ -16,7 +16,6 @@ before_install:
       source ~/.bash_profile;
       pyenv install 3.6.0;
       pyenv global 3.6.0;
-      #brew install libtool automake geth solidity pkg-config;
       brew install libtool automake geth pkg-config;
     fi
 install:
