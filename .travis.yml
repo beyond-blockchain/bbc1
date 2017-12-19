@@ -1,4 +1,5 @@
 language: python
+sudo: true
 matrix:
   include:
     - os: linux
@@ -27,7 +28,7 @@ install:
   - sh prepare.sh
   - pip install -r requirements.txt
   - pip install --upgrade setuptools
-  - pip list --outdated --format=legacy | awk '{print $1}' | xargs pip install -U
+  - pip list --outdated --format=legacy | awk '{print $1}' | sudo xargs pip install -U
 script:
   - cd tests
   - sh alltests.sh
