@@ -20,6 +20,7 @@ before_install:
       brew install openssl;
       cd /usr/local/include;
       ln -s ../opt/openssl/include/openssl;
+      cd $TRAVIS_BUILD_DIR;
     fi
 install:
   - sh prepare.sh
