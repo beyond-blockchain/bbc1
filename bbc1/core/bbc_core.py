@@ -511,9 +511,7 @@ class BBcCoreService:
             self.need_insert_completion_notification[asset_group_id].add(dat[KeyType.source_user_id])
 
         elif cmd == MsgType.CANCEL_INSERT_NOTIFICATION:
-            asset_group_id = dat[KeyType.asset_group_id]
-            if asset_group_id in self.need_insert_completion_notification:
-                self.need_insert_completion_notification.remove(asset_group_id)
+            self.remove_from_notification_list(dat[KeyType.asset_group_id], dat[KeyType.source_user_id])
 
         else:
             self.logger.error("Bad command/response: %s" % cmd)
@@ -559,6 +557,18 @@ class BBcCoreService:
             else:
                 break
         return refs
+
+    def remove_from_notification_list(self, asset_group_id, user_id):
+        """
+        Remove entry from insert completion notification list
+        :param asset_group_id:
+        :param user_id:
+        :return:
+        """
+        if asset_group_id in self.need_insert_completion_notification:
+            self.need_insert_completion_notification[asset_group_id].remove(user_id)
+            if len(self.need_insert_completion_notification[asset_group_id]) == 0:
+                self.need_insert_completion_notification.pop(asset_group_id, None)
 
     def validate_transaction(self, txid, txdata, asset_files):
         """
@@ -705,7 +715,9 @@ class BBcCoreService:
             for user_id in self.need_insert_completion_notification[asset_group_id]:
                 notifmsg = make_message_structure(MsgType.NOTIFY_INSERTED, asset_group_id, user_id, None)
                 notifmsg[KeyType.transaction_id] = txobj.transaction_id
-                self.send_message(notifmsg)
+                ret = self.send_message(notifmsg)
+                if not ret:
+                    self.remove_from_notification_list(asset_group_id, user_id)
 
         if no_network_put:
             return None
