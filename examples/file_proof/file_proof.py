@@ -279,6 +279,23 @@ def get_file(file):
     print("done get %s" % out_file_name)
 
 
+def remove_file(file):
+    fileinfo = bbc_app.get_id_from_mappings(os.path.basename(file), asset_group_id)
+    if fileinfo is None:
+        print("File does not exist: %s" % os.path.basename(file))
+        sys.exit(0)
+    fileinfo = bbc_app.remove_id_mappings(os.path.basename(file), asset_group_id)
+    print("done remove %s" % file)
+
+
+def list_file():
+    fileinfo = bbc_app.get_list_from_mappings(asset_group_id)
+    if fileinfo is None:
+        print("No files present in local mapping cache. So, asset_id is not known...")
+        sys.exit(1)
+    print("%s" % '\n'.join(fileinfo))
+
+
 def update_file(file):
     fileinfo = bbc_app.get_id_from_mappings(os.path.basename(file), asset_group_id)
     if fileinfo is None:
@@ -408,6 +425,15 @@ def argument_parser():
     get_parser.add_argument('target_file', action='store', help='A target file')
     get_parser.add_argument('-o', '--user', action='store', help='Your name (for calculating user_id)',
                             default='user_default')
+    # remove command
+    get_parser = subparsers.add_parser('remove', help='Remove a file')
+    get_parser.add_argument('target_file', action='store', help='A target file')
+    get_parser.add_argument('-o', '--user', action='store', help='Your name (for calculating user_id)',
+                            default='user_default')
+    # list command
+    list_parser = subparsers.add_parser('list', help='Get a file list')
+    list_parser.add_argument('-o', '--user', action='store', help='Your name (for calculating user_id)',
+                            default='user_default')
     # update command
     update_parser = subparsers.add_parser('update', help='Update a file')
     update_parser.add_argument('target_file', action='store', help='A target file')
@@ -454,6 +480,10 @@ if __name__ == '__main__':
             store_file(file=parsed_args.target_file)
         elif parsed_args.command_type == "get":
             get_file(file=parsed_args.target_file)
+        elif parsed_args.command_type == "remove":
+            remove_file(file=parsed_args.target_file)
+        elif parsed_args.command_type == "list":
+            list_file()
         elif parsed_args.command_type == "update":
             update_file(file=parsed_args.target_file)
         elif parsed_args.command_type == "verify":
