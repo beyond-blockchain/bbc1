@@ -18,7 +18,7 @@ This app allows a user to do the following:
     python file_proof.py keypair
     python file_proof.py setup
     ```
-    .private_key and .public_key are crated.
+    .private_key and .public_key are created.
 3. Execute commands in another terminal
     The commands must be executed in the directory having the key pair.
     * Store a file

@@ -273,15 +273,17 @@ class BBcAppClient:
         dat = self.make_message_structure(None, MsgType.REQUEST_GET_DOMAINLIST)
         return self.send_msg(dat)
 
-    def manipulate_ledger_subsystem(self, enable=False):
+    def manipulate_ledger_subsystem(self, enable=False, domain_id=None):
         """
         start/stop ledger_subsystem on the bbc_core (maybe used by a system administrator)
 
         :param enable: True->start, False->stop
+        :param domain_id: 
         :return:
         """
         dat = self.make_message_structure(None, MsgType.REQUEST_MANIP_LEDGER_SUBSYS)
         dat[KeyType.ledger_subsys_manip] = enable
+        dat[KeyType.domain_id] = domain_id
         return self.send_msg(dat)
 
     def register_to_core(self):
