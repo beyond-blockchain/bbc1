@@ -90,7 +90,7 @@ class BBcNetwork:
     """
     Socket and thread management for infrastructure layers
     """
-    def __init__(self, config, core=None, p2p_port=None, use_global=True,
+    def __init__(self, config, core=None, p2p_port=None, use_global=True, external_ip4addr=None, external_ip6addr=None,
                  loglevel="all", logname=None):
         self.core = core
         self.logger = logger.get_logger(key="bbc_network", level=loglevel, logname=logname)
@@ -100,6 +100,8 @@ class BBcNetwork:
         conf = self.config.get_config()
         self.domains = dict()
         self.asset_groups_to_advertise = set()
+        self.external_ip4addr = external_ip4addr
+        self.external_ip6addr = external_ip6addr
         self.ip_address, self.ip6_address = check_my_IPaddresses()
         if p2p_port is not None:
             conf['network']['p2p_port'] = p2p_port
@@ -151,9 +153,13 @@ class BBcNetwork:
         :return:
         """
         ipv4 = self.ip_address
+        if self.external_ip4addr is not None:
+            ipv4 = self.external_ip4addr
         if ipv4 is None or len(ipv4) == 0:
             ipv4 = "0.0.0.0"
         ipv6 = self.ip6_address
+        if self.external_ip6addr is not None:
+            ipv6 = self.external_ip6addr
         if ipv6 is None or len(ipv6) == 0:
             ipv6 = "::"
         port = socket.htons(self.port).to_bytes(2, 'little')
@@ -281,6 +287,14 @@ class BBcNetwork:
             KeyType.domain_ping: 0,
             KeyType.nonce: query_entry.nonce,
         }
+        if self.external_ip4addr is not None:
+            msg[KeyType.external_ip4addr] = self.external_ip4addr
+        else:
+            msg[KeyType.external_ip4addr] = self.ip_address
+        if self.external_ip6addr is not None:
+            msg[KeyType.external_ip6addr] = self.external_ip6addr
+        else:
+            msg[KeyType.external_ip6addr] = self.ip6_address
         self.logger.debug("Send domain_ping to %s:%d" % (query_entry.data[KeyType.peer_info].ipv4,
                                                          query_entry.data[KeyType.peer_info].port))
         query_entry.update(fire_after=1)
@@ -302,18 +316,25 @@ class BBcNetwork:
         self.core.stats.update_stats_increment("network", "domain_ping_receive", 1)
         domain_id = msg[KeyType.domain_id]
         node_id = msg[KeyType.node_id]
+        if KeyType.external_ip4addr in msg:
+            ipv4 = msg[KeyType.external_ip4addr]
+            ipv6 = "::"
+        elif KeyType.external_ip6addr in msg:
+            ipv4 = "0.0.0.0"
+            ipv6 = msg[KeyType.external_ip6addr]
+        else:
+            if ip4:
+                ipv4 = from_addr[0]
+                ipv6 = "::"
+            else:
+                ipv4 = "0.0.0.0"
+                ipv6 = from_addr[0]
+
         self.logger.debug("Receive domain_ping to domain %s" % (binascii.b2a_hex(domain_id[:4])))
         if domain_id not in self.domains:
             return
         if self.domains[domain_id].node_id == node_id:
             return
-
-        if ip4:
-            ipv4 = from_addr[0]
-            ipv6 = "::"
-        else:
-            ipv4 = "0.0.0.0"
-            ipv6 = from_addr[0]
 
         if msg[KeyType.domain_ping] == 1:
             query_entry = ticker.get_entry(msg[KeyType.nonce])
@@ -327,6 +348,16 @@ class BBcNetwork:
                 KeyType.domain_ping: 1,
                 KeyType.nonce: msg[KeyType.nonce],
             }
+            if ip4:
+                if self.external_ip4addr is not None:
+                    msg[KeyType.external_ip4addr] = self.external_ip4addr
+                else:
+                    msg[KeyType.external_ip4addr] = ipv4
+            else:
+                if self.external_ip6addr is not None:
+                    msg[KeyType.external_ip6addr] = self.external_ip6addr
+                else:
+                    msg[KeyType.external_ip6addr] = ipv6
             nodeinfo = NodeInfo(ipv4=ipv4, ipv6=ipv6, port=from_addr[1])
             self.send_message_in_network(nodeinfo, PayloadType.Type_msgpack, msg)
 

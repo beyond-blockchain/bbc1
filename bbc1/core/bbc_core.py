@@ -103,7 +103,7 @@ def check_transaction_if_having_asset_file(txdata, asid):
 
 
 class BBcCoreService:
-    def __init__(self, ipv6=None, p2p_port=None, core_port=None, use_global=False,
+    def __init__(self, ipv6=None, p2p_port=None, core_port=None, use_global=False, ip4addr=None, ip6addr=None,
                  workingdir=".bbc1", configfile=None,
                  loglevel="all", logname="-", server_start=True):
         self.logger = logger.get_logger(key="core", level=loglevel, logname=logname)
@@ -127,6 +127,7 @@ class BBcCoreService:
         self.ledger_manager = BBcLedger(self.config)
         self.storage_manager = bbc_storage.BBcStorage(self.config)
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port, use_global=use_global,
+                                                 external_ip4addr=ip4addr, external_ip6addr=ip6addr,
                                                  loglevel=loglevel, logname=logname)
         self.ledger_subsystem = ledger_subsystem.LedgerSubsystem(self.config, core=self, loglevel=loglevel, logname=logname)
 
@@ -464,15 +465,6 @@ class BBcCoreService:
                                             None, dat[KeyType.source_user_id], dat[KeyType.query_id])
             jsondat = self.config.get_json_config()
             retmsg[KeyType.bbc_configuration] = jsondat
-            self.send_raw_message(socket, retmsg)
-
-        elif cmd == MsgType.REQUEST_GET_PEERLIST:
-            domain_id = dat[KeyType.domain_id]
-            retmsg = make_message_structure(MsgType.RESPONSE_GET_PEERLIST,
-                                            None, dat[KeyType.source_user_id], dat[KeyType.query_id])
-            if domain_id in self.networking.domains:
-                retmsg[KeyType.domain_id] = domain_id
-                retmsg[KeyType.peer_list] = self.networking.domains[domain_id].make_peer_list()
             self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_DOMAINLIST:
@@ -1052,6 +1044,8 @@ if __name__ == '__main__':
         workingdir=argresult.workingdir,
         configfile=argresult.config,
         use_global=argresult.globaldomain,
+        ip4addr=argresult.ip4addr,
+        ip6addr=argresult.ip6addr,
         logname=argresult.log,
         loglevel=argresult.verbose_level,
     )
