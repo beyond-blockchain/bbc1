@@ -16,9 +16,9 @@ before_install:
       pyenv global 3.6.0;
       brew install libtool automake geth pkg-config;
       brew upgrade;
-      brew tap ethereum/ethereum
-      brew install solidity
-      brew linkapps solidity
+      brew tap ethereum/ethereum;
+      brew install solidity;
+      brew linkapps solidity;
     fi
   - pip install --upgrade pip
   - pip install --upgrade pytest
