@@ -33,5 +33,5 @@ script:
   - cd tests
   - for f in test_*.py
     do
-        pytest ${f};
+      pytest ${f};
     done;
