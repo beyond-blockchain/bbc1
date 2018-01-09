@@ -32,6 +32,6 @@ install:
 script:
   - cd tests
   - for f in test_*.py
-    do
-      pytest ${f};
-    done
+  - do
+  - pytest ${f};
+  - done
