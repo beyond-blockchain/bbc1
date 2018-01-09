@@ -24,11 +24,12 @@ before_install:
       cd $TRAVIS_BUILD_DIR;
     fi
   - pip install --upgrade pip
+  - pip install --upgrade pytest
 install:
   - sh prepare.sh
   - pip install -r requirements.txt
   - pip install --upgrade setuptools
-# - pip list --outdated --format=legacy | awk '{print $1}' | sudo -H xargs pip install -U
+  # - pip list --outdated --format=legacy | awk '{print $1}' | sudo -H xargs pip install -U
 script:
   - cd tests
   - for f in test_*.py; do pytest ${f}; done;
