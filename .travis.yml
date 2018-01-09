@@ -1,0 +1,50 @@
+language: python
+sudo: true
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      python: 3.6
+      env: TOXENV=py36
+    - os: osx
+      language: generic
+      env: TOXENV=py36
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew update;
+      pyenv install 3.6.0;
+      pyenv global 3.6.0;
+      brew install libtool automake geth pkg-config;
+      brew upgrade;
+      brew tap ethereum/ethereum;
+      brew install solidity;
+      brew linkapps solidity;
+    fi
+  - pip install --upgrade pip
+  - pip install --upgrade pytest
+install:
+  - sh prepare.sh
+  - pip install -r requirements.txt
+  - pip install --upgrade setuptools
+  # - pip list --outdated --format=legacy | awk '{print $1}' | sudo -H xargs pip install -U
+script:
+  - cd tests
+  - pytest test_asset_group_info_adv.py
+  - pytest test_bbc_app.py
+  - pytest test_bbc_app_multi_core.py
+  - pytest test_bbc_app_multi_core_many_transactions.py
+  - pytest test_bbc_app_multiclient.py
+  - pytest test_bbc_config.py
+  - pytest test_bbc_core.py
+  - pytest test_bbc_core_refresh_peers.py
+  - pytest test_bbc_ethereum.py
+  - pytest test_bbc_ledger.py
+  - pytest test_bbc_network.py
+  - pytest test_bbc_network_with_core.py
+  - pytest test_bbc_storage.py
+  - pytest test_bbclib.py
+  - pytest test_fileproof_multi_core.py
+  - pytest test_ledger_subsystem.py
+  - pytest test_many_domains_with_global.py
+  - pytest test_pending_request.py
+  - pytest test_recover.py

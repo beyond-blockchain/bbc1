@@ -1,6 +1,7 @@
 Change log
 ======
 
+=======
 ## v0.7.4
 * Fix issues regarding ledger_subsystem #26, #27
 * Refactor ledger_subsystem
@@ -17,6 +18,6 @@ Change log
 ## v0.7.1
 * Bug fix
   - TCP message wait loop in bbc_network.py
- 
+
 ## v0.7
 Initial version
