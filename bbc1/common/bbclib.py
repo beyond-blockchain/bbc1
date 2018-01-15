@@ -166,8 +166,8 @@ class KeyPair:
         if privkey is not None:
             memmove(self.private_key, bytes(privkey), sizeof(self.private_key))
         if pubkey is not None:
-            self.public_key_len = len(pubkey)
-            memmove(self.public_key, bytes(pubkey), self.public_key_len)
+            self.public_key_len = c_int32(len(pubkey))
+            memmove(self.public_key, bytes(pubkey), self.public_key_len.value)
 
         if privkey is None and pubkey is None:
             self.generate()
