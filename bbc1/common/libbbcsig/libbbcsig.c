@@ -16,7 +16,13 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+
+#include "libbbcsig.h"
+#include <string.h>
+
+#ifndef _WIN32
 #include <strings.h>
+#endif
 
 #include <openssl/ec.h>      // for EC_GROUP_new_by_curve_name, EC_GROUP_free, EC_KEY_new, EC_KEY_set_group, EC_KEY_generate_key, EC_KEY_free
 #include <openssl/ecdsa.h>   // for ECDSA_do_sign, ECDSA_do_verify
@@ -29,7 +35,8 @@
 #include <crypto/ec/ec_lcl.h>
 
 
-bool sign(int privkey_len, uint8_t *privkey, int hash_len, uint8_t *hash, uint8_t *sig)
+VS_DLL_EXPORT
+bool VS_STDCALL sign(int privkey_len, uint8_t *privkey, int hash_len, uint8_t *hash, uint8_t *sig)
 {
     BN_CTX *ctx = BN_CTX_new();
     EC_KEY *eckey = EC_KEY_new();
@@ -63,7 +70,8 @@ bool sign(int privkey_len, uint8_t *privkey, int hash_len, uint8_t *hash, uint8_
     return true;
 }
 
-int verify(int point_len, const uint8_t *point,
+VS_DLL_EXPORT
+int VS_STDCALL verify(int point_len, const uint8_t *point,
            int hash_len,uint8_t *hash,
            int sig_len, const uint8_t *sig)
 {
@@ -103,8 +111,8 @@ int verify(int point_len, const uint8_t *point,
     return verify_status;
 }
 
-
-bool generate_keypair(uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey,
+VS_DLL_EXPORT
+bool VS_STDCALL generate_keypair(uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey,
                       int *privkey_len, uint8_t *privkey)
 {
     BN_CTX *ctx = BN_CTX_new();
@@ -146,8 +154,8 @@ bool generate_keypair(uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey,
     return true;
 }
 
-
-bool get_public_key_uncompressed(int privkey_len, uint8_t *privkey, int *pubkey_len, uint8_t *pubkey)
+VS_DLL_EXPORT
+bool VS_STDCALL get_public_key_uncompressed(int privkey_len, uint8_t *privkey, int *pubkey_len, uint8_t *pubkey)
 {
     BN_CTX *ctx = BN_CTX_new();
     EC_KEY *eckey = EC_KEY_new();
@@ -181,8 +189,8 @@ bool get_public_key_uncompressed(int privkey_len, uint8_t *privkey, int *pubkey_
     return true;
 }
 
-
-bool get_public_key_compressed(int privkey_len, uint8_t *privkey, int *pubkey_len, uint8_t *pubkey)
+VS_DLL_EXPORT
+bool VS_STDCALL get_public_key_compressed(int privkey_len, uint8_t *privkey, int *pubkey_len, uint8_t *pubkey)
 {
     BN_CTX *ctx = BN_CTX_new();
     EC_KEY *eckey = EC_KEY_new();
@@ -216,8 +224,8 @@ bool get_public_key_compressed(int privkey_len, uint8_t *privkey, int *pubkey_le
     return true;
 }
 
-
-bool convert_from_der(long der_len, const unsigned char *der,
+VS_DLL_EXPORT
+bool VS_STDCALL convert_from_der(long der_len, const unsigned char *der,
                       uint8_t pubkey_type,
                       int *pubkey_len, uint8_t *pubkey,
                       int *privkey_len, uint8_t *privkey)
@@ -267,8 +275,8 @@ bool convert_from_der(long der_len, const unsigned char *der,
     return true;
 }
 
-
-bool convert_from_pem(const char *pem,
+VS_DLL_EXPORT
+bool VS_STDCALL convert_from_pem(const char *pem,
                       uint8_t pubkey_type,
                       int *pubkey_len, uint8_t *pubkey,
                       int *privkey_len, uint8_t *privkey)
@@ -322,7 +330,8 @@ bool convert_from_pem(const char *pem,
     return true;
 }
 
-int output_der(int privkey_len, uint8_t *privkey, uint8_t *der_out)
+VS_DLL_EXPORT
+int VS_STDCALL output_der(int privkey_len, uint8_t *privkey, uint8_t *der_out)
 {
     BN_CTX *ctx = BN_CTX_new();
     EC_KEY *eckey = EC_KEY_new();
@@ -357,8 +366,8 @@ int output_der(int privkey_len, uint8_t *privkey, uint8_t *der_out)
     return der_len;
 }
 
-
-int output_pem(int privkey_len, uint8_t *privkey, uint8_t *pem_out)
+VS_DLL_EXPORT
+int VS_STDCALL output_pem(int privkey_len, uint8_t *privkey, uint8_t *pem_out)
 {
     BN_CTX *ctx = BN_CTX_new();
     EC_KEY *eckey = EC_KEY_new();
@@ -389,7 +398,7 @@ int output_pem(int privkey_len, uint8_t *privkey, uint8_t *pem_out)
     PEM_write_bio_ECPrivateKey(out, eckey, NULL, NULL, 0, NULL, NULL);
     BIO_get_mem_ptr(out, &buf);
 
-    int len = strlen(buf->data);
+	int len = buf->length;
     memcpy(pem_out, buf->data, len);
 
     BIO_free_all(out);

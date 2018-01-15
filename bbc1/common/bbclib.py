@@ -28,7 +28,11 @@ from bbc1.common.bbc_error import *
 
 directory, filename = os.path.split(os.path.realpath(__file__))
 from ctypes import *
-libbbcsig = CDLL("%s/libbbcsig.so" % directory)
+
+if os.name == "nt":
+    libbbcsig = CDLL("%s/libbbcsig.dll" % directory)
+else:
+    libbbcsig = CDLL("%s/libbbcsig.so" % directory)
 
 
 domain_global_0 = binascii.a2b_hex("0000000000000000000000000000000000000000000000000000000000000000")
@@ -169,8 +173,8 @@ class KeyPair:
         if privkey is not None:
             memmove(self.private_key, bytes(privkey), sizeof(self.private_key))
         if pubkey is not None:
-            self.public_key_len = len(pubkey)
-            memmove(self.public_key, bytes(pubkey), self.public_key_len)
+            self.public_key_len = c_int32(len(pubkey))
+            memmove(self.public_key, bytes(pubkey), self.public_key_len.value)
 
         if privkey is None and pubkey is None:
             self.generate()
@@ -222,12 +226,12 @@ class KeyPair:
         return intval
 
     def get_private_key_in_der(self):
-        der_data = (c_byte * 256)()
+        der_data = (c_byte * 512)()     # 256 -> 512
         der_len = libbbcsig.output_der(self.private_key_len, self.private_key, byref(der_data))
         return bytes(bytearray(der_data)[:der_len])
 
     def get_private_key_in_pem(self):
-        pem_data = (c_char * 256)()
+        pem_data = (c_char * 512)()     # 256 -> 512
         pem_len = libbbcsig.output_pem(self.private_key_len, self.private_key, byref(pem_data))
         return pem_data.value
 
