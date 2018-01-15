@@ -1,0 +1,11 @@
+LIBRARY libbbcsig
+
+EXPORTS sign
+	verify
+	generate_keypair
+	get_public_key_uncompressed
+	get_public_key_compressed
+	convert_from_der
+	convert_from_pem
+	output_der
+	output_pem
