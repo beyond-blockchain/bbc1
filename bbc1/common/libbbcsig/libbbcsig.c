@@ -398,7 +398,7 @@ int VS_STDCALL output_pem(int privkey_len, uint8_t *privkey, uint8_t *pem_out)
     PEM_write_bio_ECPrivateKey(out, eckey, NULL, NULL, 0, NULL, NULL);
     BIO_get_mem_ptr(out, &buf);
 
-    int len = strlen(buf->data);
+	int len = buf->length;
     memcpy(pem_out, buf->data, len);
 
     BIO_free_all(out);
