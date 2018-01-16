@@ -2,7 +2,7 @@ language: python
 python: 3.6
 before_install:
   - pip install --upgrade pip
-  - pip install --upgrade pytest
+  #- pip install --upgrade pytest
 install:
   - sh prepare.sh
   - pip install -r requirements.txt
