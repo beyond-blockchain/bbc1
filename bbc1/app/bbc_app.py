@@ -304,6 +304,19 @@ class BBcAppClient:
         dat = self.make_message_structure(None, MsgType.UNREGISTER)
         return self.send_msg(dat)
 
+    def request_insert_completion_notification(self, asset_group_id, flag):
+        """
+        Request notification when a transaction has been inserted (as a copy of transaction)
+        :param asset_group_id:
+        :param flag:
+        :return:
+        """
+        if flag:
+            dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_INSERT_NOTIFICATION)
+        else:
+            dat = self.make_message_structure(asset_group_id, MsgType.CANCEL_INSERT_NOTIFICATION)
+        return self.send_msg(dat)
+
     def get_cross_refs(self, asset_group_id, number):
         """
         Get cross_refs
@@ -444,6 +457,14 @@ class BBcAppClient:
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
+    def get_stats(self):
+        """
+        Get statistics of bbc_core
+        :return:
+        """
+        dat = self.make_message_structure(None, MsgType.REQUEST_GET_STATS)
+        return self.send_msg(dat)
+
     def send_message(self, msg, asset_group_id, dst_user_id):
         """
         Send peer-to-peer message to the specified user_id
@@ -509,6 +530,8 @@ class Callback:
             self.proc_resp_sign_request(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_INSERT:
             self.proc_resp_insert(dat)
+        elif dat[KeyType.command] == MsgType.NOTIFY_INSERTED:
+            self.proc_notify_inserted(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_CROSS_REF:
             self.proc_resp_cross_ref(dat)
         elif dat[KeyType.command] == MsgType.MESSAGE:
@@ -531,7 +554,8 @@ class Callback:
             self.proc_resp_get_config(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_MANIP_LEDGER_SUBSYS:
             self.proc_resp_ledger_subsystem(dat)
-
+        elif dat[KeyType.command] == MsgType.RESPONSE_GET_STATS:
+            self.proc_resp_get_stats(dat)
         else:
             self.logger.warn("No method to process for command=%d" % dat[KeyType.command])
 
@@ -568,6 +592,9 @@ class Callback:
         self.queue.put({KeyType.status: ESUCCESS, KeyType.result: (dat[KeyType.ref_index], dat[KeyType.source_user_id], sig)})
 
     def proc_resp_insert(self, dat):
+        self.queue.put(dat)
+
+    def proc_notify_inserted(self, dat):
         self.queue.put(dat)
 
     def proc_resp_search_asset(self, dat):
@@ -652,4 +679,5 @@ class Callback:
     def proc_resp_ledger_subsystem(self, dat):
         self.queue.put(dat)
 
-
+    def proc_resp_get_stats(self, dat):
+        self.queue.put(dat)
