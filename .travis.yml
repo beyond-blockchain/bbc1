@@ -2,11 +2,11 @@ language: python
 python: 3.6
 before_install:
   - pip install --upgrade pip
-  #- pip install --upgrade pytest
 install:
   - sh prepare.sh
   - pip install -r requirements.txt
   - pip install --upgrade setuptools
+  - pip install --upgrade pytest
 script:
   - cd tests
   - pytest test_asset_group_info_adv.py
