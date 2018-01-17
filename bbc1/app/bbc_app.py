@@ -101,6 +101,22 @@ def get_id_from_mappings(name, asset_group_id):
     return None
 
 
+def get_list_from_mappings(asset_group_id):
+    if not os.path.exists(MAPPING_FILE):
+        return None
+    asset_group_id_str = binascii.b2a_hex(asset_group_id).decode()
+    with open(MAPPING_FILE, "r") as f:
+        mapping = json.load(f)
+    if mapping is None:
+        return None
+    if asset_group_id_str in mapping:
+        result  = []
+        for name in mapping[asset_group_id_str]:
+            result.append(name)
+        return result
+    return None
+
+
 class BBcAppClient:
     def __init__(self, host='127.0.0.1', port=DEFAULT_CORE_PORT, logname="-", loglevel="none"):
         self.logger = logger.get_logger(key="bbc_app", level=loglevel, logname=logname)
@@ -273,15 +289,17 @@ class BBcAppClient:
         dat = self.make_message_structure(None, MsgType.REQUEST_GET_DOMAINLIST)
         return self.send_msg(dat)
 
-    def manipulate_ledger_subsystem(self, enable=False):
+    def manipulate_ledger_subsystem(self, enable=False, domain_id=None):
         """
         start/stop ledger_subsystem on the bbc_core (maybe used by a system administrator)
 
         :param enable: True->start, False->stop
+        :param domain_id: 
         :return:
         """
         dat = self.make_message_structure(None, MsgType.REQUEST_MANIP_LEDGER_SUBSYS)
         dat[KeyType.ledger_subsys_manip] = enable
+        dat[KeyType.domain_id] = domain_id
         return self.send_msg(dat)
 
     def register_to_core(self):

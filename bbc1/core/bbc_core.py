@@ -103,7 +103,7 @@ def check_transaction_if_having_asset_file(txdata, asid):
 
 
 class BBcCoreService:
-    def __init__(self, ipv6=None, p2p_port=None, core_port=None, use_global=False,
+    def __init__(self, ipv6=None, p2p_port=None, core_port=None, use_global=False, ip4addr=None, ip6addr=None,
                  workingdir=".bbc1", configfile=None,
                  loglevel="all", logname="-", server_start=True):
         self.logger = logger.get_logger(key="core", level=loglevel, logname=logname)
@@ -127,8 +127,9 @@ class BBcCoreService:
         self.ledger_manager = BBcLedger(self.config)
         self.storage_manager = bbc_storage.BBcStorage(self.config)
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port, use_global=use_global,
+                                                 external_ip4addr=ip4addr, external_ip6addr=ip6addr,
                                                  loglevel=loglevel, logname=logname)
-        self.ledger_subsystem = ledger_subsystem.LedgerSubsystem(self.config, loglevel=loglevel, logname=logname)
+        self.ledger_subsystem = ledger_subsystem.LedgerSubsystem(self.config, core=self, loglevel=loglevel, logname=logname)
 
         gevent.signal(signal.SIGINT, self.quit_program)
         if server_start:
@@ -380,7 +381,7 @@ class BBcCoreService:
                                             dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
             result = self.ledger_subsystem.verify_transaction(asset_group_id=asset_group_id,
                                                               transaction_id=transaction_id)
-            retmsg[KeyType.markle_tree] = result
+            retmsg[KeyType.merkle_tree] = result
             self.send_message(retmsg)
 
         elif cmd == MsgType.REQUEST_GET_STATS:
@@ -466,15 +467,6 @@ class BBcCoreService:
             retmsg[KeyType.bbc_configuration] = jsondat
             self.send_raw_message(socket, retmsg)
 
-        elif cmd == MsgType.REQUEST_GET_PEERLIST:
-            domain_id = dat[KeyType.domain_id]
-            retmsg = make_message_structure(MsgType.RESPONSE_GET_PEERLIST,
-                                            None, dat[KeyType.source_user_id], dat[KeyType.query_id])
-            if domain_id in self.networking.domains:
-                retmsg[KeyType.domain_id] = domain_id
-                retmsg[KeyType.peer_list] = self.networking.domains[domain_id].make_peer_list()
-            self.send_raw_message(socket, retmsg)
-
         elif cmd == MsgType.REQUEST_GET_DOMAINLIST:
             retmsg = make_message_structure(MsgType.RESPONSE_GET_DOMAINLIST,
                                             None, dat[KeyType.source_user_id], dat[KeyType.query_id])
@@ -502,6 +494,7 @@ class BBcCoreService:
                 self.ledger_subsystem.enable()
             else:
                 self.ledger_subsystem.disable()
+            self.ledger_subsystem.set_domain(dat[KeyType.domain_id])
             self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_INSERT_NOTIFICATION:
@@ -1051,6 +1044,8 @@ if __name__ == '__main__':
         workingdir=argresult.workingdir,
         configfile=argresult.config,
         use_global=argresult.globaldomain,
+        ip4addr=argresult.ip4addr,
+        ip6addr=argresult.ip6addr,
         logname=argresult.log,
         loglevel=argresult.verbose_level,
     )

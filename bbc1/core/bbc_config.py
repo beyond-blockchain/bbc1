@@ -44,6 +44,7 @@ current_config = {
         'type': "sqlite3",
         'transaction_db': "bbc_transaction.sqlite3",
         'auxiliary_db': "bbc_aux.sqlite3",
+        'merkle_db': "bbc_merkle.sqlite3",
     },
     'storage': {
         #'path': "path/to/somewhere",
