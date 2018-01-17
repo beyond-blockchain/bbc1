@@ -6,15 +6,12 @@ matrix:
 before_install:
   - pip install --upgrade pip
   - pip install --upgrade pytest
-  - which pyetst
   - pytest --version
 install:
   - sh prepare.sh
   - pip install -r requirements.txt
-  - pip install --upgrade setuptools
-  - which pyetst
+  #- pip install --upgrade setuptools
   - pytest --version
 script:
   - cd tests
-  - which pyetst
   - pytest --version
