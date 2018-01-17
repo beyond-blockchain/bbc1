@@ -420,6 +420,18 @@ class BBcAppClient:
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
+    def search_transaction_by_userid(self, asset_group_id, user_id):
+        """
+        Search request for transaction_data by user_id
+
+        :param asset_group_id:
+        :param user_id: user_id of the asset owner
+        :return: The transaction_data that includes asset with the specified user_id
+        """
+        dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_SEARCH_USERID)
+        dat[KeyType.user_id] = user_id
+        return self.send_msg(dat)
+
     def register_in_ledger_subsystem(self, asset_group_id, transaction_id):
         """
         Register transaction_id in the ledger_subsystem
@@ -501,6 +513,8 @@ class Callback:
             self.proc_resp_search_transaction(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_ASSET:
             self.proc_resp_search_asset(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_USERID:
+            self.proc_resp_search_by_userid(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GATHER_SIGNATURE:
             self.proc_resp_gather_signature(dat)
         elif dat[KeyType.command] == MsgType.REQUEST_SIGNATURE:
@@ -571,6 +585,9 @@ class Callback:
         self.queue.put(dat)
 
     def proc_resp_search_asset(self, dat):
+        self.queue.put(dat)
+
+    def proc_resp_search_by_userid(self, dat):
         self.queue.put(dat)
 
     def proc_resp_search_transaction(self, dat):

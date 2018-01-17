@@ -286,6 +286,15 @@ class BBcCoreService:
                 retmsg.update(result)
                 self.send_message(retmsg)
 
+        elif cmd == MsgType.REQUEST_SEARCH_USERID:
+            if not self.param_check([KeyType.asset_group_id, KeyType.user_id], dat):
+                self.logger.debug("REQUEST_SEARCH_USERID: bad format")
+                return False, None
+            result = self.search_transaction_by_userid_locally(dat[KeyType.asset_group_id], dat[KeyType.user_id],
+                                                               dat[KeyType.source_user_id], dat[KeyType.query_id])
+            if result is not None:
+                self.send_message(result)
+
         elif cmd == MsgType.REQUEST_GATHER_SIGNATURE:
             if not self.param_check([KeyType.asset_group_id, KeyType.transaction_data], dat):
                 self.logger.debug("REQUEST_GATHER_SIGNATURE: bad format")
@@ -638,7 +647,7 @@ class BBcCoreService:
                 break
             user_id = evt.asset.user_id
             if not self.ledger_manager.insert_locally(domain_id, asset_group_id, user_id,
-                                                      ResourceType.Owner_asset, asid,
+                                                      ResourceType.Owner_asset, txobj.transaction_id,
                                                       require_uniqueness=False):
                 rollback_flag = True
                 break
@@ -864,7 +873,7 @@ class BBcCoreService:
         :param txid:  transaction_id
         :param source_id: the user_id of the sender
         :param query_id:
-        :return: dictionary data of transaction_data
+        :return: response data including transaction_data
         """
         domain_id = self.asset_group_domain_mapping.get(asset_group_id, None)
         if domain_id is None:
@@ -889,6 +898,35 @@ class BBcCoreService:
             query_entry.update(fire_after=INTERVAL_RETRY, callback=self.succeed_to_find_transaction)
             self.networking.get(query_entry)
             return None
+        response_info[KeyType.transaction_data] = txdata
+        return response_info
+
+    def search_transaction_by_userid_locally(self, asset_group_id, user_id, source_id, query_id):
+        """
+        Local search a latest transaction that includes the asset owned by the specified user_id
+        TODO: need to support search it within the domain
+        :param asset_group_id:
+        :param user_id:
+        :param source_id: the user_id of the sender
+        :param query_id:
+        :return: response data including transaction_data, if a transaction is not found in the local DB, None is returned.
+        """
+        domain_id = self.asset_group_domain_mapping.get(asset_group_id, None)
+        if domain_id is None:
+            self.logger.error("No such asset_group_id is set up in any domain")
+            return None
+
+        txid = self.ledger_manager.find_locally(domain_id, asset_group_id, user_id,
+                                                ResourceType.Owner_asset, want_newest=True)
+        if txid is None:
+            return None
+
+        txdata = self.ledger_manager.find_locally(domain_id, asset_group_id, txid, ResourceType.Transaction_data)
+        if txdata is not None and self.validate_transaction(txid, txdata, None) is None:
+            self.ledger_manager.remove(domain_id, asset_group_id, txid)
+            return None
+        response_info = make_message_structure(MsgType.RESPONSE_SEARCH_USERID,
+                                               asset_group_id, source_id, query_id)
         response_info[KeyType.transaction_data] = txdata
         return response_info
 

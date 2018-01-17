@@ -23,6 +23,7 @@ domain_id = bbclib.get_new_id("testdomain")
 asset_group_id = bbclib.get_new_id("asset_group_1")
 cross_refs = []
 transaction = None
+txid = None
 
 result_queue = queue.Queue()
 
@@ -79,7 +80,7 @@ class TestBBcCore(object):
             ret = core.pop_cross_refs(2)
             for cross in ret:
                 print("[%i] %s" % (idx, ret))
-                c = bbclib.BBcCrossRef(cross[0], cross[1])
+                c = bbclib.BBcCrossRef(asset_group_id=cross[1], transaction_id=cross[0])
                 cross_refs.append(c)
 
     def test_03_transaction_insert(self):
@@ -270,7 +271,7 @@ class TestBBcCore(object):
             ret = core.pop_cross_refs(2)
             for cross in ret:
                 print("[%i] %s" % (idx, ret))
-                c = bbclib.BBcCrossRef(cross[0], cross[1])
+                c = bbclib.BBcCrossRef(asset_group_id=cross[1], transaction_id=cross[0])
                 cross_refs.append(c)
 
     def test_11_transaction_insert(self):
@@ -295,6 +296,17 @@ class TestBBcCore(object):
         print(ret)
         for i in range(len(cores)):
             print("[%d] cross_ref_list=%d" % (i, len(cores[i].cross_ref_list)))
+
+    def test_12_transaction_search_by_userid_locally(self):
+        print("-----", sys._getframe().f_code.co_name, "-----")
+        ret = cores[1].search_transaction_by_userid_locally(asset_group_id, clients[1]['user_id'],
+                                                            clients[1]['user_id'], b'aaaa')
+        transaction_data = ret[KeyType.transaction_data]
+        txobj = bbclib.BBcTransaction()
+        txobj.deserialize(transaction_data)
+        assert txobj.transaction_id == transaction.transaction_id
+        print("expected: %s" % binascii.b2a_hex(transaction.transaction_id))
+        print("obtained: %s" % binascii.b2a_hex(txobj.transaction_id))
 
 
 if __name__ == '__main__':
