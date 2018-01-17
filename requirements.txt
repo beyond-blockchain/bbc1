@@ -2,6 +2,7 @@ pyOpenSSL>=16.2.0
 jinja2==2.8.1
 requests>=2.12.4
 gevent>=1.2.1
+pytest>=3.0.5
 msgpack-python>=0.4.8
 populus
 

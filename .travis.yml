@@ -10,7 +10,6 @@ before_install:
 install:
   - sh prepare.sh
   - pip install -r requirements.txt
-  #- pip install --upgrade setuptools
   - pytest --version
 script:
   - cd tests
