@@ -8,5 +8,4 @@ pytest>=3.0.5
 gevent>=1.2.1
 msgpack-python>=0.4.8
 populus
-bbc1
 
