@@ -5,6 +5,9 @@ matrix:
     - os: linux
       sudo: required
       python: 3.6
+    - os: osx
+      language: generic
+      env: TOXENV=py36
 before_install:
   - pip install --upgrade pip
   - pip install --upgrade pytest
