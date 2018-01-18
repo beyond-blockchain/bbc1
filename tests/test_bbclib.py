@@ -197,3 +197,47 @@ class TestBBcLib(object):
         digest = transaction1.digest()
         ret = transaction1.signatures[0].verify(digest)
         assert not ret
+
+    def test_08_size_change(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        asset_group_id2 = bbclib.get_new_id("asset_group_2")
+
+        txobj = BBcTransaction()
+        asset = BBcAsset()
+        asset.add(user_id=user_id, asset_body=b"0"*1500)
+        event = BBcEvent(asset_group_id=asset_group_id2)
+        event.add(asset=asset)
+        txobj.add(event=event)
+        sig = txobj.sign(key_type=KeyType.ECDSA_SECP256k1, private_key=keypair1.private_key, public_key=keypair1.public_key)
+        if sig is None:
+            print(bbclib.error_text)
+            assert sig
+            txobj.add_signature(signature=sig)
+        print("***** before max size change *****")
+        txobj.dump()
+
+        txobj = BBcTransaction()
+        asset = BBcAsset(max_body_size=2000)
+        asset.add(user_id=user_id, asset_body=b"0"*1500)
+        event = BBcEvent(asset_group_id=asset_group_id2)
+        event.add(asset=asset)
+        txobj.add(event=event)
+        sig = txobj.sign(key_type=KeyType.ECDSA_SECP256k1, private_key=keypair1.private_key, public_key=keypair1.public_key)
+        if sig is None:
+            print(bbclib.error_text)
+            assert sig
+            txobj.add_signature(signature=sig)
+        print("***** after max size change (2000bytes) *****")
+        txobj.dump()
+
+        bbclib.set_max_body_size(asset_group_id2, 3000)
+
+        txobj = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id2)
+        txobj.events[0].asset.add(user_id=user_id, asset_body=b"0"*2500)
+        sig = txobj.sign(key_type=KeyType.ECDSA_SECP256k1, private_key=keypair1.private_key, public_key=keypair1.public_key)
+        if sig is None:
+            print(bbclib.error_text)
+            assert sig
+            txobj.add_signature(signature=sig)
+        print("***** after max size change(3000bytes) *****")
+        txobj.dump()

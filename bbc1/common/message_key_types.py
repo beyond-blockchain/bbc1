@@ -146,6 +146,7 @@ class KeyType:
     port_number = to_4byte(11, 0x30)
     external_ip4addr = to_4byte(12, 0x30)
     external_ip6addr = to_4byte(13, 0x30)
+    max_body_size = to_4byte(14, 0x30)
 
     resource_id = to_4byte(0, 0x40)
     resource_type = to_4byte(1, 0x40)
