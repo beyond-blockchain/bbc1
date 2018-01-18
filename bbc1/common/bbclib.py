@@ -32,6 +32,8 @@ libbbcsig = CDLL("%s/libbbcsig.so" % directory)
 
 
 domain_global_0 = binascii.a2b_hex("0000000000000000000000000000000000000000000000000000000000000000")
+DEFAULT_MAX_BODY_SIZE = 256
+max_bodysize_conf = dict()
 
 error_code = -1
 error_text = ""
@@ -49,6 +51,11 @@ def reset_error():
     global error_text
     error_code = ESUCCESS
     error_text = ""
+
+
+def set_max_body_size(asset_group_id, body_size):
+    global max_bodysize_conf
+    max_bodysize_conf[asset_group_id] = body_size
 
 
 def get_new_id(seed_str=None, include_timestamp=True):
@@ -90,7 +97,7 @@ def make_transaction_for_base_asset(asset_group_id=None, event_num=1):
     transaction = BBcTransaction()
     for i in range(event_num):
         evt = BBcEvent(asset_group_id=asset_group_id)
-        ast = BBcAsset()
+        ast = BBcAsset(max_body_size=max_bodysize_conf.get(asset_group_id, DEFAULT_MAX_BODY_SIZE))
         evt.add(asset=ast)
         transaction.add(event=evt)
     return transaction
@@ -598,7 +605,7 @@ class BBcEvent:
                 self.option_approvers.append(appr)
             ptr, astsize = get_n_byte_int(ptr, 4, data)
             ptr, astdata = get_n_bytes(ptr, astsize, data)
-            self.asset = BBcAsset()
+            self.asset = BBcAsset(max_body_size=max_bodysize_conf.get(self.asset_group_id, DEFAULT_MAX_BODY_SIZE))
             self.asset.deserialize(astdata)
         except:
             return False
@@ -675,7 +682,7 @@ class BBcReference:
 
 
 class BBcAsset:
-    def __init__(self):
+    def __init__(self, max_body_size=DEFAULT_MAX_BODY_SIZE):
         self.asset_id = None
         self.user_id = None
         self.nonce = get_random_value()
@@ -683,7 +690,8 @@ class BBcAsset:
         self.asset_file = None
         self.asset_file_digest = None
         self.asset_body_size = 0
-        self.asset_body = []    # up to 256 bytes
+        self.asset_body = []
+        self.max_body_size = max_body_size
 
     def add(self, user_id=None, asset_file=None, asset_body=None):
         if user_id is not None:
@@ -693,7 +701,7 @@ class BBcAsset:
             self.asset_file_size = len(asset_file)
             self.asset_file_digest = hashlib.sha256(asset_file).digest()
         if asset_body is not None:
-            if len(asset_body) > 256:
+            if len(asset_body) > self.max_body_size:
                 self.asset_file = asset_body
                 self.asset_file_size = len(asset_body)
                 self.asset_file_digest = hashlib.sha256(asset_body).digest()
