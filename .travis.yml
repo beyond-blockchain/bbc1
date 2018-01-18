@@ -18,14 +18,14 @@ script:
   - pytest test_bbc_config.py
   - pytest test_bbc_core.py
   - pytest test_bbc_core_refresh_peers.py
-  - pytest test_bbc_ethereum.py
+  #- pytest test_bbc_ethereum.py
   - pytest test_bbc_ledger.py
   - pytest test_bbc_network.py
   - pytest test_bbc_network_with_core.py
   - pytest test_bbc_storage.py
   - pytest test_bbclib.py
   - pytest test_fileproof_multi_core.py
-  - pytest test_ledger_subsystem.py
+  #- pytest test_ledger_subsystem.py
   - pytest test_many_domains_with_global.py
   - pytest test_pending_request.py
   - pytest test_recover.py
