@@ -11,7 +11,7 @@ sys.path.extend(["../"])
 
 from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
-from bbc1.core import bbc_network, bbc_config, query_management
+from bbc1.core import bbc_network, bbc_config, query_management, bbc_stats
 from bbc1.core.bbc_ledger import ResourceType
 
 
@@ -80,6 +80,7 @@ class DummyCore:
     def __init__(self):
         self.ledger_manager = DummyCore.DB()
         self.storage_manager = DummyCore.Storage()
+        self.stats = bbc_stats.BBcStats()
 
     def send_message(self, data):
         print("[Core] recv=%s" % data)

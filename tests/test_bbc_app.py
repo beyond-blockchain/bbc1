@@ -170,6 +170,17 @@ class TestBBcAppClient(object):
         assert dat[KeyType.status] == ESUCCESS
         transactions[0].dump()
 
+    def test_21_search_transaction_by_userid(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        ret = clients[0]['app'].search_transaction_by_userid(asset_group_id, clients[0]['user_id'])
+        assert ret
+        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_USERID)
+        assert dat[KeyType.status] == ESUCCESS
+        transaction_data = dat[KeyType.transaction_data]
+        txobj = bbclib.BBcTransaction()
+        txobj.deserialize(transaction_data)
+        txobj.dump()
+
     @pytest.mark.unregister
     def test_99_unregister(self):
         ret = clients[0]['app'].unregister_from_core()
