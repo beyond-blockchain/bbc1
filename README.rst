@@ -29,6 +29,11 @@ Every directory includes README.md. Please read it for the details. Furthermore,
 
 # Quick start
 
+## Documents
+Some documents are available in docs/.
+* [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
+
+
 ## From source code in github
 1. Install tools (libtool, automake)
 2. Install python and pip
