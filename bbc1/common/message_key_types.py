@@ -125,11 +125,12 @@ class KeyType:
     query_id = to_4byte(12)      # query_id from bbc_app
     nonce = to_4byte(13)
     count = to_4byte(14)
+    stats = to_4byte(15)
 
     ledger_subsys_manip = to_4byte(0, 0x20)     # enable/disable ledger_subsystem
     ledger_subsys_register = to_4byte(1, 0x20)
     ledger_subsys_verify = to_4byte(2, 0x20)
-    markle_tree = to_4byte(3, 0x20)
+    merkle_tree = to_4byte(3, 0x20)
 
     network_module = to_4byte(0, 0x30)
     storage_type = to_4byte(1, 0x30)
@@ -143,6 +144,9 @@ class KeyType:
     ipv4_address = to_4byte(9, 0x30)
     ipv6_address = to_4byte(10, 0x30)
     port_number = to_4byte(11, 0x30)
+    external_ip4addr = to_4byte(12, 0x30)
+    external_ip6addr = to_4byte(13, 0x30)
+    max_body_size = to_4byte(14, 0x30)
 
     resource_id = to_4byte(0, 0x40)
     resource_type = to_4byte(1, 0x40)

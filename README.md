@@ -113,7 +113,8 @@ The working directory of BBc-1 on the docker container is mounted on docker/data
 * somewhere/.bbc1/
     - default working directory name of bbc_core.py
 * requirements.txt
-    - for pip install
+    - python modules to be required
 * setup.py
 * MANIFEST.in
+* prepare.py
     - for creatign python modules

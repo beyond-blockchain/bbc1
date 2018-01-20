@@ -44,6 +44,7 @@ current_config = {
         'type': "sqlite3",
         'transaction_db': "bbc_transaction.sqlite3",
         'auxiliary_db': "bbc_aux.sqlite3",
+        'merkle_db': "bbc_merkle.sqlite3",
     },
     'storage': {
         #'path': "path/to/somewhere",
@@ -159,5 +160,6 @@ class BBcConfig:
                 'storage_type': StorageType.FILESYSTEM,
                 'storage_path': None,
                 'advertise_in_domain0': False,
+                'max_body_size': bbclib.DEFAULT_MAX_BODY_SIZE,
             }
         return dc['asset_group_ids'][asset_group_str]

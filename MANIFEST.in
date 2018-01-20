@@ -6,6 +6,7 @@ include MANIFEST.in
 include package.json
 include *.rst
 include prepare.sh
+include prepare.py
 recursive-include third_party/openssl *
 recursive-include bbc1/common/libbbcsig *
 recursive-include bbc1/common *

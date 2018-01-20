@@ -25,7 +25,7 @@ DEFAULT_SERV_ADDR = '127.0.0.1'
 
 def parser():
     usage = 'python {} [--ipv6] [--coreport <number>] [--p2pport <number>] [--workingdir <dir>] ' \
-            '[--config <filename>] [--globaldomain] ' \
+            '[--config <filename>] [--globaldomain] [--ip4addr <IP addr>] [--ip6addr <IPv6 addr>] ' \
             '[--log <filename>] [--verbose_level <string>] [--daemon] [--kill] [--help]'.format(__file__)
     argparser = ArgumentParser(usage=usage)
     argparser.add_argument('--ipv6',
@@ -42,6 +42,10 @@ def parser():
     argparser.add_argument('--globaldomain',
                            action='store_true',
                            help='connect with domain_global_0')
+    argparser.add_argument('--ip4addr', type=str, default=None,
+                           help='IPv4 address exposed to the external network')
+    argparser.add_argument('--ip6addr', type=str, default=None,
+                           help='IPv6 address exposed to the external network')
     argparser.add_argument('-l', '--log', type=str, default="-",
                            help='log filename/"-" means STDOUT')
     argparser.add_argument('-d', '--daemon',

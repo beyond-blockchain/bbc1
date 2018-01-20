@@ -14,11 +14,12 @@ Currently supports local geth chain only.
 * ../core/ledger_subsystem.py
   * enable() to enable writing to the subsystem (or initialize with enabled=True).
   * disable() to disable writing to the subsystem.
+  * set_domain(domain_id) to set relevant domain_id.
   * register_transaction(asset_group_id, transaction_id) to write the transaction_id into a Merkle tree.
   * verify_transaction(asset_group_id, transaction_id) to verify that the transaction exists and to receive the Merkle subtree.
 
 ## Dependencies
-* populus 1.10.1 (note that rlp==0.5.1), 1.11.0
+* populus 1.10.1 (note that rlp==0.5.1), 1.11.0-2.1.0, 2.2.0 (requires project.json from older environment)
 * geth (go ethereum) 1.7.2, 1.7.3
 * solc (solidity) 0.4.17, 0.4.18
 
@@ -40,6 +41,7 @@ python setup.py new_account <passphrase>
 python setup.py run
 ```
 For the first execution, this would take some tens of minutes for mining to be started.
+
 5. Deploy BBcAnchor smart contract
 ```
 python setup.py deploy

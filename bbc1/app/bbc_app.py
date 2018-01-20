@@ -101,6 +101,22 @@ def get_id_from_mappings(name, asset_group_id):
     return None
 
 
+def get_list_from_mappings(asset_group_id):
+    if not os.path.exists(MAPPING_FILE):
+        return None
+    asset_group_id_str = binascii.b2a_hex(asset_group_id).decode()
+    with open(MAPPING_FILE, "r") as f:
+        mapping = json.load(f)
+    if mapping is None:
+        return None
+    if asset_group_id_str in mapping:
+        result  = []
+        for name in mapping[asset_group_id_str]:
+            result.append(name)
+        return result
+    return None
+
+
 class BBcAppClient:
     def __init__(self, host='127.0.0.1', port=DEFAULT_CORE_PORT, logname="-", loglevel="none"):
         self.logger = logger.get_logger(key="bbc_app", level=loglevel, logname=logname)
@@ -236,7 +252,7 @@ class BBcAppClient:
 
     def register_asset_group(self, domain_id, asset_group_id,
                              storage_type=StorageType.FILESYSTEM, storage_path=None,
-                             advertise_in_domain0=False):
+                             advertise_in_domain0=False, max_body_size=bbclib.DEFAULT_MAX_BODY_SIZE):
         """
         Register an asset_group in the core node (maybe used by a system administrator)
 
@@ -245,12 +261,14 @@ class BBcAppClient:
         :param storage_type:
         :param storage_path:
         :param advertise_in_domain0:
+        :param max_body_size:
         :return:
         """
         dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_SETUP_ASSET_GROUP)
         dat[KeyType.domain_id] = domain_id
         dat[KeyType.storage_type] = storage_type
         dat[KeyType.advertise_in_domain0] = advertise_in_domain0
+        dat[KeyType.max_body_size] = max_body_size
         if storage_path is not None:
             dat[KeyType.storage_path] = storage_path
         return self.send_msg(dat)
@@ -273,15 +291,17 @@ class BBcAppClient:
         dat = self.make_message_structure(None, MsgType.REQUEST_GET_DOMAINLIST)
         return self.send_msg(dat)
 
-    def manipulate_ledger_subsystem(self, enable=False):
+    def manipulate_ledger_subsystem(self, enable=False, domain_id=None):
         """
         start/stop ledger_subsystem on the bbc_core (maybe used by a system administrator)
 
         :param enable: True->start, False->stop
+        :param domain_id: 
         :return:
         """
         dat = self.make_message_structure(None, MsgType.REQUEST_MANIP_LEDGER_SUBSYS)
         dat[KeyType.ledger_subsys_manip] = enable
+        dat[KeyType.domain_id] = domain_id
         return self.send_msg(dat)
 
     def register_to_core(self):
@@ -302,6 +322,19 @@ class BBcAppClient:
         :return:
         """
         dat = self.make_message_structure(None, MsgType.UNREGISTER)
+        return self.send_msg(dat)
+
+    def request_insert_completion_notification(self, asset_group_id, flag):
+        """
+        Request notification when a transaction has been inserted (as a copy of transaction)
+        :param asset_group_id:
+        :param flag:
+        :return:
+        """
+        if flag:
+            dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_INSERT_NOTIFICATION)
+        else:
+            dat = self.make_message_structure(asset_group_id, MsgType.CANCEL_INSERT_NOTIFICATION)
         return self.send_msg(dat)
 
     def get_cross_refs(self, asset_group_id, number):
@@ -462,6 +495,14 @@ class BBcAppClient:
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
+    def get_stats(self):
+        """
+        Get statistics of bbc_core
+        :return:
+        """
+        dat = self.make_message_structure(None, MsgType.REQUEST_GET_STATS)
+        return self.send_msg(dat)
+
     def send_message(self, msg, asset_group_id, dst_user_id):
         """
         Send peer-to-peer message to the specified user_id
@@ -540,6 +581,8 @@ class Callback:
             self.proc_resp_sign_request(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_INSERT:
             self.proc_resp_insert(dat)
+        elif dat[KeyType.command] == MsgType.NOTIFY_INSERTED:
+            self.proc_notify_inserted(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_CROSS_REF:
             self.proc_resp_cross_ref(dat)
         elif dat[KeyType.command] == MsgType.MESSAGE:
@@ -562,7 +605,8 @@ class Callback:
             self.proc_resp_get_config(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_MANIP_LEDGER_SUBSYS:
             self.proc_resp_ledger_subsystem(dat)
-
+        elif dat[KeyType.command] == MsgType.RESPONSE_GET_STATS:
+            self.proc_resp_get_stats(dat)
         else:
             self.logger.warn("No method to process for command=%d" % dat[KeyType.command])
 
@@ -614,6 +658,9 @@ class Callback:
         self.queue.put({KeyType.status: ESUCCESS, KeyType.result: (dat[KeyType.ref_index], dat[KeyType.source_user_id], sig)})
 
     def proc_resp_insert(self, dat):
+        self.queue.put(dat)
+
+    def proc_notify_inserted(self, dat):
         self.queue.put(dat)
 
     def proc_resp_search_asset(self, dat):
@@ -701,4 +748,5 @@ class Callback:
     def proc_resp_ledger_subsystem(self, dat):
         self.queue.put(dat)
 
-
+    def proc_resp_get_stats(self, dat):
+        self.queue.put(dat)

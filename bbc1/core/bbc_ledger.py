@@ -131,8 +131,8 @@ class BBcLedger:
         sql += ");"
         self.exec_sql(domain_id, dbname, sql)
         for idx in indices:
-            self.exec_sql(domain_id, dbname, "CREATE INDEX transaction_table_idx_%d ON %s (%s);" %
-                          (idx, tbl, tbl_definition[idx][0]))
+            self.exec_sql(domain_id, dbname, "CREATE INDEX %s_idx_%d ON %s (%s);" %
+                          (tbl, idx, tbl, tbl_definition[idx][0]))
 
     def exec_sql_fetchone(self, domain_id, dbname, sql, *dat):
         """
