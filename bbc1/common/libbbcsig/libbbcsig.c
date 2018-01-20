@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <strings.h>
 
 #include "libbbcsig.h"
 #include <string.h>

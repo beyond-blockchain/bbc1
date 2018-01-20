@@ -177,18 +177,18 @@ class BBcAppClient:
         (internal use) send the message to the core node
 
         :param dat:
-        :return:
+        :return query_id or None:
         """
         if KeyType.asset_group_id not in dat or KeyType.source_user_id not in dat:
             self.logger.warn("Message must include asset_group_id and source_id")
-            return False
+            return None
         try:
             msg = message_key_types.make_message(PayloadType.Type_msgpack, dat)
             self.connection.sendall(msg)
         except Exception as e:
             self.logger.error(e)
-            return False
-        return True
+            return None
+        return self.query_id
 
     def domain_setup(self, domain_id, module_name=None):
         """
@@ -376,7 +376,7 @@ class BBcAppClient:
             dat[KeyType.all_asset_files] = asset_files
         return self.send_msg(dat)
 
-    def sendback_signature(self, asset_group_id, dst, ref_index, sig):
+    def sendback_signature(self, asset_group_id, dst, ref_index, sig, query_id=None):
         """
         Send back the signed transaction to the source
 
@@ -384,27 +384,33 @@ class BBcAppClient:
         :param dst:
         :param ref_index: Which reference in transaction the signature is for
         :param sig:
+        :param query_id:
         :return:
         """
         dat = self.make_message_structure(asset_group_id, MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dst
         dat[KeyType.ref_index] = ref_index
         dat[KeyType.signature] = sig.serialize()
+        if query_id is not None:
+            dat[KeyType.query_id] = query_id
         return self.send_msg(dat)
 
-    def sendback_denial_of_sign(self, asset_group_id, dst, reason_text):
+    def sendback_denial_of_sign(self, asset_group_id, dst, reason_text, query_id=None):
         """
         Send back the denial of sign the transaction
 
         :param asset_group_id:
         :param dst:
         :param reason_text:
+        :param query_id:
         :return:
         """
         dat = self.make_message_structure(asset_group_id, MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dst
         dat[KeyType.status] = EOTHER
         dat[KeyType.reason] = reason_text
+        if query_id is not None:
+            dat[KeyType.query_id] = query_id
         return self.send_msg(dat)
 
     def insert_transaction(self, asset_group_id, tx_obj):
@@ -451,6 +457,18 @@ class BBcAppClient:
         """
         dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_SEARCH_TRANSACTION)
         dat[KeyType.transaction_id] = transaction_id
+        return self.send_msg(dat)
+
+    def search_transaction_by_userid(self, asset_group_id, user_id):
+        """
+        Search request for transaction_data by user_id
+
+        :param asset_group_id:
+        :param user_id: user_id of the asset owner
+        :return: The transaction_data that includes asset with the specified user_id
+        """
+        dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_SEARCH_USERID)
+        dat[KeyType.user_id] = user_id
         return self.send_msg(dat)
 
     def register_in_ledger_subsystem(self, asset_group_id, transaction_id):
@@ -529,19 +547,32 @@ class Callback:
     def __init__(self, log=None):
         self.logger = log
         self.queue = queue.Queue()
+        self.query_queue = dict()
 
     def set_logger(self, log):
         self.logger = log
 
+    def create_queue(self, query_id):
+        self.query_queue.setdefault(query_id, queue.Queue())
+
+    def destroy_queue(self, query_id):
+        self.query_queue.pop(query_id, None)
+
     def dispatch(self, dat, payload_type):
-        #self.logger.debug("Received: %s" % dat)
+        self.logger.debug("Received: %s" % dat)
         if KeyType.command not in dat:
             self.logger.warn("No command exists")
             return
+        if KeyType.query_id in dat and dat[KeyType.query_id] in self.query_queue:
+            self.query_queue[dat[KeyType.query_id]].put(dat)
+            return
+
         if dat[KeyType.command] == MsgType.RESPONSE_SEARCH_TRANSACTION:
             self.proc_resp_search_transaction(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_ASSET:
             self.proc_resp_search_asset(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_USERID:
+            self.proc_resp_search_by_userid(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GATHER_SIGNATURE:
             self.proc_resp_gather_signature(dat)
         elif dat[KeyType.command] == MsgType.REQUEST_SIGNATURE:
@@ -591,6 +622,21 @@ class Callback:
         except:
             return None
 
+    def sync_by_queryid(self, query_id, timeout=None):
+        """
+        Wait for message with specified query_id
+
+        :param query_id:
+        :param timeout: timeout second for waiting
+        :return:
+        """
+        try:
+            if query_id not in self.query_queue:
+                self.create_queue(query_id)
+            return self.query_queue[query_id].get(timeout=timeout)
+        except:
+            return None
+
     def proc_resp_cross_ref(self, dat):
         cross_refs = []
         for cross_ref in dat[KeyType.cross_refs]:
@@ -618,6 +664,9 @@ class Callback:
         self.queue.put(dat)
 
     def proc_resp_search_asset(self, dat):
+        self.queue.put(dat)
+
+    def proc_resp_search_by_userid(self, dat):
         self.queue.put(dat)
 
     def proc_resp_search_transaction(self, dat):
