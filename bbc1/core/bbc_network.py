@@ -90,7 +90,7 @@ class BBcNetwork:
     """
     Socket and thread management for infrastructure layers
     """
-    def __init__(self, config, core=None, p2p_port=None, use_global=True,
+    def __init__(self, config, core=None, p2p_port=None, use_global=True, external_ip4addr=None, external_ip6addr=None,
                  loglevel="all", logname=None):
         self.core = core
         self.logger = logger.get_logger(key="bbc_network", level=loglevel, logname=logname)
@@ -100,6 +100,8 @@ class BBcNetwork:
         conf = self.config.get_config()
         self.domains = dict()
         self.asset_groups_to_advertise = set()
+        self.external_ip4addr = external_ip4addr
+        self.external_ip6addr = external_ip6addr
         self.ip_address, self.ip6_address = check_my_IPaddresses()
         if p2p_port is not None:
             conf['network']['p2p_port'] = p2p_port
@@ -136,7 +138,8 @@ class BBcNetwork:
                     self.core.asset_group_setup(domain_id, asset_group_id,
                                                 c.get('storage_type', StorageType.FILESYSTEM),
                                                 c.get('storage_path',None),
-                                                c.get('advertise_in_domain0', False))
+                                                c.get('advertise_in_domain0', False),
+                                                c.get('max_body_size', bbclib.DEFAULT_MAX_BODY_SIZE))
             for nd, info in c['static_nodes'].items():
                 node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
                 self.add_static_node_to_domain(domain_id, node_id, ipv4, ipv6, port)
@@ -151,9 +154,13 @@ class BBcNetwork:
         :return:
         """
         ipv4 = self.ip_address
+        if self.external_ip4addr is not None:
+            ipv4 = self.external_ip4addr
         if ipv4 is None or len(ipv4) == 0:
             ipv4 = "0.0.0.0"
         ipv6 = self.ip6_address
+        if self.external_ip6addr is not None:
+            ipv6 = self.external_ip6addr
         if ipv6 is None or len(ipv6) == 0:
             ipv6 = "::"
         port = socket.htons(self.port).to_bytes(2, 'little')
@@ -193,6 +200,7 @@ class BBcNetwork:
                                                           loglevel=self.logger.level, logname=self.logname)
         if domain_id != bbclib.domain_global_0:
             self.core.ledger_manager.add_domain(domain_id)
+        self.core.stats.update_stats_increment("network", "num_domains", 1)
         return True
 
     def remove_domain(self, domain_id=ZEROS):
@@ -210,6 +218,7 @@ class BBcNetwork:
             self.asset_groups_to_advertise.remove(domain_id)
         if self.use_global:
             self.domains[bbclib.domain_global_0].advertise_asset_group_info()
+        self.core.stats.update_stats_decrement("network", "num_domains", 1)
 
     def add_static_node_to_domain(self, domain_id, node_id, ipv4, ipv6, port):
         """
@@ -232,6 +241,7 @@ class BBcNetwork:
             if not isinstance(ipv6, str):
                 ipv6 = ipv6.decode()
             conf['static_nodes'][bbclib.convert_id_to_string(node_id)] = [ipv4, ipv6, port]
+            self.core.stats.update_stats_increment("network", "peer_num", 1)
 
     def save_all_peer_lists(self):
         """
@@ -278,9 +288,18 @@ class BBcNetwork:
             KeyType.domain_ping: 0,
             KeyType.nonce: query_entry.nonce,
         }
+        if self.external_ip4addr is not None:
+            msg[KeyType.external_ip4addr] = self.external_ip4addr
+        else:
+            msg[KeyType.external_ip4addr] = self.ip_address
+        if self.external_ip6addr is not None:
+            msg[KeyType.external_ip6addr] = self.external_ip6addr
+        else:
+            msg[KeyType.external_ip6addr] = self.ip6_address
         self.logger.debug("Send domain_ping to %s:%d" % (query_entry.data[KeyType.peer_info].ipv4,
                                                          query_entry.data[KeyType.peer_info].port))
         query_entry.update(fire_after=1)
+        self.core.stats.update_stats_increment("network", "domain_ping_send", 1)
         self.send_message_in_network(query_entry.data[KeyType.peer_info], PayloadType.Type_msgpack, msg)
 
     def receive_domain_ping(self, ip4, from_addr, msg):
@@ -295,20 +314,28 @@ class BBcNetwork:
         """
         if KeyType.domain_id not in msg or KeyType.node_id not in msg:
             return
+        self.core.stats.update_stats_increment("network", "domain_ping_receive", 1)
         domain_id = msg[KeyType.domain_id]
         node_id = msg[KeyType.node_id]
+        if KeyType.external_ip4addr in msg:
+            ipv4 = msg[KeyType.external_ip4addr]
+            ipv6 = "::"
+        elif KeyType.external_ip6addr in msg:
+            ipv4 = "0.0.0.0"
+            ipv6 = msg[KeyType.external_ip6addr]
+        else:
+            if ip4:
+                ipv4 = from_addr[0]
+                ipv6 = "::"
+            else:
+                ipv4 = "0.0.0.0"
+                ipv6 = from_addr[0]
+
         self.logger.debug("Receive domain_ping to domain %s" % (binascii.b2a_hex(domain_id[:4])))
         if domain_id not in self.domains:
             return
         if self.domains[domain_id].node_id == node_id:
             return
-
-        if ip4:
-            ipv4 = from_addr[0]
-            ipv6 = "::"
-        else:
-            ipv4 = "0.0.0.0"
-            ipv6 = from_addr[0]
 
         if msg[KeyType.domain_ping] == 1:
             query_entry = ticker.get_entry(msg[KeyType.nonce])
@@ -322,6 +349,16 @@ class BBcNetwork:
                 KeyType.domain_ping: 1,
                 KeyType.nonce: msg[KeyType.nonce],
             }
+            if ip4:
+                if self.external_ip4addr is not None:
+                    msg[KeyType.external_ip4addr] = self.external_ip4addr
+                else:
+                    msg[KeyType.external_ip4addr] = ipv4
+            else:
+                if self.external_ip6addr is not None:
+                    msg[KeyType.external_ip6addr] = self.external_ip6addr
+                else:
+                    msg[KeyType.external_ip6addr] = ipv6
             nodeinfo = NodeInfo(ipv4=ipv4, ipv6=ipv6, port=from_addr[1])
             self.send_message_in_network(nodeinfo, PayloadType.Type_msgpack, msg)
 
@@ -393,6 +430,7 @@ class BBcNetwork:
                                                         'msg_to_send': msg_to_send},
                                                   retry_count=ROUTE_RETRY_COUNT)
         self.domains[domain_id].send_p2p_message(query_entry)
+        self.core.stats.update_stats_increment("network", "p2p_message_count", 1)
         return True
 
     def forward_message(self, query_entry):
@@ -425,7 +463,6 @@ class BBcNetwork:
         :return:
         """
         dat = query_entry.data['msg_to_send']
-        print(dat)
         msg = bbc_core.make_message_structure(dat[KeyType.command], query_entry.data[KeyType.asset_group_id],
                                               query_entry.data[KeyType.source_node_id], dat[KeyType.query_id])
         self.core.error_reply(msg=msg, err_code=ENODESTINATION, txt="cannot find core node")
@@ -439,6 +476,7 @@ class BBcNetwork:
         :param user_id:
         :return:
         """
+        self.core.stats.update_stats_increment("network", "user_num", 1)
         self.domains[domain_id].register_user_id(asset_group_id, user_id)
 
     def remove_user_id(self, asset_group_id, user_id):
@@ -451,6 +489,7 @@ class BBcNetwork:
         """
         for domain_id in self.domains:
             self.domains[domain_id].unregister_user_id(asset_group_id, user_id)
+            self.core.stats.update_stats_decrement("network", "user_num", 1)
 
     def disseminate_cross_ref(self, transaction_id, asset_group_id):
         """
@@ -487,9 +526,11 @@ class BBcNetwork:
             return
         if nodeinfo.ipv4 != "":
             self.socket_udp.sendto(data_to_send, (nodeinfo.ipv4, nodeinfo.port))
+            self.core.stats.update_stats_increment("network", "message_size_sent_by_udp", len(data_to_send))
             return
         if nodeinfo.ipv6 != "":
             self.socket_udp6.sendto(data_to_send, (nodeinfo.ipv6, nodeinfo.port))
+            self.core.stats.update_stats_increment("network", "packets_sent_by_udp", 1)
 
     def setup_udp_socket(self):
         """
@@ -542,6 +583,7 @@ class BBcNetwork:
                         data, addr = self.socket_udp6.recvfrom(1500)
                         ip4 = False
                     if data is not None:
+                        self.core.stats.update_stats_increment("network", "packets_received_by_udp", 1)
                         msg_parser.recv(data)
                         msg = msg_parser.parse()
                         #self.logger.debug("Recv_UDP from %s: data=%s" % (addr, msg))
@@ -621,6 +663,7 @@ class BBcNetwork:
                             readfds.remove(sock)
                         else:
                             msg_parsers[sock].recv(buf)
+                            self.core.stats.update_stats_increment("network", "message_size_received_by_tcy", len(buf))
                             while True:
                                 msg = msg_parsers[sock].parse()
                                 if msg is None:
