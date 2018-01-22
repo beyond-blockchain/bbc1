@@ -559,7 +559,7 @@ class Callback:
         self.query_queue.pop(query_id, None)
 
     def dispatch(self, dat, payload_type):
-        self.logger.debug("Received: %s" % dat)
+        #self.logger.debug("Received: %s" % dat)
         if KeyType.command not in dat:
             self.logger.warn("No command exists")
             return
