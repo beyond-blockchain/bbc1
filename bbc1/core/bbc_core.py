@@ -540,6 +540,7 @@ class BBcCoreService:
             conf['advertise_in_domain0'] = advertise_in_domain0
             conf['max_body_size'] = max_body_size
             self.config.update_config()
+        bbclib.set_max_body_size(asset_group_id, max_body_size)
         self.storage_manager.set_storage_path(domain_id, asset_group_id, from_config=True)
         self.asset_group_domain_mapping[asset_group_id] = domain_id
         self.stats.update_stats_increment("asset_group", "total_num", 1)
