@@ -1,0 +1,31 @@
+language: python
+matrix:
+  include:
+    - os: linux
+      python: 3.6
+before_install:
+  - pip install --upgrade pip
+install:
+  - sh prepare.sh
+  - pip install -r requirements.txt
+script:
+  - cd tests
+  - pytest test_asset_group_info_adv.py
+  - pytest test_bbc_app.py
+  - pytest test_bbc_app_multi_core.py
+  - pytest test_bbc_app_multi_core_many_transactions.py
+  - pytest test_bbc_app_multiclient.py
+  - pytest test_bbc_config.py
+  - pytest test_bbc_core.py
+  - pytest test_bbc_core_refresh_peers.py
+  #- pytest test_bbc_ethereum.py
+  - pytest test_bbc_ledger.py
+  - pytest test_bbc_network.py
+  - pytest test_bbc_network_with_core.py
+  - pytest test_bbc_storage.py
+  - pytest test_bbclib.py
+  - pytest test_fileproof_multi_core.py
+  #- pytest test_ledger_subsystem.py
+  - pytest test_many_domains_with_global.py
+  - pytest test_pending_request.py
+  - pytest test_recover.py
