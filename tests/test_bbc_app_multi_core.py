@@ -248,12 +248,24 @@ class TestBBcAppClient(object):
         ret = clients[0]['app'].send_message(msg, asset_group_id, bbclib.get_new_id("xxxxx"))
         print("recv=",msg_processor[0].synchronize())
 
+    def test_97_get_stat(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        for cl in clients:
+            ret = cl['app'].get_stats()
+            assert ret
+        time.sleep(2)
+        import pprint
+        for i in range(1, client_num):
+            pprint.pprint(msg_processor[i].synchronize()[KeyType.stats])
+
     def test_98_unregister(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         for cl in clients:
             ret = cl['app'].unregister_from_core()
             assert ret
 
     def test_99_quit(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         for core in cores:
             core.networking.save_all_peer_lists()
             core.config.update_config()

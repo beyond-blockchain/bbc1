@@ -28,10 +28,16 @@ from bbc1.common.bbc_error import *
 
 directory, filename = os.path.split(os.path.realpath(__file__))
 from ctypes import *
-libbbcsig = CDLL("%s/libbbcsig.so" % directory)
+
+if os.name == "nt":
+    libbbcsig = CDLL("%s/libbbcsig.dll" % directory)
+else:
+    libbbcsig = CDLL("%s/libbbcsig.so" % directory)
 
 
 domain_global_0 = binascii.a2b_hex("0000000000000000000000000000000000000000000000000000000000000000")
+DEFAULT_MAX_BODY_SIZE = 256
+max_bodysize_conf = dict()
 
 error_code = -1
 error_text = ""
@@ -49,6 +55,11 @@ def reset_error():
     global error_text
     error_code = ESUCCESS
     error_text = ""
+
+
+def set_max_body_size(asset_group_id, body_size):
+    global max_bodysize_conf
+    max_bodysize_conf[asset_group_id] = body_size
 
 
 def get_new_id(seed_str=None, include_timestamp=True):
@@ -90,7 +101,7 @@ def make_transaction_for_base_asset(asset_group_id=None, event_num=1):
     transaction = BBcTransaction()
     for i in range(event_num):
         evt = BBcEvent(asset_group_id=asset_group_id)
-        ast = BBcAsset()
+        ast = BBcAsset(max_body_size=max_bodysize_conf.get(asset_group_id, DEFAULT_MAX_BODY_SIZE))
         evt.add(asset=ast)
         transaction.add(event=evt)
     return transaction
@@ -162,8 +173,8 @@ class KeyPair:
         if privkey is not None:
             memmove(self.private_key, bytes(privkey), sizeof(self.private_key))
         if pubkey is not None:
-            self.public_key_len = len(pubkey)
-            memmove(self.public_key, bytes(pubkey), self.public_key_len)
+            self.public_key_len = c_int32(len(pubkey))
+            memmove(self.public_key, bytes(pubkey), self.public_key_len.value)
 
         if privkey is None and pubkey is None:
             self.generate()
@@ -215,12 +226,12 @@ class KeyPair:
         return intval
 
     def get_private_key_in_der(self):
-        der_data = (c_byte * 256)()
+        der_data = (c_byte * 512)()     # 256 -> 512
         der_len = libbbcsig.output_der(self.private_key_len, self.private_key, byref(der_data))
         return bytes(bytearray(der_data)[:der_len])
 
     def get_private_key_in_pem(self):
-        pem_data = (c_char * 256)()
+        pem_data = (c_char * 512)()     # 256 -> 512
         pem_len = libbbcsig.output_pem(self.private_key_len, self.private_key, byref(pem_data))
         return pem_data.value
 
@@ -598,7 +609,7 @@ class BBcEvent:
                 self.option_approvers.append(appr)
             ptr, astsize = get_n_byte_int(ptr, 4, data)
             ptr, astdata = get_n_bytes(ptr, astsize, data)
-            self.asset = BBcAsset()
+            self.asset = BBcAsset(max_body_size=max_bodysize_conf.get(self.asset_group_id, DEFAULT_MAX_BODY_SIZE))
             self.asset.deserialize(astdata)
         except:
             return False
@@ -675,7 +686,7 @@ class BBcReference:
 
 
 class BBcAsset:
-    def __init__(self):
+    def __init__(self, max_body_size=DEFAULT_MAX_BODY_SIZE):
         self.asset_id = None
         self.user_id = None
         self.nonce = get_random_value()
@@ -683,7 +694,8 @@ class BBcAsset:
         self.asset_file = None
         self.asset_file_digest = None
         self.asset_body_size = 0
-        self.asset_body = []    # up to 256 bytes
+        self.asset_body = []
+        self.max_body_size = max_body_size
 
     def add(self, user_id=None, asset_file=None, asset_body=None):
         if user_id is not None:
@@ -693,7 +705,7 @@ class BBcAsset:
             self.asset_file_size = len(asset_file)
             self.asset_file_digest = hashlib.sha256(asset_file).digest()
         if asset_body is not None:
-            if len(asset_body) > 256:
+            if len(asset_body) > self.max_body_size:
                 self.asset_file = asset_body
                 self.asset_file_size = len(asset_body)
                 self.asset_file_digest = hashlib.sha256(asset_body).digest()
@@ -802,6 +814,10 @@ class ServiceMessageType:
     DOMAIN_PING = 12
     REQUEST_GET_DOMAINLIST = 13
     RESPONSE_GET_DOMAINLIST = 14
+    REQUEST_INSERT_NOTIFICATION = 15
+    CANCEL_INSERT_NOTIFICATION = 16
+    REQUEST_GET_STATS = 17
+    RESPONSE_GET_STATS = 18
 
     REGISTER = 32
     UNREGISTER = 33
@@ -813,13 +829,16 @@ class ServiceMessageType:
     RESPONSE_SIGNATURE = 38
     REQUEST_INSERT = 39
     RESPONSE_INSERT = 40
+    NOTIFY_INSERTED = 41
 
     REQUEST_SEARCH_ASSET = 66
     RESPONSE_SEARCH_ASSET = 67
     REQUEST_SEARCH_TRANSACTION = 68
     RESPONSE_SEARCH_TRANSACTION = 69
-    REQUEST_CROSS_REF = 70
-    RESPONSE_CROSS_REF = 71
+    REQUEST_SEARCH_USERID = 70
+    RESPONSE_SEARCH_USERID = 71
+    REQUEST_CROSS_REF = 72
+    RESPONSE_CROSS_REF = 73
 
     REQUEST_REGISTER_HASH_IN_SUBSYS = 128
     RESPONSE_REGISTER_HASH_IN_SUBSYS = 129

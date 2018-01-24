@@ -101,6 +101,22 @@ def get_id_from_mappings(name, asset_group_id):
     return None
 
 
+def get_list_from_mappings(asset_group_id):
+    if not os.path.exists(MAPPING_FILE):
+        return None
+    asset_group_id_str = binascii.b2a_hex(asset_group_id).decode()
+    with open(MAPPING_FILE, "r") as f:
+        mapping = json.load(f)
+    if mapping is None:
+        return None
+    if asset_group_id_str in mapping:
+        result  = []
+        for name in mapping[asset_group_id_str]:
+            result.append(name)
+        return result
+    return None
+
+
 class BBcAppClient:
     def __init__(self, host='127.0.0.1', port=DEFAULT_CORE_PORT, logname="-", loglevel="none"):
         self.logger = logger.get_logger(key="bbc_app", level=loglevel, logname=logname)
@@ -161,18 +177,18 @@ class BBcAppClient:
         (internal use) send the message to the core node
 
         :param dat:
-        :return:
+        :return query_id or None:
         """
         if KeyType.asset_group_id not in dat or KeyType.source_user_id not in dat:
             self.logger.warn("Message must include asset_group_id and source_id")
-            return False
+            return None
         try:
             msg = message_key_types.make_message(PayloadType.Type_msgpack, dat)
             self.connection.sendall(msg)
         except Exception as e:
             self.logger.error(e)
-            return False
-        return True
+            return None
+        return self.query_id
 
     def domain_setup(self, domain_id, module_name=None):
         """
@@ -236,7 +252,7 @@ class BBcAppClient:
 
     def register_asset_group(self, domain_id, asset_group_id,
                              storage_type=StorageType.FILESYSTEM, storage_path=None,
-                             advertise_in_domain0=False):
+                             advertise_in_domain0=False, max_body_size=bbclib.DEFAULT_MAX_BODY_SIZE):
         """
         Register an asset_group in the core node (maybe used by a system administrator)
 
@@ -245,12 +261,14 @@ class BBcAppClient:
         :param storage_type:
         :param storage_path:
         :param advertise_in_domain0:
+        :param max_body_size:
         :return:
         """
         dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_SETUP_ASSET_GROUP)
         dat[KeyType.domain_id] = domain_id
         dat[KeyType.storage_type] = storage_type
         dat[KeyType.advertise_in_domain0] = advertise_in_domain0
+        dat[KeyType.max_body_size] = max_body_size
         if storage_path is not None:
             dat[KeyType.storage_path] = storage_path
         return self.send_msg(dat)
@@ -306,6 +324,19 @@ class BBcAppClient:
         dat = self.make_message_structure(None, MsgType.UNREGISTER)
         return self.send_msg(dat)
 
+    def request_insert_completion_notification(self, asset_group_id, flag):
+        """
+        Request notification when a transaction has been inserted (as a copy of transaction)
+        :param asset_group_id:
+        :param flag:
+        :return:
+        """
+        if flag:
+            dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_INSERT_NOTIFICATION)
+        else:
+            dat = self.make_message_structure(asset_group_id, MsgType.CANCEL_INSERT_NOTIFICATION)
+        return self.send_msg(dat)
+
     def get_cross_refs(self, asset_group_id, number):
         """
         Get cross_refs
@@ -345,7 +376,7 @@ class BBcAppClient:
             dat[KeyType.all_asset_files] = asset_files
         return self.send_msg(dat)
 
-    def sendback_signature(self, asset_group_id, dst, ref_index, sig):
+    def sendback_signature(self, asset_group_id, dst, ref_index, sig, query_id=None):
         """
         Send back the signed transaction to the source
 
@@ -353,27 +384,33 @@ class BBcAppClient:
         :param dst:
         :param ref_index: Which reference in transaction the signature is for
         :param sig:
+        :param query_id:
         :return:
         """
         dat = self.make_message_structure(asset_group_id, MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dst
         dat[KeyType.ref_index] = ref_index
         dat[KeyType.signature] = sig.serialize()
+        if query_id is not None:
+            dat[KeyType.query_id] = query_id
         return self.send_msg(dat)
 
-    def sendback_denial_of_sign(self, asset_group_id, dst, reason_text):
+    def sendback_denial_of_sign(self, asset_group_id, dst, reason_text, query_id=None):
         """
         Send back the denial of sign the transaction
 
         :param asset_group_id:
         :param dst:
         :param reason_text:
+        :param query_id:
         :return:
         """
         dat = self.make_message_structure(asset_group_id, MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dst
         dat[KeyType.status] = EOTHER
         dat[KeyType.reason] = reason_text
+        if query_id is not None:
+            dat[KeyType.query_id] = query_id
         return self.send_msg(dat)
 
     def insert_transaction(self, asset_group_id, tx_obj):
@@ -422,6 +459,18 @@ class BBcAppClient:
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
+    def search_transaction_by_userid(self, asset_group_id, user_id):
+        """
+        Search request for transaction_data by user_id
+
+        :param asset_group_id:
+        :param user_id: user_id of the asset owner
+        :return: The transaction_data that includes asset with the specified user_id
+        """
+        dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_SEARCH_USERID)
+        dat[KeyType.user_id] = user_id
+        return self.send_msg(dat)
+
     def register_in_ledger_subsystem(self, asset_group_id, transaction_id):
         """
         Register transaction_id in the ledger_subsystem
@@ -444,6 +493,14 @@ class BBcAppClient:
         """
         dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_VERIFY_HASH_IN_SUBSYS)
         dat[KeyType.transaction_id] = transaction_id
+        return self.send_msg(dat)
+
+    def get_stats(self):
+        """
+        Get statistics of bbc_core
+        :return:
+        """
+        dat = self.make_message_structure(None, MsgType.REQUEST_GET_STATS)
         return self.send_msg(dat)
 
     def send_message(self, msg, asset_group_id, dst_user_id):
@@ -490,19 +547,32 @@ class Callback:
     def __init__(self, log=None):
         self.logger = log
         self.queue = queue.Queue()
+        self.query_queue = dict()
 
     def set_logger(self, log):
         self.logger = log
+
+    def create_queue(self, query_id):
+        self.query_queue.setdefault(query_id, queue.Queue())
+
+    def destroy_queue(self, query_id):
+        self.query_queue.pop(query_id, None)
 
     def dispatch(self, dat, payload_type):
         #self.logger.debug("Received: %s" % dat)
         if KeyType.command not in dat:
             self.logger.warn("No command exists")
             return
+        if KeyType.query_id in dat and dat[KeyType.query_id] in self.query_queue:
+            self.query_queue[dat[KeyType.query_id]].put(dat)
+            return
+
         if dat[KeyType.command] == MsgType.RESPONSE_SEARCH_TRANSACTION:
             self.proc_resp_search_transaction(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_ASSET:
             self.proc_resp_search_asset(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_USERID:
+            self.proc_resp_search_by_userid(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GATHER_SIGNATURE:
             self.proc_resp_gather_signature(dat)
         elif dat[KeyType.command] == MsgType.REQUEST_SIGNATURE:
@@ -511,6 +581,8 @@ class Callback:
             self.proc_resp_sign_request(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_INSERT:
             self.proc_resp_insert(dat)
+        elif dat[KeyType.command] == MsgType.NOTIFY_INSERTED:
+            self.proc_notify_inserted(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_CROSS_REF:
             self.proc_resp_cross_ref(dat)
         elif dat[KeyType.command] == MsgType.MESSAGE:
@@ -533,7 +605,8 @@ class Callback:
             self.proc_resp_get_config(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_MANIP_LEDGER_SUBSYS:
             self.proc_resp_ledger_subsystem(dat)
-
+        elif dat[KeyType.command] == MsgType.RESPONSE_GET_STATS:
+            self.proc_resp_get_stats(dat)
         else:
             self.logger.warn("No method to process for command=%d" % dat[KeyType.command])
 
@@ -546,6 +619,21 @@ class Callback:
         """
         try:
             return self.queue.get(timeout=timeout)
+        except:
+            return None
+
+    def sync_by_queryid(self, query_id, timeout=None):
+        """
+        Wait for message with specified query_id
+
+        :param query_id:
+        :param timeout: timeout second for waiting
+        :return:
+        """
+        try:
+            if query_id not in self.query_queue:
+                self.create_queue(query_id)
+            return self.query_queue[query_id].get(timeout=timeout)
         except:
             return None
 
@@ -572,7 +660,13 @@ class Callback:
     def proc_resp_insert(self, dat):
         self.queue.put(dat)
 
+    def proc_notify_inserted(self, dat):
+        self.queue.put(dat)
+
     def proc_resp_search_asset(self, dat):
+        self.queue.put(dat)
+
+    def proc_resp_search_by_userid(self, dat):
         self.queue.put(dat)
 
     def proc_resp_search_transaction(self, dat):
@@ -654,4 +748,5 @@ class Callback:
     def proc_resp_ledger_subsystem(self, dat):
         self.queue.put(dat)
 
-
+    def proc_resp_get_stats(self, dat):
+        self.queue.put(dat)

@@ -1,5 +1,7 @@
 Core system of BBc-1 (Beyond Blockchain One)
 ===========================================
+![travisCI](https://travis-ci.org/beyond-blockchain/bbc1.svg?branch=develop)
+
 This project is a Python-based reference implementation of BBc-1, a trustable system of record keeping beyond blockchains.
 
 The design paper (white paper) and the analysis paper are available [here](https://beyond-blockchain.org/public/bbc1-design-paper.pdf) and [here](https://beyond-blockchain.org/public/bbc1-analysis.pdf). BBc-1 is inspired from blockchain technologies like Bitcoin, Ethereum, Hyperledger projects, and so on.
@@ -28,6 +30,11 @@ Every directory includes README.md. Please read it for the details. Furthermore,
 
 
 # Quick start
+
+## Documents
+Some documents are available in docs/.
+* [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
+
 
 ## From source code in github
 1. Install tools (libtool, automake)

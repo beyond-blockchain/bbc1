@@ -191,7 +191,7 @@ class BBcLedger:
                                      "select * from sqlite_master where type='table' and name=?", name)
         return ret
 
-    def find_locally(self, domain_id, asset_group_id, resource_id, resource_type):
+    def find_locally(self, domain_id, asset_group_id, resource_id, resource_type, want_newest=False):
         """
         Find data by ID
 
@@ -199,6 +199,7 @@ class BBcLedger:
         :param asset_group_id
         :param resource_id:   Transaction_ID or Asset_ID
         :param resource_type: ResourceType value
+        :param want_newest:   If True, the entry having the biggest ID in the same condition is required
         :return:              data, data_type
         """
         if resource_type == ResourceType.Transaction_data:
@@ -208,10 +209,16 @@ class BBcLedger:
             if row is not None:
                 return row[2]
         else:
-            row = self.exec_sql_fetchone(domain_id, "auxiliary_db",
-                                         "select * from auxiliary_table where resource_id = ? AND "
-                                         "asset_group_id = ? AND resource_type = ?",
-                                         resource_id, asset_group_id, resource_type)
+            if want_newest:
+                row = self.exec_sql_fetchone(domain_id, "auxiliary_db",
+                                             "select * from auxiliary_table where resource_id = ? AND "
+                                             "asset_group_id = ? AND resource_type = ? order by id desc",
+                                             resource_id, asset_group_id, resource_type)
+            else:
+                row = self.exec_sql_fetchone(domain_id, "auxiliary_db",
+                                             "select * from auxiliary_table where resource_id = ? AND "
+                                             "asset_group_id = ? AND resource_type = ?",
+                                             resource_id, asset_group_id, resource_type)
             if row is not None:
                 return row[4]
         return None

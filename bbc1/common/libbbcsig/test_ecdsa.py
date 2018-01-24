@@ -1,8 +1,11 @@
 import binascii
+import os
 from ctypes import *
 
-lib = cdll.LoadLibrary("libbbcsig.so")
-
+if os.name == "nt":
+    lib = windll.LoadLibrary("libbbcsig.dll")
+else:
+    lib = cdll.LoadLibrary("libbbcsig.so")
 
 test_digest = binascii.a2b_hex("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 privkey_len = c_int32(32)
@@ -22,7 +25,7 @@ print(lib.sign(privkey_len, privkey, privkey_len, test_digest, signature))
 print(binascii.b2a_hex(signature))
 
 print("# -- output_der()")
-der_data = (c_byte * 256)()
+der_data = (c_byte * 512)()     # 256 -> 512
 der_len = lib.output_der(privkey_len, privkey, byref(der_data))
 print("DER: len=",der_len, "  dat=", binascii.b2a_hex(bytearray(der_data)[:der_len]))
 
@@ -58,6 +61,6 @@ res = lib.verify(pubkey_len, pubkey, 32, test_digest, 64, signature)
 print("result:", res)
 
 print("# -- output_pem()")
-pem = (c_char * 256)()
+pem = (c_char * 512)()      # 256 -> 512
 length = lib.output_pem(privkey_len, privkey, byref(pem))
 print("PEM: len=", length, " dat=", pem.value)
