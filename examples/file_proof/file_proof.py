@@ -1,4 +1,8 @@
-#!/usr/bin/env python
+#!/bin/sh
+""":" .
+
+exec python "$0" "$@"
+"""
 # -*- coding: utf-8 -*-
 """
 Copyright (c) 2017 beyond-blockchain.org.
