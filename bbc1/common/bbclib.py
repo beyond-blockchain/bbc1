@@ -23,7 +23,8 @@ import socket
 import time
 import traceback
 
-sys.path.append("../../")
+current_dir = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(os.path.join(current_dir, "../.."))
 from bbc1.common.bbc_error import *
 
 directory, filename = os.path.split(os.path.realpath(__file__))
@@ -97,13 +98,15 @@ def convert_idstring_to_bytes(datastr, bytelen=32):
     return bytes(res)
 
 
-def make_transaction_for_base_asset(asset_group_id=None, event_num=1):
+def make_transaction_for_base_asset(asset_group_id=None, event_num=1, witness=False):
     transaction = BBcTransaction()
     for i in range(event_num):
         evt = BBcEvent(asset_group_id=asset_group_id)
         ast = BBcAsset(max_body_size=max_bodysize_conf.get(asset_group_id, DEFAULT_MAX_BODY_SIZE))
         evt.add(asset=ast)
         transaction.add(event=evt)
+    if witness:
+        transaction.add(witness=BBcWitness())
     return transaction
 
 
@@ -307,13 +310,14 @@ class BBcTransaction:
         self.timestamp = int(time.time())
         self.events = []
         self.references = []
+        self.witness = None
         self.cross_refs = []
         self.signatures = []
         self.userid_sigidx_mapping = dict()
         self.transaction_id = None
         self.transaction_base_digest = None
 
-    def add(self, event=None, reference=None, cross_ref=None):
+    def add(self, event=None, reference=None, witness=None, cross_ref=None):
         if event is not None:
             if isinstance(event, list):
                 self.events.extend(event)
@@ -324,6 +328,9 @@ class BBcTransaction:
                 self.references.extend(reference)
             else:
                 self.references.append(reference)
+        if witness is not None:
+            witness.transaction = self
+            self.witness = witness
         if cross_ref is not None:
             if isinstance(cross_ref, list):
                 self.cross_refs.extend(cross_ref)
@@ -363,6 +370,13 @@ class BBcTransaction:
             refe = self.references[i].serialize()
             dat.extend(to_4byte(len(refe)))
             dat.extend(refe)
+        if self.witness is not None:
+            witness = self.witness.serialize()
+            dat.extend(to_2byte(1))
+            dat.extend(to_4byte(len(witness)))
+            dat.extend(witness)
+        else:
+            dat.extend(to_2byte(0))
         if for_id:
             self.transaction_base_digest = hashlib.sha256(dat).digest()
 
@@ -412,6 +426,16 @@ class BBcTransaction:
                 refe = BBcReference(None, None)
                 refe.deserialize(refdata)
                 self.references.append(refe)
+
+            ptr, witness_num = get_n_byte_int(ptr, 2, data)
+            if witness_num == 0:
+                self.witness = None
+            else:
+                ptr, size = get_n_byte_int(ptr, 4, data)
+                ptr, witnessdata = get_n_bytes(ptr, size, data)
+                self.witness = BBcWitness()
+                self.witness.deserialize(witnessdata)
+                self.witness.transaction = self
 
             ptr, cross_num = get_n_byte_int(ptr, 2, data)
             self.cross_refs = []
@@ -513,18 +537,35 @@ class BBcTransaction:
         if len(self.references) > 0:
             for i, refe in enumerate(self.references):
                 print("[%d]" % i)
-                print("  asset_group_id:", binascii.b2a_hex(refe.asset_group_id))
-                print("  transaction_id:", binascii.b2a_hex(refe.transaction_id))
-                print("  event_index_in_ref:", refe.event_index_in_ref)
-                print("  sig_index:", refe.sig_indices)
+                if refe.asset_group_id is not None and refe.transaction_id is not None:
+                    print("  asset_group_id:", binascii.b2a_hex(refe.asset_group_id))
+                    print("  transaction_id:", binascii.b2a_hex(refe.transaction_id))
+                    print("  event_index_in_ref:", refe.event_index_in_ref)
+                    print("  sig_index:", refe.sig_indices)
+                else:
+                    print("  -- None (invalid)")
+        else:
+            print("  None")
+        print("Witness:")
+        if self.witness is not None:
+            for i in range(len(self.witness.sig_indices)):
+                print("[%d]" % i)
+                if self.witness.user_ids[i] is not None:
+                    print("  user_id:", binascii.b2a_hex(self.witness.user_ids[i]))
+                    print("  sig_index:", self.witness.sig_indices[i])
+                else:
+                    print("  -- None (invalid)")
         else:
             print("  None")
         print("Cross_Ref[]:",len(self.cross_refs))
         if len(self.cross_refs) > 0:
             for i, cross in enumerate(self.cross_refs):
                 print("[%d]" % i)
-                print("  asset_group_id:", binascii.b2a_hex(cross.asset_group_id))
-                print("  transaction_id:", binascii.b2a_hex(cross.transaction_id))
+                if cross is not None:
+                    print("  asset_group_id:", binascii.b2a_hex(cross.asset_group_id))
+                    print("  transaction_id:", binascii.b2a_hex(cross.transaction_id))
+                else:
+                    print("  -- None (invalid)")
         else:
             print("  None")
         print("Signature[]:")
@@ -678,6 +719,42 @@ class BBcReference:
             ptr, signum = get_n_byte_int(ptr, 2, data)
             self.sig_indices = []
             for i in range(signum):
+                ptr, idx = get_n_byte_int(ptr, 2, data)
+                self.sig_indices.append(idx)
+        except:
+            return False
+        return True
+
+
+class BBcWitness:
+    def __init__(self):
+        self.transaction = None
+        self.user_ids = list()
+        self.sig_indices = list()
+
+    def add_witness(self, user_id):
+        self.user_ids.append(user_id)
+        self.sig_indices.append(self.transaction.get_sig_index(user_id))
+
+    def add_signature(self, user_id=None, signature=None):
+        self.transaction.add_signature(user_id=user_id, signature=signature)
+
+    def serialize(self):
+        dat = bytearray(to_2byte(len(self.sig_indices)))
+        for i in range(len(self.sig_indices)):
+            dat.extend(to_bigint(self.user_ids[i]))
+            dat.extend(to_2byte(self.sig_indices[i]))
+        return bytes(dat)
+
+    def deserialize(self, data):
+        ptr = 0
+        try:
+            ptr, signum = get_n_byte_int(ptr, 2, data)
+            self.user_ids = list()
+            self.sig_indices = list()
+            for i in range(signum):
+                ptr, uid = get_bigint(ptr, data)
+                self.user_ids.append(uid)
                 ptr, idx = get_n_byte_int(ptr, 2, data)
                 self.sig_indices.append(idx)
         except:

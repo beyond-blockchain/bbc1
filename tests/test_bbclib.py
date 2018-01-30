@@ -4,7 +4,7 @@ import pytest
 import binascii
 import sys
 sys.path.extend(["../"])
-from bbc1.common.bbclib import BBcTransaction, BBcEvent, BBcReference, BBcAsset, BBcCrossRef, KeyPair, KeyType
+from bbc1.common.bbclib import BBcTransaction, BBcEvent, BBcReference, BBcWitness, BBcAsset, BBcCrossRef, KeyPair, KeyType
 from bbc1.common import bbclib
 
 user_id = bbclib.get_new_id("user_id_test1")
@@ -86,6 +86,8 @@ class TestBBcLib(object):
         transaction1.add(cross_ref=dummy_cross_ref1)
         dummy_cross_ref2 = BBcCrossRef(asset_group_id=asset_group_id, transaction_id=transaction2_id)
         transaction1.add(cross_ref=dummy_cross_ref2)
+        witness = BBcWitness()
+        transaction1.add(witness=witness)
 
         sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
                                 private_key=keypair1.private_key,
@@ -181,7 +183,36 @@ class TestBBcLib(object):
 
         transaction1.dump()
 
-    def test_06_proof(self):
+    def test_06_transaction3_with_witness(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        witness = BBcWitness()
+
+        global transaction1
+        transaction1 = BBcTransaction()
+        transaction1.add(witness=witness)
+
+        witness.add_witness(user_id)
+        witness.add_witness(user_id2)
+
+        sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
+                                private_key=keypair2.private_key,
+                                public_key=keypair2.public_key)
+        if sig is None:
+            print(bbclib.error_text)
+            assert sig
+        witness.add_signature(user_id=user_id2, signature=sig)
+
+        sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
+                                private_key=keypair1.private_key,
+                                public_key=keypair1.public_key)
+        if sig is None:
+            print(bbclib.error_text)
+            assert sig
+        witness.add_signature(user_id=user_id, signature=sig)
+
+        transaction1.dump()
+
+    def test_07_proof(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
 
         digest = transaction1.digest()
@@ -191,14 +222,14 @@ class TestBBcLib(object):
             print(bbclib.error_text)
             assert ret
 
-    def test_07_proof(self):
+    def test_08_proof(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         transaction1.timestamp = transaction1.timestamp + 1
         digest = transaction1.digest()
         ret = transaction1.signatures[0].verify(digest)
         assert not ret
 
-    def test_08_size_change(self):
+    def test_09_size_change(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         asset_group_id2 = bbclib.get_new_id("asset_group_2")
 

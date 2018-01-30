@@ -83,13 +83,15 @@ def create_transaction_object_for_filedata(receiver_name, receiver_user_id, ref_
                                            bbc_app_client=None):
     if ref_txids is None or ref_txids[0] is None:
         ref_txids = []
-    transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
+    transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1, witness=True)
 
     user_info_msg = "Ownership is transfered from %s to %s" % (user_name, receiver_name)
     transaction.events[0].asset.add(user_id=receiver_user_id,
                                     asset_body=user_info_msg,
                                     asset_file=file_data)
     transaction.events[0].add(mandatory_approver=receiver_user_id)
+    witness = transaction.witness
+    witness.add_witness(receiver_user_id)
 
     for i, ref_txid in enumerate(ref_txids):
         bbc_app_client.search_transaction(asset_group_id, ref_txid)
@@ -99,11 +101,6 @@ def create_transaction_object_for_filedata(receiver_name, receiver_user_id, ref_
             sys.exit(0)
         prev_tx = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
         bbclib.add_reference_to_transaction(asset_group_id, transaction, prev_tx, 0)
-
-    sig_mine = transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
-                                private_key=key_pair.private_key,
-                                public_key=key_pair.public_key)
-    transaction.references[0].add_signature(user_id=user_id, signature=sig_mine)
 
     asset_id = transaction.events[0].asset.asset_id
     asset_files = {asset_id: file_data}
@@ -117,7 +114,12 @@ def create_transaction_object_for_filedata(receiver_name, receiver_user_id, ref_
         print("Rejected because ", response_data[KeyType.reason].decode(), "")
         sys.exit(0)
     result = response_data[KeyType.result]
-    transaction.references[result[0]].add_signature(user_id=result[1], signature=result[2])
+    transaction.add_signature(user_id=result[1], signature=result[2])
+
+    sig_mine = transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
+                                private_key=key_pair.private_key,
+                                public_key=key_pair.public_key)
+    transaction.references[0].add_signature(user_id=user_id, signature=sig_mine)
 
     transaction.digest()
     return transaction
