@@ -23,6 +23,7 @@ import argparse
 import time
 import binascii
 import sys
+import ipaddress
 sys.path.append("../")
 
 from bbc1.app import bbc_app
@@ -41,24 +42,35 @@ def wait_check_result_msg_type(callback, msg_type):
 
 def argument_parser():
     argparser = argparse.ArgumentParser(description='Send domain ping to crate domain and static node info.')
-    argparser.add_argument('-4', '--ip4address', action='store', default="127.0.0.1", help='bbc_core address (IPv4)')
-    argparser.add_argument('-6', '--ip6address', action='store', help='bbc_core address (IPv6)')
+    argparser.add_argument('-4', '--ip4address', action='store', help='bbc_core address (IPv4) to control')
+    argparser.add_argument('-6', '--ip6address', action='store', help='bbc_core address (IPv6) to control')
     argparser.add_argument('-p', '--port', action='store', default=DEFAULT_CORE_PORT,  help='port number of bbc_core')
     argparser.add_argument('domain_id', action='store', nargs='?', default=None,  help='domain_id string')
-    argparser.add_argument('dst_address', action='store', nargs='?', default="127.0.0.1",  help='IPv4/v6 address string')
+    argparser.add_argument('dst_address', action='store', nargs='?', help='destination IPv4/v6 address string')
     argparser.add_argument('dst_port', action='store', nargs='?', default=DEFAULT_P2P_PORT+1,  help='port number')
     return argparser.parse_args()
+
+
+def send_domain_ping(bbcclient, domain_id, addr, port):
+    dst_ip, dst_port = ipaddress.ip_address(addr), int(port)
+    ipv4 = None
+    ipv6 = None
+    if isinstance(dst_ip, ipaddress.IPv4Address):
+        ipv4 = str(dst_ip)
+    else:
+        ipv6 = str(dst_ip)
+    print("Request domain_ping to %s, %s, %d" % (ipv4, ipv6, dst_port))
+    bbcclient.send_domain_ping(domain_id, ipv4, ipv6, dst_port)
 
 
 if __name__ == '__main__':
     port = None
     parsed_args = argument_parser()
+    addr = "127.0.0.1"
     if parsed_args.ip4address:
         addr = parsed_args.ip4address
-        v4flag = True
     if parsed_args.ip6address:
         addr = parsed_args.ip6address
-        v4flag = False
     port = parsed_args.port
 
     bbcclient = bbc_app.BBcAppClient(host=addr, port=port, loglevel="all")
@@ -68,15 +80,7 @@ if __name__ == '__main__':
     dat = wait_check_result_msg_type(bbcclient.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_DOMAIN)
     assert dat[KeyType.status] == ESUCCESS
 
-    dst_ip, dst_port = parsed_args.dst_address, int(parsed_args.dst_port)
-    ipv4 = "0.0.0.0"
-    ipv6 = "::"
-    if v4flag:
-        ipv4 = dst_ip
-    else:
-        ipv6 = dst_ip
-    print("Request domain_ping to %s, %s, %d" % (ipv4, ipv6, dst_port))
-    bbcclient.send_domain_ping(domain_id, ipv4, ipv6, dst_port)
+    send_domain_ping(bbcclient, domain_id, parsed_args.dst_address, parsed_args.dst_port)
 
     print("*** wait 5 sec, checking peer_list in the core ***")
     time.sleep(5)

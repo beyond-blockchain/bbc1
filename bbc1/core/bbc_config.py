@@ -37,7 +37,6 @@ TIMEOUT_TIMER = 3
 current_config = {
     'workingdir': DEFAULT_WORKING_DIR,
     'client': {
-        'ipv6': False,
         'port': DEFAULT_CORE_PORT,
     },
     'ledger': {
@@ -51,7 +50,6 @@ current_config = {
         #'path': "/path/to/somewhere",
     },
     'network': {
-        'ipv6': False,
         'p2p_port': DEFAULT_P2P_PORT,
         'max_connections': 100,
         'modules': {
@@ -122,7 +120,8 @@ class BBcConfig:
             with open(os.path.join(self.working_dir, self.config_file), "w") as f:
                 json.dump(self.config, f, indent=4)
         except:
-            print(self.config)
+            #print(self.config)
+            pass
 
     def get_json_config(self):
         self.update_config()

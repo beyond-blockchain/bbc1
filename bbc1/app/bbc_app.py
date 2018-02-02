@@ -34,6 +34,7 @@ from bbc1.common.bbc_error import *
 from bbc1.common import logger
 
 DEFAULT_CORE_PORT = 9000
+DEFAULT_P2P_PORT = 6641
 MAPPING_FILE = ".bbc_id_mappings"
 
 
@@ -233,7 +234,7 @@ class BBcAppClient:
         dat[KeyType.peer_info] = [node_id, ipv4, ipv6, port]
         return self.send_msg(dat)
 
-    def send_domain_ping(self, domain_id, ipv4, ipv6, port):
+    def send_domain_ping(self, domain_id, ipv4=None, ipv6=None, port=DEFAULT_P2P_PORT):
         """
         Send domain ping to notify the existence of the node (maybe used by a system administrator)
 
@@ -243,10 +244,14 @@ class BBcAppClient:
         :param port:
         :return:
         """
+        if ipv4 is None and ipv6 is None:
+            return
         dat = self.make_message_structure(None, MsgType.DOMAIN_PING)
         dat[KeyType.domain_id] = domain_id
-        dat[KeyType.ipv4_address] = ipv4
-        dat[KeyType.ipv6_address] = ipv6
+        if ipv4 is not None:
+            dat[KeyType.ipv4_address] = ipv4
+        if ipv6 is not None:
+            dat[KeyType.ipv6_address] = ipv6
         dat[KeyType.port_number] = port
         return self.send_msg(dat)
 
@@ -708,13 +713,14 @@ class Callback:
             return
         peerlist = dat[KeyType.peer_list]
         results = []
-        count = int.from_bytes(peerlist[:4], 'little')
+        count = int.from_bytes(peerlist[:4], 'big')
         for i in range(count):
-            base = 4 + i*(32+4+16+2)
+            base = 4 + i*(32+4+16+2+8)
             node_id = peerlist[base:base+32]
             ipv4 = peerlist[base+32:base+36]
             ipv6 = peerlist[base+36:base+52]
             port = peerlist[base+52:base+54]
+            updated_at = peerlist[base+54:base+62]
             info = NodeInfo()
             info.recover_nodeinfo(node_id, ipv4, ipv6, port)
             results.append([info.node_id, info.ipv4, info.ipv6, info.port])

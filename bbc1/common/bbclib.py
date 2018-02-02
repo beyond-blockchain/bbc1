@@ -871,14 +871,14 @@ class NodeInfo:
     def __init__(self, node_id=domain_global_0, ipv4=None, ipv6=None, port=None):
         self.node_id = node_id
         if ipv4 is None or len(ipv4) == 0:
-            self.ipv4 = "0.0.0.0"
+            self.ipv4 = None
         else:
             if isinstance(ipv4, bytes):
                 self.ipv4 = ipv4.decode()
             else:
                 self.ipv4 = ipv4
         if ipv6 is None or len(ipv6) == 0:
-            self.ipv6 = "::"
+            self.ipv6 = None
         else:
             if isinstance(ipv6, bytes):
                 self.ipv6 = ipv6.decode()
@@ -902,6 +902,11 @@ class NodeInfo:
     def __len__(self):
         return len(self.node_id)
 
+    def __str__(self):
+        output = "[node_id=%s, ipv4=%s, ipv6=%s, port=%d, time=%d]" % (binascii.b2a_hex(self.node_id), self.ipv4,
+                                                                       self.ipv6, self.port, self.updated_at)
+        return output
+
     def touch(self):
         self.updated_at = time.time()
         self.is_alive = True
@@ -920,16 +925,26 @@ class NodeInfo:
         self.updated_at = time.time()
 
     def get_nodeinfo(self):
-        ipv4 = socket.inet_pton(socket.AF_INET, self.ipv4)
-        ipv6 = socket.inet_pton(socket.AF_INET6, self.ipv6)
-        return self.node_id, ipv4, ipv6, socket.htons(self.port).to_bytes(2, 'little')
+        if self.ipv4 is not None:
+            ipv4 = socket.inet_pton(socket.AF_INET, self.ipv4)
+        else:
+            ipv4 = socket.inet_pton(socket.AF_INET, "0.0.0.0")
+        if self.ipv6 is not None:
+            ipv6 = socket.inet_pton(socket.AF_INET6, self.ipv6)
+        else:
+            ipv6 = socket.inet_pton(socket.AF_INET6, "::")
+        return self.node_id, ipv4, ipv6, socket.htons(self.port).to_bytes(2, 'big'), \
+               int(self.updated_at).to_bytes(8, 'big')
 
-    def recover_nodeinfo(self, node_id, ipv4, ipv6, port):
+    def recover_nodeinfo(self, node_id, ipv4, ipv6, port, updated_at=0):
         self.node_id = node_id
-        self.ipv4 = socket.inet_ntop(socket.AF_INET, ipv4)
-        self.ipv6 = socket.inet_ntop(socket.AF_INET6, ipv6)
-        self.port = socket.ntohs(int.from_bytes(port, 'little'))
-        self.touch()
+        if ipv4 != socket.inet_pton(socket.AF_INET, "0.0.0.0"):
+            self.ipv4 = socket.inet_ntop(socket.AF_INET, ipv4)
+        if ipv6 != socket.inet_pton(socket.AF_INET6, "::"):
+            self.ipv6 = socket.inet_ntop(socket.AF_INET6, ipv6)
+        self.port = socket.ntohs(int.from_bytes(port, 'big'))
+        if updated_at > 0:
+            self.updated_at = updated_at
 
 
 class StorageType:
