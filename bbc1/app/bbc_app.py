@@ -163,7 +163,7 @@ class BBcAppClient:
         :param cmd:
         :return:
         """
-        self.query_id = ((int.from_bytes(self.query_id, 'little') + 1) // 65536).to_bytes(2, 'little')
+        self.query_id = ((int.from_bytes(self.query_id, 'little') + 1) % 65536).to_bytes(2, 'little')
         return {
             KeyType.command: cmd,
             KeyType.asset_group_id: asset_group_id,
