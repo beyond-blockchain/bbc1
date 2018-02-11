@@ -108,8 +108,13 @@ class TestBBcAppClient(object):
             assert ret
             ret = msg_processor[i].synchronize()
             print("[%d] set_peer result is %s" %(i, ret))
+            clients[i]['app'].ping_to_all_neighbors(domain_id)
+        time.sleep(2)
 
-        time.sleep(3)
+        cores[0].networking.domains[domain_id].alive_check()
+        print("** wait 16 sec to finish alive_check")
+        time.sleep(16)
+        assert len(cores[1].networking.domains[domain_id].id_ip_mapping) == core_num-1
         for i in range(core_num):
             cores[i].networking.domains[domain_id].print_peerlist()
 
@@ -268,7 +273,8 @@ class TestBBcAppClient(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for core in cores:
             core.networking.save_all_peer_lists()
-            core.config.update_config()
+            ret = core.config.update_config()
+            assert ret
 
 
 if __name__ == '__main__':

@@ -42,12 +42,12 @@ def start_core(index, core_port, p2p_port, use_global=False, remove_dir=True):
     print("** [%d] start: port=%i" % (index, core_port))
     if remove_dir and os.path.exists(".bbc1-%i/" % core_port):
         shutil.rmtree(".bbc1-%i/" % core_port)
-    cores[index] = bbc_core.BBcCoreService(ipv6=False, p2p_port=p2p_port, core_port=core_port,
+    cores[index] = bbc_core.BBcCoreService(p2p_port=p2p_port, core_port=core_port,
                                            workingdir=".bbc1-%i/" % core_port,
                                            use_global=use_global,
                                            server_start=False,
                                            loglevel=loglv)
-    cores[index].start_server(ipv6=False, port=core_port)
+    cores[index].start_server(port=core_port)
 
 
 def domain_and_asset_group_setup(core_port_increment, domain_id, asset_group_ids,

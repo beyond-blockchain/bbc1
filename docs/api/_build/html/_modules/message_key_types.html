@@ -297,11 +297,12 @@
     <span class="n">query_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>      <span class="c1"># query_id from bbc_app</span>
     <span class="n">nonce</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
     <span class="n">count</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">14</span><span class="p">)</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
 
     <span class="n">ledger_subsys_manip</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">)</span>     <span class="c1"># enable/disable ledger_subsystem</span>
     <span class="n">ledger_subsys_register</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">)</span>
     <span class="n">ledger_subsys_verify</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">)</span>
-    <span class="n">markle_tree</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">)</span>
+    <span class="n">merkle_tree</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">)</span>
 
     <span class="n">network_module</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
     <span class="n">storage_type</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
@@ -315,6 +316,9 @@
     <span class="n">ipv4_address</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
     <span class="n">ipv6_address</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
     <span class="n">port_number</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">external_ip4addr</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">external_ip6addr</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">max_body_size</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
 
     <span class="n">resource_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">)</span>
     <span class="n">resource_type</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">)</span>

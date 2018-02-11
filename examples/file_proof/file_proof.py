@@ -1,4 +1,8 @@
-#!/usr/bin/env python
+#!/bin/sh
+""":" .
+
+exec python "$0" "$@"
+"""
 # -*- coding: utf-8 -*-
 """
 Copyright (c) 2017 beyond-blockchain.org.
@@ -117,6 +121,7 @@ def create_transaction_object_for_filedata(receiver_name, receiver_user_id, ref_
         print("Rejected because ", response_data[KeyType.reason].decode(), "")
         sys.exit(0)
     result = response_data[KeyType.result]
+    transaction.get_sig_index(receiver_user_id)
     transaction.references[result[0]].add_signature(user_id=result[1], signature=result[2])
 
     transaction.digest()

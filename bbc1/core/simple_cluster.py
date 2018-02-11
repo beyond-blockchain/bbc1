@@ -44,6 +44,7 @@ class NetworkDomain(DomainBase):
         self.node_pointer_index = 0
         self.module_name = "simple_cluster"
         self.default_payload_type = PayloadType.Type_msgpack
+        self.in_alive_checking = False
 
     def domain_manager_loop(self):
         """
@@ -56,20 +57,13 @@ class NetworkDomain(DomainBase):
             time.sleep(30)
 
     def alive_check(self):
+        if self.in_alive_checking:
+            return
+        self.in_alive_checking = True
         query_entry = query_management.QueryEntry(expire_after=15,
-                                                  callback_expire=self.broadcast_peerlist,
-                                                  data={KeyType.peer_info: [],
-                                                        'number_of_ping': len(self.id_ip_mapping)},
+                                                  callback_expire=self.send_peerlist,
                                                   retry_count=0)
-        for nd in self.id_ip_mapping.keys():
-            query_entry2 = query_management.QueryEntry(expire_after=14,
-                                                       callback_expire=None,
-                                                       callback=self.add_advertise_list,
-                                                       callback_error=self.ping_with_retry,
-                                                       interval=3,
-                                                       data={KeyType.node_id: nd,
-                                                             'parent_nonce': query_entry.nonce})
-            self.ping_with_retry(query_entry2)
+        self.ping_to_all_neighbors()
 
     def add_peer_node(self, node_id, ip4, addr_info):
         """
@@ -83,37 +77,6 @@ class NetworkDomain(DomainBase):
         if super(NetworkDomain, self).add_peer_node(node_id, ip4, addr_info):
             self.node_pointer_index = 0
 
-    def broadcast_peerlist(self, query_entry):
-        """
-        Broadcast the peer_list to the neighbors
-
-        :param query_entry:
-        :return:
-        """
-        dellist = []
-        peerlist = query_entry.data[KeyType.peer_info]
-        for nd in self.id_ip_mapping.keys():
-            if nd not in peerlist:
-                dellist.append(nd)
-        for nd in dellist:
-            del self.id_ip_mapping[nd]
-        self.send_peerlist()
-
-    def add_advertise_list(self, query_entry):
-        """
-        The peer node information will be advertised because ping is successful
-
-        :param query_entry:
-        :return:
-        """
-        parent_query_entry = ticker.get_entry(query_entry.data['parent_nonce'])
-        parent_query_entry.data[KeyType.peer_info].append(query_entry.data[KeyType.node_id])
-        parent_query_entry.data['number_of_ping'] -= 1
-        self.logger.debug("add_advertise_list %s (num_ping=%d)" % (
-            binascii.b2a_hex(query_entry.data[KeyType.node_id][:4]), parent_query_entry.data['number_of_ping']))
-        if parent_query_entry.data['number_of_ping'] == 0:
-            parent_query_entry.fire()
-
     def print_peerlist(self):
         """
         Print peer list
@@ -121,10 +84,14 @@ class NetworkDomain(DomainBase):
         :return:
         """
         self.logger.info("================ peer list [%s] ===============" % self.shortname)
+        print("================ peer list [%s] ===============" % self.shortname)
         for nd in self.id_ip_mapping.keys():
-            self.logger.info("%s: (%s, %d)" % (binascii.b2a_hex(nd[:4]),
-                                               self.id_ip_mapping[nd].ipv4, self.id_ip_mapping[nd].port))
+            self.logger.info("%s: (%s, %s, %d)" % (binascii.b2a_hex(nd[:4]), self.id_ip_mapping[nd].ipv4,
+                                                   self.id_ip_mapping[nd].ipv6, self.id_ip_mapping[nd].port))
+            print("%s: (%s, %s, %d)" % (binascii.b2a_hex(nd[:4]), self.id_ip_mapping[nd].ipv4,
+                                        self.id_ip_mapping[nd].ipv6, self.id_ip_mapping[nd].port))
         self.logger.info("-----------------------------------------------")
+        print("-----------------------------------------------")
 
     def advertise_domain_info(self):
         pass
@@ -268,12 +235,13 @@ class NetworkDomain(DomainBase):
         msg[KeyType.resource_id] = resource_id
         return self.send_message_to_peer(msg, self.default_payload_type)
 
-    def send_peerlist(self):
+    def send_peerlist(self, query_entry):
         msg = self.make_message(dst_node_id=ZEROS, nonce=None, msg_type=InfraMessageTypeBase.NOTIFY_PEERLIST)
         msg[KeyType.peer_list] = self.make_peer_list()
         for nd in self.get_neighbor_nodes():
             msg[KeyType.destination_node_id] = nd
             self.send_message_to_peer(msg, self.default_payload_type)
+        self.in_alive_checking = False
 
     def get_resource(self, query_entry):
         if len(self.get_neighbor_nodes()) == 0:
