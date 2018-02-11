@@ -46,6 +46,8 @@ def argument_parser():
     argparser.add_argument('-6', '--ip6address', action='store', help='bbc_core address (IPv6)')
     argparser.add_argument('-p', '--port', action='store', default=DEFAULT_CORE_PORT,  help='port number of bbc_core')
     argparser.add_argument('-d', '--domain_id', action='store', default=None, help='domain_id to setup')
+    argparser.add_argument('--ping_to_neighbor', action='store_true', help='make the bbc_core send ping to all '
+                                                                           'neighbors')
     argparser.add_argument('-i', '--id', action='store',  help='SHA256 ID calculation from the given strings')
     argparser.add_argument('-t', '--timebaseid', action='store',  help='SHA256 ID calculation from the given strings including timestamp')
     return argparser.parse_args()
@@ -84,6 +86,12 @@ if __name__ == '__main__':
         addr = parsed_args.ip6address
     port = parsed_args.port
     bbcclient = bbc_app.BBcAppClient(host=addr, port=port, loglevel="all")
+
+    if parsed_args.ping_to_neighbor:
+        print("ping to all neighbor bbc_cores")
+        bbcclient.ping_to_all_neighbors()
+        time.sleep(1)
+        sys.exit(0)
 
     domain_id = bbclib.convert_idstring_to_bytes(parsed_args.domain_id)
     bbcclient.domain_setup(domain_id, "simple_cluster")
