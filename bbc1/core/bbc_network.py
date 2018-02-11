@@ -537,11 +537,11 @@ class BBcNetwork:
         if len(data_to_send) > TCP_THRESHOLD_SIZE:
             send_data_by_tcp(ipv4=nodeinfo.ipv4, ipv6=nodeinfo.ipv6, port=nodeinfo.port, msg=data_to_send)
             return
-        if nodeinfo.ipv6 is not None:
+        if nodeinfo.ipv6 is not None and self.socket_udp6 is not None:
             self.socket_udp6.sendto(data_to_send, (nodeinfo.ipv6, nodeinfo.port))
             self.core.stats.update_stats_increment("network", "packets_sent_by_udp", 1)
             return
-        if nodeinfo.ipv4 is not None:
+        if nodeinfo.ipv4 is not None and self.socket_udp is not None:
             self.socket_udp.sendto(data_to_send, (nodeinfo.ipv4, nodeinfo.port))
             self.core.stats.update_stats_increment("network", "message_size_sent_by_udp", len(data_to_send))
             return

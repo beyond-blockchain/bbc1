@@ -1,6 +1,10 @@
 Change log
 ======
 
+## v0.8.1
+* IPv6 support
+* Fix several bugs
+
 ## v0.8
 * Implement system statistics API #8
 * Notification of transaction insertion is implemented #9

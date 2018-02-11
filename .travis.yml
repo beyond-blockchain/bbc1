@@ -27,4 +27,6 @@ script:
   #- pytest test_ledger_subsystem.py
   - pytest test_many_domains_with_global.py
   - pytest test_pending_request.py
+  - pytest test_bbc_ping.py
+  - pytest test_bbc_stats.py
   - pytest test_recover.py

@@ -198,12 +198,18 @@
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;../../&quot;</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">bbc1.common.bbc_error</span> <span class="k">import</span> <span class="o">*</span>
 
-<span class="n">directory</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">__file__</span><span class="p">))</span>
+<span class="n">directory</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
 <span class="kn">from</span> <span class="nn">ctypes</span> <span class="k">import</span> <span class="o">*</span>
-<span class="n">libbbcsig</span> <span class="o">=</span> <span class="n">CDLL</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/libbbcsig.so&quot;</span> <span class="o">%</span> <span class="n">directory</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;nt&quot;</span><span class="p">:</span>
+    <span class="n">libbbcsig</span> <span class="o">=</span> <span class="n">CDLL</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/libbbcsig.dll&quot;</span> <span class="o">%</span> <span class="n">directory</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">libbbcsig</span> <span class="o">=</span> <span class="n">CDLL</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/libbbcsig.so&quot;</span> <span class="o">%</span> <span class="n">directory</span><span class="p">)</span>
 
 
 <span class="n">domain_global_0</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="s2">&quot;0000000000000000000000000000000000000000000000000000000000000000&quot;</span><span class="p">)</span>
+<span class="n">DEFAULT_MAX_BODY_SIZE</span> <span class="o">=</span> <span class="mi">256</span>
+<span class="n">max_bodysize_conf</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
 <span class="n">error_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 <span class="n">error_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -221,6 +227,11 @@
     <span class="k">global</span> <span class="n">error_text</span>
     <span class="n">error_code</span> <span class="o">=</span> <span class="n">ESUCCESS</span>
     <span class="n">error_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="set_max_body_size"><a class="viewcode-back" href="../bbclib.html#bbclib.set_max_body_size">[docs]</a><span class="k">def</span> <span class="nf">set_max_body_size</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">body_size</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">max_bodysize_conf</span>
+    <span class="n">max_bodysize_conf</span><span class="p">[</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">body_size</span></div>
 
 
 <div class="viewcode-block" id="get_new_id"><a class="viewcode-back" href="../bbclib.html#bbclib.get_new_id">[docs]</a><span class="k">def</span> <span class="nf">get_new_id</span><span class="p">(</span><span class="n">seed_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_timestamp</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -254,7 +265,7 @@
 <div class="viewcode-block" id="convert_idstring_to_bytes"><a class="viewcode-back" href="../bbclib.html#bbclib.convert_idstring_to_bytes">[docs]</a><span class="k">def</span> <span class="nf">convert_idstring_to_bytes</span><span class="p">(</span><span class="n">datastr</span><span class="p">,</span> <span class="n">bytelen</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
     <span class="n">res</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="n">datastr</span><span class="p">))</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">bytelen</span><span class="p">:</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">bytelen</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)))</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">bytelen</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)))</span><span class="o">+</span><span class="n">res</span>
     <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div>
 
 
@@ -262,7 +273,7 @@
     <span class="n">transaction</span> <span class="o">=</span> <span class="n">BBcTransaction</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">event_num</span><span class="p">):</span>
         <span class="n">evt</span> <span class="o">=</span> <span class="n">BBcEvent</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="n">asset_group_id</span><span class="p">)</span>
-        <span class="n">ast</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">()</span>
+        <span class="n">ast</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">(</span><span class="n">max_body_size</span><span class="o">=</span><span class="n">max_bodysize_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">DEFAULT_MAX_BODY_SIZE</span><span class="p">))</span>
         <span class="n">evt</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">asset</span><span class="o">=</span><span class="n">ast</span><span class="p">)</span>
         <span class="n">transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">evt</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">transaction</span></div>
@@ -334,8 +345,8 @@
         <span class="k">if</span> <span class="n">privkey</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">memmove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">private_key</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">privkey</span><span class="p">),</span> <span class="n">sizeof</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">private_key</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">pubkey</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">public_key_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pubkey</span><span class="p">)</span>
-            <span class="n">memmove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">public_key</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">pubkey</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_key_len</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">public_key_len</span> <span class="o">=</span> <span class="n">c_int32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pubkey</span><span class="p">))</span>
+            <span class="n">memmove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">public_key</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">pubkey</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_key_len</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">privkey</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">pubkey</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
@@ -361,6 +372,11 @@
                                    <span class="n">byref</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">public_key_len</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_key</span><span class="p">,</span>
                                    <span class="n">byref</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">private_key_len</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">private_key</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="KeyPair.mk_keyobj_from_private_key_pem"><a class="viewcode-back" href="../bbclib.html#bbclib.KeyPair.mk_keyobj_from_private_key_pem">[docs]</a>    <span class="k">def</span> <span class="nf">mk_keyobj_from_private_key_pem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pemdat_string</span><span class="p">):</span>
+        <span class="n">libbbcsig</span><span class="o">.</span><span class="n">convert_from_pem</span><span class="p">(</span><span class="n">create_string_buffer</span><span class="p">(</span><span class="n">pemdat_string</span><span class="o">.</span><span class="n">encode</span><span class="p">()),</span> <span class="mi">0</span><span class="p">,</span>
+                                   <span class="n">byref</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">public_key_len</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_key</span><span class="p">,</span>
+                                   <span class="n">byref</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">private_key_len</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">private_key</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="KeyPair.to_binary"><a class="viewcode-back" href="../bbclib.html#bbclib.KeyPair.to_binary">[docs]</a>    <span class="k">def</span> <span class="nf">to_binary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
         <span class="n">byteval</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_key_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -382,14 +398,26 @@
         <span class="k">return</span> <span class="n">intval</span></div>
 
 <div class="viewcode-block" id="KeyPair.get_private_key_in_der"><a class="viewcode-back" href="../bbclib.html#bbclib.KeyPair.get_private_key_in_der">[docs]</a>    <span class="k">def</span> <span class="nf">get_private_key_in_der</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">der_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">256</span><span class="p">)()</span>
+        <span class="n">der_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">512</span><span class="p">)()</span>     <span class="c1"># 256 -&gt; 512</span>
         <span class="n">der_len</span> <span class="o">=</span> <span class="n">libbbcsig</span><span class="o">.</span><span class="n">output_der</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">private_key_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">private_key</span><span class="p">,</span> <span class="n">byref</span><span class="p">(</span><span class="n">der_data</span><span class="p">))</span>
         <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">(</span><span class="n">der_data</span><span class="p">)[:</span><span class="n">der_len</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="KeyPair.get_private_key_in_pem"><a class="viewcode-back" href="../bbclib.html#bbclib.KeyPair.get_private_key_in_pem">[docs]</a>    <span class="k">def</span> <span class="nf">get_private_key_in_pem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">pem_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_char</span> <span class="o">*</span> <span class="mi">256</span><span class="p">)()</span>
+        <span class="n">pem_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_char</span> <span class="o">*</span> <span class="mi">512</span><span class="p">)()</span>     <span class="c1"># 256 -&gt; 512</span>
         <span class="n">pem_len</span> <span class="o">=</span> <span class="n">libbbcsig</span><span class="o">.</span><span class="n">output_pem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">private_key_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">private_key</span><span class="p">,</span> <span class="n">byref</span><span class="p">(</span><span class="n">pem_data</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">pem_data</span><span class="o">.</span><span class="n">value</span></div></div>
+        <span class="k">return</span> <span class="n">pem_data</span><span class="o">.</span><span class="n">value</span></div>
+
+<div class="viewcode-block" id="KeyPair.sign"><a class="viewcode-back" href="../bbclib.html#bbclib.KeyPair.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digest</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">ECDSA_SECP256k1</span><span class="p">:</span>
+            <span class="n">signature</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">64</span><span class="p">)()</span>
+            <span class="n">libbbcsig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">private_key_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">private_key</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">signature</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">set_error</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">EOTHER</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;sig_type </span><span class="si">%d</span><span class="s2"> is not supported&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="KeyPair.verify"><a class="viewcode-back" href="../bbclib.html#bbclib.KeyPair.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">libbbcsig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">public_key_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">digest</span><span class="p">),</span> <span class="n">digest</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sig</span><span class="p">),</span> <span class="n">sig</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="BBcSignature"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcSignature">[docs]</a><span class="k">class</span> <span class="nc">BBcSignature</span><span class="p">:</span>
@@ -438,8 +466,7 @@
             <span class="n">set_error</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">EBADKEYPAIR</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;Bad private_key/public_key&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">flag</span> <span class="o">=</span> <span class="n">libbbcsig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keypair</span><span class="o">.</span><span class="n">public_key_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keypair</span><span class="o">.</span><span class="n">public_key</span><span class="p">,</span>
-                                    <span class="nb">len</span><span class="p">(</span><span class="n">digest</span><span class="p">),</span> <span class="n">digest</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="p">)</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keypair</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">digest</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -604,11 +631,8 @@
                 <span class="k">return</span> <span class="kc">None</span>
 
         <span class="n">sig</span> <span class="o">=</span> <span class="n">BBcSignature</span><span class="p">(</span><span class="n">key_type</span><span class="o">=</span><span class="n">keypair</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">keypair</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">ECDSA_SECP256k1</span><span class="p">:</span>
-            <span class="n">signature</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">64</span><span class="p">)()</span>
-            <span class="n">libbbcsig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">keypair</span><span class="o">.</span><span class="n">private_key_len</span><span class="p">,</span> <span class="n">keypair</span><span class="o">.</span><span class="n">private_key</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">digest</span><span class="p">(),</span> <span class="n">signature</span><span class="p">)</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">signature</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">keypair</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">set_error</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">EOTHER</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;sig_type </span><span class="si">%d</span><span class="s2"> is not supported&quot;</span> <span class="o">%</span> <span class="n">keypair</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">sig</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">signature</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">pubkey</span><span class="o">=</span><span class="n">keypair</span><span class="o">.</span><span class="n">public_key</span><span class="p">)</span>
@@ -757,7 +781,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">option_approvers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">appr</span><span class="p">)</span>
             <span class="n">ptr</span><span class="p">,</span> <span class="n">astsize</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
             <span class="n">ptr</span><span class="p">,</span> <span class="n">astdata</span> <span class="o">=</span> <span class="n">get_n_bytes</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">astsize</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">(</span><span class="n">max_body_size</span><span class="o">=</span><span class="n">max_bodysize_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">DEFAULT_MAX_BODY_SIZE</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">astdata</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -834,7 +858,7 @@
 
 
 <div class="viewcode-block" id="BBcAsset"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcAsset">[docs]</a><span class="k">class</span> <span class="nc">BBcAsset</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_body_size</span><span class="o">=</span><span class="n">DEFAULT_MAX_BODY_SIZE</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span> <span class="o">=</span> <span class="n">get_random_value</span><span class="p">()</span>
@@ -842,7 +866,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">asset_file</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_digest</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asset_body_size</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">asset_body</span> <span class="o">=</span> <span class="p">[]</span>    <span class="c1"># up to 256 bytes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_body</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_body_size</span> <span class="o">=</span> <span class="n">max_body_size</span>
 
 <div class="viewcode-block" id="BBcAsset.add"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcAsset.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_body</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -852,7 +877,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">asset_file</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">asset_file</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">asset_body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">asset_body</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">256</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">asset_body</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_body_size</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">asset_file</span> <span class="o">=</span> <span class="n">asset_body</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">asset_body</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">asset_body</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
@@ -961,6 +986,11 @@
     <span class="n">DOMAIN_PING</span> <span class="o">=</span> <span class="mi">12</span>
     <span class="n">REQUEST_GET_DOMAINLIST</span> <span class="o">=</span> <span class="mi">13</span>
     <span class="n">RESPONSE_GET_DOMAINLIST</span> <span class="o">=</span> <span class="mi">14</span>
+    <span class="n">REQUEST_INSERT_NOTIFICATION</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">CANCEL_INSERT_NOTIFICATION</span> <span class="o">=</span> <span class="mi">16</span>
+    <span class="n">REQUEST_GET_STATS</span> <span class="o">=</span> <span class="mi">17</span>
+    <span class="n">RESPONSE_GET_STATS</span> <span class="o">=</span> <span class="mi">18</span>
+    <span class="n">REQUEST_PING_TO_ALL</span> <span class="o">=</span> <span class="mi">19</span>
 
     <span class="n">REGISTER</span> <span class="o">=</span> <span class="mi">32</span>
     <span class="n">UNREGISTER</span> <span class="o">=</span> <span class="mi">33</span>
@@ -972,13 +1002,16 @@
     <span class="n">RESPONSE_SIGNATURE</span> <span class="o">=</span> <span class="mi">38</span>
     <span class="n">REQUEST_INSERT</span> <span class="o">=</span> <span class="mi">39</span>
     <span class="n">RESPONSE_INSERT</span> <span class="o">=</span> <span class="mi">40</span>
+    <span class="n">NOTIFY_INSERTED</span> <span class="o">=</span> <span class="mi">41</span>
 
     <span class="n">REQUEST_SEARCH_ASSET</span> <span class="o">=</span> <span class="mi">66</span>
     <span class="n">RESPONSE_SEARCH_ASSET</span> <span class="o">=</span> <span class="mi">67</span>
     <span class="n">REQUEST_SEARCH_TRANSACTION</span> <span class="o">=</span> <span class="mi">68</span>
     <span class="n">RESPONSE_SEARCH_TRANSACTION</span> <span class="o">=</span> <span class="mi">69</span>
-    <span class="n">REQUEST_CROSS_REF</span> <span class="o">=</span> <span class="mi">70</span>
-    <span class="n">RESPONSE_CROSS_REF</span> <span class="o">=</span> <span class="mi">71</span>
+    <span class="n">REQUEST_SEARCH_USERID</span> <span class="o">=</span> <span class="mi">70</span>
+    <span class="n">RESPONSE_SEARCH_USERID</span> <span class="o">=</span> <span class="mi">71</span>
+    <span class="n">REQUEST_CROSS_REF</span> <span class="o">=</span> <span class="mi">72</span>
+    <span class="n">RESPONSE_CROSS_REF</span> <span class="o">=</span> <span class="mi">73</span>
 
     <span class="n">REQUEST_REGISTER_HASH_IN_SUBSYS</span> <span class="o">=</span> <span class="mi">128</span>
     <span class="n">RESPONSE_REGISTER_HASH_IN_SUBSYS</span> <span class="o">=</span> <span class="mi">129</span>
@@ -1011,14 +1044,14 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=</span><span class="n">domain_global_0</span><span class="p">,</span> <span class="n">ipv4</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_id</span> <span class="o">=</span> <span class="n">node_id</span>
         <span class="k">if</span> <span class="n">ipv4</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ipv4</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ipv4</span> <span class="o">=</span> <span class="s2">&quot;0.0.0.0&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ipv4</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ipv4</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ipv4</span> <span class="o">=</span> <span class="n">ipv4</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ipv4</span> <span class="o">=</span> <span class="n">ipv4</span>
         <span class="k">if</span> <span class="n">ipv6</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ipv6</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ipv6</span> <span class="o">=</span> <span class="s2">&quot;::&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ipv6</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ipv6</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ipv6</span> <span class="o">=</span> <span class="n">ipv6</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
@@ -1042,6 +1075,11 @@
     <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_id</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;[node_id=</span><span class="si">%s</span><span class="s2">, ipv4=</span><span class="si">%s</span><span class="s2">, ipv6=</span><span class="si">%s</span><span class="s2">, port=</span><span class="si">%d</span><span class="s2">, time=</span><span class="si">%d</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_id</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipv4</span><span class="p">,</span>
+                                                                       <span class="bp">self</span><span class="o">.</span><span class="n">ipv6</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">updated_at</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span>
+
 <div class="viewcode-block" id="NodeInfo.touch"><a class="viewcode-back" href="../bbclib.html#bbclib.NodeInfo.touch">[docs]</a>    <span class="k">def</span> <span class="nf">touch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">updated_at</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span> <span class="o">=</span> <span class="kc">True</span></div>
@@ -1060,16 +1098,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">updated_at</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="NodeInfo.get_nodeinfo"><a class="viewcode-back" href="../bbclib.html#bbclib.NodeInfo.get_nodeinfo">[docs]</a>    <span class="k">def</span> <span class="nf">get_nodeinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">ipv4</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipv4</span><span class="p">)</span>
-        <span class="n">ipv6</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipv6</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">htons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipv4</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ipv4</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipv4</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ipv4</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="s2">&quot;0.0.0.0&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipv6</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ipv6</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipv6</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ipv6</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span><span class="p">,</span> <span class="s2">&quot;::&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">htons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">),</span> \
+               <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updated_at</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="NodeInfo.recover_nodeinfo"><a class="viewcode-back" href="../bbclib.html#bbclib.NodeInfo.recover_nodeinfo">[docs]</a>    <span class="k">def</span> <span class="nf">recover_nodeinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeInfo.recover_nodeinfo"><a class="viewcode-back" href="../bbclib.html#bbclib.NodeInfo.recover_nodeinfo">[docs]</a>    <span class="k">def</span> <span class="nf">recover_nodeinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">updated_at</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_id</span> <span class="o">=</span> <span class="n">node_id</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ipv4</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_ntop</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ipv6</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_ntop</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">ntohs</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span></div></div>
+        <span class="k">if</span> <span class="n">ipv4</span> <span class="o">!=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="s2">&quot;0.0.0.0&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ipv4</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_ntop</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ipv6</span> <span class="o">!=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span><span class="p">,</span> <span class="s2">&quot;::&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ipv6</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_ntop</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">ntohs</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">updated_at</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updated_at</span> <span class="o">=</span> <span class="n">updated_at</span></div></div>
 
 
 <div class="viewcode-block" id="StorageType"><a class="viewcode-back" href="../bbclib.html#bbclib.StorageType">[docs]</a><span class="k">class</span> <span class="nc">StorageType</span><span class="p">:</span>

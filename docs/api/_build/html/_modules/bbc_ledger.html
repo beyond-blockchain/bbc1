@@ -303,8 +303,8 @@
         <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;);&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="n">sql</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="s2">&quot;CREATE INDEX transaction_table_idx_</span><span class="si">%d</span><span class="s2"> ON </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">);&quot;</span> <span class="o">%</span>
-                          <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="s2">&quot;CREATE INDEX </span><span class="si">%s</span><span class="s2">_idx_</span><span class="si">%d</span><span class="s2"> ON </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">);&quot;</span> <span class="o">%</span>
+                          <span class="p">(</span><span class="n">tbl</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span></div>
 
 <div class="viewcode-block" id="BBcLedger.exec_sql_fetchone"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.exec_sql_fetchone">[docs]</a>    <span class="k">def</span> <span class="nf">exec_sql_fetchone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="o">*</span><span class="n">dat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -363,7 +363,7 @@
                                      <span class="s2">&quot;select * from sqlite_master where type=&#39;table&#39; and name=?&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
-<div class="viewcode-block" id="BBcLedger.find_locally"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.find_locally">[docs]</a>    <span class="k">def</span> <span class="nf">find_locally</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcLedger.find_locally"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.find_locally">[docs]</a>    <span class="k">def</span> <span class="nf">find_locally</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">,</span> <span class="n">want_newest</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find data by ID</span>
 
@@ -371,6 +371,7 @@
 <span class="sd">        :param asset_group_id</span>
 <span class="sd">        :param resource_id:   Transaction_ID or Asset_ID</span>
 <span class="sd">        :param resource_type: ResourceType value</span>
+<span class="sd">        :param want_newest:   If True, the entry having the biggest ID in the same condition is required</span>
 <span class="sd">        :return:              data, data_type</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">resource_type</span> <span class="o">==</span> <span class="n">ResourceType</span><span class="o">.</span><span class="n">Transaction_data</span><span class="p">:</span>
@@ -380,10 +381,16 @@
             <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span>
-                                         <span class="s2">&quot;select * from auxiliary_table where resource_id = ? AND &quot;</span>
-                                         <span class="s2">&quot;asset_group_id = ? AND resource_type = ?&quot;</span><span class="p">,</span>
-                                         <span class="n">resource_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">want_newest</span><span class="p">:</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span>
+                                             <span class="s2">&quot;select * from auxiliary_table where resource_id = ? AND &quot;</span>
+                                             <span class="s2">&quot;asset_group_id = ? AND resource_type = ? order by id desc&quot;</span><span class="p">,</span>
+                                             <span class="n">resource_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span>
+                                             <span class="s2">&quot;select * from auxiliary_table where resource_id = ? AND &quot;</span>
+                                             <span class="s2">&quot;asset_group_id = ? AND resource_type = ?&quot;</span><span class="p">,</span>
+                                             <span class="n">resource_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
         <span class="k">return</span> <span class="kc">None</span></div>
