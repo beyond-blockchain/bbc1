@@ -82,8 +82,8 @@ class TestBBcCore(object):
             cores[i].networking.domains[domain_id].send_ping(node_id, None)
         time.sleep(1)
         cores[0].networking.domains[domain_id].alive_check()
-        print("*** wait for 2 sec for topology construction ***")
-        time.sleep(2)
+        print("*** wait for 16 sec for topology construction ***")
+        time.sleep(16)
         for i in range(core_num):
             cores[i].networking.domains[domain_id].print_peerlist()
 

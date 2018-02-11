@@ -122,9 +122,9 @@ class TestBBcNetworkWithCore(object):
             cores[i].networking.domains[domain_id].print_peerlist()
 
         cores[0].networking.domains[domain_id].alive_check()
-        print("** wait 5 sec to finish alive_check")
-        time.sleep(5)
-        assert len(cores[1].networking.domains[domain_id].id_ip_mapping) == 10-1
+        print("** wait 16 sec to finish alive_check")
+        time.sleep(16)
+        assert len(cores[1].networking.domains[domain_id].id_ip_mapping) == core_nodes-1
 
         query_entry = query_management.QueryEntry(expire_after=2,
                                                   callback_expire=get_test_func_failure,
