@@ -198,7 +198,7 @@ SQL style only (for PoC alpha version)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> – </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -215,9 +215,9 @@ SQL style only (for PoC alpha version)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>dbname</strong> &#8211; </li>
-<li><strong>name</strong> &#8211; </li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>dbname</strong> – </li>
+<li><strong>name</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -237,8 +237,8 @@ SQL style only (for PoC alpha version)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>dbname</strong> &#8211; </li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>dbname</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -258,12 +258,12 @@ SQL style only (for PoC alpha version)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>dbname</strong> &#8211; </li>
-<li><strong>tbl</strong> &#8211; </li>
-<li><strong>tbl_definition</strong> &#8211; </li>
-<li><strong>primary_keys</strong> &#8211; </li>
-<li><strong>indices</strong> &#8211; </li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>dbname</strong> – </li>
+<li><strong>tbl</strong> – </li>
+<li><strong>tbl_definition</strong> – </li>
+<li><strong>primary_keys</strong> – </li>
+<li><strong>indices</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -283,10 +283,10 @@ SQL style only (for PoC alpha version)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>dbname</strong> &#8211; </li>
-<li><strong>sql</strong> &#8211; </li>
-<li><strong>dat</strong> &#8211; </li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>dbname</strong> – </li>
+<li><strong>sql</strong> – </li>
+<li><strong>dat</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -306,10 +306,10 @@ SQL style only (for PoC alpha version)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>dbname</strong> &#8211; </li>
-<li><strong>sql</strong> &#8211; </li>
-<li><strong>dat</strong> &#8211; </li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>dbname</strong> – </li>
+<li><strong>sql</strong> – </li>
+<li><strong>dat</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -322,19 +322,20 @@ SQL style only (for PoC alpha version)</p>
 
 <dl class="method">
 <dt id="bbc_ledger.BBcLedger.find_locally">
-<code class="descname">find_locally</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>resource_id</em>, <em>resource_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_ledger.html#BBcLedger.find_locally"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.BBcLedger.find_locally" title="Permalink to this definition">¶</a></dt>
+<code class="descname">find_locally</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>resource_id</em>, <em>resource_type</em>, <em>want_newest=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_ledger.html#BBcLedger.find_locally"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.BBcLedger.find_locally" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find data by ID</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> – </td>
 </tr>
 </tbody>
 </table>
 <p>:param asset_group_id
 :param resource_id:   Transaction_ID or Asset_ID
 :param resource_type: ResourceType value
+:param want_newest:   If True, the entry having the biggest ID in the same condition is required
 :return:              data, data_type</p>
 </dd></dl>
 
@@ -347,12 +348,12 @@ SQL style only (for PoC alpha version)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>asset_group_id</strong> &#8211; </li>
-<li><strong>resource_id</strong> &#8211; Transaction_ID, Asset_ID, or Owner_ID</li>
-<li><strong>resource_type</strong> &#8211; ResourceType value</li>
-<li><strong>data</strong> &#8211; Transaction Data (serialized), Transacrtion_ID, or Node_ID</li>
-<li><strong>require_uniqueness</strong> &#8211; Ignore uniqueness if True</li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>asset_group_id</strong> – </li>
+<li><strong>resource_id</strong> – Transaction_ID, Asset_ID, or Owner_ID</li>
+<li><strong>resource_type</strong> – ResourceType value</li>
+<li><strong>data</strong> – Transaction Data (serialized), Transacrtion_ID, or Node_ID</li>
+<li><strong>require_uniqueness</strong> – Ignore uniqueness if True</li>
 </ul>
 </td>
 </tr>
@@ -372,8 +373,8 @@ SQL style only (for PoC alpha version)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>dbname</strong> &#8211; </li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>dbname</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -393,9 +394,9 @@ SQL style only (for PoC alpha version)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>asset_group_id</strong> &#8211; </li>
-<li><strong>resource_id</strong> &#8211; Transaction_ID, Asset_ID, or Owner_ID</li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>asset_group_id</strong> – </li>
+<li><strong>resource_id</strong> – Transaction_ID, Asset_ID, or Owner_ID</li>
 </ul>
 </td>
 </tr>

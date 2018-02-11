@@ -174,13 +174,13 @@
   <div class="section" id="module-bbclib">
 <span id="bbclib-module"></span><h1>bbclib module<a class="headerlink" href="#module-bbclib" title="Permalink to this headline">¶</a></h1>
 <p>Copyright (c) 2017 beyond-blockchain.org.</p>
-<p>Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;);
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at</p>
 <blockquote>
 <div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
 <p>Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an &#8220;AS IS&#8221; BASIS,
+distributed under the License is distributed on an “AS IS” BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.</p>
@@ -194,7 +194,7 @@ limitations under the License.</p>
 </table>
 <dl class="class">
 <dt id="bbclib.BBcAsset">
-<em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">BBcAsset</code><a class="reference internal" href="_modules/bbclib.html#BBcAsset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcAsset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">BBcAsset</code><span class="sig-paren">(</span><em>max_body_size=256</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#BBcAsset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.BBcAsset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="bbclib.BBcAsset.add">
@@ -408,6 +408,16 @@ limitations under the License.</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="bbclib.KeyPair.mk_keyobj_from_private_key_pem">
+<code class="descname">mk_keyobj_from_private_key_pem</code><span class="sig-paren">(</span><em>pemdat_string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.mk_keyobj_from_private_key_pem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.mk_keyobj_from_private_key_pem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.KeyPair.sign">
+<code class="descname">sign</code><span class="sig-paren">(</span><em>digest</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="bbclib.KeyPair.to_bigint">
 <code class="descname">to_bigint</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.to_bigint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.to_bigint" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -415,6 +425,11 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbclib.KeyPair.to_binary">
 <code class="descname">to_binary</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.to_binary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.to_binary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbclib.KeyPair.verify">
+<code class="descname">verify</code><span class="sig-paren">(</span><em>digest</em>, <em>sig</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#KeyPair.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.KeyPair.verify" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -447,7 +462,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbclib.NodeInfo.recover_nodeinfo">
-<code class="descname">recover_nodeinfo</code><span class="sig-paren">(</span><em>node_id</em>, <em>ipv4</em>, <em>ipv6</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#NodeInfo.recover_nodeinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.NodeInfo.recover_nodeinfo" title="Permalink to this definition">¶</a></dt>
+<code class="descname">recover_nodeinfo</code><span class="sig-paren">(</span><em>node_id</em>, <em>ipv4</em>, <em>ipv6</em>, <em>port</em>, <em>updated_at=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#NodeInfo.recover_nodeinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.NodeInfo.recover_nodeinfo" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -467,6 +482,11 @@ limitations under the License.</p>
 <em class="property">class </em><code class="descclassname">bbclib.</code><code class="descname">ServiceMessageType</code><a class="reference internal" href="_modules/bbclib.html#ServiceMessageType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.ServiceMessageType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="attribute">
+<dt id="bbclib.ServiceMessageType.CANCEL_INSERT_NOTIFICATION">
+<code class="descname">CANCEL_INSERT_NOTIFICATION</code><em class="property"> = 16</em><a class="headerlink" href="#bbclib.ServiceMessageType.CANCEL_INSERT_NOTIFICATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="bbclib.ServiceMessageType.DOMAIN_PING">
 <code class="descname">DOMAIN_PING</code><em class="property"> = 12</em><a class="headerlink" href="#bbclib.ServiceMessageType.DOMAIN_PING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -477,13 +497,18 @@ limitations under the License.</p>
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="bbclib.ServiceMessageType.NOTIFY_INSERTED">
+<code class="descname">NOTIFY_INSERTED</code><em class="property"> = 41</em><a class="headerlink" href="#bbclib.ServiceMessageType.NOTIFY_INSERTED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="bbclib.ServiceMessageType.REGISTER">
 <code class="descname">REGISTER</code><em class="property"> = 32</em><a class="headerlink" href="#bbclib.ServiceMessageType.REGISTER" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbclib.ServiceMessageType.REQUEST_CROSS_REF">
-<code class="descname">REQUEST_CROSS_REF</code><em class="property"> = 70</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_CROSS_REF" title="Permalink to this definition">¶</a></dt>
+<code class="descname">REQUEST_CROSS_REF</code><em class="property"> = 72</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_CROSS_REF" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -507,13 +532,28 @@ limitations under the License.</p>
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_GET_STATS">
+<code class="descname">REQUEST_GET_STATS</code><em class="property"> = 17</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_GET_STATS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="bbclib.ServiceMessageType.REQUEST_INSERT">
 <code class="descname">REQUEST_INSERT</code><em class="property"> = 39</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_INSERT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_INSERT_NOTIFICATION">
+<code class="descname">REQUEST_INSERT_NOTIFICATION</code><em class="property"> = 15</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_INSERT_NOTIFICATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="bbclib.ServiceMessageType.REQUEST_MANIP_LEDGER_SUBSYS">
 <code class="descname">REQUEST_MANIP_LEDGER_SUBSYS</code><em class="property"> = 10</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_MANIP_LEDGER_SUBSYS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_PING_TO_ALL">
+<code class="descname">REQUEST_PING_TO_ALL</code><em class="property"> = 19</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_PING_TO_ALL" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -529,6 +569,11 @@ limitations under the License.</p>
 <dl class="attribute">
 <dt id="bbclib.ServiceMessageType.REQUEST_SEARCH_TRANSACTION">
 <code class="descname">REQUEST_SEARCH_TRANSACTION</code><em class="property"> = 68</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_SEARCH_TRANSACTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.REQUEST_SEARCH_USERID">
+<code class="descname">REQUEST_SEARCH_USERID</code><em class="property"> = 70</em><a class="headerlink" href="#bbclib.ServiceMessageType.REQUEST_SEARCH_USERID" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -558,7 +603,7 @@ limitations under the License.</p>
 
 <dl class="attribute">
 <dt id="bbclib.ServiceMessageType.RESPONSE_CROSS_REF">
-<code class="descname">RESPONSE_CROSS_REF</code><em class="property"> = 71</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_CROSS_REF" title="Permalink to this definition">¶</a></dt>
+<code class="descname">RESPONSE_CROSS_REF</code><em class="property"> = 73</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_CROSS_REF" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -579,6 +624,11 @@ limitations under the License.</p>
 <dl class="attribute">
 <dt id="bbclib.ServiceMessageType.RESPONSE_GET_PEERLIST">
 <code class="descname">RESPONSE_GET_PEERLIST</code><em class="property"> = 3</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_GET_PEERLIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_GET_STATS">
+<code class="descname">RESPONSE_GET_STATS</code><em class="property"> = 18</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_GET_STATS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -604,6 +654,11 @@ limitations under the License.</p>
 <dl class="attribute">
 <dt id="bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION">
 <code class="descname">RESPONSE_SEARCH_TRANSACTION</code><em class="property"> = 69</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbclib.ServiceMessageType.RESPONSE_SEARCH_USERID">
+<code class="descname">RESPONSE_SEARCH_USERID</code><em class="property"> = 71</em><a class="headerlink" href="#bbclib.ServiceMessageType.RESPONSE_SEARCH_USERID" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -731,6 +786,11 @@ limitations under the License.</p>
 <dl class="function">
 <dt id="bbclib.set_error">
 <code class="descclassname">bbclib.</code><code class="descname">set_error</code><span class="sig-paren">(</span><em>code=-1</em>, <em>txt=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#set_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.set_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbclib.set_max_body_size">
+<code class="descclassname">bbclib.</code><code class="descname">set_max_body_size</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>body_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbclib.html#set_max_body_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbclib.set_max_body_size" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
