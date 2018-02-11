@@ -100,8 +100,14 @@ class TestBBcAppClient(object):
             assert ret
             ret = msg_processor[i].synchronize()
             print("[%d] set_peer result is %s" %(i, ret))
-
+            clients[i]['app'].ping_to_all_neighbors(bbclib.domain_global_0)
         time.sleep(3)
+
+        cores[0].networking.domains[bbclib.domain_global_0].alive_check()
+        print("** wait 16 sec to finish alive_check")
+        time.sleep(16)
+        assert len(cores[1].networking.domains[bbclib.domain_global_0].id_ip_mapping) == core_num-1
+
         for i in range(core_num):
             cores[i].networking.domains[bbclib.domain_global_0].print_peerlist()
 

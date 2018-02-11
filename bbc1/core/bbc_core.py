@@ -108,17 +108,13 @@ def check_transaction_if_having_asset_file(txdata, asid):
 
 
 class BBcCoreService:
-    def __init__(self, ipv6=None, p2p_port=None, core_port=None, use_global=False, ip4addr=None, ip6addr=None,
+    def __init__(self, p2p_port=None, core_port=None, use_global=False, ip4addr=None, ip6addr=None,
                  workingdir=".bbc1", configfile=None,
                  loglevel="all", logname="-", server_start=True):
         self.logger = logger.get_logger(key="core", level=loglevel, logname=logname)
         self.stats = bbc_stats.BBcStats()
         self.config = BBcConfig(workingdir, configfile)
         conf = self.config.get_config()
-        if ipv6 is not None:
-            conf['client']['ipv6'] = ipv6
-        else:
-            ipv6 = conf['client']['ipv6']
         if p2p_port is not None:
             conf['client']['port'] = core_port
         else:
@@ -138,19 +134,19 @@ class BBcCoreService:
 
         gevent.signal(signal.SIGINT, self.quit_program)
         if server_start:
-            self.start_server(core_port, ipv6=ipv6)
+            self.start_server(core_port)
 
     def quit_program(self):
         self.networking.save_all_peer_lists()
         self.config.update_config()
         os._exit(0)
 
-    def start_server(self, port, ipv6=False):
+    def start_server(self, port):
         pool = Pool(POOL_SIZE)
-        if ipv6:
-            server = StreamServer(("::", port), self.handler, spawn=pool)
-        else:
+        if self.networking.ip6_address == "::":
             server = StreamServer(("0.0.0.0", port), self.handler, spawn=pool)
+        else:
+            server = StreamServer(("::", port), self.handler, spawn=pool)
         try:
             server.serve_forever()
         except KeyboardInterrupt:
@@ -492,14 +488,20 @@ class BBcCoreService:
             self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.DOMAIN_PING:
-            if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.ipv4_address,
-                                     KeyType.ipv6_address, KeyType.port_number], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.port_number], dat):
+                return False, None
+            ipv4 = dat.get(KeyType.ipv4_address, None)
+            ipv6 = dat.get(KeyType.ipv6_address, None)
+            if ipv4 is None and ipv6 is None:
                 return False, None
             domain_id = dat[KeyType.domain_id]
-            ipv4 = dat[KeyType.ipv4_address]
-            ipv6 = dat[KeyType.ipv6_address]
             port = dat[KeyType.port_number]
-            self.networking.send_raw_message(domain_id, ipv4, ipv6, port)
+            self.networking.send_domain_ping(domain_id, ipv4, ipv6, port)
+
+        elif cmd == MsgType.REQUEST_PING_TO_ALL:
+            domain_id = dat[KeyType.domain_id]
+            if domain_id in self.networking.domains:
+                self.networking.domains[domain_id].ping_to_all_neighbors()
 
         elif cmd == MsgType.REQUEST_MANIP_LEDGER_SUBSYS:
             retmsg = make_message_structure(MsgType.RESPONSE_MANIP_LEDGER_SUBSYS,
@@ -1085,7 +1087,6 @@ if __name__ == '__main__':
     if argresult.daemon:
         daemonize()
     BBcCoreService(
-        ipv6=argresult.ipv6,
         p2p_port=argresult.p2pport,
         core_port=argresult.coreport,
         workingdir=argresult.workingdir,
