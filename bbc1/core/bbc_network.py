@@ -826,6 +826,14 @@ class DomainBase:
         query_entry.update()
         self.send_ping(node_id, nonce=query_entry.nonce)
 
+    def ping_to_all_neighbors(self):
+        """
+        send ping to all neighbors
+        :return:
+        """
+        for nd in self.id_ip_mapping.keys():
+            self.ping_with_retry(None, nd)
+
     def add_peer_node_ip46(self, node_id, ipv4, ipv6, port, need_ping=False):
         """
         Add as a peer node (with ipv4 and ipv6 address)
@@ -838,8 +846,6 @@ class DomainBase:
         """
         self.logger.debug("[%s] add_peer_node_ip46: nodeid=%s, port=%d" % (self.shortname,
                                                                            binascii.b2a_hex(node_id[:2]), port))
-        print("[%s] add_peer_node_ip46: nodeid=%s, ipv4=%s, ipv6=%s, port=%d" % (self.shortname, binascii.b2a_hex(node_id[:2]),
-                                                                                 ipv4, ipv6, port))
         self.id_ip_mapping[node_id] = NodeInfo(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port)
         if need_ping:
             query_entry = query_management.QueryEntry(expire_after=ALIVE_CHECK_PING_WAIT,
@@ -859,11 +865,10 @@ class DomainBase:
         """
         if addr_info is None:
             return True
-        print("[%s] add_peer_node: %s, %s" % (self.shortname, node_id.hex()[:4], addr_info))
-        print("[%s] current nodelist: %s" % (self.shortname, [str(m) for m in self.id_ip_mapping.values()]))
+        #print("[%s] add_peer_node: %s, %s" % (self.shortname, node_id.hex()[:4], addr_info))
+        #print("[%s] current nodelist: %s" % (self.shortname, [str(m) for m in self.id_ip_mapping.values()]))
         port = addr_info[1]
         if node_id in self.id_ip_mapping:
-            print("  -> update")
             self.logger.debug("[%s] add_peer_node: nodeid=%s, port=%d" % (self.shortname,
                                                                           binascii.b2a_hex(node_id[:2]),
                                                                           addr_info[1]))
@@ -872,10 +877,9 @@ class DomainBase:
             else:
                 self.id_ip_mapping[node_id].update(ipv6=addr_info[0], port=port)
             self.id_ip_mapping[node_id].touch()
-            print("[%s] updated nodelist: %s" % (self.shortname, [str(m) for m in self.id_ip_mapping.values()]))
+            #print("[%s] updated nodelist: %s" % (self.shortname, [str(m) for m in self.id_ip_mapping.values()]))
             return False
         else:
-            print("  -> new")
             self.logger.debug("[%s] add_peer_node: new! nodeid=%s, port=%d" % (self.shortname,
                                                                                binascii.b2a_hex(node_id[:2]),
                                                                                addr_info[1]))
@@ -883,9 +887,9 @@ class DomainBase:
                 self.id_ip_mapping[node_id] = NodeInfo(node_id=node_id, ipv4=addr_info[0], ipv6=None, port=port)
             else:
                 self.id_ip_mapping[node_id] = NodeInfo(node_id=node_id, ipv4=None, ipv6=addr_info[0], port=port)
-            print("[%s] new nodelist: %s" % (self.shortname, [str(m) for m in self.id_ip_mapping.values()]))
-            #if self.refresh_entry.rest_of_time_to_expire() > 10:
-            #    self.update_refresh_timer_random(10)
+            #print("[%s] new nodelist: %s" % (self.shortname, [str(m) for m in self.id_ip_mapping.values()]))
+            if self.refresh_entry.rest_of_time_to_expire() > 10:
+                self.update_refresh_timer_random(10)
             return True
 
     def remove_peer_node(self, node_id=ZEROS):
@@ -1035,10 +1039,6 @@ class DomainBase:
                           (self.shortname,
                            int.from_bytes(msg[KeyType.p2p_msg_type], 'big'),
                            binascii.b2a_hex(msg[KeyType.source_node_id][:4])))
-        print("[%s] process_message(type=%d) from %s" %
-                          (self.shortname,
-                           int.from_bytes(msg[KeyType.p2p_msg_type], 'big'),
-                           binascii.b2a_hex(msg[KeyType.source_node_id][:4])))
         if msg[KeyType.p2p_msg_type] == InfraMessageTypeBase.MESSAGE_TO_USER:
             if KeyType.message not in msg:
                 return
@@ -1108,7 +1108,6 @@ class DomainBase:
         :return:
         """
         count = int.from_bytes(peerlist[:4], 'big')
-        print("[%s] RENEW count=%d" % (self.shortname, count))
         for i in range(count):
             base = 4 + i*(32+4+16+2+8)
             node_id = peerlist[base:base+32]

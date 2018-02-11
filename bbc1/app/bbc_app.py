@@ -255,6 +255,16 @@ class BBcAppClient:
         dat[KeyType.port_number] = port
         return self.send_msg(dat)
 
+    def ping_to_all_neighbors(self, domain_id):
+        """
+        Request bbc_core to send ping to all its neighbors
+        :param domain_id:
+        :return:
+        """
+        dat = self.make_message_structure(None, MsgType.REQUEST_PING_TO_ALL)
+        dat[KeyType.domain_id] = domain_id
+        return self.send_msg(dat)
+
     def register_asset_group(self, domain_id, asset_group_id,
                              storage_type=StorageType.FILESYSTEM, storage_path=None,
                              advertise_in_domain0=False, max_body_size=bbclib.DEFAULT_MAX_BODY_SIZE):

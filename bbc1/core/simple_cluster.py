@@ -60,12 +60,10 @@ class NetworkDomain(DomainBase):
         if self.in_alive_checking:
             return
         self.in_alive_checking = True
-        # FIXME: buggy code.... not considered adding nodes while checking.....
         query_entry = query_management.QueryEntry(expire_after=15,
                                                   callback_expire=self.send_peerlist,
                                                   retry_count=0)
-        for nd in self.id_ip_mapping.keys():
-            self.ping_with_retry(None, nd)
+        self.ping_to_all_neighbors()
 
     def add_peer_node(self, node_id, ip4, addr_info):
         """

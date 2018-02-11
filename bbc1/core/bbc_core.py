@@ -498,6 +498,11 @@ class BBcCoreService:
             port = dat[KeyType.port_number]
             self.networking.send_domain_ping(domain_id, ipv4, ipv6, port)
 
+        elif cmd == MsgType.REQUEST_PING_TO_ALL:
+            domain_id = dat[KeyType.domain_id]
+            if domain_id in self.networking.domains:
+                self.networking.domains[domain_id].ping_to_all_neighbors()
+
         elif cmd == MsgType.REQUEST_MANIP_LEDGER_SUBSYS:
             retmsg = make_message_structure(MsgType.RESPONSE_MANIP_LEDGER_SUBSYS,
                                             None, dat[KeyType.source_user_id], dat[KeyType.query_id])
