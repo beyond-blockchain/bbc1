@@ -94,6 +94,13 @@ class TestBBcPing(object):
                     print("            %s, %s, %s, %d" % (binascii.b2a_hex(node_id[:4]), ipv4, ipv6, port))
             time.sleep(1)
 
+    def test_99_quit(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        for core in cores:
+            core.networking.save_all_peer_lists()
+            ret = core.config.update_config()
+            assert ret
+
 
 if __name__ == '__main__':
     pytest.main()

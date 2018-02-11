@@ -119,9 +119,11 @@ class BBcConfig:
         try:
             with open(os.path.join(self.working_dir, self.config_file), "w") as f:
                 json.dump(self.config, f, indent=4)
+            return True
         except:
-            #print(self.config)
-            pass
+            import traceback
+            traceback.print_exc()
+            return False
 
     def get_json_config(self):
         self.update_config()

@@ -86,6 +86,13 @@ def send_data_by_tcp(ipv4=None, ipv6=None, port=DEFAULT_P2P_PORT, msg=None):
     gevent.spawn(worker)
 
 
+def convert_to_string(array):
+    for i in range(len(array)):
+        if isinstance(array[i], bytes):
+            array[i] = array[i].decode()
+    return array
+
+
 class BBcNetwork:
     """
     Socket and thread management for infrastructure layers
@@ -243,7 +250,8 @@ class BBcNetwork:
         self.domains[domain_id].add_peer_node_ip46(node_id, ipv4, ipv6, port)
         conf = self.config.get_domain_config(domain_id)
         if node_id not in conf['static_nodes']:
-            conf['static_nodes'][bbclib.convert_id_to_string(node_id)] = [ipv4, ipv6, port]
+            info = convert_to_string([ipv4, ipv6, port])
+            conf['static_nodes'][bbclib.convert_id_to_string(node_id)] = info
             self.core.stats.update_stats_increment("network", "peer_num", 1)
 
     def save_all_peer_lists(self):
@@ -258,7 +266,8 @@ class BBcNetwork:
             conf['peer_list'] = dict()
             for node_id, nodeinfo in self.domains[domain_id].id_ip_mapping.items():
                 nid = bbclib.convert_id_to_string(node_id)
-                conf['peer_list'][nid] = [nodeinfo.ipv4, nodeinfo.ipv6, nodeinfo.port]
+                info = convert_to_string([nodeinfo.ipv4, nodeinfo.ipv6, nodeinfo.port])
+                conf['peer_list'][nid] = info
         self.logger.info("Done...")
 
     def send_domain_ping(self, domain_id, ipv4, ipv6, port):

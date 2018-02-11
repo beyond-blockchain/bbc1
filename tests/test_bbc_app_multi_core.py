@@ -273,7 +273,8 @@ class TestBBcAppClient(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for core in cores:
             core.networking.save_all_peer_lists()
-            core.config.update_config()
+            ret = core.config.update_config()
+            assert ret
 
 
 if __name__ == '__main__':
