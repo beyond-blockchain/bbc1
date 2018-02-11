@@ -17,7 +17,6 @@ script:
   - pytest test_bbc_app_multiclient.py
   - pytest test_bbc_config.py
   - pytest test_bbc_core.py
-  - pytest test_bbc_core_refresh_peers.py
   #- pytest test_bbc_ethereum.py
   - pytest test_bbc_ledger.py
   - pytest test_bbc_network.py
