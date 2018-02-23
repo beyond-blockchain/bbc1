@@ -159,7 +159,7 @@ class BBcCoreService:
         :return:
         """
         if sock is None:
-            if KeyType.asset_group_id not in dat or KeyType.destination_user_id not in dat:
+            if KeyType.destination_user_id not in dat:
                 self.logger.warn("invalid message")
                 return
         self.logger.debug("[port:%d] send_message to %s" % (self.networking.port,
@@ -178,7 +178,7 @@ class BBcCoreService:
         try:
             socket.sendall(message_key_types.make_message(PayloadType.Type_msgpack, dat))
         except Exception as e:
-            self.logger.error("send error: %s" % e)
+            self.logger.error("send error (raw): %s" % e)
         return True
 
     def send_to_other_user(self, asset_group_id, dst_user_id, src_user_id, msg):
@@ -272,7 +272,7 @@ class BBcCoreService:
             return False, None
         cmd = dat[KeyType.command]
         if cmd == MsgType.REQUEST_SEARCH_TRANSACTION:
-            if not self.param_check([KeyType.asset_group_id, KeyType.transaction_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_SEARCH_TRANSACTION: bad format")
                 return False, None
             result = self.search_transaction_by_txid(dat[KeyType.asset_group_id], dat[KeyType.transaction_id],
@@ -281,7 +281,7 @@ class BBcCoreService:
                 self.send_message(result)
 
         elif cmd == MsgType.REQUEST_SEARCH_ASSET:
-            if not self.param_check([KeyType.asset_group_id, KeyType.asset_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.asset_id], dat):
                 self.logger.debug("REQUEST_SEARCH_ASSET: bad format")
                 return False, None
             retmsg = make_message_structure(MsgType.RESPONSE_SEARCH_ASSET,
@@ -293,7 +293,7 @@ class BBcCoreService:
                 self.send_message(retmsg)
 
         elif cmd == MsgType.REQUEST_SEARCH_USERID:
-            if not self.param_check([KeyType.asset_group_id, KeyType.user_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.user_id], dat):
                 self.logger.debug("REQUEST_SEARCH_USERID: bad format")
                 return False, None
             result = self.search_transaction_by_userid_locally(dat[KeyType.asset_group_id], dat[KeyType.user_id],
@@ -302,7 +302,7 @@ class BBcCoreService:
                 self.send_message(result)
 
         elif cmd == MsgType.REQUEST_GATHER_SIGNATURE:
-            if not self.param_check([KeyType.asset_group_id, KeyType.transaction_data], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.transaction_data], dat):
                 self.logger.debug("REQUEST_GATHER_SIGNATURE: bad format")
                 return False, None
             if not self.distribute_transaction_to_gather_signatures(dat[KeyType.asset_group_id], dat):
@@ -311,7 +311,7 @@ class BBcCoreService:
                 self.error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt="Fail to forward transaction")
 
         elif cmd == MsgType.REQUEST_INSERT:
-            if not self.param_check([KeyType.asset_group_id, KeyType.transaction_data,
+            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.transaction_data,
                                      KeyType.all_asset_files], dat):
                 self.logger.debug("REQUEST_INSERT: bad format")
                 return False, None
@@ -327,7 +327,8 @@ class BBcCoreService:
                 self.send_message(retmsg)
 
         elif cmd == MsgType.RESPONSE_SIGNATURE:
-            if not self.param_check([KeyType.asset_group_id, KeyType.destination_user_id, KeyType.source_user_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.destination_user_id,
+                                     KeyType.source_user_id], dat):
                 self.logger.debug("RESPONSE_SIGNATURE: bad format")
                 return False, None
             retmsg = make_message_structure(MsgType.RESPONSE_GATHER_SIGNATURE,
@@ -358,7 +359,8 @@ class BBcCoreService:
             self.send_message(retmsg)
 
         elif cmd == MsgType.MESSAGE:
-            if not self.param_check([KeyType.asset_group_id, KeyType.source_user_id, KeyType.destination_user_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.source_user_id,
+                                     KeyType.destination_user_id], dat):
                 self.logger.debug("MESSAGE: bad format")
                 return False, None
             domain_id = self.asset_group_domain_mapping[dat[KeyType.asset_group_id]]
@@ -397,19 +399,16 @@ class BBcCoreService:
             self.send_message(retmsg, sock=socket)
 
         elif cmd == MsgType.REGISTER:
-            if not self.param_check([KeyType.asset_group_id, KeyType.source_user_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.source_user_id], dat):
                 self.logger.debug("REGISTER: bad format")
                 return False, None
             user_id = dat[KeyType.source_user_id]
-            asset_group_id = dat[KeyType.asset_group_id]
-            if asset_group_id in self.asset_group_domain_mapping:
-                domain_id = self.asset_group_domain_mapping[asset_group_id]
-                self.logger.debug("[%s] register_user: %s" % (binascii.b2a_hex(domain_id[:2]),
-                                                              binascii.b2a_hex(user_id[:4])))
-                self.networking.register_user_id(domain_id, user_id)
-                self.user_id_sock_mapping[user_id] = socket
-                return False, user_id
-            return False, None
+            domain_id = dat[KeyType.domain_id]
+            self.logger.debug("[%s] register_user: %s" % (binascii.b2a_hex(domain_id[:2]),
+                                                          binascii.b2a_hex(user_id[:4])))
+            self.networking.register_user_id(domain_id, user_id)
+            self.user_id_sock_mapping[user_id] = socket
+            return False, user_id
 
         elif cmd == MsgType.UNREGISTER:
             return True, None
@@ -517,12 +516,15 @@ class BBcCoreService:
             self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_INSERT_NOTIFICATION:
+            domain_id = dat[KeyType.domain_id]
             asset_group_id = dat[KeyType.asset_group_id]
-            self.need_insert_completion_notification.setdefault(asset_group_id, set())
-            self.need_insert_completion_notification[asset_group_id].add(dat[KeyType.source_user_id])
+            self.need_insert_completion_notification.setdefault(domain_id, dict())
+            self.need_insert_completion_notification[domain_id].setdefault(asset_group_id, set())
+            self.need_insert_completion_notification[domain_id][asset_group_id].add(dat[KeyType.source_user_id])
 
         elif cmd == MsgType.CANCEL_INSERT_NOTIFICATION:
-            self.remove_from_notification_list(dat[KeyType.asset_group_id], dat[KeyType.source_user_id])
+            self.remove_from_notification_list(dat[KeyType.domain_id], dat[KeyType.asset_group_id],
+                                               dat[KeyType.source_user_id])
 
         else:
             self.logger.error("Bad command/response: %s" % cmd)
@@ -573,17 +575,21 @@ class BBcCoreService:
                 break
         return refs
 
-    def remove_from_notification_list(self, asset_group_id, user_id):
+    def remove_from_notification_list(self, domain_id, asset_group_id, user_id):
         """
         Remove entry from insert completion notification list
+        :param domain_id:
         :param asset_group_id:
         :param user_id:
         :return:
         """
-        if asset_group_id in self.need_insert_completion_notification:
-            self.need_insert_completion_notification[asset_group_id].remove(user_id)
-            if len(self.need_insert_completion_notification[asset_group_id]) == 0:
-                self.need_insert_completion_notification.pop(asset_group_id, None)
+        if domain_id in self.need_insert_completion_notification:
+            if asset_group_id in self.need_insert_completion_notification[domain_id]:
+                self.need_insert_completion_notification[domain_id][asset_group_id].remove(user_id)
+                if len(self.need_insert_completion_notification[domain_id][asset_group_id]) == 0:
+                    self.need_insert_completion_notification[domain_id].pop(asset_group_id, None)
+                if len(self.need_insert_completion_notification[domain_id]) == 0:
+                    self.need_insert_completion_notification.pop(domain_id, None)
 
     def validate_transaction(self, txid, txdata, asset_files):
         """
@@ -726,13 +732,14 @@ class BBcCoreService:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             return "Failed to register asset"
 
-        if asset_group_id in self.need_insert_completion_notification:
-            for user_id in self.need_insert_completion_notification[asset_group_id]:
-                notifmsg = make_message_structure(MsgType.NOTIFY_INSERTED, asset_group_id, user_id, None)
-                notifmsg[KeyType.transaction_id] = txobj.transaction_id
-                ret = self.send_message(notifmsg)
-                if not ret:
-                    self.remove_from_notification_list(asset_group_id, user_id)
+        if domain_id in self.need_insert_completion_notification:
+            if asset_group_id in self.need_insert_completion_notification[domain_id]:
+                for user_id in self.need_insert_completion_notification[domain_id][asset_group_id]:
+                    notifmsg = make_message_structure(MsgType.NOTIFY_INSERTED, asset_group_id, user_id, None)
+                    notifmsg[KeyType.transaction_id] = txobj.transaction_id
+                    ret = self.send_message(notifmsg)
+                    if not ret:
+                        self.remove_from_notification_list(domain_id, asset_group_id, user_id)
 
         if no_network_put:
             return None

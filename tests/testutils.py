@@ -15,6 +15,7 @@ from bbc1.core.bbc_config import DEFAULT_CORE_PORT, DEFAULT_P2P_PORT
 
 cores = None
 clients = None
+domain_id = None
 loglv = 'debug'
 
 
@@ -50,17 +51,19 @@ def start_core(index, core_port, p2p_port, use_global=False, remove_dir=True):
     cores[index].start_server(port=core_port)
 
 
-def domain_and_asset_group_setup(core_port_increment, domain_id, asset_group_ids,
+def domain_and_asset_group_setup(core_port_increment, dom_id, asset_group_ids,
                                  network_module=None, advertise_in_domain0=False):
     cl = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT+core_port_increment)
-    cl.domain_setup(domain_id, network_module)
+    cl.domain_setup(dom_id, network_module)
+    global domain_id
+    domain_id = dom_id
     wait_check_result_msg_type(cl.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_DOMAIN)
     if isinstance(asset_group_ids, list):
         for asset_group_id in asset_group_ids:
-            cl.register_asset_group(domain_id=domain_id, asset_group_id=asset_group_id, advertise_in_domain0=advertise_in_domain0)
+            cl.register_asset_group(domain_id=dom_id, asset_group_id=asset_group_id, advertise_in_domain0=advertise_in_domain0)
             wait_check_result_msg_type(cl.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_ASSET_GROUP)
     else:
-        cl.register_asset_group(domain_id=domain_id, asset_group_id=asset_group_ids, advertise_in_domain0=advertise_in_domain0)
+        cl.register_asset_group(domain_id=dom_id, asset_group_id=asset_group_ids, advertise_in_domain0=advertise_in_domain0)
         wait_check_result_msg_type(cl.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_ASSET_GROUP)
     cl.unregister_from_core()
 
@@ -71,8 +74,10 @@ def make_client(index, core_port_increment, callback=None, connect_to_core=True,
     clients[index]['user_id'] = bbclib.get_new_id("user_%i" % index)
     clients[index]['keypair'] = keypair
     if connect_to_core:
+        global domain_id
         clients[index]['app'] = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT+core_port_increment, loglevel=loglv)
         clients[index]['app'].set_user_id(clients[index]['user_id'])
+        clients[index]['app'].set_domain_id(domain_id)
         clients[index]['app'].set_asset_group_id(asset_group_id)
     if callback is not None:
         clients[index]['app'].set_callback(callback)

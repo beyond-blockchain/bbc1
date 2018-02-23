@@ -33,6 +33,7 @@ from bbc1.common.bbc_error import *
 PRIVATE_KEY = ".private_key"
 PUBLIC_KEY = ".public_key"
 
+domain_id = bbclib.get_new_id("landdomain", include_timestamp=False)
 land_asset_group = bbclib.get_new_id("land_asset_group", include_timestamp=False)
 
 coin_asset_group = bbclib.get_new_id("coin_asset_group", include_timestamp=False)
@@ -49,6 +50,7 @@ bbc_app_client = None
 def setup_bbc_client(asset_group):
     bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
     bbc_app_client.set_user_id(user_id)
+    bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_asset_group_id(asset_group)
     bbc_app_client.set_callback(bbc_app.Callback())
     ret = bbc_app_client.register_to_core()

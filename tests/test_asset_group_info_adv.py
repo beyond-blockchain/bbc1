@@ -87,6 +87,7 @@ class TestBBcAppClient(object):
     def test_12_register(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for cl in clients:
+            cl['app'].set_domain_id(bbclib.domain_global_0)
             ret = cl['app'].register_to_core()
             assert ret
         time.sleep(1)

@@ -113,8 +113,9 @@ class TestBBcAppClient(object):
 
     def test_12_register(self):
         print("-----", sys._getframe().f_code.co_name, "-----")
-        for cl in clients:
-            ret = cl['app'].register_to_core()
+        for i in range(client_num):
+            clients[i]['app'].set_domain_id(domain_ids[i%domain_num])
+            ret = clients[i]['app'].register_to_core()
             assert ret
         time.sleep(1)
 
