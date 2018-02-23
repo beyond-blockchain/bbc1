@@ -421,15 +421,17 @@ class BBcCoreService:
         elif cmd == MsgType.REQUEST_SETUP_ASSET_GROUP:
             domain_id = dat.get(KeyType.domain_id, None)
             asset_group_id = dat.get(KeyType.asset_group_id, None)
+            retmsg = make_message_structure(MsgType.RESPONSE_SETUP_ASSET_GROUP,
+                                            asset_group_id, dat[KeyType.source_user_id], dat[KeyType.query_id])
             if domain_id is None or asset_group_id is None:
+                self.error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt="No such domain or asset_group_id")
                 return False, None
             if domain_id not in self.networking.domains:
+                self.error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt="No such domain")
                 return False, None
             self.asset_group_setup(domain_id, asset_group_id, dat.get(KeyType.storage_type, StorageType.FILESYSTEM),
                                    dat.get(KeyType.storage_path,None), dat.get(KeyType.advertise_in_domain0, False),
                                    dat.get(KeyType.max_body_size, bbclib.DEFAULT_MAX_BODY_SIZE), config_update=True)
-            retmsg = make_message_structure(MsgType.RESPONSE_SETUP_ASSET_GROUP,
-                                            dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
             self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_SETUP_DOMAIN:
