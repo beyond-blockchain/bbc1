@@ -164,17 +164,13 @@ class BBcCoreService:
                 return
         self.logger.debug("[port:%d] send_message to %s" % (self.networking.port,
                                                             binascii.b2a_hex(dat[KeyType.destination_user_id][:4])))
-        asset_group_id = None
         try:
             user_id = dat[KeyType.destination_user_id]
             if sock is None:
-                asset_group_id = dat[KeyType.asset_group_id]
-                sock = self.user_id_sock_mapping[asset_group_id][user_id]
+                sock = self.user_id_sock_mapping[user_id]
             sock.sendall(message_key_types.make_message(PayloadType.Type_msgpack, dat))
         except Exception as e:
             self.logger.error("send error: %s" % dat)
-            if asset_group_id is not None:
-                self.user_id_sock_mapping[asset_group_id].pop(user_id, None)
             return False
         return True
 
@@ -186,7 +182,7 @@ class BBcCoreService:
         return True
 
     def send_to_other_user(self, asset_group_id, dst_user_id, src_user_id, msg):
-        if dst_user_id in self.user_id_sock_mapping[asset_group_id]:
+        if dst_user_id in self.user_id_sock_mapping:
             return self.send_message(msg)
         domain_id = self.asset_group_domain_mapping[asset_group_id]
         return self.networking.route_message(domain_id, asset_group_id, dst_user_id, src_user_id, msg)
@@ -229,11 +225,11 @@ class BBcCoreService:
             traceback.print_exc()
         self.logger.debug("closing socket")
         try:
-            for info in mappings:
-                self.user_id_sock_mapping[info[0]].pop(info[1], None)
-                if len(self.user_id_sock_mapping[info[0]]) == 0:
-                    self.user_id_sock_mapping[info[0]].pop(info[1], None)
-                self.networking.remove_user_id(info[0], info[1])
+            for uid in mappings:
+                self.user_id_sock_mapping.pop(uid, None)
+                if len(self.user_id_sock_mapping) == 0:
+                    self.user_id_sock_mapping.pop(uid, None)
+                self.networking.remove_user_id(uid)
             socket.shutdown(py_socket.SHUT_RDWR)
             socket.close()
         except:
@@ -410,9 +406,9 @@ class BBcCoreService:
                 domain_id = self.asset_group_domain_mapping[asset_group_id]
                 self.logger.debug("[%s] register_user: %s" % (binascii.b2a_hex(domain_id[:2]),
                                                               binascii.b2a_hex(user_id[:4])))
-                self.networking.register_user_id(domain_id, asset_group_id, user_id)
-                self.user_id_sock_mapping.setdefault(asset_group_id, {})[user_id] = socket
-                return False, (asset_group_id, user_id)
+                self.networking.register_user_id(domain_id, user_id)
+                self.user_id_sock_mapping[user_id] = socket
+                return False, user_id
             return False, None
 
         elif cmd == MsgType.UNREGISTER:

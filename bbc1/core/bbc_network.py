@@ -425,7 +425,7 @@ class BBcNetwork:
             return False
 
         self.logger.debug("route_message to dst_user_id:%s" % (binascii.b2a_hex(dst_user_id[:2])))
-        if self.domains[domain_id].is_registered_user(asset_group_id, dst_user_id):
+        if dst_user_id in self.domains[domain_id].registered_user_id:
             self.logger.debug(" -> directly to the app")
             self.core.send_message(msg_to_send)
             return True
@@ -480,28 +480,26 @@ class BBcNetwork:
                                               query_entry.data[KeyType.source_node_id], dat[KeyType.query_id])
         self.core.error_reply(msg=msg, err_code=ENODESTINATION, txt="cannot find core node")
 
-    def register_user_id(self, domain_id, asset_group_id, user_id):
+    def register_user_id(self, domain_id, user_id):
         """
         Register user_id connecting directly to this node in the domain
 
         :param domain_id:
-        :param asset_group_id:
         :param user_id:
         :return:
         """
         self.core.stats.update_stats_increment("network", "user_num", 1)
-        self.domains[domain_id].register_user_id(asset_group_id, user_id)
+        self.domains[domain_id].register_user_id(user_id)
 
-    def remove_user_id(self, asset_group_id, user_id):
+    def remove_user_id(self, user_id):
         """
         Remove user_id from the domain
 
-        :param asset_group_id:
         :param user_id:
         :return:
         """
         for domain_id in self.domains:
-            self.domains[domain_id].unregister_user_id(asset_group_id, user_id)
+            self.domains[domain_id].unregister_user_id(user_id)
             self.core.stats.update_stats_decrement("network", "user_num", 1)
 
     def disseminate_cross_ref(self, transaction_id, asset_group_id):
@@ -950,46 +948,24 @@ class DomainBase:
         """
         pass
 
-    def register_user_id(self, asset_group_id, user_id):
+    def register_user_id(self, user_id):
         """
         Register user_id that connect directly to this core node in the list
 
-        :param asset_group_id:
         :param user_id:
         :return:
         """
         #self.logger.debug("[%s] register_user_id: %s" % (self.shortname,binascii.b2a_hex(user_id[:4])))
-        self.registered_user_id.setdefault(asset_group_id, dict())
-        self.registered_user_id[asset_group_id][user_id] = time.time()
+        self.registered_user_id[user_id] = time.time()
 
-    def unregister_user_id(self, asset_group_id, user_id):
+    def unregister_user_id(self, user_id):
         """
         (internal use) remove user_id from the list
 
-        :param asset_group_id:
         :param user_id:
         :return:
         """
-        if asset_group_id in self.registered_user_id:
-            self.registered_user_id[asset_group_id].pop(user_id, None)
-        if len(self.registered_user_id[asset_group_id]) == 0:
-            self.registered_user_id.pop(asset_group_id, None)
-
-    def is_registered_user(self, asset_group_id, user_id):
-        """
-        (internal use) check if the user_id is registered in the asset_group
-
-        :param asset_group_id:
-        :param user_id:
-        :return:
-        """
-        #self.logger.debug("[%s] is_registered_user: %s" % (self.shortname, binascii.b2a_hex(user_id[:4])))
-        try:
-            if user_id in self.registered_user_id[asset_group_id]:
-                return True
-            return False
-        except:
-            return False
+        self.registered_user_id.pop(user_id, None)
 
     def make_message(self, dst_node_id=None, nonce=None, msg_type=None):
         """

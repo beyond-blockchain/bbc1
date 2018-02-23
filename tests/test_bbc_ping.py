@@ -19,7 +19,7 @@ LOGLEVEL = 'debug'
 #LOGLEVEL = 'info'
 
 localhost = "127.0.0.1"
-localhost = "::1"
+#localhost = "::1"
 
 core_num = 4
 client_num = 4
