@@ -38,8 +38,8 @@ DEFAULT_P2P_PORT = 6641
 MAPPING_FILE = ".bbc_id_mappings"
 
 MESSAGE_WITH_NO_RESPONSE = (MsgType.MESSAGE, MsgType.REGISTER, MsgType.UNREGISTER, MsgType.DOMAIN_PING,
-                            MsgType.REQUEST_PING_TO_ALL, MsgType.REQUEST_INSERT_NOTIFICATION,
-                            MsgType.CANCEL_INSERT_NOTIFICATION)
+                            MsgType.REQUEST_PING_TO_ALL, MsgType.REQUEST_ALIVE_CHECK,
+                            MsgType.REQUEST_INSERT_NOTIFICATION, MsgType.CANCEL_INSERT_NOTIFICATION)
 
 
 def store_id_mappings(name, asset_group_id, transaction_id=None, asset_ids=None):
@@ -271,6 +271,16 @@ class BBcAppClient:
         :return:
         """
         dat = self.make_message_structure(None, MsgType.REQUEST_PING_TO_ALL)
+        dat[KeyType.domain_id] = domain_id
+        return self.send_msg(dat)
+
+    def broadcast_peerlist_to_all_neighbors(self, domain_id):
+        """
+        Request bbc_core to broadcast peerlist to all its neighbors
+        :param domain_id:
+        :return:
+        """
+        dat = self.make_message_structure(None, MsgType.REQUEST_ALIVE_CHECK)
         dat[KeyType.domain_id] = domain_id
         return self.send_msg(dat)
 
