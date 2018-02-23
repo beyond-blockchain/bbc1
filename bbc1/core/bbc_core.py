@@ -505,6 +505,11 @@ class BBcCoreService:
             if domain_id in self.networking.domains:
                 self.networking.domains[domain_id].ping_to_all_neighbors()
 
+        elif cmd == MsgType.REQUEST_ALIVE_CHECK:
+            domain_id = dat[KeyType.domain_id]
+            if domain_id in self.networking.domains:
+                self.networking.domains[domain_id].send_peerlist(None)
+
         elif cmd == MsgType.REQUEST_MANIP_LEDGER_SUBSYS:
             retmsg = make_message_structure(MsgType.RESPONSE_MANIP_LEDGER_SUBSYS,
                                             None, dat[KeyType.source_user_id], dat[KeyType.query_id])

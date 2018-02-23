@@ -89,9 +89,9 @@ class TestBBcAppClient(object):
             clients[i]['app'].ping_to_all_neighbors(domain_id)
         time.sleep(2)
 
-        cores[0].networking.domains[domain_id].alive_check()
-        print("** wait 16 sec to finish alive_check")
-        time.sleep(16)
+        clients[0]['app'].broadcast_peerlist_to_all_neighbors(domain_id)
+        print("** wait 3 sec to finish alive_check")
+        time.sleep(3)
         assert len(cores[1].networking.domains[domain_id].id_ip_mapping) == core_num-1
         for i in range(core_num):
             cores[i].networking.domains[domain_id].print_peerlist()
