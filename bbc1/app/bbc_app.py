@@ -37,6 +37,10 @@ DEFAULT_CORE_PORT = 9000
 DEFAULT_P2P_PORT = 6641
 MAPPING_FILE = ".bbc_id_mappings"
 
+MESSAGE_WITH_NO_RESPONSE = (MsgType.MESSAGE, MsgType.REGISTER, MsgType.UNREGISTER, MsgType.DOMAIN_PING,
+                            MsgType.REQUEST_PING_TO_ALL, MsgType.REQUEST_INSERT_NOTIFICATION,
+                            MsgType.CANCEL_INSERT_NOTIFICATION)
+
 
 def store_id_mappings(name, asset_group_id, transaction_id=None, asset_ids=None):
     if transaction_id is None and asset_ids is None:
@@ -123,6 +127,7 @@ class BBcAppClient:
         self.logger = logger.get_logger(key="bbc_app", level=loglevel, logname=logname)
         self.connection = socket.create_connection((host, port))
         self.callback = Callback(log=self.logger)
+        self.use_query_id_based_message_wait = False
         self.asset_groups = set()
         self.user_id = None
         self.query_id = (0).to_bytes(2, 'little')
@@ -165,6 +170,10 @@ class BBcAppClient:
         :return:
         """
         self.query_id = ((int.from_bytes(self.query_id, 'little') + 1) % 65536).to_bytes(2, 'little')
+        if cmd not in MESSAGE_WITH_NO_RESPONSE:
+            if self.use_query_id_based_message_wait:
+                if self.query_id not in self.callback.query_queue:
+                    self.callback.create_queue(self.query_id)
         return {
             KeyType.command: cmd,
             KeyType.asset_group_id: asset_group_id,
