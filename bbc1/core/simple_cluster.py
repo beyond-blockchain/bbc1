@@ -160,7 +160,7 @@ class NetworkDomain(DomainBase):
         resource_id = msg[KeyType.resource_id]
         resource = msg[KeyType.resource]
         if resource_type == ResourceType.Transaction_data:
-            self.network.core.insert_transaction(asset_group_id, resource, None, no_network_put=True)
+            self.network.core.insert_transaction(domain_id, asset_group_id, resource, None, no_network_put=True)
         elif resource_type == ResourceType.Asset_file:
             # TODO: need to check validity of the file
             self.network.core.storage_manager.store_locally(self.domain_id, asset_group_id, resource_id, resource)

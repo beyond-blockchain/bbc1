@@ -122,7 +122,6 @@ class BBcCoreService:
         self.logger.debug("config = %s" % conf)
         self.test_tx_obj = BBcTransaction()
         self.user_id_sock_mapping = dict()
-        self.asset_group_domain_mapping = dict()
         self.need_insert_completion_notification = dict()
         self.cross_ref_list = []
         self.ledger_manager = BBcLedger(self.config)
@@ -181,10 +180,9 @@ class BBcCoreService:
             self.logger.error("send error (raw): %s" % e)
         return True
 
-    def send_to_other_user(self, asset_group_id, dst_user_id, src_user_id, msg):
+    def send_to_other_user(self, domain_id, asset_group_id, dst_user_id, src_user_id, msg):
         if dst_user_id in self.user_id_sock_mapping:
             return self.send_message(msg)
-        domain_id = self.asset_group_domain_mapping[asset_group_id]
         return self.networking.route_message(domain_id, asset_group_id, dst_user_id, src_user_id, msg)
 
     def error_reply(self, msg=None, err_code=EINVALID_COMMAND, txt=""):
@@ -275,7 +273,8 @@ class BBcCoreService:
             if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_SEARCH_TRANSACTION: bad format")
                 return False, None
-            result = self.search_transaction_by_txid(dat[KeyType.asset_group_id], dat[KeyType.transaction_id],
+            result = self.search_transaction_by_txid(dat[KeyType.domain_id], dat[KeyType.asset_group_id],
+                                                     dat[KeyType.transaction_id],
                                                      dat[KeyType.source_user_id], dat[KeyType.query_id])
             if result is not None:
                 self.send_message(result)
@@ -287,7 +286,8 @@ class BBcCoreService:
             retmsg = make_message_structure(MsgType.RESPONSE_SEARCH_ASSET,
                                             dat[KeyType.asset_group_id],
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
-            result = self.search_asset_by_asid(dat[KeyType.asset_group_id], dat[KeyType.asset_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
+            result = self.search_asset_by_asid(dat[KeyType.domain_id], dat[KeyType.asset_group_id],
+                                               dat[KeyType.asset_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
             if isinstance(result, dict):
                 retmsg.update(result)
                 self.send_message(retmsg)
@@ -296,7 +296,8 @@ class BBcCoreService:
             if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.user_id], dat):
                 self.logger.debug("REQUEST_SEARCH_USERID: bad format")
                 return False, None
-            result = self.search_transaction_by_userid_locally(dat[KeyType.asset_group_id], dat[KeyType.user_id],
+            result = self.search_transaction_by_userid_locally(dat[KeyType.domain_id], dat[KeyType.asset_group_id],
+                                                               dat[KeyType.user_id],
                                                                dat[KeyType.source_user_id], dat[KeyType.query_id])
             if result is not None:
                 self.send_message(result)
@@ -305,7 +306,8 @@ class BBcCoreService:
             if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.transaction_data], dat):
                 self.logger.debug("REQUEST_GATHER_SIGNATURE: bad format")
                 return False, None
-            if not self.distribute_transaction_to_gather_signatures(dat[KeyType.asset_group_id], dat):
+            if not self.distribute_transaction_to_gather_signatures(dat[KeyType.domain_id],
+                                                                    dat[KeyType.asset_group_id], dat):
                 retmsg = make_message_structure(MsgType.RESPONSE_GATHER_SIGNATURE,
                                                 dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
                 self.error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt="Fail to forward transaction")
@@ -317,9 +319,10 @@ class BBcCoreService:
                 return False, None
             transaction_data = dat[KeyType.transaction_data]
             asset_files = dat[KeyType.all_asset_files]
-            retmsg = make_message_structure(MsgType.RESPONSE_INSERT,
-                                            dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
-            ret = self.insert_transaction(dat[KeyType.asset_group_id], transaction_data, asset_files)
+            retmsg = make_message_structure(MsgType.RESPONSE_INSERT, dat[KeyType.asset_group_id],
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            ret = self.insert_transaction(dat[KeyType.domain_id], dat[KeyType.asset_group_id],
+                                          transaction_data, asset_files)
             if isinstance(ret, str):
                 self.error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt=ret)
             else:
@@ -343,10 +346,8 @@ class BBcCoreService:
                 retmsg[KeyType.status] = dat[KeyType.status]
                 retmsg[KeyType.reason] = dat[KeyType.reason]
             retmsg[KeyType.source_user_id] = dat[KeyType.source_user_id]
-            self.send_to_other_user(dat[KeyType.asset_group_id],
-                                    dat[KeyType.destination_user_id],
-                                    dat[KeyType.source_user_id],
-                                    retmsg)
+            self.send_to_other_user(dat[KeyType.domain_id], dat[KeyType.asset_group_id],
+                                    dat[KeyType.destination_user_id], dat[KeyType.source_user_id], retmsg)
 
         elif cmd == MsgType.REQUEST_CROSS_REF:
             if KeyType.count in dat:
@@ -363,8 +364,7 @@ class BBcCoreService:
                                      KeyType.destination_user_id], dat):
                 self.logger.debug("MESSAGE: bad format")
                 return False, None
-            domain_id = self.asset_group_domain_mapping[dat[KeyType.asset_group_id]]
-            self.networking.route_message(domain_id, dat[KeyType.asset_group_id],
+            self.networking.route_message(dat[KeyType.domain_id], dat[KeyType.asset_group_id],
                                           dat[KeyType.destination_user_id],
                                           dat[KeyType.source_user_id], dat)
 
@@ -554,7 +554,6 @@ class BBcCoreService:
             self.config.update_config()
         bbclib.set_max_body_size(asset_group_id, max_body_size)
         self.storage_manager.set_storage_path(domain_id, asset_group_id, from_config=True)
-        self.asset_group_domain_mapping[asset_group_id] = domain_id
         self.stats.update_stats_increment("asset_group", "total_num", 1)
         if advertise_in_domain0:
             self.networking.asset_groups_to_advertise.add(asset_group_id)
@@ -654,10 +653,11 @@ class BBcCoreService:
         self.stats.update_stats_increment("asset", "invalid", 1)
         return False
 
-    def insert_transaction(self, asset_group_id, txdata, asset_files, no_network_put=False):
+    def insert_transaction(self, domain_id, asset_group_id, txdata, asset_files, no_network_put=False):
         """
         Insert transaction into ledger subsystem
 
+        :param domain_id:           domain_id where the transaction is inserted
         :param asset_group_id:      asset_group_id to insert into
         :param txdata:              BBcTransaction data
         :param asset_files:   dictionary of { asid=>asset_content,,, }
@@ -667,7 +667,6 @@ class BBcCoreService:
             self.stats.update_stats_increment("transaction", "copy_insert_count", 1)
         else:
             self.stats.update_stats_increment("transaction", "insert_count", 1)
-        domain_id = self.asset_group_domain_mapping.get(asset_group_id, None)
         if domain_id is None:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("No such asset_group_id is set up in any domain")
@@ -755,10 +754,11 @@ class BBcCoreService:
                                     resource_type=ResourceType.Asset_file, resource=asset_files[asid])
         return {KeyType.transaction_id: txobj.transaction_id}
 
-    def distribute_transaction_to_gather_signatures(self, asset_group_id, dat):
+    def distribute_transaction_to_gather_signatures(self, domain_id, asset_group_id, dat):
         """
         Request to distribute sign_request to users
 
+        :param domain_id:
         :param asset_group_id:
         :param dat:
         :return:
@@ -774,14 +774,15 @@ class BBcCoreService:
                 msg[KeyType.transactions] = dat[KeyType.transactions]
             if KeyType.all_asset_files in dat:
                 msg[KeyType.all_asset_files] = dat[KeyType.all_asset_files]
-            if not self.send_to_other_user(asset_group_id, dst, dat[KeyType.source_user_id], msg):
+            if not self.send_to_other_user(domain_id, asset_group_id, dst, dat[KeyType.source_user_id], msg):
                 return False
         return True
 
-    def search_asset_by_asid(self, asset_group_id, asid, source_id, query_id):
+    def search_asset_by_asid(self, domain_id, asset_group_id, asid, source_id, query_id):
         """
         Search asset in the storage by asset_id. If not found, search it in the network
 
+        :param domain_id:        domain_id where the transaction is inserted
         :param asset_group_id:   asset_group_id to search in
         :param asid:        asset_id in byte format
         :param source_id: the user_id of the sender
@@ -791,7 +792,6 @@ class BBcCoreService:
         self.stats.update_stats_increment("asset", "search_count", 1)
         response_info = make_message_structure(MsgType.RESPONSE_SEARCH_ASSET,
                                                asset_group_id, source_id, query_id)
-        domain_id = self.asset_group_domain_mapping.get(asset_group_id, None)
         if domain_id is None:
             self.stats.update_stats_increment("asset", "search_fail_count", 1)
             self.logger.error("No such asset_group_id is set up in any domain")
@@ -942,10 +942,11 @@ class BBcCoreService:
                                                query_entry.data[KeyType.resource])
         self.send_message(query_entry.data['response_info'])
 
-    def search_transaction_by_txid(self, asset_group_id, txid, source_id, query_id):
+    def search_transaction_by_txid(self, domain_id, asset_group_id, txid, source_id, query_id):
         """
         Search transaction_data by transaction_id
 
+        :param domain_id:        domain_id where the transaction is inserted
         :param asset_group_id:   asset_group_id to search in
         :param txid:  transaction_id
         :param source_id: the user_id of the sender
@@ -953,7 +954,6 @@ class BBcCoreService:
         :return: response data including transaction_data
         """
         self.stats.update_stats_increment("transaction", "search_count", 1)
-        domain_id = self.asset_group_domain_mapping.get(asset_group_id, None)
         if domain_id is None:
             self.logger.error("No such asset_group_id is set up in any domain")
             return None
@@ -979,17 +979,17 @@ class BBcCoreService:
         response_info[KeyType.transaction_data] = txdata
         return response_info
 
-    def search_transaction_by_userid_locally(self, asset_group_id, user_id, source_id, query_id):
+    def search_transaction_by_userid_locally(self, domain_id, asset_group_id, user_id, source_id, query_id):
         """
         Local search a latest transaction that includes the asset owned by the specified user_id
         TODO: need to support search it within the domain
+        :param domain_id:        domain_id where the transaction is inserted
         :param asset_group_id:
         :param user_id:
         :param source_id: the user_id of the sender
         :param query_id:
         :return: response data including transaction_data, if a transaction is not found in the local DB, None is returned.
         """
-        domain_id = self.asset_group_domain_mapping.get(asset_group_id, None)
         if domain_id is None:
             self.logger.error("No such asset_group_id is set up in any domain")
             return None
