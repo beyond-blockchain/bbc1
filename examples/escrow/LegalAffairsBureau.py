@@ -46,15 +46,12 @@ key_pair = None
 bbc_app_client = None
 
 
-def asset_group_setup():
+def domain_setup():
     tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
     tmpclient.domain_setup(domain_id, "simple_cluster")
     tmpclient.callback.synchronize()
-    tmpclient.register_asset_group(domain_id=domain_id, asset_group_id=asset_group_id)
-    tmpclient.callback.synchronize()
     tmpclient.unregister_from_core()
-    print("Domain %s and asset_group %s are created." % (binascii.b2a_hex(domain_id[:4]).decode(),
-                                                        binascii.b2a_hex(asset_group_id[:4]).decode()))
+    print("Domain %s is created." % (binascii.b2a_hex(domain_id[:4]).decode()))
     print("Setup is done.")
 
 

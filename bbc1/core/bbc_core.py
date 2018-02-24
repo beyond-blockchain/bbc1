@@ -413,21 +413,6 @@ class BBcCoreService:
         elif cmd == MsgType.UNREGISTER:
             return True, None
 
-        elif cmd == MsgType.REQUEST_SETUP_ASSET_GROUP:
-            domain_id = dat.get(KeyType.domain_id, None)
-            asset_group_id = dat.get(KeyType.asset_group_id, None)
-            retmsg = make_message_structure(MsgType.RESPONSE_SETUP_ASSET_GROUP,
-                                            asset_group_id, dat[KeyType.source_user_id], dat[KeyType.query_id])
-            if domain_id is None or asset_group_id is None:
-                self.error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt="No such domain or asset_group_id")
-                return False, None
-            if domain_id not in self.networking.domains:
-                self.error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt="No such domain")
-                return False, None
-            self.asset_group_setup(domain_id, asset_group_id, dat.get(KeyType.storage_type, StorageType.FILESYSTEM),
-                                   dat.get(KeyType.storage_path,None))
-            self.send_raw_message(socket, retmsg)
-
         elif cmd == MsgType.REQUEST_SETUP_DOMAIN:
             retmsg = make_message_structure(MsgType.RESPONSE_SETUP_DOMAIN,
                                             None, dat[KeyType.source_user_id], dat[KeyType.query_id])
@@ -440,6 +425,10 @@ class BBcCoreService:
                 retmsg[KeyType.domain_id] = domain_id
                 retmsg[KeyType.result] = True
                 retmsg[KeyType.network_module] = self.networking.domains[domain_id].module_name
+                if domain_id != bbclib.domain_global_0:
+                    self.storage_manager.set_storage_path(domain_id,
+                                                          storage_type=dat.get(KeyType.storage_type, StorageType.FILESYSTEM),
+                                                          storage_path=dat.get(KeyType.storage_path, None))
             self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_PEERLIST:
@@ -528,19 +517,6 @@ class BBcCoreService:
         else:
             self.logger.error("Bad command/response: %s" % cmd)
         return False, None
-
-    def asset_group_setup(self, domain_id, asset_group_id, storage_type=StorageType.FILESYSTEM, storage_path=None):
-        """
-        Setup asset_group in a specified domain
-
-        :param domain_id:
-        :param asset_group_id:
-        :param storage_type:
-        :param storage_path:
-        :return:
-        """
-        self.storage_manager.set_storage_path(domain_id)
-        self.stats.update_stats_increment("asset_group", "total_num", 1)
 
     def pop_cross_refs(self, num=1):
         """

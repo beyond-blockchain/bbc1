@@ -213,9 +213,9 @@ class BBcAppClient:
             return None
         return self.query_id
 
-    def domain_setup(self, domain_id, module_name=None):
+    def domain_setup(self, domain_id, module_name=None, storage_type=StorageType.FILESYSTEM, storage_path=None):
         """
-        Set up domain with the specified network module (maybe used by a system administrator)
+        Set up domain with the specified network module and storage (maybe used by a system administrator)
 
         :param domain_id:
         :param module_name:
@@ -227,6 +227,9 @@ class BBcAppClient:
         dat[KeyType.domain_id] = domain_id
         if module_name is not None:
             dat[KeyType.network_module] = module_name
+        dat[KeyType.storage_type] = storage_type
+        if storage_path is not None:
+            dat[KeyType.storage_path] = storage_path
         return self.send_msg(dat)
 
     def get_domain_peerlist(self, domain_id):
@@ -295,24 +298,6 @@ class BBcAppClient:
         """
         dat = self.make_message_structure(None, MsgType.REQUEST_ALIVE_CHECK)
         dat[KeyType.domain_id] = domain_id
-        return self.send_msg(dat)
-
-    def register_asset_group(self, domain_id, asset_group_id,
-                             storage_type=StorageType.FILESYSTEM, storage_path=None):
-        """
-        Register an asset_group in the core node (maybe used by a system administrator)
-
-        :param domain_id:
-        :param asset_group_id:
-        :param storage_type:
-        :param storage_path:
-        :return:
-        """
-        dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_SETUP_ASSET_GROUP)
-        dat[KeyType.domain_id] = domain_id
-        dat[KeyType.storage_type] = storage_type
-        if storage_path is not None:
-            dat[KeyType.storage_path] = storage_path
         return self.send_msg(dat)
 
     def get_bbc_config(self):
@@ -632,8 +617,6 @@ class Callback:
             self.proc_resp_register_hash(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS:
             self.proc_resp_verify_hash(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_SETUP_ASSET_GROUP:
-            self.proc_resp_asset_group_setup(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SETUP_DOMAIN:
             self.proc_resp_domain_setup(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GET_PEERLIST:
@@ -729,9 +712,6 @@ class Callback:
         self.queue.put(dat)
 
     def proc_resp_verify_hash(self, dat):
-        self.queue.put(dat)
-
-    def proc_resp_asset_group_setup(self, dat):
         self.queue.put(dat)
 
     def proc_resp_domain_setup(self, dat):

@@ -140,16 +140,14 @@ class BBcNetwork:
             c = conf['domains'][dm]
             nw_module = c.get('module', 'simple_cluster')
             self.create_domain(domain_id=domain_id, network_module=nw_module)
-            if 'special_domain' in c:
-                c.pop('storage_type', None)
-                c.pop('storage_path', None)
-            else:
-                self.core.ledger_manager.add_domain(domain_id)
-                for asset_group_id_str, info in c['asset_group_ids'].items():
-                    asset_group_id = bbclib.convert_idstring_to_bytes(asset_group_id_str)
-                    self.core.asset_group_setup(domain_id, asset_group_id,
-                                                c.get('storage_type', StorageType.FILESYSTEM),
-                                                c.get('storage_path', None))
+            default_type = StorageType.FILESYSTEM
+            if domain_id == bbclib.domain_global_0:
+                default_type = StorageType.NONE
+            storage_type = c.pop('storage_type', default_type)
+            storage_path = c.pop('storage_path', None)
+            self.core.ledger_manager.add_domain(domain_id)
+            self.core.storage_manager.set_storage_path(domain_id, storage_type=storage_type, storage_path=storage_path)
+
             for nd, info in c['static_nodes'].items():
                 node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
                 self.add_static_node_to_domain(domain_id, node_id, ipv4, ipv6, port)

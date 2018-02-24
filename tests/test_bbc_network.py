@@ -74,7 +74,7 @@ class DummyCore:
                 return None
 
     class Storage:
-        def set_storage_path(self, domain_id, from_config):
+        def set_storage_path(self, domain_id, storage_type, storage_path):
             pass
 
     def __init__(self):
