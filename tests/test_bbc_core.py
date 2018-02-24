@@ -7,7 +7,7 @@ import time
 
 import sys
 sys.path.extend(["../"])
-from bbc1.core.bbc_ledger import ResourceType
+from bbc1.core.bbc_types import ResourceType
 from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
 from testutils import prepare, start_core_thread, get_core_client, make_client
@@ -70,6 +70,7 @@ class TestBBcCore(object):
         cores, clients = get_core_client()
         for i in range(core_num):
             cores[i].networking.create_domain(network_module="simple_cluster", domain_id=domain_id)
+            cores[i].ledger_manager.add_domain(domain_id)
             cores[i].send_message = dummy_send_message
             cores[i].storage_manager.set_storage_path(domain_id)
 
@@ -91,6 +92,7 @@ class TestBBcCore(object):
             transaction.add(cross_ref=cross_refs.pop(0))
         transaction.events[0].asset.add(user_id=user1, asset_body=b'123456')
         transaction.events[1].asset.add(user_id=user1, asset_file=b'abcdefg')
+        transaction.get_sig_index(user1)
 
         sig = transaction.sign(keypair=clients[1]['keypair'])
         transaction.add_signature(user_id=user1, signature=sig)
@@ -106,6 +108,7 @@ class TestBBcCore(object):
 
     def test_04_1_search_transaction_by_txid_locally(self):
         print("-----", sys._getframe().f_code.co_name, "-----")
+        print(transaction.transaction_id.hex())
         ret = cores[1].search_transaction_by_txid(domain_id, asset_group_id, transaction.transaction_id,
                                                   clients[1]['user_id'], b'aaaa')
         print(ret)

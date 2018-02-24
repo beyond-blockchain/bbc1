@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import binascii
-import time
 import random
 import struct
 
@@ -23,7 +22,7 @@ import sys
 sys.path.extend(["../../"])
 from bbc1.common import bbclib
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
-from bbc1.core.bbc_network import InfraMessageTypeBase
+from bbc1.core.bbc_types import InfraMessageTypeBase
 from bbc1.core import query_management, simple_cluster
 
 

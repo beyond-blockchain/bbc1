@@ -32,13 +32,13 @@ import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core import bbc_core
 from bbc1.core.bbc_config import DEFAULT_P2P_PORT
-from bbc1.core.bbc_ledger import ResourceType
-from bbc1.common.bbclib import NodeInfo, StorageType
+from bbc1.core.bbc_types import ResourceType, InfraMessageTypeBase
+from bbc1.core import query_management
+from bbc1.common.bbclib import NodeInfo
 from bbc1.common import bbclib, message_key_types
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
 from bbc1.common import logger
 from bbc1.common.bbc_error import *
-from bbc1.core import query_management
 
 TCP_THRESHOLD_SIZE = 1300
 ZEROS = bytes([0] * 32)
@@ -131,30 +131,6 @@ class BBcNetwork:
             self.logger.error("** Fail to setup TCP server **")
             return
 
-        if 'domains' not in conf:
-            return
-        for dm in conf['domains'].keys():
-            domain_id = bbclib.convert_idstring_to_bytes(dm)
-            if not self.use_global and domain_id == bbclib.domain_global_0:
-                continue
-            c = conf['domains'][dm]
-            nw_module = c.get('module', 'simple_cluster')
-            self.create_domain(domain_id=domain_id, network_module=nw_module)
-            default_type = StorageType.FILESYSTEM
-            if domain_id == bbclib.domain_global_0:
-                default_type = StorageType.NONE
-            storage_type = c.pop('storage_type', default_type)
-            storage_path = c.pop('storage_path', None)
-            self.core.ledger_manager.add_domain(domain_id)
-            self.core.storage_manager.set_storage_path(domain_id, storage_type=storage_type, storage_path=storage_path)
-
-            for nd, info in c['static_nodes'].items():
-                node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
-                self.add_static_node_to_domain(domain_id, node_id, ipv4, ipv6, port)
-            for nd, info in c['peer_list'].items():
-                node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
-                self.domains[domain_id].add_peer_node_ip46(node_id, ipv4, ipv6, port, need_ping=True)
-
     def get_my_socket_info(self):
         """
         Return waiting port and my IP address
@@ -207,8 +183,6 @@ class BBcNetwork:
         self.domains[domain_id] = nw_module.NetworkDomain(network=self, config=self.config,
                                                           domain_id=domain_id, node_id=node_id,
                                                           loglevel=self.logger.level, logname=self.logname)
-        if domain_id != bbclib.domain_global_0:
-            self.core.ledger_manager.add_domain(domain_id)
         self.core.stats.update_stats_increment("network", "num_domains", 1)
         return True
 
@@ -692,27 +666,6 @@ class BBcNetwork:
                 sock.close()
             self.listen_socket = None
             self.listen_socket6 = None
-
-
-class InfraMessageTypeBase:
-    DOMAIN_PING = to_2byte(0)
-    NOTIFY_LEAVE = to_2byte(1)
-    NOTIFY_PEERLIST = to_2byte(2)
-    START_TO_REFRESH = to_2byte(3)
-    REQUEST_PING = to_2byte(4)
-    RESPONSE_PING = to_2byte(5)
-
-    NOTIFY_CROSS_REF = to_2byte(0, 0x10)        # only used in domain_global_0
-    ADVERTISE_DOMAIN_INFO = to_2byte(1, 0x10)   # only used in domain_global_0
-
-    REQUEST_STORE = to_2byte(0, 0x40)
-    RESPONSE_STORE = to_2byte(1, 0x40)
-    RESPONSE_STORE_COPY = to_2byte(2, 0x40)
-    REQUEST_FIND_USER = to_2byte(3, 0x40)
-    RESPONSE_FIND_USER = to_2byte(4, 0x40)
-    REQUEST_FIND_VALUE = to_2byte(5, 0x40)
-    RESPONSE_FIND_VALUE = to_2byte(6, 0x40)
-    MESSAGE_TO_USER = to_2byte(7, 0x40)
 
 
 class DomainBase:

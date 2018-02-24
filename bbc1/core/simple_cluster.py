@@ -17,13 +17,13 @@ limitations under the License.
 import binascii
 import time
 import random
-import socket
 
 import sys
 sys.path.extend(["../../"])
-from bbc1.common.message_key_types import KeyType, PayloadType, to_2byte
-from bbc1.core.bbc_ledger import ResourceType
-from bbc1.core.bbc_network import InfraMessageTypeBase, DomainBase
+from bbc1.common.message_key_types import KeyType, PayloadType
+from bbc1.core.bbc_types import ResourceType
+from bbc1.core.bbc_network import DomainBase
+from bbc1.core.bbc_types import InfraMessageTypeBase
 from bbc1.core import query_management
 
 
