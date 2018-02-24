@@ -5,6 +5,7 @@ import sqlite3
 import sys
 sys.path.extend(["../../"])
 from bbc1.common import logger
+from bbc1.core.bbc_types import ResourceType
 
 import binascii
 
@@ -16,15 +17,6 @@ auxiliary_db_definition = [
     ["id", "INTEGER"], ["resource_id", "BLOB"], ["asset_group_id", "BLOB"],
     ["resource_type", "INTEGER"], ["data", "BLOB"],
 ]
-
-
-class ResourceType:
-    Transaction_data = 0
-    Asset_ID = 1
-    Asset_file = 2
-    Edge_incoming = 3
-    Edge_outgoing = 4
-    Owner_asset = 5
 
 
 class BBcLedger:

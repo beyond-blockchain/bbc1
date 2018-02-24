@@ -35,20 +35,13 @@ asset_id = None
 large_data = b"aaaaaaaaaa" * 200
 
 
-def asset_group_setup(client):
-    client.domain_setup(domain_id)
-    client.callback.synchronize()
-    client.register_asset_group(domain_id=domain_id, asset_group_id=asset_group_id)
-    client.callback.synchronize()
-    print("Domain %s and asset_group %s are created." % (binascii.b2a_hex(domain_id[:4]).decode(),
-                                                        binascii.b2a_hex(asset_group_id[:4]).decode()))
-    print("Setup is done.")
-
-
 def setup_bbc_client(port_increase=0, user_id=None):
     bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT+port_increase, loglevel="all")
     bbc_app_client.set_user_id(user_id)
+    bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_callback(bbc_app.Callback())
+    bbc_app_client.domain_setup(domain_id)
+    bbc_app_client.callback.synchronize()
     return bbc_app_client
 
 
@@ -133,7 +126,6 @@ class TestFileProofClient(object):
 
         for i in range(client_num):
             clients[i] = setup_bbc_client(i, user_ids[i])
-            asset_group_setup(clients[i])
             clients[i].set_asset_group_id(asset_group_id)
             ret = clients[i].register_to_core()
             assert ret
@@ -197,7 +189,7 @@ class TestFileProofClient(object):
             print("ERROR: ", response_data[KeyType.reason].decode())
             assert False
 
-    def test_11_store_file(self):
+    def test_11_verify_file(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         # -- verify by user_1
         ret = clients[1].search_asset(asset_group_id, asset_id)

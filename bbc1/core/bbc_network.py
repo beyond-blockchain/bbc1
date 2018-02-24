@@ -32,13 +32,13 @@ import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core import bbc_core
 from bbc1.core.bbc_config import DEFAULT_P2P_PORT
-from bbc1.core.bbc_ledger import ResourceType
-from bbc1.common.bbclib import NodeInfo, StorageType
+from bbc1.core.bbc_types import ResourceType, InfraMessageTypeBase
+from bbc1.core import query_management
+from bbc1.common.bbclib import NodeInfo
 from bbc1.common import bbclib, message_key_types
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
 from bbc1.common import logger
 from bbc1.common.bbc_error import *
-from bbc1.core import query_management
 
 TCP_THRESHOLD_SIZE = 1300
 ZEROS = bytes([0] * 32)
@@ -106,7 +106,6 @@ class BBcNetwork:
         self.use_global = use_global
         conf = self.config.get_config()
         self.domains = dict()
-        self.asset_groups_to_advertise = set()
         self.ip_address, self.ip6_address = check_my_IPaddresses()
         if external_ip4addr is not None:
             self.external_ip4addr = external_ip4addr
@@ -131,34 +130,6 @@ class BBcNetwork:
         if not self.setup_tcp_server():
             self.logger.error("** Fail to setup TCP server **")
             return
-
-        if 'domains' not in conf:
-            return
-        for dm in conf['domains'].keys():
-            domain_id = bbclib.convert_idstring_to_bytes(dm)
-            if not self.use_global and domain_id == bbclib.domain_global_0:
-                continue
-            c = conf['domains'][dm]
-            nw_module = c.get('module', 'simple_cluster')
-            self.create_domain(domain_id=domain_id, network_module=nw_module)
-            if 'special_domain' in c:
-                c.pop('storage_type', None)
-                c.pop('storage_path', None)
-            else:
-                self.core.ledger_manager.add_domain(domain_id)
-                for asset_group_id_str, info in c['asset_group_ids'].items():
-                    asset_group_id = bbclib.convert_idstring_to_bytes(asset_group_id_str)
-                    self.core.asset_group_setup(domain_id, asset_group_id,
-                                                c.get('storage_type', StorageType.FILESYSTEM),
-                                                c.get('storage_path', None),
-                                                c.get('advertise_in_domain0', False),
-                                                c.get('max_body_size', bbclib.DEFAULT_MAX_BODY_SIZE))
-            for nd, info in c['static_nodes'].items():
-                node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
-                self.add_static_node_to_domain(domain_id, node_id, ipv4, ipv6, port)
-            for nd, info in c['peer_list'].items():
-                node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
-                self.domains[domain_id].add_peer_node_ip46(node_id, ipv4, ipv6, port, need_ping=True)
 
     def get_my_socket_info(self):
         """
@@ -212,8 +183,6 @@ class BBcNetwork:
         self.domains[domain_id] = nw_module.NetworkDomain(network=self, config=self.config,
                                                           domain_id=domain_id, node_id=node_id,
                                                           loglevel=self.logger.level, logname=self.logname)
-        if domain_id != bbclib.domain_global_0:
-            self.core.ledger_manager.add_domain(domain_id)
         self.core.stats.update_stats_increment("network", "num_domains", 1)
         return True
 
@@ -228,8 +197,6 @@ class BBcNetwork:
             return
         self.domains[domain_id].leave_domain()
         del self.domains[domain_id]
-        if domain_id in self.asset_groups_to_advertise:
-            self.asset_groups_to_advertise.remove(domain_id)
         if self.use_global:
             self.domains[bbclib.domain_global_0].advertise_asset_group_info()
         self.core.stats.update_stats_decrement("network", "num_domains", 1)
@@ -425,7 +392,7 @@ class BBcNetwork:
             return False
 
         self.logger.debug("route_message to dst_user_id:%s" % (binascii.b2a_hex(dst_user_id[:2])))
-        if self.domains[domain_id].is_registered_user(asset_group_id, dst_user_id):
+        if dst_user_id in self.domains[domain_id].registered_user_id:
             self.logger.debug(" -> directly to the app")
             self.core.send_message(msg_to_send)
             return True
@@ -480,28 +447,26 @@ class BBcNetwork:
                                               query_entry.data[KeyType.source_node_id], dat[KeyType.query_id])
         self.core.error_reply(msg=msg, err_code=ENODESTINATION, txt="cannot find core node")
 
-    def register_user_id(self, domain_id, asset_group_id, user_id):
+    def register_user_id(self, domain_id, user_id):
         """
         Register user_id connecting directly to this node in the domain
 
         :param domain_id:
-        :param asset_group_id:
         :param user_id:
         :return:
         """
         self.core.stats.update_stats_increment("network", "user_num", 1)
-        self.domains[domain_id].register_user_id(asset_group_id, user_id)
+        self.domains[domain_id].register_user_id(user_id)
 
-    def remove_user_id(self, asset_group_id, user_id):
+    def remove_user_id(self, user_id):
         """
         Remove user_id from the domain
 
-        :param asset_group_id:
         :param user_id:
         :return:
         """
         for domain_id in self.domains:
-            self.domains[domain_id].unregister_user_id(asset_group_id, user_id)
+            self.domains[domain_id].unregister_user_id(user_id)
             self.core.stats.update_stats_decrement("network", "user_num", 1)
 
     def disseminate_cross_ref(self, transaction_id, asset_group_id):
@@ -701,27 +666,6 @@ class BBcNetwork:
                 sock.close()
             self.listen_socket = None
             self.listen_socket6 = None
-
-
-class InfraMessageTypeBase:
-    DOMAIN_PING = to_2byte(0)
-    NOTIFY_LEAVE = to_2byte(1)
-    NOTIFY_PEERLIST = to_2byte(2)
-    START_TO_REFRESH = to_2byte(3)
-    REQUEST_PING = to_2byte(4)
-    RESPONSE_PING = to_2byte(5)
-
-    NOTIFY_CROSS_REF = to_2byte(0, 0x10)        # only used in domain_global_0
-    ADVERTISE_ASSET_GROUP = to_2byte(1, 0x10)   # only used in domain_global_0
-
-    REQUEST_STORE = to_2byte(0, 0x40)
-    RESPONSE_STORE = to_2byte(1, 0x40)
-    RESPONSE_STORE_COPY = to_2byte(2, 0x40)
-    REQUEST_FIND_USER = to_2byte(3, 0x40)
-    RESPONSE_FIND_USER = to_2byte(4, 0x40)
-    REQUEST_FIND_VALUE = to_2byte(5, 0x40)
-    RESPONSE_FIND_VALUE = to_2byte(6, 0x40)
-    MESSAGE_TO_USER = to_2byte(7, 0x40)
 
 
 class DomainBase:
@@ -950,46 +894,24 @@ class DomainBase:
         """
         pass
 
-    def register_user_id(self, asset_group_id, user_id):
+    def register_user_id(self, user_id):
         """
         Register user_id that connect directly to this core node in the list
 
-        :param asset_group_id:
         :param user_id:
         :return:
         """
         #self.logger.debug("[%s] register_user_id: %s" % (self.shortname,binascii.b2a_hex(user_id[:4])))
-        self.registered_user_id.setdefault(asset_group_id, dict())
-        self.registered_user_id[asset_group_id][user_id] = time.time()
+        self.registered_user_id[user_id] = time.time()
 
-    def unregister_user_id(self, asset_group_id, user_id):
+    def unregister_user_id(self, user_id):
         """
         (internal use) remove user_id from the list
 
-        :param asset_group_id:
         :param user_id:
         :return:
         """
-        if asset_group_id in self.registered_user_id:
-            self.registered_user_id[asset_group_id].pop(user_id, None)
-        if len(self.registered_user_id[asset_group_id]) == 0:
-            self.registered_user_id.pop(asset_group_id, None)
-
-    def is_registered_user(self, asset_group_id, user_id):
-        """
-        (internal use) check if the user_id is registered in the asset_group
-
-        :param asset_group_id:
-        :param user_id:
-        :return:
-        """
-        #self.logger.debug("[%s] is_registered_user: %s" % (self.shortname, binascii.b2a_hex(user_id[:4])))
-        try:
-            if user_id in self.registered_user_id[asset_group_id]:
-                return True
-            return False
-        except:
-            return False
+        self.registered_user_id.pop(user_id, None)
 
     def make_message(self, dst_node_id=None, nonce=None, msg_type=None):
         """

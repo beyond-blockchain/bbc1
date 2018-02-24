@@ -7,7 +7,7 @@ import time
 
 import sys
 sys.path.extend(["../"])
-from bbc1.core.bbc_ledger import ResourceType
+from bbc1.core.bbc_types import ResourceType
 from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
 from testutils import prepare, start_core_thread, get_core_client, make_client
@@ -70,9 +70,9 @@ class TestBBcCore(object):
         cores, clients = get_core_client()
         for i in range(core_num):
             cores[i].networking.create_domain(network_module="simple_cluster", domain_id=domain_id)
+            cores[i].ledger_manager.add_domain(domain_id)
             cores[i].send_message = dummy_send_message
-            cores[i].storage_manager.set_storage_path(domain_id, asset_group_id)
-            cores[i].asset_group_domain_mapping[asset_group_id] = domain_id
+            cores[i].storage_manager.set_storage_path(domain_id)
 
     def test_02_get_cross_ref(self):
         print("-----", sys._getframe().f_code.co_name, "-----")
@@ -92,6 +92,7 @@ class TestBBcCore(object):
             transaction.add(cross_ref=cross_refs.pop(0))
         transaction.events[0].asset.add(user_id=user1, asset_body=b'123456')
         transaction.events[1].asset.add(user_id=user1, asset_file=b'abcdefg')
+        transaction.get_sig_index(user1)
 
         sig = transaction.sign(keypair=clients[1]['keypair'])
         transaction.add_signature(user_id=user1, signature=sig)
@@ -100,14 +101,15 @@ class TestBBcCore(object):
         transaction.dump()
         asset_file = dict()
         asset_file[transaction.events[1].asset.asset_id] = transaction.events[1].asset.asset_file
-        ret = cores[1].insert_transaction(asset_group_id, transaction.serialize(), asset_file)
+        ret = cores[1].insert_transaction(domain_id, asset_group_id, transaction.serialize(), asset_file)
         print(ret)
         for i in range(len(cores)):
             print("[%d] cross_ref_list=%d" % (i, len(cores[i].cross_ref_list)))
 
     def test_04_1_search_transaction_by_txid_locally(self):
         print("-----", sys._getframe().f_code.co_name, "-----")
-        ret = cores[1].search_transaction_by_txid(asset_group_id, transaction.transaction_id,
+        print(transaction.transaction_id.hex())
+        ret = cores[1].search_transaction_by_txid(domain_id, asset_group_id, transaction.transaction_id,
                                                   clients[1]['user_id'], b'aaaa')
         print(ret)
         assert ret is not None
@@ -115,14 +117,14 @@ class TestBBcCore(object):
     def test_04_2_search_asset_by_asid_locally(self):
         print("-----", sys._getframe().f_code.co_name, "-----")
         asid = transaction.events[0].asset.asset_id
-        ret = cores[1].search_asset_by_asid(asset_group_id, asid, clients[1]['user_id'], b'aaaa')
+        ret = cores[1].search_asset_by_asid(domain_id, asset_group_id, asid, clients[1]['user_id'], b'aaaa')
         print(ret)
         assert ret is not None
 
     def test_04_3_search_asset_by_asid_locally_in_storage(self):
         print("-----", sys._getframe().f_code.co_name, "-----")
         asid = transaction.events[1].asset.asset_id
-        ret = cores[1].search_asset_by_asid(asset_group_id, asid, clients[1]['user_id'], b'aaaa')
+        ret = cores[1].search_asset_by_asid(domain_id, asset_group_id, asid, clients[1]['user_id'], b'aaaa')
         print(ret)
         assert ret is not None
 
@@ -153,7 +155,7 @@ class TestBBcCore(object):
                                                ResourceType.Asset_ID, transaction.transaction_id)
 
         # -- search the transaction at core_node_0
-        ret = cores[0].search_transaction_by_txid(asset_group_id, transaction.transaction_id,
+        ret = cores[0].search_transaction_by_txid(domain_id, asset_group_id, transaction.transaction_id,
                                                   clients[2]['user_id'], b'bbbb')
         print(ret)
         assert ret is None
@@ -165,7 +167,7 @@ class TestBBcCore(object):
         print("-----", sys._getframe().f_code.co_name, "-----")
         # -- search the asset at core_node_0
         asid = transaction.events[0].asset.asset_id
-        ret = cores[0].search_asset_by_asid(asset_group_id, asid, clients[1]['user_id'], b'aaaa')
+        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[1]['user_id'], b'aaaa')
         assert ret is None
         print("wait queue: 1")
         total = wait_results(1)
@@ -175,7 +177,7 @@ class TestBBcCore(object):
         print("-----", sys._getframe().f_code.co_name, "-----")
         # -- search the asset at core_node_0
         asid = transaction.events[1].asset.asset_id
-        ret = cores[0].search_asset_by_asid(asset_group_id, asid, clients[1]['user_id'], b'aaaa')
+        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[1]['user_id'], b'aaaa')
         assert ret is None
         print("wait queue: 1")
         total = wait_results(1)
@@ -199,7 +201,7 @@ class TestBBcCore(object):
     def test_07_1_search_transaction_by_txid_other_node(self):
         print("-----", sys._getframe().f_code.co_name, "-----")
         # -- search the transaction at core_node_0
-        ret = cores[0].search_transaction_by_txid(asset_group_id, transaction.transaction_id,
+        ret = cores[0].search_transaction_by_txid(domain_id, asset_group_id, transaction.transaction_id,
                                                   clients[0]['user_id'], b'cccc')
         assert ret is None
         print("wait queue: 1")
@@ -210,7 +212,7 @@ class TestBBcCore(object):
         print("-----", sys._getframe().f_code.co_name, "-----")
         # -- search the asset at core_node_0
         asid = transaction.events[0].asset.asset_id
-        ret = cores[0].search_asset_by_asid(asset_group_id, asid, clients[0]['user_id'], b'dddd')
+        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[0]['user_id'], b'dddd')
         assert ret is None
         print("wait queue: 1")
         total = wait_results(1)
@@ -220,7 +222,7 @@ class TestBBcCore(object):
         print("-----", sys._getframe().f_code.co_name, "-----")
         # -- search the asset at core_node_0
         asid = transaction.events[1].asset.asset_id
-        ret = cores[0].search_asset_by_asid(asset_group_id, asid, clients[0]['user_id'], b'dddd')
+        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[0]['user_id'], b'dddd')
         assert ret is None
         print("wait queue: 1")
         total = wait_results(1)
@@ -230,7 +232,7 @@ class TestBBcCore(object):
         print("-----", sys._getframe().f_code.co_name, "-----")
         # -- search the asset at core_node_0
         asid = transaction.events[1].asset.asset_id
-        ret = cores[0].search_asset_by_asid(asset_group_id, asid, clients[0]['user_id'], b'eeee')
+        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[0]['user_id'], b'eeee')
         assert ret is None
         print("wait queue: 1")
         total = wait_results(1)
@@ -249,7 +251,7 @@ class TestBBcCore(object):
         print("-----", sys._getframe().f_code.co_name, "-----")
         # -- search the asset at core_node_0
         asid = transaction.events[1].asset.asset_id
-        ret = cores[0].search_asset_by_asid(asset_group_id, asid, clients[0]['user_id'], b'dddd')
+        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[0]['user_id'], b'dddd')
         assert ret is None
         print("wait queue: 1")
         total = wait_results(1)
@@ -259,7 +261,7 @@ class TestBBcCore(object):
         print("-----", sys._getframe().f_code.co_name, "-----")
         # -- search the asset at core_node_0
         asid = transaction.events[1].asset.asset_id
-        ret = cores[0].search_asset_by_asid(asset_group_id, asid, clients[0]['user_id'], b'eeee')
+        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[0]['user_id'], b'eeee')
         assert ret is None
         print("wait queue: 1")
         total = wait_results(1)
@@ -292,14 +294,14 @@ class TestBBcCore(object):
         transaction.dump()
         asset_file = dict()
         asset_file[transaction.events[1].asset.asset_id] = transaction.events[1].asset.asset_file
-        ret = cores[1].insert_transaction(asset_group_id, transaction.serialize(), asset_file)
+        ret = cores[1].insert_transaction(domain_id, asset_group_id, transaction.serialize(), asset_file)
         print(ret)
         for i in range(len(cores)):
             print("[%d] cross_ref_list=%d" % (i, len(cores[i].cross_ref_list)))
 
     def test_12_transaction_search_by_userid_locally(self):
         print("-----", sys._getframe().f_code.co_name, "-----")
-        ret = cores[1].search_transaction_by_userid_locally(asset_group_id, clients[1]['user_id'],
+        ret = cores[1].search_transaction_by_userid_locally(domain_id, asset_group_id, clients[1]['user_id'],
                                                             clients[1]['user_id'], b'aaaa')
         transaction_data = ret[KeyType.transaction_data]
         txobj = bbclib.BBcTransaction()
