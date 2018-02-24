@@ -90,6 +90,7 @@ class TestBBcAppClient(object):
         time.sleep(3)
         for i in range(core_num):
             cores[i].networking.domains[domain_id].print_peerlist()
+            cores[i].storage_manager.set_storage_path(domain_id)
 
     def test_11_register(self):
         print("-----", sys._getframe().f_code.co_name, "-----")
@@ -232,6 +233,7 @@ class TestBBcAppClient(object):
         asset_id = transactions[0].events[0].asset.asset_id
 
         asset_id_str = binascii.b2a_hex(asset_id).decode()
+        cores[4].storage_manager.create_new_directory(domain_id, asset_group_id)
         filepath = cores[4].storage_manager.storage_path[domain_id][asset_group_id]+"/%s" % asset_id_str
         with open(filepath, "a") as f:
             f.write("asldkfjsadkfj;asdlkfj;l")

@@ -106,7 +106,6 @@ class BBcNetwork:
         self.use_global = use_global
         conf = self.config.get_config()
         self.domains = dict()
-        self.asset_groups_to_advertise = set()
         self.ip_address, self.ip6_address = check_my_IPaddresses()
         if external_ip4addr is not None:
             self.external_ip4addr = external_ip4addr
@@ -228,8 +227,6 @@ class BBcNetwork:
             return
         self.domains[domain_id].leave_domain()
         del self.domains[domain_id]
-        if domain_id in self.asset_groups_to_advertise:
-            self.asset_groups_to_advertise.remove(domain_id)
         if self.use_global:
             self.domains[bbclib.domain_global_0].advertise_asset_group_info()
         self.core.stats.update_stats_decrement("network", "num_domains", 1)
@@ -710,7 +707,7 @@ class InfraMessageTypeBase:
     RESPONSE_PING = to_2byte(5)
 
     NOTIFY_CROSS_REF = to_2byte(0, 0x10)        # only used in domain_global_0
-    ADVERTISE_ASSET_GROUP = to_2byte(1, 0x10)   # only used in domain_global_0
+    ADVERTISE_DOMAIN_INFO = to_2byte(1, 0x10)   # only used in domain_global_0
 
     REQUEST_STORE = to_2byte(0, 0x40)
     RESPONSE_STORE = to_2byte(1, 0x40)

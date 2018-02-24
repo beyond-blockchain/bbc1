@@ -426,7 +426,7 @@ class BBcCoreService:
                 return False, None
             self.asset_group_setup(domain_id, asset_group_id, dat.get(KeyType.storage_type, StorageType.FILESYSTEM),
                                    dat.get(KeyType.storage_path,None), dat.get(KeyType.advertise_in_domain0, False),
-                                   dat.get(KeyType.max_body_size, bbclib.DEFAULT_MAX_BODY_SIZE), config_update=True)
+                                   dat.get(KeyType.max_body_size, bbclib.DEFAULT_MAX_BODY_SIZE))
             self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_SETUP_DOMAIN:
@@ -531,7 +531,7 @@ class BBcCoreService:
         return False, None
 
     def asset_group_setup(self, domain_id, asset_group_id, storage_type=StorageType.FILESYSTEM,
-                          storage_path=None, advertise_in_domain0=False, max_body_size=bbclib.DEFAULT_MAX_BODY_SIZE,
+                          storage_path=None, max_body_size=bbclib.DEFAULT_MAX_BODY_SIZE,
                           config_update=False):
         """
         Setup asset_group in a specified domain
@@ -545,16 +545,8 @@ class BBcCoreService:
         :param config_update:
         :return:
         """
-        if config_update:
-            conf = self.config.get_asset_group_config(domain_id, asset_group_id, create_if_new=True)
-            conf['advertise_in_domain0'] = advertise_in_domain0
-            conf['max_body_size'] = max_body_size
-            self.config.update_config()
-        bbclib.set_max_body_size(asset_group_id, max_body_size)
         self.storage_manager.set_storage_path(domain_id)
         self.stats.update_stats_increment("asset_group", "total_num", 1)
-        if advertise_in_domain0:
-            self.networking.asset_groups_to_advertise.add(asset_group_id)
 
     def pop_cross_refs(self, num=1):
         """
