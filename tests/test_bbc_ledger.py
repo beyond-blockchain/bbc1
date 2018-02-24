@@ -5,7 +5,7 @@ import sys
 sys.path.extend(["../"])
 from bbc1.common import bbclib
 from bbc1.core import bbc_ledger, bbc_config
-from bbc1.core.bbc_ledger import ResourceType
+from bbc1.core.bbc_types import ResourceType
 
 config = bbc_config.BBcConfig()
 ledger_manager =bbc_ledger.BBcLedger(config=config)

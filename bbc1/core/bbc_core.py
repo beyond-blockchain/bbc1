@@ -39,8 +39,8 @@ from bbc1.common.message_key_types import KeyType, PayloadType, to_2byte
 from bbc1.common.bbclib import BBcTransaction, ServiceMessageType as MsgType, StorageType
 from bbc1.core import bbc_network, bbc_storage, query_management, bbc_stats
 from bbc1.core.bbc_config import BBcConfig
-from bbc1.core.bbc_ledger import BBcLedger, ResourceType
-from bbc1.core import ledger_subsystem
+from bbc1.core.bbc_types import ResourceType
+from bbc1.core.bbc_ledger import BBcLedger
 from bbc1.core import command
 from bbc1.common.bbc_error import *
 
@@ -109,7 +109,7 @@ def check_transaction_if_having_asset_file(txdata, asid):
 
 class BBcCoreService:
     def __init__(self, p2p_port=None, core_port=None, use_global=False, ip4addr=None, ip6addr=None,
-                 workingdir=".bbc1", configfile=None,
+                 workingdir=".bbc1", configfile=None, use_ledger_subsystem=False,
                  loglevel="all", logname="-", server_start=True):
         self.logger = logger.get_logger(key="core", level=loglevel, logname=logname)
         self.stats = bbc_stats.BBcStats()
@@ -129,11 +129,39 @@ class BBcCoreService:
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port, use_global=use_global,
                                                  external_ip4addr=ip4addr, external_ip6addr=ip6addr,
                                                  loglevel=loglevel, logname=logname)
-        self.ledger_subsystem = ledger_subsystem.LedgerSubsystem(self.config, core=self, loglevel=loglevel, logname=logname)
+        self.ledger_subsystem = None
+        if conf['use_ledger_subsystem'] or use_ledger_subsystem:
+            from bbc1.core import ledger_subsystem
+            self.ledger_subsystem = ledger_subsystem.LedgerSubsystem(self.config, core=self,
+                                                                     loglevel=loglevel, logname=logname)
+
+        for domain_id_str in conf['domains'].keys():
+            domain_id = bbclib.convert_idstring_to_bytes(domain_id_str)
+            c = self.config.get_domain_config(domain_id)
+            nw_module = c.get('module', 'simple_cluster')
+            default_type = StorageType.FILESYSTEM
+            if domain_id == bbclib.domain_global_0:
+                default_type = StorageType.NONE
+            storage_type = c.pop('storage_type', default_type)
+            storage_path = c.pop('storage_path', None)
+            self.configure_domain(domain_id, nw_module, storage_type, storage_path)
+
+            for nd, info in c['static_nodes'].items():
+                node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
+                self.networking.add_static_node_to_domain(domain_id, node_id, ipv4, ipv6, port)
+            for nd, info in c['peer_list'].items():
+                node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
+                self.networking.domains[domain_id].add_peer_node_ip46(node_id, ipv4, ipv6, port, need_ping=True)
 
         gevent.signal(signal.SIGINT, self.quit_program)
         if server_start:
             self.start_server(core_port)
+
+    def configure_domain(self, domain_id, nw_module='simple_cluster', storage_type=StorageType.NONE, storage_path=None):
+        self.networking.create_domain(domain_id=domain_id, network_module=nw_module)
+        if domain_id != bbclib.domain_global_0:
+            self.ledger_manager.add_domain(domain_id)
+            self.storage_manager.set_storage_path(domain_id, storage_type=storage_type, storage_path=storage_path)
 
     def quit_program(self):
         self.networking.save_all_peer_lists()
@@ -372,25 +400,27 @@ class BBcCoreService:
             if not self.param_check([KeyType.asset_group_id, KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_REGISTER_HASH_IN_SUBSYS: bad format")
                 return False, None
-            asset_group_id = dat[KeyType.asset_group_id]
-            transaction_id = dat[KeyType.transaction_id]
-            self.ledger_subsystem.register_transaction(asset_group_id=asset_group_id, transaction_id=transaction_id)
-            retmsg = make_message_structure(MsgType.RESPONSE_REGISTER_HASH_IN_SUBSYS,
-                                            dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
-            self.send_message(retmsg)
+            if self.ledger_subsystem is not None:
+                asset_group_id = dat[KeyType.asset_group_id]
+                transaction_id = dat[KeyType.transaction_id]
+                self.ledger_subsystem.register_transaction(asset_group_id=asset_group_id, transaction_id=transaction_id)
+                retmsg = make_message_structure(MsgType.RESPONSE_REGISTER_HASH_IN_SUBSYS,
+                                                dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
+                self.send_message(retmsg)
 
         elif cmd == MsgType.REQUEST_VERIFY_HASH_IN_SUBSYS:
             if not self.param_check([KeyType.asset_group_id, KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_REGISTER_HASH_IN_SUBSYS: bad format")
                 return False, None
-            asset_group_id = dat[KeyType.asset_group_id]
-            transaction_id = dat[KeyType.transaction_id]
-            retmsg = make_message_structure(MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS,
-                                            dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
-            result = self.ledger_subsystem.verify_transaction(asset_group_id=asset_group_id,
-                                                              transaction_id=transaction_id)
-            retmsg[KeyType.merkle_tree] = result
-            self.send_message(retmsg)
+            if self.ledger_subsystem is not None:
+                asset_group_id = dat[KeyType.asset_group_id]
+                transaction_id = dat[KeyType.transaction_id]
+                retmsg = make_message_structure(MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS,
+                                                dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
+                result = self.ledger_subsystem.verify_transaction(asset_group_id=asset_group_id,
+                                                                  transaction_id=transaction_id)
+                retmsg[KeyType.merkle_tree] = result
+                self.send_message(retmsg)
 
         elif cmd == MsgType.REQUEST_GET_STATS:
             retmsg = make_message_structure(MsgType.RESPONSE_GET_STATS, None,
@@ -420,15 +450,9 @@ class BBcCoreService:
             if domain_id is None:
                 retmsg[KeyType.result] = False
             else:
-                self.networking.create_domain(domain_id=domain_id,
-                                              network_module=dat.get(KeyType.network_module, "simple_cluster"))
-                retmsg[KeyType.domain_id] = domain_id
-                retmsg[KeyType.result] = True
-                retmsg[KeyType.network_module] = self.networking.domains[domain_id].module_name
-                if domain_id != bbclib.domain_global_0:
-                    self.storage_manager.set_storage_path(domain_id,
-                                                          storage_type=dat.get(KeyType.storage_type, StorageType.FILESYSTEM),
-                                                          storage_path=dat.get(KeyType.storage_path, None))
+                self.configure_domain(domain_id, nw_module=dat.get(KeyType.network_module, "simple_cluster"),
+                                      storage_type=dat.get(KeyType.storage_type, StorageType.FILESYSTEM),
+                                      storage_path=dat.get(KeyType.storage_path, None))
             self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_PEERLIST:
@@ -496,12 +520,13 @@ class BBcCoreService:
         elif cmd == MsgType.REQUEST_MANIP_LEDGER_SUBSYS:
             retmsg = make_message_structure(MsgType.RESPONSE_MANIP_LEDGER_SUBSYS,
                                             None, dat[KeyType.source_user_id], dat[KeyType.query_id])
-            if dat[KeyType.ledger_subsys_manip]:
-                self.ledger_subsystem.enable()
-            else:
-                self.ledger_subsystem.disable()
-            self.ledger_subsystem.set_domain(dat[KeyType.domain_id])
-            self.send_raw_message(socket, retmsg)
+            if self.ledger_subsystem is not None:
+                if dat[KeyType.ledger_subsys_manip]:
+                    self.ledger_subsystem.enable()
+                else:
+                    self.ledger_subsystem.disable()
+                self.ledger_subsystem.set_domain(dat[KeyType.domain_id])
+                self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_INSERT_NOTIFICATION:
             domain_id = dat[KeyType.domain_id]
@@ -1062,6 +1087,7 @@ if __name__ == '__main__':
         workingdir=argresult.workingdir,
         configfile=argresult.config,
         use_global=argresult.globaldomain,
+        use_ledger_subsystem=argresult.ledgersubsystem,
         ip4addr=argresult.ip4addr,
         ip6addr=argresult.ip6addr,
         logname=argresult.log,

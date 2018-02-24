@@ -12,7 +12,6 @@ sys.path.extend(["../"])
 from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
 from bbc1.core import bbc_network, bbc_config, query_management, bbc_stats
-from bbc1.core.bbc_ledger import ResourceType
 
 
 LOGLEVEL = 'debug'

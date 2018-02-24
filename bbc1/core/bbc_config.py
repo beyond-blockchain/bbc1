@@ -65,7 +65,6 @@ current_config = {
     },
     'domains': {
         '0000000000000000000000000000000000000000000000000000000000000000': {
-            'special_domain': True,
             'module': 'p2p_domain0',
             'static_nodes': {
                 # id : [ipv4, ipv6, port]
@@ -75,6 +74,7 @@ current_config = {
             },
         },
     },
+    'use_ledger_subsystem': False,
     'ethereum': {
         'chain_id': DEFAULT_ETHEREUM_CHAIN_ID,
         'port': DEFAULT_ETHEREUM_GETH_PORT,
@@ -143,24 +143,7 @@ class BBcConfig:
                 'peer_list': {
                     # id : [ipv4, ipv6, port]
                 },
-                'asset_group_ids': {
-                    # id: { config }
-                }
             }
         if domain_id_str in self.config['domains']:
             return self.config['domains'][domain_id_str]
         return None
-
-    def get_asset_group_config(self, domain_id, asset_group_id, create_if_new=False):
-        dc = self.get_domain_config(domain_id, create_if_new=create_if_new)
-        if dc is None:
-            return None
-        asset_group_str = bbclib.convert_id_to_string(asset_group_id)
-        if asset_group_str not in dc['asset_group_ids']:
-            dc['asset_group_ids'][asset_group_str] = {
-                'storage_type': StorageType.FILESYSTEM,
-                'storage_path': None,
-                'advertise_in_domain0': False,
-                'max_body_size': bbclib.DEFAULT_MAX_BODY_SIZE,
-            }
-        return dc['asset_group_ids'][asset_group_str]

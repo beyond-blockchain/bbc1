@@ -21,7 +21,6 @@ import sys
 sys.path.extend(["../../"])
 from bbc1.common import logger
 from bbc1.common.bbclib import StorageType
-from bbc1.common import bbclib
 
 
 class BBcStorage:
