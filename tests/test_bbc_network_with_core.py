@@ -76,7 +76,7 @@ class TestBBcNetworkWithCore(object):
         for i in range(core_nodes):
             cores[i].networking.create_domain(network_module="simple_cluster", domain_id=domain_id)
             nodes[i] = cores[i].networking.domains[domain_id].node_id
-            cores[i].networking.register_user_id(domain_id, asset_group_id, users[i])
+            cores[i].networking.register_user_id(domain_id, users[i])
             cores[i].send_message = dummy_send_message
             cores[i].storage_manager.set_storage_path(domain_id, asset_group_id)
 

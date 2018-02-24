@@ -44,54 +44,52 @@ class BBcStorage:
         self.storage_type = dict()
         self.storage_path = dict()
 
-    def set_storage_path(self, domain_id, asset_group_id, from_config=False,
-                         storage_type=StorageType.FILESYSTEM, storage_path=None):
+    def set_storage_path(self, domain_id, storage_type=StorageType.FILESYSTEM, storage_path=None):
         """
         Set storage path for the domain
 
         :param domain_id:
-        :param asset_group_id
-        :param from_config:  If True, read setting from config and ignore storage_type and storage_path param
         :param storage_type: filesystem/HTTP-PUT/HTTP-POST/NONE
         :param storage_path:    directory path or URL
         :return: True if make dir is successful
         """
-        if from_config:
-            conf = self.config.get_asset_group_config(domain_id, asset_group_id)
-            storage_type = conf['storage_type']
-            storage_path = conf['storage_path']
         if storage_type == StorageType.NONE:
             self.storage_type.pop(domain_id, None)
             self.storage_path[domain_id] = None
             return True
         domain_id_str = binascii.b2a_hex(domain_id).decode('utf-8')
-        asset_group_id_str = binascii.b2a_hex(asset_group_id).decode('utf-8')
         if storage_path is None:
-            storage_path = self.storage_root + domain_id_str + "/" + asset_group_id_str + "/storage/"
-        else:
-            if not os.path.exists(storage_path):
-                os.mkdir(storage_path, 0o777)
+            storage_path = self.storage_root + domain_id_str + "/"
+        if not os.path.exists(storage_path):
+            os.mkdir(storage_path, 0o777)
 
-        self.storage_type.setdefault(domain_id, dict())
-        self.storage_type[domain_id][asset_group_id] = storage_type
-
+        self.storage_type[domain_id] = storage_type
         self.storage_path.setdefault(domain_id, dict())
-        if storage_type == StorageType.FILESYSTEM:
-            self.storage_path[domain_id][asset_group_id] = storage_path
-            return os.makedirs(self.storage_path[domain_id][asset_group_id], exist_ok=True)
-        # TODO: need to implement other types
 
-    def get_storage_type(self, domain_id, asset_group_id):
+    def get_storage_type(self, domain_id):
         """
         Get storage type for the domain
 
         :param domain_id:
-        :param asset_group_id:
         :return:
         """
         if domain_id in self.storage_type:
-            return self.storage_type[domain_id].get(asset_group_id, None)
+            return self.storage_type[domain_id]
         return None
+
+    def create_new_directory(self, domain_id, asset_group_id):
+        """
+        Create a new directory for new asset_group_id
+        :param domain_id: domain to put in
+        :param asset_group_id:
+        :return:
+        """
+        domain_id_str = binascii.b2a_hex(domain_id).decode('utf-8')
+        asset_group_id_str = binascii.b2a_hex(asset_group_id).decode('utf-8')
+        storage_path = self.storage_root + domain_id_str + "/" + asset_group_id_str + "/storage/"
+        if not os.path.exists(storage_path):
+            os.makedirs(storage_path)
+        self.storage_path[domain_id][asset_group_id] = storage_path
 
     def store_locally(self, domain_id, asset_group_id, asid, content):
         """
@@ -103,9 +101,9 @@ class BBcStorage:
         :param content:
         :return:
         """
-        if domain_id not in self.storage_type or asset_group_id not in self.storage_type[domain_id]:
+        if domain_id not in self.storage_type:
             return True
-        elif self.storage_type[domain_id][asset_group_id] == StorageType.FILESYSTEM:
+        elif self.storage_type[domain_id] == StorageType.FILESYSTEM:
             return self.store_in_filesystem(domain_id, asset_group_id, asid, content)
 
         self.logger.info("Not supported yet.")
@@ -121,6 +119,8 @@ class BBcStorage:
         :param content:
         :return:
         """
+        if asset_group_id not in self.storage_path[domain_id]:
+            self.create_new_directory(domain_id, asset_group_id)
         path = self.storage_path[domain_id][asset_group_id]+"/"+binascii.b2a_hex(asid).decode('utf-8')
         with open(path, 'wb') as f:
             try:
@@ -138,9 +138,9 @@ class BBcStorage:
         :param asid:   file name
         :return:       the file content (None if not found)
         """
-        if domain_id not in self.storage_type or asset_group_id not in self.storage_type[domain_id]:
+        if domain_id not in self.storage_type:
             return None
-        elif self.storage_type[domain_id][asset_group_id] == StorageType.FILESYSTEM:
+        elif self.storage_type[domain_id] == StorageType.FILESYSTEM:
             return self.get_in_filesystem(domain_id, asset_group_id, asid)
 
         self.logger.info("Not supported yet.")
@@ -155,6 +155,8 @@ class BBcStorage:
         :param asid:   file name
         :return:       the file content (None if not found)
         """
+        if asset_group_id not in self.storage_path[domain_id]:
+            return None
         path = self.storage_path[domain_id][asset_group_id]+"/"+binascii.b2a_hex(asid).decode('utf-8')
         if os.path.exists(path):
             try:
@@ -174,7 +176,9 @@ class BBcStorage:
         :param asid:   file name
         :return:       True if succeeded
         """
-        if domain_id not in self.storage_type or asset_group_id not in self.storage_type[domain_id]:
+        if domain_id not in self.storage_type:
+            return None
+        if asset_group_id not in self.storage_path[domain_id]:
             return None
         # TODO: do we need this method? If so, removing remote resources is also needed
         path = self.storage_path[domain_id][asset_group_id]+"/"+binascii.b2a_hex(asid).decode('utf-8')

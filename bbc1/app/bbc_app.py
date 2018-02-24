@@ -130,6 +130,7 @@ class BBcAppClient:
         self.use_query_id_based_message_wait = False
         self.asset_groups = set()
         self.user_id = None
+        self.domain_id = None
         self.query_id = (0).to_bytes(2, 'little')
         self.start_receiver_loop()
 
@@ -142,6 +143,15 @@ class BBcAppClient:
         """
         self.callback = callback_obj
         self.callback.set_logger(self.logger)
+
+    def set_domain_id(self, domain_id):
+        """
+        set domain_id to this client to include it in all messages
+
+        :param domain_id:
+        :return:
+        """
+        self.domain_id = domain_id
 
     def set_user_id(self, identifier):
         """
@@ -174,13 +184,16 @@ class BBcAppClient:
             if self.use_query_id_based_message_wait:
                 if self.query_id not in self.callback.query_queue:
                     self.callback.create_queue(self.query_id)
-        return {
+        msg = {
             KeyType.command: cmd,
-            KeyType.asset_group_id: asset_group_id,
+            KeyType.domain_id: self.domain_id,
             KeyType.source_user_id: self.user_id,
             KeyType.query_id: self.query_id,
             KeyType.status: ESUCCESS,
         }
+        if asset_group_id is not None:
+            msg[KeyType.asset_group_id] = asset_group_id
+        return msg
 
     def send_msg(self, dat):
         """
@@ -189,8 +202,8 @@ class BBcAppClient:
         :param dat:
         :return query_id or None:
         """
-        if KeyType.asset_group_id not in dat or KeyType.source_user_id not in dat:
-            self.logger.warn("Message must include asset_group_id and source_id")
+        if KeyType.domain_id not in dat or KeyType.source_user_id not in dat:
+            self.logger.warn("Message must include domain_id and source_id")
             return None
         try:
             msg = message_key_types.make_message(PayloadType.Type_msgpack, dat)
@@ -200,9 +213,9 @@ class BBcAppClient:
             return None
         return self.query_id
 
-    def domain_setup(self, domain_id, module_name=None):
+    def domain_setup(self, domain_id, module_name=None, storage_type=StorageType.FILESYSTEM, storage_path=None):
         """
-        Set up domain with the specified network module (maybe used by a system administrator)
+        Set up domain with the specified network module and storage (maybe used by a system administrator)
 
         :param domain_id:
         :param module_name:
@@ -214,6 +227,9 @@ class BBcAppClient:
         dat[KeyType.domain_id] = domain_id
         if module_name is not None:
             dat[KeyType.network_module] = module_name
+        dat[KeyType.storage_type] = storage_type
+        if storage_path is not None:
+            dat[KeyType.storage_path] = storage_path
         return self.send_msg(dat)
 
     def get_domain_peerlist(self, domain_id):
@@ -284,29 +300,6 @@ class BBcAppClient:
         dat[KeyType.domain_id] = domain_id
         return self.send_msg(dat)
 
-    def register_asset_group(self, domain_id, asset_group_id,
-                             storage_type=StorageType.FILESYSTEM, storage_path=None,
-                             advertise_in_domain0=False, max_body_size=bbclib.DEFAULT_MAX_BODY_SIZE):
-        """
-        Register an asset_group in the core node (maybe used by a system administrator)
-
-        :param domain_id:
-        :param asset_group_id:
-        :param storage_type:
-        :param storage_path:
-        :param advertise_in_domain0:
-        :param max_body_size:
-        :return:
-        """
-        dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_SETUP_ASSET_GROUP)
-        dat[KeyType.domain_id] = domain_id
-        dat[KeyType.storage_type] = storage_type
-        dat[KeyType.advertise_in_domain0] = advertise_in_domain0
-        dat[KeyType.max_body_size] = max_body_size
-        if storage_path is not None:
-            dat[KeyType.storage_path] = storage_path
-        return self.send_msg(dat)
-
     def get_bbc_config(self):
         """
         Get config file of bbc_core (maybe used by a system administrator)
@@ -344,9 +337,8 @@ class BBcAppClient:
 
         :return:
         """
-        for asset_group_id in self.asset_groups:
-            dat = self.make_message_structure(asset_group_id, MsgType.REGISTER)
-            self.send_msg(dat)
+        dat = self.make_message_structure(None, MsgType.REGISTER)
+        self.send_msg(dat)
         return True
 
     def unregister_from_core(self):
@@ -625,8 +617,6 @@ class Callback:
             self.proc_resp_register_hash(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS:
             self.proc_resp_verify_hash(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_SETUP_ASSET_GROUP:
-            self.proc_resp_asset_group_setup(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SETUP_DOMAIN:
             self.proc_resp_domain_setup(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GET_PEERLIST:
@@ -722,9 +712,6 @@ class Callback:
         self.queue.put(dat)
 
     def proc_resp_verify_hash(self, dat):
-        self.queue.put(dat)
-
-    def proc_resp_asset_group_setup(self, dat):
         self.queue.put(dat)
 
     def proc_resp_domain_setup(self, dat):

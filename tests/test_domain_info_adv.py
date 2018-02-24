@@ -7,8 +7,7 @@ import time
 import sys
 sys.path.extend(["../"])
 from bbc1.common import bbclib
-from bbc1.app import bbc_app
-from testutils import prepare, get_core_client, start_core_thread, make_client, domain_and_asset_group_setup
+from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 
 import random
 
@@ -29,14 +28,13 @@ msg_processor = [None for i in range(client_num)]
 class TestBBcAppClient(object):
 
     def test_00_setup(self):
-        print("XXXXXXXXXXXXXXX change value to ASSET_GROUP_INFO_LIFETIME = 20 in bbc_network.py XXXXXXXXXXXXXXX")
+        print("XXXXXXXXXXXXXXX change value to DOMAIN_INFO_LIFETIME = 20 in p2p_domain0.py XXXXXXXXXXXXXXX")
         print("-----", sys._getframe().f_code.co_name, "-----")
         global msg_processor
         prepare(core_num=core_num, client_num=client_num, loglevel=LOGLEVEL)
         for i in range(core_num):
             start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i, use_global=True)
-            domain_and_asset_group_setup(i, domain_ids[i%domain_num], asset_group_ids[i%domain_num],
-                                         advertise_in_domain0=True)  # system administrator
+            domain_setup_utility(i, domain_ids[i%domain_num])
         time.sleep(1)
         for i in range(client_num):
             make_client(index=i, core_port_increment=i%core_num, asset_group_id=asset_group_ids[i%domain_num])
@@ -87,6 +85,7 @@ class TestBBcAppClient(object):
     def test_12_register(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for cl in clients:
+            cl['app'].set_domain_id(bbclib.domain_global_0)
             ret = cl['app'].register_to_core()
             assert ret
         time.sleep(1)
@@ -98,11 +97,11 @@ class TestBBcAppClient(object):
         print("-- sleep 10 sec")
         time.sleep(10)
         for i in range(core_num):
-            cores[i].networking.domains[bbclib.domain_global_0].print_asset_group_info()
+            cores[i].networking.domains[bbclib.domain_global_0].print_domain_info()
         print("-- sleep 10 sec")
         time.sleep(10)
         for i in range(core_num):
-            cores[i].networking.domains[bbclib.domain_global_0].print_asset_group_info()
+            cores[i].networking.domains[bbclib.domain_global_0].print_domain_info()
         print("-- sleep 10 sec")
         time.sleep(10)
         print("-- sleep 10 sec")
@@ -110,7 +109,7 @@ class TestBBcAppClient(object):
         print("-- sleep 10 sec")
         time.sleep(10)
         for i in range(core_num):
-            cores[i].networking.domains[bbclib.domain_global_0].print_asset_group_info()
+            cores[i].networking.domains[bbclib.domain_global_0].print_domain_info()
 
     def test_98_unregister(self):
         for cl in clients:

@@ -74,7 +74,7 @@ class DummyCore:
                 return None
 
     class Storage:
-        def set_storage_path(self, domain_id, from_config):
+        def set_storage_path(self, domain_id, storage_type, storage_path):
             pass
 
     def __init__(self):
@@ -113,7 +113,7 @@ class TestBBcNetwork(object):
             print("IPv4: %s, IPv6 %s, port: %d" % (networkings[i].ip_address, networkings[i].ip6_address,
                                                    networkings[i].port))
         for i in range(core_nodes):
-            networkings[i].register_user_id(domain_id, asset_group_id, users[i])
+            networkings[i].register_user_id(domain_id, users[i])
 
     def test_02_set_initial_peer(self):
         print("-----", sys._getframe().f_code.co_name, "-----")

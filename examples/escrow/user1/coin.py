@@ -38,21 +38,20 @@ user_id = None
 key_pair = None
 bbc_app_client = None
 
-def asset_group_setup():
+
+def domain_setup():
     tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
     tmpclient.domain_setup(domain_id, "simple_cluster")
     tmpclient.callback.synchronize()
-    tmpclient.register_asset_group(domain_id=domain_id, asset_group_id=asset_group_id)
-    tmpclient.callback.synchronize()
     tmpclient.unregister_from_core()
-    print("Domain %s and asset_group %s are created." % (binascii.b2a_hex(domain_id[:4]).decode(),
-                                                        binascii.b2a_hex(asset_group_id[:4]).decode()))
+    print("Domain %s is created." % (binascii.b2a_hex(domain_id[:4]).decode()))
     print("Setup is done.")
 
 
 def setup_bbc_client():
     bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
     bbc_app_client.set_user_id(user_id)
+    bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_asset_group_id(asset_group_id)
     bbc_app_client.set_callback(bbc_app.Callback())
     ret = bbc_app_client.register_to_core()
@@ -165,7 +164,7 @@ if __name__ == '__main__':
     with open(PUBLIC_KEY, "rb") as fin:
         public_key = fin.read()
 
-    asset_group_setup()
+    domain_setup()
 
     key_pair = bbclib.KeyPair(privkey=private_key, pubkey=public_key)
     user_id = bbclib.get_new_id(str(binascii.b2a_hex(key_pair.public_key)), include_timestamp=False)

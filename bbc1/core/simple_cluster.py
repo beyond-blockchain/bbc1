@@ -136,7 +136,7 @@ class NetworkDomain(DomainBase):
                 return
             asset_group_id = msg[KeyType.asset_group_id]
             user_id = msg[KeyType.resource_id]
-            if asset_group_id in self.registered_user_id and user_id in self.registered_user_id[asset_group_id]:
+            if user_id in self.registered_user_id:
                 target_id = msg[KeyType.source_node_id]
                 nonce = msg[KeyType.nonce]
                 resource_id = msg[KeyType.resource_id]
@@ -160,7 +160,7 @@ class NetworkDomain(DomainBase):
         resource_id = msg[KeyType.resource_id]
         resource = msg[KeyType.resource]
         if resource_type == ResourceType.Transaction_data:
-            self.network.core.insert_transaction(asset_group_id, resource, None, no_network_put=True)
+            self.network.core.insert_transaction(domain_id, asset_group_id, resource, None, no_network_put=True)
         elif resource_type == ResourceType.Asset_file:
             # TODO: need to check validity of the file
             self.network.core.storage_manager.store_locally(self.domain_id, asset_group_id, resource_id, resource)
@@ -288,7 +288,7 @@ class NetworkDomain(DomainBase):
         """
         asset_group_id = query_entry.data[KeyType.asset_group_id]
         user_id = query_entry.data[KeyType.resource_id]
-        if asset_group_id in self.registered_user_id and user_id in self.registered_user_id[asset_group_id]:
+        if user_id in self.registered_user_id:
             # TODO: can remove this condition
             query_entry.callback()
         elif user_id in self.user_id_forward_cache:

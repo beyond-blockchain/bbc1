@@ -21,6 +21,7 @@ import struct
 
 import sys
 sys.path.extend(["../../"])
+from bbc1.common import bbclib
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
 from bbc1.core.bbc_network import InfraMessageTypeBase
 from bbc1.core import query_management, simple_cluster
@@ -30,32 +31,32 @@ INTERVAL_RETRY = 3
 FORWARD_CACHE_SIZE = 1000
 ZEROS = bytes([0] * 32)
 
-ASSET_GROUP_INFO_LIFETIME = 1800
+DOMAIN_INFO_LIFETIME = 1800
 
 ticker = query_management.get_ticker()
 
 
-class AssetGroupInfo:
-    def __init__(self, asset_group_id, del_func):
-        self.asset_group_id = asset_group_id
-        self.asset_groups = dict()
+class DomainInfo:
+    def __init__(self, domain_id, del_func):
+        self.domain_id = domain_id
+        self.domains = dict()
         self.del_func = del_func
 
     def get_nodes(self):
-        return self.asset_groups.keys()
+        return self.domains.keys()
 
     def add_node(self, node_id):
-        if node_id not in self.asset_groups:
-            self.asset_groups[node_id] = query_management.QueryEntry(expire_after=ASSET_GROUP_INFO_LIFETIME,
-                                                                     callback_expire=self.remove_entry,
-                                                                     data={KeyType.node_id: node_id},
-                                                                     retry_count=0)
+        if node_id not in self.domains:
+            self.domains[node_id] = query_management.QueryEntry(expire_after=DOMAIN_INFO_LIFETIME,
+                                                                callback_expire=self.remove_entry,
+                                                                data={KeyType.node_id: node_id},
+                                                                retry_count=0)
         else:
-            self.asset_groups[node_id].update_expiration_time(ASSET_GROUP_INFO_LIFETIME)
+            self.domains[node_id].update_expiration_time(DOMAIN_INFO_LIFETIME)
 
     def remove_entry(self, query_entry):
-        self.asset_groups.pop(query_entry.data[KeyType.node_id], None)
-        self.del_func(self.asset_group_id)
+        self.domains.pop(query_entry.data[KeyType.node_id], None)
+        self.del_func(self.domains)
 
 
 class NetworkDomain(simple_cluster.NetworkDomain):
@@ -65,8 +66,8 @@ class NetworkDomain(simple_cluster.NetworkDomain):
     def __init__(self, network=None, config=None, domain_id=None, node_id=None, loglevel="all", logname=None):
         super(NetworkDomain, self).__init__(network, config, domain_id, node_id, loglevel, logname)
         self.module_name = "simple_cluster"  # TODO: this is temporary module
-        self.asset_group_list = dict()
-        self.periodic_advertising_asset_group_info()
+        self.domain_list = dict()
+        self.periodic_advertising_domain_info()
 
     def domain_manager_loop(self):
         """
@@ -76,59 +77,61 @@ class NetworkDomain(simple_cluster.NetworkDomain):
         """
         pass
 
-    def periodic_advertising_asset_group_info(self, query_entry=None):
-        self.advertise_asset_group_info()
-        query_management.exec_func_after(self.periodic_advertising_asset_group_info,
-                                         random.randint(int(ASSET_GROUP_INFO_LIFETIME * 0.4),
-                                                        int(ASSET_GROUP_INFO_LIFETIME * 0.6)))
+    def periodic_advertising_domain_info(self, query_entry=None):
+        self.advertise_domain_info()
+        query_management.exec_func_after(self.periodic_advertising_domain_info,
+                                         random.randint(int(DOMAIN_INFO_LIFETIME * 0.4),
+                                                        int(DOMAIN_INFO_LIFETIME * 0.6)))
 
-    def advertise_asset_group_info(self):
+    def advertise_domain_info(self):
         """
         Advertise domain information in domain_global_0
 
         :return:
         """
         data = bytearray()
-        count = len(self.network.asset_groups_to_advertise)
+        count = len(self.network.domains)
         data.extend(to_2byte(count))
-        for asset_group_id in self.network.asset_groups_to_advertise:
-            data.extend(asset_group_id)
+        for domain_id in self.network.domains:
+            if domain_id != bbclib.domain_global_0:
+                data[0:2] = to_2byte(count-1)
+                data.extend(domain_id)
 
-        msg = self.make_message(dst_node_id=None, msg_type=InfraMessageTypeBase.ADVERTISE_ASSET_GROUP)
-        msg[KeyType.asset_group_list] = bytes(data)
+        msg = self.make_message(dst_node_id=None, msg_type=InfraMessageTypeBase.ADVERTISE_DOMAIN_INFO)
+        msg[KeyType.domain_list] = bytes(data)
         for nd in self.id_ip_mapping.keys():
             msg[KeyType.destination_node_id] = nd
             self.send_message_to_peer(msg)
 
-    def update_asset_group_info(self, source_node_id, asset_group_id):
+    def update_domain_info(self, source_node_id, domain_id):
         """
-        (internal use) update asset_group info (self.asset_group_list)
+        (internal use) update asset_group info (self.domain_list)
 
         :param source_node_id:
-        :param asset_group_id:
+        :param domain_id:
         :return:
         """
-        if asset_group_id not in self.asset_group_list:
-            self.asset_group_list[asset_group_id] = AssetGroupInfo(asset_group_id, self.delete_asset_group_from_info)
-        self.asset_group_list[asset_group_id].add_node(source_node_id)
+        if domain_id not in self.domain_list:
+            self.domain_list[domain_id] = DomainInfo(domain_id, self.delete_domain_from_info)
+        self.domain_list[domain_id].add_node(source_node_id)
 
-    def delete_asset_group_from_info(self, asset_group_id):
+    def delete_domain_from_info(self, domain_id):
         """
         (internal use) delete asset_group_id
 
-        :param asset_group_id:
+        :param domain_id:
         :return:
         """
-        if len(self.asset_group_list[asset_group_id].get_nodes()) == 0:
-            self.asset_group_list.pop(asset_group_id, None)
+        if len(self.domain_list[domain_id].get_nodes()) == 0:
+            self.domain_list.pop(domain_id, None)
 
-    def print_asset_group_info(self):
-        if self.asset_group_list is None:
-            self.logger.info("** No asset_group_id..")
+    def print_domain_info(self):
+        if self.domain_list is None:
+            self.logger.info("** No domain_id..")
         self.logger.info("========================")
-        for asset_group_id in self.asset_group_list.keys():
-            self.logger.info("AssetGroup: %s" % binascii.b2a_hex(asset_group_id[:4]))
-            for nd in self.asset_group_list[asset_group_id].get_nodes():
+        for domain_id in self.domain_list.keys():
+            self.logger.info("Domain: %s" % binascii.b2a_hex(domain_id[:4]))
+            for nd in self.domain_list[domain_id].get_nodes():
                 self.logger.info("  * node_id: %s" % binascii.b2a_hex(nd[:4]))
         self.logger.info("========================")
 
@@ -143,17 +146,17 @@ class NetworkDomain(simple_cluster.NetworkDomain):
         """
         super(NetworkDomain, self).process_message(ip4, from_addr, msg)
 
-        if msg[KeyType.p2p_msg_type] == InfraMessageTypeBase.ADVERTISE_ASSET_GROUP:
-            if KeyType.asset_group_list not in msg or KeyType.source_node_id not in msg:
+        if msg[KeyType.p2p_msg_type] == InfraMessageTypeBase.ADVERTISE_DOMAIN_INFO:
+            if KeyType.domain_list not in msg or KeyType.source_node_id not in msg:
                 return
             self.add_peer_node(msg[KeyType.source_node_id], ip4, from_addr)
-            self.process_ADVERTISE_ASSET_GROUP(msg)
+            self.process_ADVERTISE_DOMAIN_INFO(msg)
 
-    def process_ADVERTISE_ASSET_GROUP(self, msg):
+    def process_ADVERTISE_DOMAIN_INFO(self, msg):
         source_node_id = msg[KeyType.source_node_id]
-        data = msg[KeyType.asset_group_list]
+        data = msg[KeyType.domain_list]
         count = struct.unpack(">H", data[:2])[0]
         ptr = 2
         for i in range(count):
-            asset_group_id = data[ptr:ptr+32]
-            self.update_asset_group_info(source_node_id, asset_group_id)
+            domain_id = data[ptr:ptr+32]
+            self.update_domain_info(source_node_id, domain_id)

@@ -11,7 +11,7 @@ from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
 from bbc1.common.bbc_error import *
 from bbc1.app import bbc_app
-from testutils import prepare, get_core_client, start_core_thread, make_client, domain_and_asset_group_setup
+from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 
 
 LOGLEVEL = 'debug'
@@ -88,7 +88,7 @@ class TestBBcAppClient(object):
         time.sleep(1)
         for i in range(client_num):
             msg_processor[i] = MessageProcessor(index=i)
-            domain_and_asset_group_setup(i, domain_id, asset_group_id)  # system administrator
+            domain_setup_utility(i, domain_id)  # system administrator
             make_client(index=i, core_port_increment=i, callback=msg_processor[i], asset_group_id=asset_group_id)
         time.sleep(1)
 
