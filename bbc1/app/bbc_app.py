@@ -298,8 +298,7 @@ class BBcAppClient:
         return self.send_msg(dat)
 
     def register_asset_group(self, domain_id, asset_group_id,
-                             storage_type=StorageType.FILESYSTEM, storage_path=None,
-                             advertise_in_domain0=False, max_body_size=bbclib.DEFAULT_MAX_BODY_SIZE):
+                             storage_type=StorageType.FILESYSTEM, storage_path=None):
         """
         Register an asset_group in the core node (maybe used by a system administrator)
 
@@ -307,15 +306,11 @@ class BBcAppClient:
         :param asset_group_id:
         :param storage_type:
         :param storage_path:
-        :param advertise_in_domain0:
-        :param max_body_size:
         :return:
         """
         dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_SETUP_ASSET_GROUP)
         dat[KeyType.domain_id] = domain_id
         dat[KeyType.storage_type] = storage_type
-        dat[KeyType.advertise_in_domain0] = advertise_in_domain0
-        dat[KeyType.max_body_size] = max_body_size
         if storage_path is not None:
             dat[KeyType.storage_path] = storage_path
         return self.send_msg(dat)

@@ -54,8 +54,7 @@ class TestBBcAppClient(object):
         prepare(core_num=core_num, client_num=client_num, loglevel=LOGLEVEL)
         for i in range(core_num):
             start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i, use_global=True)
-            domain_and_asset_group_setup(i, domain_ids[i % domain_num], asset_group_ids[i % domain_num],
-                                         advertise_in_domain0=True)  # system administrator
+            domain_and_asset_group_setup(i, domain_ids[i % domain_num], asset_group_ids[i % domain_num])
         time.sleep(1)
         for i in range(client_num):
             make_client(index=i, core_port_increment=i % core_num, asset_group_id=asset_group_ids[i % domain_num])

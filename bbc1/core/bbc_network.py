@@ -149,9 +149,7 @@ class BBcNetwork:
                     asset_group_id = bbclib.convert_idstring_to_bytes(asset_group_id_str)
                     self.core.asset_group_setup(domain_id, asset_group_id,
                                                 c.get('storage_type', StorageType.FILESYSTEM),
-                                                c.get('storage_path', None),
-                                                c.get('advertise_in_domain0', False),
-                                                c.get('max_body_size', bbclib.DEFAULT_MAX_BODY_SIZE))
+                                                c.get('storage_path', None))
             for nd, info in c['static_nodes'].items():
                 node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
                 self.add_static_node_to_domain(domain_id, node_id, ipv4, ipv6, port)

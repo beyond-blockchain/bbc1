@@ -51,8 +51,7 @@ def start_core(index, core_port, p2p_port, use_global=False, remove_dir=True):
     cores[index].start_server(port=core_port)
 
 
-def domain_and_asset_group_setup(core_port_increment, dom_id, asset_group_ids,
-                                 network_module=None, advertise_in_domain0=False):
+def domain_and_asset_group_setup(core_port_increment, dom_id, asset_group_ids, network_module=None):
     cl = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT+core_port_increment)
     cl.domain_setup(dom_id, network_module)
     global domain_id
@@ -60,10 +59,10 @@ def domain_and_asset_group_setup(core_port_increment, dom_id, asset_group_ids,
     wait_check_result_msg_type(cl.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_DOMAIN)
     if isinstance(asset_group_ids, list):
         for asset_group_id in asset_group_ids:
-            cl.register_asset_group(domain_id=dom_id, asset_group_id=asset_group_id, advertise_in_domain0=advertise_in_domain0)
+            cl.register_asset_group(domain_id=dom_id, asset_group_id=asset_group_id)
             wait_check_result_msg_type(cl.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_ASSET_GROUP)
     else:
-        cl.register_asset_group(domain_id=dom_id, asset_group_id=asset_group_ids, advertise_in_domain0=advertise_in_domain0)
+        cl.register_asset_group(domain_id=dom_id, asset_group_id=asset_group_ids)
         wait_check_result_msg_type(cl.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_ASSET_GROUP)
     cl.unregister_from_core()
 

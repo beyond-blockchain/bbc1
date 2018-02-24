@@ -425,8 +425,7 @@ class BBcCoreService:
                 self.error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt="No such domain")
                 return False, None
             self.asset_group_setup(domain_id, asset_group_id, dat.get(KeyType.storage_type, StorageType.FILESYSTEM),
-                                   dat.get(KeyType.storage_path,None), dat.get(KeyType.advertise_in_domain0, False),
-                                   dat.get(KeyType.max_body_size, bbclib.DEFAULT_MAX_BODY_SIZE))
+                                   dat.get(KeyType.storage_path,None))
             self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_SETUP_DOMAIN:
@@ -530,9 +529,7 @@ class BBcCoreService:
             self.logger.error("Bad command/response: %s" % cmd)
         return False, None
 
-    def asset_group_setup(self, domain_id, asset_group_id, storage_type=StorageType.FILESYSTEM,
-                          storage_path=None, max_body_size=bbclib.DEFAULT_MAX_BODY_SIZE,
-                          config_update=False):
+    def asset_group_setup(self, domain_id, asset_group_id, storage_type=StorageType.FILESYSTEM, storage_path=None):
         """
         Setup asset_group in a specified domain
 
@@ -540,9 +537,6 @@ class BBcCoreService:
         :param asset_group_id:
         :param storage_type:
         :param storage_path:
-        :param advertise_in_domain0:
-        :param max_body_size:
-        :param config_update:
         :return:
         """
         self.storage_manager.set_storage_path(domain_id)
