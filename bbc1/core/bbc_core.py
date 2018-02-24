@@ -547,13 +547,11 @@ class BBcCoreService:
         """
         if config_update:
             conf = self.config.get_asset_group_config(domain_id, asset_group_id, create_if_new=True)
-            conf['storage_type'] = storage_type
-            conf['storage_path'] = storage_path
             conf['advertise_in_domain0'] = advertise_in_domain0
             conf['max_body_size'] = max_body_size
             self.config.update_config()
         bbclib.set_max_body_size(asset_group_id, max_body_size)
-        self.storage_manager.set_storage_path(domain_id, asset_group_id, from_config=True)
+        self.storage_manager.set_storage_path(domain_id)
         self.stats.update_stats_increment("asset_group", "total_num", 1)
         if advertise_in_domain0:
             self.networking.asset_groups_to_advertise.add(asset_group_id)
@@ -748,7 +746,7 @@ class BBcCoreService:
 
         self.networking.put(domain_id=domain_id, asset_group_id=asset_group_id, resource_id=txobj.transaction_id,
                             resource_type=ResourceType.Transaction_data, resource=txdata)
-        if self.storage_manager.get_storage_type(domain_id, asset_group_id) != "NONE":
+        if self.storage_manager.get_storage_type(domain_id) is not None:
             for asid in registered_asset_ids_in_storage:
                 self.networking.put(domain_id=domain_id, asset_group_id=asset_group_id, resource_id=asid,
                                     resource_type=ResourceType.Asset_file, resource=asset_files[asid])

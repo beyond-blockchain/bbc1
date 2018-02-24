@@ -198,7 +198,7 @@ class TestFileProofClient(object):
             print("ERROR: ", response_data[KeyType.reason].decode())
             assert False
 
-    def test_11_store_file(self):
+    def test_11_verify_file(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         # -- verify by user_1
         ret = clients[1].search_asset(asset_group_id, asset_id)
