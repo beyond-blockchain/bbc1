@@ -44,7 +44,7 @@ from bbc1.core.bbc_ledger import BBcLedger
 from bbc1.core import command
 from bbc1.common.bbc_error import *
 
-VERSION = "core version 0.1.0"
+VERSION = "core version 0.8.2"
 
 PID_FILE = "/tmp/bbc1.pid"
 POOL_SIZE = 1000
