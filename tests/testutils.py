@@ -70,7 +70,6 @@ def make_client(index, core_port_increment, callback=None, connect_to_core=True,
         clients[index]['app'] = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT+core_port_increment, loglevel=loglv)
         clients[index]['app'].set_user_id(clients[index]['user_id'])
         clients[index]['app'].set_domain_id(domain_id)
-        clients[index]['app'].set_asset_group_id(asset_group_id)
     if callback is not None:
         clients[index]['app'].set_callback(callback)
     print("[%i] user_id = %s" % (index, binascii.b2a_hex(clients[index]['user_id'])))

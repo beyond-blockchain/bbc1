@@ -128,7 +128,6 @@ class BBcAppClient:
         self.connection = socket.create_connection((host, port))
         self.callback = Callback(log=self.logger)
         self.use_query_id_based_message_wait = False
-        self.asset_groups = set()
         self.user_id = None
         self.domain_id = None
         self.query_id = (0).to_bytes(2, 'little')
@@ -161,15 +160,6 @@ class BBcAppClient:
         :return:
         """
         self.user_id = identifier
-
-    def set_asset_group_id(self, asset_group_id):
-        """
-        Set asset_group_id (before register_to_core)
-
-        :param asset_group_id:
-        :return:
-        """
-        self.asset_groups.add(asset_group_id)
 
     def make_message_structure(self, asset_group_id, cmd):
         """

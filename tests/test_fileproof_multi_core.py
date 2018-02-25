@@ -126,7 +126,6 @@ class TestFileProofClient(object):
 
         for i in range(client_num):
             clients[i] = setup_bbc_client(i, user_ids[i])
-            clients[i].set_asset_group_id(asset_group_id)
             ret = clients[i].register_to_core()
             assert ret
             keypairs[i] = bbclib.KeyPair()
