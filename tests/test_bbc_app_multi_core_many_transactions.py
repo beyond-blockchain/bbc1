@@ -10,7 +10,7 @@ from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
 from bbc1.common.bbc_error import *
 from bbc1.app import bbc_app
-from testutils import prepare, get_core_client, start_core_thread, make_client, domain_and_asset_group_setup
+from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 
 
 LOGLEVEL = 'debug'
@@ -62,7 +62,7 @@ class TestBBcAppClient(object):
         prepare(core_num=core_num, client_num=client_num, loglevel=LOGLEVEL)
         for i in range(core_num):
             start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i)
-            domain_and_asset_group_setup(i, domain_id, asset_group_id)  # system administrator
+            domain_setup_utility(i, domain_id)  # system administrator
         time.sleep(1)
         for i in range(client_num):
             msg_processor[i] = MessageProcessor(index=i)
@@ -89,9 +89,9 @@ class TestBBcAppClient(object):
             clients[i]['app'].ping_to_all_neighbors(domain_id)
         time.sleep(2)
 
-        cores[0].networking.domains[domain_id].alive_check()
-        print("** wait 16 sec to finish alive_check")
-        time.sleep(16)
+        clients[0]['app'].broadcast_peerlist_to_all_neighbors(domain_id)
+        print("** wait 3 sec to finish alive_check")
+        time.sleep(3)
         assert len(cores[1].networking.domains[domain_id].id_ip_mapping) == core_num-1
         for i in range(core_num):
             cores[i].networking.domains[domain_id].print_peerlist()

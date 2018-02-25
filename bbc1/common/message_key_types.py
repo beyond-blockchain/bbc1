@@ -137,8 +137,6 @@ class KeyType:
     storage_path = to_4byte(2, 0x30)
     peer_info = to_4byte(3, 0x30)
     peer_list = to_4byte(4, 0x30)
-    advertise_in_domain0 = to_4byte(5, 0x30)
-    asset_group_list = to_4byte(6, 0x30)
     domain_list = to_4byte(7, 0x30)
     bbc_configuration = to_4byte(8, 0x30)
     ipv4_address = to_4byte(9, 0x30)
@@ -146,7 +144,6 @@ class KeyType:
     port_number = to_4byte(11, 0x30)
     external_ip4addr = to_4byte(12, 0x30)
     external_ip6addr = to_4byte(13, 0x30)
-    max_body_size = to_4byte(14, 0x30)
 
     resource_id = to_4byte(0, 0x40)
     resource_type = to_4byte(1, 0x40)

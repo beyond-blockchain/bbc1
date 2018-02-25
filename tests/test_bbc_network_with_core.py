@@ -10,7 +10,7 @@ import sys
 sys.path.extend(["../"])
 from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
-from bbc1.core.bbc_ledger import ResourceType
+from bbc1.core.bbc_types import ResourceType
 from bbc1.core import query_management
 from testutils import prepare, start_core_thread, get_core_client
 
@@ -75,8 +75,9 @@ class TestBBcNetworkWithCore(object):
         simple_cluster.FORWARD_CACHE_SIZE = 5
         for i in range(core_nodes):
             cores[i].networking.create_domain(network_module="simple_cluster", domain_id=domain_id)
+            cores[i].ledger_manager.add_domain(domain_id)
             nodes[i] = cores[i].networking.domains[domain_id].node_id
-            cores[i].networking.register_user_id(domain_id, asset_group_id, users[i])
+            cores[i].networking.register_user_id(domain_id, users[i])
             cores[i].send_message = dummy_send_message
             cores[i].storage_manager.set_storage_path(domain_id, asset_group_id)
 

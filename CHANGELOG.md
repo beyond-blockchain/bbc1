@@ -1,6 +1,12 @@
 Change log
 ======
 
+## v0.8.2
+* Eliminate the concept of "registering asset_group_id" to bbc_core
+* Unlimit the size of BBcAsset body
+* Default off for ledger_subsystem ('use_ledger_subsystem' item is introduced in config.json)
+* Fix several bugs
+
 ## v0.8.1
 * IPv6 support
 * Fix several bugs
