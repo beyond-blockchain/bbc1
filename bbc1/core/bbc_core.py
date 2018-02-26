@@ -655,8 +655,8 @@ class BBcCoreService:
             self.stats.update_stats_increment("transaction", "insert_count", 1)
         if domain_id is None:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
-            self.logger.error("No such asset_group_id is set up in any domain")
-            return "Set up the asset_group_id in a domain"
+            self.logger.error("No such domain")
+            return "Set up the domain, first!"
         if domain_id == bbclib.domain_global_0:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("Insert is not allowed in domain_global_0")
@@ -783,7 +783,7 @@ class BBcCoreService:
                                                asset_group_id, source_id, query_id)
         if domain_id is None:
             self.stats.update_stats_increment("asset", "search_fail_count", 1)
-            self.logger.error("No such asset_group_id is set up in any domain")
+            self.logger.error("No such domain")
             return None
         response_info[KeyType.asset_id] = asid
 
@@ -944,7 +944,10 @@ class BBcCoreService:
         """
         self.stats.update_stats_increment("transaction", "search_count", 1)
         if domain_id is None:
-            self.logger.error("No such asset_group_id is set up in any domain")
+            self.logger.error("No such domain")
+            return None
+        if txid is None:
+            self.logger.error("Transaction_id must not be None")
             return None
         txdata = self.ledger_manager.find_locally(domain_id, asset_group_id, txid, ResourceType.Transaction_data)
         if txdata is not None and self.validate_transaction(txid, txdata, None) is None:
@@ -979,7 +982,7 @@ class BBcCoreService:
         :return: response data including transaction_data, if a transaction is not found in the local DB, None is returned.
         """
         if domain_id is None:
-            self.logger.error("No such asset_group_id is set up in any domain")
+            self.logger.error("No such domain")
             return None
 
         txid = self.ledger_manager.find_locally(domain_id, asset_group_id, user_id,
