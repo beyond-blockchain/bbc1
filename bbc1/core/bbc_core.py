@@ -198,6 +198,7 @@ class BBcCoreService:
             sock.sendall(message_key_types.make_message(PayloadType.Type_msgpack, dat))
         except Exception as e:
             self.logger.error("send error: %s" % dat)
+            traceback.print_exc()
             return False
         return True
 
@@ -718,12 +719,15 @@ class BBcCoreService:
 
         if domain_id in self.need_insert_completion_notification:
             if asset_group_id in self.need_insert_completion_notification[domain_id]:
+                dellist = list()
                 for user_id in self.need_insert_completion_notification[domain_id][asset_group_id]:
                     notifmsg = make_message_structure(MsgType.NOTIFY_INSERTED, asset_group_id, user_id, None)
                     notifmsg[KeyType.transaction_id] = txobj.transaction_id
                     ret = self.send_message(notifmsg)
                     if not ret:
-                        self.remove_from_notification_list(domain_id, asset_group_id, user_id)
+                        dellist.append(user_id)
+                for uid in dellist:
+                    self.remove_from_notification_list(domain_id, asset_group_id, uid)
 
         if no_network_put:
             return None
@@ -942,7 +946,6 @@ class BBcCoreService:
         if domain_id is None:
             self.logger.error("No such asset_group_id is set up in any domain")
             return None
-
         txdata = self.ledger_manager.find_locally(domain_id, asset_group_id, txid, ResourceType.Transaction_data)
         if txdata is not None and self.validate_transaction(txid, txdata, None) is None:
             txdata = None
