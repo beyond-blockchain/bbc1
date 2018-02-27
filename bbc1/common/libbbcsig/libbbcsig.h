@@ -16,6 +16,7 @@
  *
  */
 typedef unsigned char uint8_t;
+typedef unsigned int uint32_t;
 //#else
 //#endif
 
@@ -26,11 +27,14 @@ typedef unsigned char uint8_t;
  * @param [in] privkey
  * @param [in] hash_len
  * @param [in] hash
- * @param [out] sig
+ * @param [out] sig_r
+ * @param [out] sig_s
+ * @param [out] sig_r_len
+ * @param [out] sig_s_len
  * @return bool 
  */
 VS_DLL_EXPORT
-bool VS_STDCALL sign(int privkey_len, uint8_t *privkey, int hash_len, uint8_t *hash, uint8_t *sig);
+bool VS_STDCALL sign(int privkey_len, uint8_t *privkey, int hash_len, uint8_t *hash, uint8_t *sig_r, uint8_t *sig_t, uint32_t *sig_r_len, uint32_t *sig_s_len);
 
 /**
  *
