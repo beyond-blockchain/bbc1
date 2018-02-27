@@ -10,7 +10,7 @@ from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
 from bbc1.common.bbc_error import *
 from bbc1.app import bbc_app
-from testutils import prepare, get_core_client, start_core_thread, make_client, domain_and_asset_group_setup
+from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 
 
 LOGLEVEL = 'debug'
@@ -65,13 +65,13 @@ class TestBBcAppClient(object):
             if core_num > 1:
                 cni = i
             start_core_thread(index=i, core_port_increment=cni, p2p_port_increment=i)
-            domain_and_asset_group_setup(i, domain_id, asset_group_id)  # system administrator
+            domain_setup_utility(i, domain_id)  # system administrator
         time.sleep(1)
         for i in range(client_num):
             if core_num > 1:
                 cni = i
             msg_processor[i] = MessageProcessor(index=i)
-            make_client(index=i, core_port_increment=cni, callback=msg_processor[i], asset_group_id=asset_group_id)
+            make_client(index=i, core_port_increment=cni, callback=msg_processor[i])
         time.sleep(1)
 
         global cores, clients
@@ -91,8 +91,13 @@ class TestBBcAppClient(object):
             assert ret
             ret = msg_processor[i].synchronize()
             print("[%d] set_peer result is %s" %(i, ret))
+            clients[i]['app'].ping_to_all_neighbors(domain_id)
+        time.sleep(2)
 
-        time.sleep(3)
+        cores[0].networking.domains[domain_id].alive_check()
+        print("** wait 16 sec to finish alive_check")
+        time.sleep(16)
+        assert len(cores[1].networking.domains[domain_id].id_ip_mapping) == core_num-1
         for i in range(core_num):
             cores[i].networking.domains[domain_id].print_peerlist()
 
@@ -128,7 +133,7 @@ class TestBBcAppClient(object):
 
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
-            ret = cl['app'].insert_transaction(asset_group_id, transactions[i])
+            ret = cl['app'].insert_transaction(transactions[i])
             assert ret
             print("  ----> wait for notification")
             for j in range(client_num):
@@ -167,7 +172,7 @@ class TestBBcAppClient(object):
 
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
-            ret = cl['app'].insert_transaction(asset_group_id, transactions[i])
+            ret = cl['app'].insert_transaction(transactions[i])
             assert ret
             msg_processor[i].synchronize()
 
@@ -197,7 +202,7 @@ class TestBBcAppClient(object):
 
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
-            ret = cl['app'].insert_transaction(asset_group_id, transactions[i])
+            ret = cl['app'].insert_transaction(transactions[i])
             assert ret
             print("  ----> wait for notification")
             for j in range(client_num):

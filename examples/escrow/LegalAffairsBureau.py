@@ -45,20 +45,20 @@ user_id = bbclib.get_new_id("LegalAffairsBureau", include_timestamp=False)
 key_pair = None
 bbc_app_client = None
 
-def asset_group_setup():
+
+def domain_setup():
     tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
     tmpclient.domain_setup(domain_id, "simple_cluster")
     tmpclient.callback.synchronize()
-    tmpclient.register_asset_group(domain_id=domain_id, asset_group_id=asset_group_id)
-    tmpclient.callback.synchronize()
     tmpclient.unregister_from_core()
-    print("Domain %s and asset_group %s are created." % (binascii.b2a_hex(domain_id[:4]).decode(),
-                                                        binascii.b2a_hex(asset_group_id[:4]).decode()))
+    print("Domain %s is created." % (binascii.b2a_hex(domain_id[:4]).decode()))
     print("Setup is done.")
+
 
 def setup_bbc_client():
     bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
     bbc_app_client.set_user_id(user_id)
+    bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_asset_group_id(asset_group_id)
     bbc_app_client.set_callback(bbc_app.Callback())
     ret = bbc_app_client.register_to_core()
@@ -90,7 +90,7 @@ def recive():
         list = cur.fetchall()
         if len(list) != 0:
             print("Ref tx has alredy been referenced")
-            bbc_app_client.sendback_denial_of_sign(asset_group_id, recvdat[KeyType.source_user_id], "Ref tx has alredy been referenced")
+            bbc_app_client.sendback_denial_of_sign(recvdat[KeyType.source_user_id], "Ref tx has alredy been referenced")
             return 0;
         else:
             print("Ref tx has not been referenced.")
@@ -99,7 +99,7 @@ def recive():
             list = cur.fetchall()
             if len(list) == 0:
                 print("ref tx is not found")
-                bbc_app_client.sendback_denial_of_sign(asset_group_id, recvdat[KeyType.source_user_id], "Ref Tx is not found")
+                bbc_app_client.sendback_denial_of_sign(recvdat[KeyType.source_user_id], "Ref Tx is not found")
                 return 0;
             else:
                 print("Ref is correct, insert tx to our DB.")
@@ -113,7 +113,7 @@ def recive():
         con.commit()
 
     signature = transaction.sign(keypair=key_pair)
-    bbc_app_client.sendback_signature(asset_group_id ,recvdat[KeyType.source_user_id],0,signature)
+    bbc_app_client.sendback_signature(recvdat[KeyType.source_user_id],0,signature)
 
 if __name__ == '__main__':
     if(not os.path.exists(PRIVATE_KEY) and not os.path.exists(PUBLIC_KEY)):

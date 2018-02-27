@@ -1,3 +1,8 @@
+#!/bin/sh
+""":" .
+
+exec python "$0" "$@"
+"""
 # -*- coding: utf-8 -*-
 """
 Copyright (c) 2017 beyond-blockchain.org.
@@ -34,12 +39,12 @@ from bbc1.common.message_key_types import KeyType, PayloadType, to_2byte
 from bbc1.common.bbclib import BBcTransaction, ServiceMessageType as MsgType, StorageType
 from bbc1.core import bbc_network, bbc_storage, query_management, bbc_stats
 from bbc1.core.bbc_config import BBcConfig
-from bbc1.core.bbc_ledger import BBcLedger, ResourceType
-from bbc1.core import ledger_subsystem
+from bbc1.core.bbc_types import ResourceType
+from bbc1.core.bbc_ledger import BBcLedger
 from bbc1.core import command
 from bbc1.common.bbc_error import *
 
-VERSION = "core version 0.1.0"
+VERSION = "core version 0.8.2"
 
 PID_FILE = "/tmp/bbc1.pid"
 POOL_SIZE = 1000
@@ -51,26 +56,17 @@ ticker = query_management.get_ticker()
 core_service = None
 
 
-def make_message_structure(cmd, asgid, dstid, qid):
+def make_message_structure(cmd, dstid, qid):
     """
     (internal use) Create a base structure of message
 
     :param cmd:
-    :param asgid: asset_group_id
     :param dstid: destination_user_id
     :param qid:   query_id
     :return:
     """
-    if asgid is None:
-        return {
-            KeyType.command: cmd,
-            KeyType.destination_user_id: dstid,
-            KeyType.query_id: qid,
-            KeyType.status: ESUCCESS,
-        }
     return {
         KeyType.command: cmd,
-        KeyType.asset_group_id: asgid,
         KeyType.destination_user_id: dstid,
         KeyType.query_id: qid,
         KeyType.status: ESUCCESS,
@@ -103,17 +99,13 @@ def check_transaction_if_having_asset_file(txdata, asid):
 
 
 class BBcCoreService:
-    def __init__(self, ipv6=None, p2p_port=None, core_port=None, use_global=False, ip4addr=None, ip6addr=None,
-                 workingdir=".bbc1", configfile=None,
+    def __init__(self, p2p_port=None, core_port=None, use_global=False, ip4addr=None, ip6addr=None,
+                 workingdir=".bbc1", configfile=None, use_ledger_subsystem=False,
                  loglevel="all", logname="-", server_start=True):
         self.logger = logger.get_logger(key="core", level=loglevel, logname=logname)
         self.stats = bbc_stats.BBcStats()
         self.config = BBcConfig(workingdir, configfile)
         conf = self.config.get_config()
-        if ipv6 is not None:
-            conf['client']['ipv6'] = ipv6
-        else:
-            ipv6 = conf['client']['ipv6']
         if p2p_port is not None:
             conf['client']['port'] = core_port
         else:
@@ -121,7 +113,6 @@ class BBcCoreService:
         self.logger.debug("config = %s" % conf)
         self.test_tx_obj = BBcTransaction()
         self.user_id_sock_mapping = dict()
-        self.asset_group_domain_mapping = dict()
         self.need_insert_completion_notification = dict()
         self.cross_ref_list = []
         self.ledger_manager = BBcLedger(self.config)
@@ -129,23 +120,51 @@ class BBcCoreService:
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port, use_global=use_global,
                                                  external_ip4addr=ip4addr, external_ip6addr=ip6addr,
                                                  loglevel=loglevel, logname=logname)
-        self.ledger_subsystem = ledger_subsystem.LedgerSubsystem(self.config, core=self, loglevel=loglevel, logname=logname)
+        self.ledger_subsystem = None
+        if conf['use_ledger_subsystem'] or use_ledger_subsystem:
+            from bbc1.core import ledger_subsystem
+            self.ledger_subsystem = ledger_subsystem.LedgerSubsystem(self.config, core=self,
+                                                                     loglevel=loglevel, logname=logname)
+
+        for domain_id_str in conf['domains'].keys():
+            domain_id = bbclib.convert_idstring_to_bytes(domain_id_str)
+            c = self.config.get_domain_config(domain_id)
+            nw_module = c.get('module', 'simple_cluster')
+            default_type = StorageType.FILESYSTEM
+            if domain_id == bbclib.domain_global_0:
+                default_type = StorageType.NONE
+            storage_type = c.pop('storage_type', default_type)
+            storage_path = c.pop('storage_path', None)
+            self.configure_domain(domain_id, nw_module, storage_type, storage_path)
+
+            for nd, info in c['static_nodes'].items():
+                node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
+                self.networking.add_static_node_to_domain(domain_id, node_id, ipv4, ipv6, port)
+            for nd, info in c['peer_list'].items():
+                node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
+                self.networking.domains[domain_id].add_peer_node_ip46(node_id, ipv4, ipv6, port, need_ping=True)
 
         gevent.signal(signal.SIGINT, self.quit_program)
         if server_start:
-            self.start_server(core_port, ipv6=ipv6)
+            self.start_server(core_port)
+
+    def configure_domain(self, domain_id, nw_module='simple_cluster', storage_type=StorageType.NONE, storage_path=None):
+        self.networking.create_domain(domain_id=domain_id, network_module=nw_module)
+        if domain_id != bbclib.domain_global_0:
+            self.ledger_manager.add_domain(domain_id)
+            self.storage_manager.set_storage_path(domain_id, storage_type=storage_type, storage_path=storage_path)
 
     def quit_program(self):
         self.networking.save_all_peer_lists()
         self.config.update_config()
         os._exit(0)
 
-    def start_server(self, port, ipv6=False):
+    def start_server(self, port):
         pool = Pool(POOL_SIZE)
-        if ipv6:
-            server = StreamServer(("::", port), self.handler, spawn=pool)
-        else:
+        if self.networking.ip6_address == "::":
             server = StreamServer(("0.0.0.0", port), self.handler, spawn=pool)
+        else:
+            server = StreamServer(("::", port), self.handler, spawn=pool)
         try:
             server.serve_forever()
         except KeyboardInterrupt:
@@ -158,22 +177,19 @@ class BBcCoreService:
         :return:
         """
         if sock is None:
-            if KeyType.asset_group_id not in dat or KeyType.destination_user_id not in dat:
+            if KeyType.destination_user_id not in dat:
                 self.logger.warn("invalid message")
                 return
         self.logger.debug("[port:%d] send_message to %s" % (self.networking.port,
                                                             binascii.b2a_hex(dat[KeyType.destination_user_id][:4])))
-        asset_group_id = None
         try:
             user_id = dat[KeyType.destination_user_id]
             if sock is None:
-                asset_group_id = dat[KeyType.asset_group_id]
-                sock = self.user_id_sock_mapping[asset_group_id][user_id]
+                sock = self.user_id_sock_mapping[user_id]
             sock.sendall(message_key_types.make_message(PayloadType.Type_msgpack, dat))
         except Exception as e:
             self.logger.error("send error: %s" % dat)
-            if asset_group_id is not None:
-                self.user_id_sock_mapping[asset_group_id].pop(user_id, None)
+            traceback.print_exc()
             return False
         return True
 
@@ -181,14 +197,13 @@ class BBcCoreService:
         try:
             socket.sendall(message_key_types.make_message(PayloadType.Type_msgpack, dat))
         except Exception as e:
-            self.logger.error("send error: %s" % e)
+            self.logger.error("send error (raw): %s" % e)
         return True
 
-    def send_to_other_user(self, asset_group_id, dst_user_id, src_user_id, msg):
-        if dst_user_id in self.user_id_sock_mapping[asset_group_id]:
+    def send_to_other_user(self, domain_id, dst_user_id, src_user_id, msg):
+        if dst_user_id in self.user_id_sock_mapping:
             return self.send_message(msg)
-        domain_id = self.asset_group_domain_mapping[asset_group_id]
-        return self.networking.route_message(domain_id, asset_group_id, dst_user_id, src_user_id, msg)
+        return self.networking.route_message(domain_id, dst_user_id, src_user_id, msg)
 
     def error_reply(self, msg=None, err_code=EINVALID_COMMAND, txt=""):
         msg[KeyType.status] = err_code
@@ -228,11 +243,11 @@ class BBcCoreService:
             traceback.print_exc()
         self.logger.debug("closing socket")
         try:
-            for info in mappings:
-                self.user_id_sock_mapping[info[0]].pop(info[1], None)
-                if len(self.user_id_sock_mapping[info[0]]) == 0:
-                    self.user_id_sock_mapping[info[0]].pop(info[1], None)
-                self.networking.remove_user_id(info[0], info[1])
+            for uid in mappings:
+                self.user_id_sock_mapping.pop(uid, None)
+                if len(self.user_id_sock_mapping) == 0:
+                    self.user_id_sock_mapping.pop(uid, None)
+                self.networking.remove_user_id(uid)
             socket.shutdown(py_socket.SHUT_RDWR)
             socket.close()
         except:
@@ -275,54 +290,56 @@ class BBcCoreService:
             return False, None
         cmd = dat[KeyType.command]
         if cmd == MsgType.REQUEST_SEARCH_TRANSACTION:
-            if not self.param_check([KeyType.asset_group_id, KeyType.transaction_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_SEARCH_TRANSACTION: bad format")
                 return False, None
-            result = self.search_transaction_by_txid(dat[KeyType.asset_group_id], dat[KeyType.transaction_id],
+            result = self.search_transaction_by_txid(dat[KeyType.domain_id],
+                                                     dat[KeyType.transaction_id],
                                                      dat[KeyType.source_user_id], dat[KeyType.query_id])
             if result is not None:
                 self.send_message(result)
 
         elif cmd == MsgType.REQUEST_SEARCH_ASSET:
-            if not self.param_check([KeyType.asset_group_id, KeyType.asset_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.asset_id], dat):
                 self.logger.debug("REQUEST_SEARCH_ASSET: bad format")
                 return False, None
             retmsg = make_message_structure(MsgType.RESPONSE_SEARCH_ASSET,
-                                            dat[KeyType.asset_group_id],
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
-            result = self.search_asset_by_asid(dat[KeyType.asset_group_id], dat[KeyType.asset_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg[KeyType.asset_group_id] = dat[KeyType.asset_group_id]
+            result = self.search_asset_by_asid(dat[KeyType.domain_id], dat[KeyType.asset_group_id],
+                                               dat[KeyType.asset_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
             if isinstance(result, dict):
                 retmsg.update(result)
                 self.send_message(retmsg)
 
         elif cmd == MsgType.REQUEST_SEARCH_USERID:
-            if not self.param_check([KeyType.asset_group_id, KeyType.user_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.user_id], dat):
                 self.logger.debug("REQUEST_SEARCH_USERID: bad format")
                 return False, None
-            result = self.search_transaction_by_userid_locally(dat[KeyType.asset_group_id], dat[KeyType.user_id],
+            result = self.search_transaction_by_userid_locally(dat[KeyType.domain_id], dat[KeyType.asset_group_id],
+                                                               dat[KeyType.user_id],
                                                                dat[KeyType.source_user_id], dat[KeyType.query_id])
             if result is not None:
                 self.send_message(result)
 
         elif cmd == MsgType.REQUEST_GATHER_SIGNATURE:
-            if not self.param_check([KeyType.asset_group_id, KeyType.transaction_data], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.transaction_data], dat):
                 self.logger.debug("REQUEST_GATHER_SIGNATURE: bad format")
                 return False, None
-            if not self.distribute_transaction_to_gather_signatures(dat[KeyType.asset_group_id], dat):
+            if not self.distribute_transaction_to_gather_signatures(dat[KeyType.domain_id], dat):
                 retmsg = make_message_structure(MsgType.RESPONSE_GATHER_SIGNATURE,
-                                                dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
+                                                dat[KeyType.source_user_id], dat[KeyType.query_id])
                 self.error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt="Fail to forward transaction")
 
         elif cmd == MsgType.REQUEST_INSERT:
-            if not self.param_check([KeyType.asset_group_id, KeyType.transaction_data,
-                                     KeyType.all_asset_files], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.transaction_data, KeyType.all_asset_files], dat):
                 self.logger.debug("REQUEST_INSERT: bad format")
                 return False, None
             transaction_data = dat[KeyType.transaction_data]
             asset_files = dat[KeyType.all_asset_files]
             retmsg = make_message_structure(MsgType.RESPONSE_INSERT,
-                                            dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
-            ret = self.insert_transaction(dat[KeyType.asset_group_id], transaction_data, asset_files)
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            ret = self.insert_transaction(dat[KeyType.domain_id], transaction_data, asset_files)
             if isinstance(ret, str):
                 self.error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt=ret)
             else:
@@ -330,11 +347,11 @@ class BBcCoreService:
                 self.send_message(retmsg)
 
         elif cmd == MsgType.RESPONSE_SIGNATURE:
-            if not self.param_check([KeyType.asset_group_id, KeyType.destination_user_id, KeyType.source_user_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.destination_user_id, KeyType.source_user_id], dat):
                 self.logger.debug("RESPONSE_SIGNATURE: bad format")
                 return False, None
             retmsg = make_message_structure(MsgType.RESPONSE_GATHER_SIGNATURE,
-                                            dat[KeyType.asset_group_id], dat[KeyType.destination_user_id], dat[KeyType.query_id])
+                                            dat[KeyType.destination_user_id], dat[KeyType.query_id])
             if KeyType.signature in dat:
                 retmsg[KeyType.signature] = dat[KeyType.signature]
                 retmsg[KeyType.ref_index] = dat[KeyType.ref_index]
@@ -345,10 +362,8 @@ class BBcCoreService:
                 retmsg[KeyType.status] = dat[KeyType.status]
                 retmsg[KeyType.reason] = dat[KeyType.reason]
             retmsg[KeyType.source_user_id] = dat[KeyType.source_user_id]
-            self.send_to_other_user(dat[KeyType.asset_group_id],
-                                    dat[KeyType.destination_user_id],
-                                    dat[KeyType.source_user_id],
-                                    retmsg)
+            self.send_to_other_user(dat[KeyType.domain_id], dat[KeyType.destination_user_id],
+                                    dat[KeyType.source_user_id], retmsg)
 
         elif cmd == MsgType.REQUEST_CROSS_REF:
             if KeyType.count in dat:
@@ -356,99 +371,83 @@ class BBcCoreService:
             else:
                 num = 1
             retmsg = make_message_structure(MsgType.RESPONSE_CROSS_REF,
-                                            dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.cross_refs] = self.pop_cross_refs(num=num)
             self.send_message(retmsg)
 
         elif cmd == MsgType.MESSAGE:
-            if not self.param_check([KeyType.asset_group_id, KeyType.source_user_id, KeyType.destination_user_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.source_user_id,
+                                     KeyType.destination_user_id], dat):
                 self.logger.debug("MESSAGE: bad format")
                 return False, None
-            domain_id = self.asset_group_domain_mapping[dat[KeyType.asset_group_id]]
-            self.networking.route_message(domain_id, dat[KeyType.asset_group_id],
-                                          dat[KeyType.destination_user_id],
+            self.networking.route_message(dat[KeyType.domain_id], dat[KeyType.destination_user_id],
                                           dat[KeyType.source_user_id], dat)
 
         elif cmd == MsgType.REQUEST_REGISTER_HASH_IN_SUBSYS:
             if not self.param_check([KeyType.asset_group_id, KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_REGISTER_HASH_IN_SUBSYS: bad format")
                 return False, None
-            asset_group_id = dat[KeyType.asset_group_id]
-            transaction_id = dat[KeyType.transaction_id]
-            self.ledger_subsystem.register_transaction(asset_group_id=asset_group_id, transaction_id=transaction_id)
-            retmsg = make_message_structure(MsgType.RESPONSE_REGISTER_HASH_IN_SUBSYS,
-                                            dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
-            self.send_message(retmsg)
+            if self.ledger_subsystem is not None:
+                asset_group_id = dat[KeyType.asset_group_id]
+                transaction_id = dat[KeyType.transaction_id]
+                self.ledger_subsystem.register_transaction(asset_group_id=asset_group_id, transaction_id=transaction_id)
+                retmsg = make_message_structure(MsgType.RESPONSE_REGISTER_HASH_IN_SUBSYS,
+                                                dat[KeyType.source_user_id], dat[KeyType.query_id])
+                retmsg[KeyType.asset_group_id] = dat[KeyType.asset_group_id]
+                self.send_message(retmsg)
 
         elif cmd == MsgType.REQUEST_VERIFY_HASH_IN_SUBSYS:
             if not self.param_check([KeyType.asset_group_id, KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_REGISTER_HASH_IN_SUBSYS: bad format")
                 return False, None
-            asset_group_id = dat[KeyType.asset_group_id]
-            transaction_id = dat[KeyType.transaction_id]
-            retmsg = make_message_structure(MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS,
-                                            dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
-            result = self.ledger_subsystem.verify_transaction(asset_group_id=asset_group_id,
-                                                              transaction_id=transaction_id)
-            retmsg[KeyType.merkle_tree] = result
-            self.send_message(retmsg)
+            if self.ledger_subsystem is not None:
+                asset_group_id = dat[KeyType.asset_group_id]
+                transaction_id = dat[KeyType.transaction_id]
+                retmsg = make_message_structure(MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS,
+                                                dat[KeyType.source_user_id], dat[KeyType.query_id])
+                retmsg[KeyType.asset_group_id] = dat[KeyType.asset_group_id]
+                result = self.ledger_subsystem.verify_transaction(asset_group_id=asset_group_id,
+                                                                  transaction_id=transaction_id)
+                retmsg[KeyType.merkle_tree] = result
+                self.send_message(retmsg)
 
         elif cmd == MsgType.REQUEST_GET_STATS:
-            retmsg = make_message_structure(MsgType.RESPONSE_GET_STATS, None,
+            retmsg = make_message_structure(MsgType.RESPONSE_GET_STATS,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.stats] = self.stats.get_stats()
             self.send_message(retmsg, sock=socket)
 
         elif cmd == MsgType.REGISTER:
-            if not self.param_check([KeyType.asset_group_id, KeyType.source_user_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.source_user_id], dat):
                 self.logger.debug("REGISTER: bad format")
                 return False, None
             user_id = dat[KeyType.source_user_id]
-            asset_group_id = dat[KeyType.asset_group_id]
-            if asset_group_id in self.asset_group_domain_mapping:
-                domain_id = self.asset_group_domain_mapping[asset_group_id]
-                self.logger.debug("[%s] register_user: %s" % (binascii.b2a_hex(domain_id[:2]),
-                                                              binascii.b2a_hex(user_id[:4])))
-                self.networking.register_user_id(domain_id, asset_group_id, user_id)
-                self.user_id_sock_mapping.setdefault(asset_group_id, {})[user_id] = socket
-                return False, (asset_group_id, user_id)
-            return False, None
+            domain_id = dat[KeyType.domain_id]
+            self.logger.debug("[%s] register_user: %s" % (binascii.b2a_hex(domain_id[:2]),
+                                                          binascii.b2a_hex(user_id[:4])))
+            self.networking.register_user_id(domain_id, user_id)
+            self.user_id_sock_mapping[user_id] = socket
+            return False, user_id
 
         elif cmd == MsgType.UNREGISTER:
             return True, None
 
-        elif cmd == MsgType.REQUEST_SETUP_ASSET_GROUP:
-            domain_id = dat.get(KeyType.domain_id, None)
-            asset_group_id = dat.get(KeyType.asset_group_id, None)
-            if domain_id is None or asset_group_id is None:
-                return False, None
-            if domain_id not in self.networking.domains:
-                return False, None
-            self.asset_group_setup(domain_id, asset_group_id, dat.get(KeyType.storage_type, StorageType.FILESYSTEM),
-                                   dat.get(KeyType.storage_path,None), dat.get(KeyType.advertise_in_domain0, False),
-                                   dat.get(KeyType.max_body_size, bbclib.DEFAULT_MAX_BODY_SIZE), config_update=True)
-            retmsg = make_message_structure(MsgType.RESPONSE_SETUP_ASSET_GROUP,
-                                            dat[KeyType.asset_group_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
-            self.send_raw_message(socket, retmsg)
-
         elif cmd == MsgType.REQUEST_SETUP_DOMAIN:
             retmsg = make_message_structure(MsgType.RESPONSE_SETUP_DOMAIN,
-                                            None, dat[KeyType.source_user_id], dat[KeyType.query_id])
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
             domain_id = dat.get(KeyType.domain_id, None)
             if domain_id is None:
                 retmsg[KeyType.result] = False
             else:
-                self.networking.create_domain(domain_id=domain_id,
-                                              network_module=dat.get(KeyType.network_module, "simple_cluster"))
-                retmsg[KeyType.domain_id] = domain_id
-                retmsg[KeyType.result] = True
-                retmsg[KeyType.network_module] = self.networking.domains[domain_id].module_name
+                self.configure_domain(domain_id, nw_module=dat.get(KeyType.network_module, "simple_cluster"),
+                                      storage_type=dat.get(KeyType.storage_type, StorageType.FILESYSTEM),
+                                      storage_path=dat.get(KeyType.storage_path, None))
             self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_PEERLIST:
             domain_id = dat[KeyType.domain_id]
             retmsg = make_message_structure(MsgType.RESPONSE_GET_PEERLIST,
-                                            None, dat[KeyType.source_user_id], dat[KeyType.query_id])
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
             if domain_id in self.networking.domains:
                 retmsg[KeyType.domain_id] = domain_id
                 retmsg[KeyType.peer_list] = self.networking.domains[domain_id].make_peer_list()
@@ -456,7 +455,7 @@ class BBcCoreService:
 
         elif cmd == MsgType.REQUEST_SET_STATIC_NODE:
             retmsg = make_message_structure(MsgType.RESPONSE_SET_STATIC_NODE,
-                                            None, dat[KeyType.source_user_id], dat[KeyType.query_id])
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
             domain_id = dat[KeyType.domain_id]
             node_info = dat.get(KeyType.peer_info, None)
             if node_info is None:
@@ -471,14 +470,14 @@ class BBcCoreService:
 
         elif cmd == MsgType.REQUEST_GET_CONFIG:
             retmsg = make_message_structure(MsgType.RESPONSE_GET_CONFIG,
-                                            None, dat[KeyType.source_user_id], dat[KeyType.query_id])
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
             jsondat = self.config.get_json_config()
             retmsg[KeyType.bbc_configuration] = jsondat
             self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_DOMAINLIST:
             retmsg = make_message_structure(MsgType.RESPONSE_GET_DOMAINLIST,
-                                            None, dat[KeyType.source_user_id], dat[KeyType.query_id])
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
             data = bytearray()
             data.extend(to_2byte(len(self.networking.domains)))
             for domain_id in self.networking.domains:
@@ -487,65 +486,51 @@ class BBcCoreService:
             self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.DOMAIN_PING:
-            if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.ipv4_address,
-                                     KeyType.ipv6_address, KeyType.port_number], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.port_number], dat):
+                return False, None
+            ipv4 = dat.get(KeyType.ipv4_address, None)
+            ipv6 = dat.get(KeyType.ipv6_address, None)
+            if ipv4 is None and ipv6 is None:
                 return False, None
             domain_id = dat[KeyType.domain_id]
-            ipv4 = dat[KeyType.ipv4_address]
-            ipv6 = dat[KeyType.ipv6_address]
             port = dat[KeyType.port_number]
-            self.networking.send_raw_message(domain_id, ipv4, ipv6, port)
+            self.networking.send_domain_ping(domain_id, ipv4, ipv6, port)
+
+        elif cmd == MsgType.REQUEST_PING_TO_ALL:
+            domain_id = dat[KeyType.domain_id]
+            if domain_id in self.networking.domains:
+                self.networking.domains[domain_id].ping_to_all_neighbors()
+
+        elif cmd == MsgType.REQUEST_ALIVE_CHECK:
+            domain_id = dat[KeyType.domain_id]
+            if domain_id in self.networking.domains:
+                self.networking.domains[domain_id].send_peerlist(None)
 
         elif cmd == MsgType.REQUEST_MANIP_LEDGER_SUBSYS:
             retmsg = make_message_structure(MsgType.RESPONSE_MANIP_LEDGER_SUBSYS,
-                                            None, dat[KeyType.source_user_id], dat[KeyType.query_id])
-            if dat[KeyType.ledger_subsys_manip]:
-                self.ledger_subsystem.enable()
-            else:
-                self.ledger_subsystem.disable()
-            self.ledger_subsystem.set_domain(dat[KeyType.domain_id])
-            self.send_raw_message(socket, retmsg)
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            if self.ledger_subsystem is not None:
+                if dat[KeyType.ledger_subsys_manip]:
+                    self.ledger_subsystem.enable()
+                else:
+                    self.ledger_subsystem.disable()
+                self.ledger_subsystem.set_domain(dat[KeyType.domain_id])
+                self.send_raw_message(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_INSERT_NOTIFICATION:
+            domain_id = dat[KeyType.domain_id]
             asset_group_id = dat[KeyType.asset_group_id]
-            self.need_insert_completion_notification.setdefault(asset_group_id, set())
-            self.need_insert_completion_notification[asset_group_id].add(dat[KeyType.source_user_id])
+            self.need_insert_completion_notification.setdefault(domain_id, dict())
+            self.need_insert_completion_notification[domain_id].setdefault(asset_group_id, set())
+            self.need_insert_completion_notification[domain_id][asset_group_id].add(dat[KeyType.source_user_id])
 
         elif cmd == MsgType.CANCEL_INSERT_NOTIFICATION:
-            self.remove_from_notification_list(dat[KeyType.asset_group_id], dat[KeyType.source_user_id])
+            self.remove_from_notification_list(dat[KeyType.domain_id], dat[KeyType.asset_group_id],
+                                               dat[KeyType.source_user_id])
 
         else:
             self.logger.error("Bad command/response: %s" % cmd)
         return False, None
-
-    def asset_group_setup(self, domain_id, asset_group_id, storage_type=StorageType.FILESYSTEM,
-                          storage_path=None, advertise_in_domain0=False, max_body_size=bbclib.DEFAULT_MAX_BODY_SIZE,
-                          config_update=False):
-        """
-        Setup asset_group in a specified domain
-
-        :param domain_id:
-        :param asset_group_id:
-        :param storage_type:
-        :param storage_path:
-        :param advertise_in_domain0:
-        :param max_body_size:
-        :param config_update:
-        :return:
-        """
-        if config_update:
-            conf = self.config.get_asset_group_config(domain_id, asset_group_id, create_if_new=True)
-            conf['storage_type'] = storage_type
-            conf['storage_path'] = storage_path
-            conf['advertise_in_domain0'] = advertise_in_domain0
-            conf['max_body_size'] = max_body_size
-            self.config.update_config()
-        bbclib.set_max_body_size(asset_group_id, max_body_size)
-        self.storage_manager.set_storage_path(domain_id, asset_group_id, from_config=True)
-        self.asset_group_domain_mapping[asset_group_id] = domain_id
-        self.stats.update_stats_increment("asset_group", "total_num", 1)
-        if advertise_in_domain0:
-            self.networking.asset_groups_to_advertise.add(asset_group_id)
 
     def pop_cross_refs(self, num=1):
         """
@@ -563,19 +548,23 @@ class BBcCoreService:
                 break
         return refs
 
-    def remove_from_notification_list(self, asset_group_id, user_id):
+    def remove_from_notification_list(self, domain_id, asset_group_id, user_id):
         """
         Remove entry from insert completion notification list
+        :param domain_id:
         :param asset_group_id:
         :param user_id:
         :return:
         """
-        if asset_group_id in self.need_insert_completion_notification:
-            self.need_insert_completion_notification[asset_group_id].remove(user_id)
-            if len(self.need_insert_completion_notification[asset_group_id]) == 0:
-                self.need_insert_completion_notification.pop(asset_group_id, None)
+        if domain_id in self.need_insert_completion_notification:
+            if asset_group_id in self.need_insert_completion_notification[domain_id]:
+                self.need_insert_completion_notification[domain_id][asset_group_id].remove(user_id)
+                if len(self.need_insert_completion_notification[domain_id][asset_group_id]) == 0:
+                    self.need_insert_completion_notification[domain_id].pop(asset_group_id, None)
+                if len(self.need_insert_completion_notification[domain_id]) == 0:
+                    self.need_insert_completion_notification.pop(domain_id, None)
 
-    def validate_transaction(self, txid, txdata, asset_files):
+    def validate_transaction(self, txid, txdata, asset_files=None):
         """
         Validate transaction by verifying signature
 
@@ -638,11 +627,11 @@ class BBcCoreService:
         self.stats.update_stats_increment("asset", "invalid", 1)
         return False
 
-    def insert_transaction(self, asset_group_id, txdata, asset_files, no_network_put=False):
+    def insert_transaction(self, domain_id, txdata, asset_files, no_network_put=False):
         """
         Insert transaction into ledger subsystem
 
-        :param asset_group_id:      asset_group_id to insert into
+        :param domain_id:           domain_id where the transaction is inserted
         :param txdata:              BBcTransaction data
         :param asset_files:   dictionary of { asid=>asset_content,,, }
         :param no_network_put:      If false, skip networking.put()
@@ -651,11 +640,10 @@ class BBcCoreService:
             self.stats.update_stats_increment("transaction", "copy_insert_count", 1)
         else:
             self.stats.update_stats_increment("transaction", "insert_count", 1)
-        domain_id = self.asset_group_domain_mapping.get(asset_group_id, None)
         if domain_id is None:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
-            self.logger.error("No such asset_group_id is set up in any domain")
-            return "Set up the asset_group_id in a domain"
+            self.logger.error("No such domain")
+            return "Set up the domain, first!"
         if domain_id == bbclib.domain_global_0:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("Insert is not allowed in domain_global_0")
@@ -669,8 +657,7 @@ class BBcCoreService:
                           (binascii.b2a_hex(self.networking.domains[domain_id].node_id[:4]),
                            binascii.b2a_hex(txobj.transaction_id[:4])))
 
-        ret = self.ledger_manager.insert_locally(domain_id, asset_group_id, txobj.transaction_id,
-                                                 ResourceType.Transaction_data, txdata)
+        ret = self.ledger_manager.insert_transaction_locally(domain_id, txobj.transaction_id, txdata)
         if not ret:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("[%s] Fail to insert a transaction into the ledger"%
@@ -678,71 +665,73 @@ class BBcCoreService:
             return "Failed to insert a transaction into the ledger"
 
         rollback_flag = False
-        registered_asset_ids = []
-        registered_asset_ids_in_storage = []
+        registered_asset_in_storage = []
+        asset_group_ids = list()
         for idx, evt in enumerate(txobj.events):
             if evt.asset is None:
                 continue
+            asset_group_id = evt.asset_group_id
+            asset_group_ids.append(asset_group_id)
             asid = evt.asset.asset_id
+            user_id = evt.asset.user_id
             if asset_files is not None and asid in asset_files.keys():
                 if not self.storage_manager.store_locally(domain_id, asset_group_id, asid, asset_files[asid]):
                     rollback_flag = True
                     break
-                registered_asset_ids_in_storage.append(asid)
-            if not self.ledger_manager.insert_locally(domain_id, asset_group_id, asid,
-                                                      ResourceType.Asset_ID, txobj.transaction_id):
+                registered_asset_in_storage.append([asset_group_id, asid])
+            if not self.ledger_manager.insert_asset_info_locally(domain_id, txobj.transaction_id,
+                                                                 asset_group_id, asid, user_id):
                 rollback_flag = True
                 break
-            user_id = evt.asset.user_id
-            if not self.ledger_manager.insert_locally(domain_id, asset_group_id, user_id,
-                                                      ResourceType.Owner_asset, txobj.transaction_id,
-                                                      require_uniqueness=False):
-                rollback_flag = True
-                break
-            registered_asset_ids.append(asid)
 
         for reference in txobj.references:
-            self.ledger_manager.insert_locally(domain_id, asset_group_id, txobj.transaction_id,
-                                               ResourceType.Edge_outgoing, reference.transaction_id)
-            self.ledger_manager.insert_locally(domain_id, asset_group_id, reference.transaction_id,
-                                               ResourceType.Edge_incoming, txobj.transaction_id)
+            self.ledger_manager.insert_topology_info_locally(domain_id, txobj.transaction_id,
+                                                             ResourceType.Edge_outgoing, reference.transaction_id)
+            self.ledger_manager.insert_topology_info_locally(domain_id, txobj.transaction_id,
+                                                             ResourceType.Edge_incoming, reference.transaction_id)
 
         if rollback_flag:
-            self.ledger_manager.remove(domain_id, asset_group_id, txobj.transaction_id)
-            for asid in registered_asset_ids:
-                self.ledger_manager.remove(domain_id, asset_group_id, asid)
-            for asid in registered_asset_ids_in_storage:
-                self.storage_manager.remove(domain_id, asset_group_id, asid)
-            self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
-            return "Failed to register asset"
+            self.ledger_manager.remove(domain_id, txobj.transaction_id)
+            if len(registered_asset_in_storage) > 0:
+                for asset_group_id, asid in registered_asset_in_storage:
+                    self.storage_manager.remove(domain_id, asset_group_id, asid)
+                self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
+                return "Failed to insert"
 
-        if asset_group_id in self.need_insert_completion_notification:
-            for user_id in self.need_insert_completion_notification[asset_group_id]:
-                notifmsg = make_message_structure(MsgType.NOTIFY_INSERTED, asset_group_id, user_id, None)
-                notifmsg[KeyType.transaction_id] = txobj.transaction_id
-                ret = self.send_message(notifmsg)
-                if not ret:
-                    self.remove_from_notification_list(asset_group_id, user_id)
+        if domain_id in self.need_insert_completion_notification:
+            for asset_group_id in asset_group_ids:
+                if asset_group_id in self.need_insert_completion_notification[domain_id]:
+                    dellist = list()
+                    for user_id in self.need_insert_completion_notification[domain_id][asset_group_id]:
+                        notifmsg = make_message_structure(MsgType.NOTIFY_INSERTED, user_id, None)
+                        notifmsg[KeyType.asset_group_id] = asset_group_id
+                        notifmsg[KeyType.transaction_id] = txobj.transaction_id
+                        ret = self.send_message(notifmsg)
+                        if not ret:
+                            dellist.append(user_id)
+                    for uid in dellist:
+                        self.remove_from_notification_list(domain_id, asset_group_id, uid)
 
         if no_network_put:
             return None
 
         if len(txobj.cross_refs) > 0 or len(self.cross_ref_list) < 3:
-            self.networking.disseminate_cross_ref(asset_group_id, txobj.transaction_id)
+            self.networking.disseminate_cross_ref(domain_id, txobj.transaction_id)
 
-        self.networking.put(domain_id=domain_id, asset_group_id=asset_group_id, resource_id=txobj.transaction_id,
+        self.networking.put(domain_id=domain_id, resource_id=txobj.transaction_id,
                             resource_type=ResourceType.Transaction_data, resource=txdata)
-        if self.storage_manager.get_storage_type(domain_id, asset_group_id) != "NONE":
-            for asid in registered_asset_ids_in_storage:
-                self.networking.put(domain_id=domain_id, asset_group_id=asset_group_id, resource_id=asid,
-                                    resource_type=ResourceType.Asset_file, resource=asset_files[asid])
+        if self.storage_manager.get_storage_type(domain_id) is not None:
+            for asset_group_id, asid in registered_asset_in_storage:
+                self.networking.put(domain_id=domain_id, resource_id=asid,
+                                    resource_type=ResourceType.Asset_file,
+                                    resource=asset_files[asid], asset_group_id=asset_group_id)
         return {KeyType.transaction_id: txobj.transaction_id}
 
-    def distribute_transaction_to_gather_signatures(self, asset_group_id, dat):
+    def distribute_transaction_to_gather_signatures(self, domain_id, dat):
         """
         Request to distribute sign_request to users
 
-        :param asset_group_id:
+        :param domain_id:
         :param dat:
         :return:
         """
@@ -750,21 +739,22 @@ class BBcCoreService:
         for dst in destinations:
             if dst == dat[KeyType.source_user_id]:
                 continue
-            msg = make_message_structure(MsgType.REQUEST_SIGNATURE, asset_group_id, dst, dat[KeyType.query_id])
+            msg = make_message_structure(MsgType.REQUEST_SIGNATURE, dst, dat[KeyType.query_id])
             msg[KeyType.source_user_id] = dat[KeyType.source_user_id]
             msg[KeyType.transaction_data] = dat[KeyType.transaction_data]
             if KeyType.transactions in dat:
                 msg[KeyType.transactions] = dat[KeyType.transactions]
             if KeyType.all_asset_files in dat:
                 msg[KeyType.all_asset_files] = dat[KeyType.all_asset_files]
-            if not self.send_to_other_user(asset_group_id, dst, dat[KeyType.source_user_id], msg):
+            if not self.send_to_other_user(domain_id, dst, dat[KeyType.source_user_id], msg):
                 return False
         return True
 
-    def search_asset_by_asid(self, asset_group_id, asid, source_id, query_id):
+    def search_asset_by_asid(self, domain_id, asset_group_id, asid, source_id, query_id):
         """
         Search asset in the storage by asset_id. If not found, search it in the network
 
+        :param domain_id:        domain_id where the transaction is inserted
         :param asset_group_id:   asset_group_id to search in
         :param asid:        asset_id in byte format
         :param source_id: the user_id of the sender
@@ -772,33 +762,36 @@ class BBcCoreService:
         :return: dictionary data of transaction_data, asset_file (if exists)
         """
         self.stats.update_stats_increment("asset", "search_count", 1)
-        response_info = make_message_structure(MsgType.RESPONSE_SEARCH_ASSET,
-                                               asset_group_id, source_id, query_id)
-        domain_id = self.asset_group_domain_mapping.get(asset_group_id, None)
+        response_info = make_message_structure(MsgType.RESPONSE_SEARCH_ASSET, source_id, query_id)
+        response_info[KeyType.asset_group_id] = asset_group_id
         if domain_id is None:
             self.stats.update_stats_increment("asset", "search_fail_count", 1)
-            self.logger.error("No such asset_group_id is set up in any domain")
+            self.logger.error("No such domain")
             return None
         response_info[KeyType.asset_id] = asid
 
-        txid = self.ledger_manager.find_locally(domain_id, asset_group_id, asid, ResourceType.Asset_ID)
-        if txid is None:
+        sql = "SELECT DISTINCT transaction_id FROM asset_info_table WHERE asset_group_id = ? AND asset_id = ?"
+        row = self.ledger_manager.find_by_sql_in_local_auxiliary_db(domain_id, sql, asset_group_id, asid)
+
+        if len(row) == 0:
             query_entry = query_management.QueryEntry(expire_after=DURATION_GIVEUP_GET,
                                                       callback_expire=self.failure_response,
                                                       data={'response_info': response_info,
                                                             KeyType.domain_id: domain_id,
+                                                            KeyType.sql: sql,
                                                             KeyType.asset_group_id: asset_group_id,
-                                                            KeyType.asset_id: asid,
                                                             KeyType.resource_id: asid,
+                                                            KeyType.asset_id: asid,
                                                             KeyType.resource_type: ResourceType.Asset_ID},
                                                       retry_count=GET_RETRY_COUNT)
             query_entry.update(fire_after=INTERVAL_RETRY, callback=self.search_transaction_for_asset)
             self.networking.get(query_entry)
             return None
 
-        txdata = self.ledger_manager.find_locally(domain_id, asset_group_id, txid, ResourceType.Transaction_data)
+        txid = row[0][0]
+        txdata = self.ledger_manager.find_transaction_locally(domain_id, txid)
         if txdata is not None:
-            txobj = self.validate_transaction(txid, txdata, None)
+            txobj = self.validate_transaction(txid, txdata)
             if txobj is None:
                 txdata = None
                 self.ledger_manager.remove(domain_id, asset_group_id, txid)
@@ -808,9 +801,8 @@ class BBcCoreService:
                                                       callback_expire=self.failure_response,
                                                       data={'response_info': response_info,
                                                             KeyType.domain_id: domain_id,
-                                                            KeyType.asset_group_id: asset_group_id,
-                                                            KeyType.asset_id: asid,
                                                             KeyType.resource_id: txid,
+                                                            KeyType.asset_id: asid,
                                                             KeyType.resource_type: ResourceType.Transaction_data},
                                                       retry_count=GET_RETRY_COUNT)
             query_entry.update(fire_after=INTERVAL_RETRY, callback=self.check_asset_in_response)
@@ -847,12 +839,12 @@ class BBcCoreService:
         :param query_entry:
         :return:
         """
+        print("search_transaction_for_asset")
         self.stats.update_stats_increment("transaction", "search_count", 1)
         domain_id = query_entry.data[KeyType.domain_id]
-        asset_group_id = query_entry.data[KeyType.asset_group_id]
         if query_entry.data[KeyType.resource_type] == ResourceType.Asset_ID:  # resource is txid that includes the asset
             txid = query_entry.data[KeyType.resource]
-            txdata = self.ledger_manager.find_locally(domain_id, asset_group_id, txid, ResourceType.Transaction_data)
+            txdata = self.ledger_manager.find_transaction_locally(domain_id, txid)
         else:
             txid = query_entry.data[KeyType.resource_id]
             txdata = query_entry.data[KeyType.resource]
@@ -861,7 +853,7 @@ class BBcCoreService:
             txobj = self.validate_transaction(txid, txdata, None)
             if txobj is None:
                 txdata = None
-                self.ledger_manager.remove(domain_id, asset_group_id, txid)
+                self.ledger_manager.remove(domain_id, txid)
         if txdata is None:
             del query_entry.data[KeyType.resource]
             query_entry.data.update({KeyType.resource_id: txid, KeyType.resource_type: ResourceType.Transaction_data})
@@ -872,6 +864,7 @@ class BBcCoreService:
 
         query_entry.data['response_info'][KeyType.transaction_data] = txdata
         asid = query_entry.data[KeyType.asset_id]
+        asset_group_id = query_entry.data[KeyType.asset_group_id]
         if check_transaction_if_having_asset_file(txdata, asid):
             asset_file = self.storage_manager.get_locally(domain_id, asset_group_id, asid)  # FIXME: to support storage_type=NONE
             if asset_file is not None:
@@ -895,6 +888,7 @@ class BBcCoreService:
         :param query_entry:
         :return:
         """
+        print("check_asset_in_response")
         domain_id = query_entry.data[KeyType.domain_id]
         asset_group_id = query_entry.data[KeyType.asset_group_id]
         if query_entry.data[KeyType.resource_type] == ResourceType.Transaction_data:
@@ -925,34 +919,33 @@ class BBcCoreService:
                                                query_entry.data[KeyType.resource])
         self.send_message(query_entry.data['response_info'])
 
-    def search_transaction_by_txid(self, asset_group_id, txid, source_id, query_id):
+    def search_transaction_by_txid(self, domain_id, txid, source_id, query_id):
         """
         Search transaction_data by transaction_id
 
-        :param asset_group_id:   asset_group_id to search in
+        :param domain_id:        domain_id where the transaction is inserted
         :param txid:  transaction_id
         :param source_id: the user_id of the sender
         :param query_id:
         :return: response data including transaction_data
         """
         self.stats.update_stats_increment("transaction", "search_count", 1)
-        domain_id = self.asset_group_domain_mapping.get(asset_group_id, None)
         if domain_id is None:
-            self.logger.error("No such asset_group_id is set up in any domain")
+            self.logger.error("No such domain")
             return None
-
-        txdata = self.ledger_manager.find_locally(domain_id, asset_group_id, txid, ResourceType.Transaction_data)
-        if txdata is not None and self.validate_transaction(txid, txdata, None) is None:
+        if txid is None:
+            self.logger.error("Transaction_id must not be None")
+            return None
+        txdata = self.ledger_manager.find_transaction_locally(domain_id, txid)
+        if txdata is not None and self.validate_transaction(txid, txdata) is None:
             txdata = None
-            self.ledger_manager.remove(domain_id, asset_group_id, txid)
-        response_info = make_message_structure(MsgType.RESPONSE_SEARCH_TRANSACTION,
-                                               asset_group_id, source_id, query_id)
+            self.ledger_manager.remove(domain_id, txid)
+        response_info = make_message_structure(MsgType.RESPONSE_SEARCH_TRANSACTION, source_id, query_id)
         if txdata is None:
             query_entry = query_management.QueryEntry(expire_after=DURATION_GIVEUP_GET,
                                                       callback_expire=self.failure_response,
                                                       data={'response_info': response_info,
                                                             KeyType.domain_id: domain_id,
-                                                            KeyType.asset_group_id: asset_group_id,
                                                             KeyType.resource_id: txid,
                                                             KeyType.resource_type: ResourceType.Transaction_data},
                                                       retry_count=GET_RETRY_COUNT)
@@ -962,45 +955,51 @@ class BBcCoreService:
         response_info[KeyType.transaction_data] = txdata
         return response_info
 
-    def search_transaction_by_userid_locally(self, asset_group_id, user_id, source_id, query_id):
+    def search_transaction_by_userid_locally(self, domain_id, asset_group_id, user_id, source_id, query_id, count=1):
         """
         Local search a latest transaction that includes the asset owned by the specified user_id
-        TODO: need to support search it within the domain
+        :param domain_id:        domain_id where the transaction is inserted
         :param asset_group_id:
         :param user_id:
         :param source_id: the user_id of the sender
         :param query_id:
         :return: response data including transaction_data, if a transaction is not found in the local DB, None is returned.
         """
-        domain_id = self.asset_group_domain_mapping.get(asset_group_id, None)
         if domain_id is None:
-            self.logger.error("No such asset_group_id is set up in any domain")
+            self.logger.error("No such domain")
             return None
 
-        txid = self.ledger_manager.find_locally(domain_id, asset_group_id, user_id,
-                                                ResourceType.Owner_asset, want_newest=True)
-        if txid is None:
+        sql = "SELECT DISTINCT transaction_id FROM asset_info_table WHERE asset_group_id = ? AND user_id = ? " \
+              "ORDER BY id DESC limit ?"
+        row = self.ledger_manager.find_by_sql_in_local_auxiliary_db(domain_id, sql, asset_group_id, user_id, count)
+        if len(row) == 0:
             return None
 
-        txdata = self.ledger_manager.find_locally(domain_id, asset_group_id, txid, ResourceType.Transaction_data)
-        if txdata is not None and self.validate_transaction(txid, txdata, None) is None:
-            self.ledger_manager.remove(domain_id, asset_group_id, txid)
-            return None
-        response_info = make_message_structure(MsgType.RESPONSE_SEARCH_USERID,
-                                               asset_group_id, source_id, query_id)
-        response_info[KeyType.transaction_data] = txdata
+        response_info = make_message_structure(MsgType.RESPONSE_SEARCH_USERID, source_id, query_id)
+        for r in row:
+            txid = r[0]
+            txdata = self.ledger_manager.find_transaction_locally(domain_id, txid)
+            if txdata is not None and self.validate_transaction(txid, txdata) is None:
+                self.ledger_manager.remove(domain_id, txid)
+                return None
+            if len(row) == 1:
+                response_info[KeyType.transaction_data] = txdata
+            else:
+                if KeyType.transactions not in response_info:
+                    response_info[KeyType.transactions] = list()
+                response_info[KeyType.transactions].append(txdata)
         return response_info
 
-    def add_cross_ref_into_list(self, asset_group_id, txid):
+    def add_cross_ref_into_list(self, domain_id, txid):
         """
         (internal use) register cross_ref info in the list
 
-        :param asset_group_id:
+        :param domain_id:
         :param txid:
         :return:
         """
         self.stats.update_stats_increment("cross_ref", "total_num", 1)
-        self.cross_ref_list.append([asset_group_id, txid])
+        self.cross_ref_list.append([domain_id, txid])
 
     def send_response(self, response_info, dat):
         """
@@ -1032,9 +1031,9 @@ class BBcCoreService:
         :param query_entry:
         :return:
         """
-        self.ledger_manager.insert_locally(query_entry.data[KeyType.domain_id], query_entry.data[KeyType.asset_group_id],
-                                           query_entry.data[KeyType.resource_id],
-                                           ResourceType.Transaction_data, query_entry.data[KeyType.resource])
+        self.ledger_manager.insert_transaction_locally(query_entry.data[KeyType.domain_id],
+                                                       query_entry.data[KeyType.resource_id],
+                                                       query_entry.data[KeyType.resource])
         response_info = query_entry.data['response_info']
         response_info[KeyType.transaction_data] = query_entry.data[KeyType.resource]
         self.send_message(response_info)
@@ -1080,12 +1079,12 @@ if __name__ == '__main__':
     if argresult.daemon:
         daemonize()
     BBcCoreService(
-        ipv6=argresult.ipv6,
         p2p_port=argresult.p2pport,
         core_port=argresult.coreport,
         workingdir=argresult.workingdir,
         configfile=argresult.config,
         use_global=argresult.globaldomain,
+        use_ledger_subsystem=argresult.ledgersubsystem,
         ip4addr=argresult.ip4addr,
         ip6addr=argresult.ip6addr,
         logname=argresult.log,

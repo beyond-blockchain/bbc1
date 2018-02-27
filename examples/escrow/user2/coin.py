@@ -38,21 +38,20 @@ user_id = None
 key_pair = None
 bbc_app_client = None
 
-def asset_group_setup():
+
+def domain_setup():
     tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
     tmpclient.domain_setup(domain_id, "simple_cluster")
     tmpclient.callback.synchronize()
-    tmpclient.register_asset_group(domain_id=domain_id, asset_group_id=asset_group_id)
-    tmpclient.callback.synchronize()
     tmpclient.unregister_from_core()
-    print("Domain %s and asset_group %s are created." % (binascii.b2a_hex(domain_id[:4]).decode(),
-                                                        binascii.b2a_hex(asset_group_id[:4]).decode()))
+    print("Domain %s is created." % (binascii.b2a_hex(domain_id[:4]).decode()))
     print("Setup is done.")
 
 
 def setup_bbc_client():
     bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
     bbc_app_client.set_user_id(user_id)
+    bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_asset_group_id(asset_group_id)
     bbc_app_client.set_callback(bbc_app.Callback())
     ret = bbc_app_client.register_to_core()
@@ -66,7 +65,7 @@ def store_proc(data, approver_id, txid=None):
     transaction.events[0].add(mandatory_approver=approver_id, asset_group_id=asset_group_id)
     transaction.events[0].asset.add(user_id=user_id, asset_body=data)
     if txid:
-        bbc_app_client.search_transaction(asset_group_id, txid)
+        bbc_app_client.search_transaction(txid)
         response_data = bbc_app_client.callback.synchronize()
         if response_data[KeyType.status] < ESUCCESS:
             print("ERROR: ", response_data[KeyType.reason].decode())
@@ -85,7 +84,7 @@ def store_proc(data, approver_id, txid=None):
     transaction.digest()
     transaction.dump()
 
-    ret = bbc_app_client.insert_transaction(asset_group_id, transaction)
+    ret = bbc_app_client.insert_transaction(transaction)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
@@ -154,8 +153,9 @@ def chown(new_owner,asid):
     get_transaction.deserialize(response_data[KeyType.transaction_data])
     transaction_id = get_transaction.transaction_id
     transaction_info = store_proc(data, approver_id=binascii.unhexlify(new_owner),txid=transaction_id)
-    bbc_app_client.send_message(transaction_info, asset_group_id, binascii.unhexlify(new_owner))
+    bbc_app_client.send_message(transaction_info, binascii.unhexlify(new_owner))
     print("Transfer is done.....")
+
 
 if __name__ == '__main__':
     if(not os.path.exists(PRIVATE_KEY) and not os.path.exists(PUBLIC_KEY)):
@@ -165,7 +165,7 @@ if __name__ == '__main__':
     with open(PUBLIC_KEY, "rb") as fin:
         public_key = fin.read()
 
-    asset_group_setup()
+    domain_setup()
 
     key_pair = bbclib.KeyPair(privkey=private_key, pubkey=public_key)
     user_id = bbclib.get_new_id(str(binascii.b2a_hex(key_pair.public_key)), include_timestamp=False)
