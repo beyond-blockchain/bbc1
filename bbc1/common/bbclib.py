@@ -230,9 +230,16 @@ class KeyPair:
 
     def sign(self, digest):
         if self.type == KeyType.ECDSA_SECP256k1:
-            signature = (c_byte * 64)()
-            libbbcsig.sign(self.private_key_len, self.private_key, 32, digest, signature)
-            return bytes(signature)
+            sig_r = (c_byte * 32)()
+            sig_s = (c_byte * 32)()
+            sig_r_len = (c_byte * 4)()  # Adjust size according to the expected size of sig_r and sig_s. Default:uint32.
+            sig_s_len = (c_byte * 4)()
+            libbbcsig.sign(self.private_key_len, self.private_key, 32, digest, sig_r, sig_s, sig_r_len, sig_s_len)
+            sig_r_len = int.from_bytes(bytes(sig_r_len), "little")
+            sig_s_len = int.from_bytes(bytes(sig_s_len), "little")
+            sig_r = binascii.a2b_hex("00"*(32-sig_r_len) + bytes(sig_r)[:sig_r_len].hex())
+            sig_s = binascii.a2b_hex("00"*(32-sig_s_len) + bytes(sig_s)[:sig_s_len].hex())
+            return bytes(bytearray(sig_r)+bytearray(sig_s))
         else:
             set_error(code=EOTHER, txt="sig_type %d is not supported" % self.type)
             return None

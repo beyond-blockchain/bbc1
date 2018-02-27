@@ -32,12 +32,13 @@
 #include <openssl/pem.h>
 #include <openssl/evp.h>
 #include <openssl/bio.h>
+#include <openssl/err.h>
+
 
 #include <crypto/ec/ec_lcl.h>
 
-
 VS_DLL_EXPORT
-bool VS_STDCALL sign(int privkey_len, uint8_t *privkey, int hash_len, uint8_t *hash, uint8_t *sig)
+bool VS_STDCALL sign(int privkey_len, uint8_t *privkey, int hash_len, uint8_t *hash, uint8_t *sig_r, uint8_t *sig_t, uint32_t *sig_r_len, uint32_t *sig_s_len)
 {
     BN_CTX *ctx = BN_CTX_new();
     EC_KEY *eckey = EC_KEY_new();
@@ -59,8 +60,11 @@ bool VS_STDCALL sign(int privkey_len, uint8_t *privkey, int hash_len, uint8_t *h
     EC_KEY_set_private_key(eckey, private_key);
 
     ECDSA_SIG *signature = ECDSA_do_sign(hash, hash_len, eckey);
-    BN_bn2bin(signature->r, sig);
-    BN_bn2bin(signature->s, &sig[privkey_len]);
+    BN_bn2bin(signature->r, sig_r);
+    BN_bn2bin(signature->s, sig_t);
+
+    *sig_r_len = (uint32_t) BN_num_bytes(signature->r);
+    *sig_s_len = (uint32_t) BN_num_bytes(signature->s);
 
     EC_GROUP_free(ecgroup);
     EC_KEY_free(eckey);

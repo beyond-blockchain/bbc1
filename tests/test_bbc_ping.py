@@ -52,7 +52,7 @@ class TestBBcPing(object):
         time.sleep(1)
         for i in range(client_num):
             msg_processor[i] = MessageProcessor(index=i)
-            make_client(index=i, core_port_increment=i, callback=msg_processor[i], asset_group_id=asset_group_id)
+            make_client(index=i, core_port_increment=i, callback=msg_processor[i])
         time.sleep(1)
 
         global cores, clients
