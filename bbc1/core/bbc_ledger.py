@@ -6,6 +6,7 @@ import binascii
 import sys
 sys.path.extend(["../../"])
 from bbc1.common import logger
+from bbc1.core.bbc_types import ResourceType
 
 
 transaction_tbl_definition = [
