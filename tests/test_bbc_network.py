@@ -12,6 +12,7 @@ sys.path.extend(["../"])
 from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
 from bbc1.core import bbc_network, bbc_config, query_management, bbc_stats
+from bbc1.core.bbc_types import ResourceType
 
 
 LOGLEVEL = 'debug'
@@ -59,12 +60,12 @@ class DummyCore:
         def add_domain(self, domain_id):
             pass
 
-        def insert_locally(self, domain_id, asset_group_id, resource_id, resource_type, data):
+        def insert_transaction_locally(self, domain_id, resource_id, resource_type, data):
             print("insert_locally: domain_id=%s, resource_id=%s" % (binascii.b2a_hex(domain_id[:4]),
                                                                     binascii.b2a_hex(resource_id[:4])))
             result_queue.put(1)
 
-        def find_locally(self, domain_id, asset_group_id, resource_id, resource_type):
+        def find_transaction_locally(self, domain_id, resource_id):
             if resource_id == sample_resource_id:
                 print("find_locally: FOUND %s" % binascii.b2a_hex(resource_id[:4]))
                 return b'sample_resource'
@@ -97,7 +98,7 @@ class DummyCore:
 class TestBBcNetwork(object):
 
     def test_01_start(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         dummycore = DummyCore()
         from bbc1.core import simple_cluster
         simple_cluster.FORWARD_CACHE_SIZE = 5
@@ -115,7 +116,7 @@ class TestBBcNetwork(object):
             networkings[i].register_user_id(domain_id, users[i])
 
     def test_02_set_initial_peer(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(core_nodes):
             networkings[i].domains[domain_id].add_peer_node(node_id=nodes[0],
                                                             ip4=True,
@@ -123,7 +124,7 @@ class TestBBcNetwork(object):
             networkings[i].domains[domain_id].print_peerlist()
 
     def test_03_send_ping(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(1, core_nodes):
             print("node=%d: ping_to:%s"%(i, binascii.b2a_hex(nodes[0])))
             ret = networkings[i].domains[domain_id].send_ping(nodes[0], None)
@@ -136,7 +137,7 @@ class TestBBcNetwork(object):
         assert not ret
 
     def test_04_alive_check(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         networkings[0].domains[domain_id].alive_check()
         print("alive checking. need to wait 16 sec")
         time.sleep(16)
@@ -149,9 +150,8 @@ class TestBBcNetwork(object):
         for i in range(0, core_nodes):
             networkings[i].domains[domain_id].print_peerlist()
 
-    """
     def test_05_send_ping(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(1, core_nodes):
             k = random.randint(0,9)
             if i == k:
@@ -164,66 +164,65 @@ class TestBBcNetwork(object):
         networkings[0].domains[domain_id].print_peerlist()
 
     def test_06_route_message(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(core_nodes):
             msg = {b'aaaaa': 1, b'bbbb': "AAAAAA from %d" % i}
-            networkings[i].route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                         dst_user_id=users[0], msg_to_send=msg)
+            networkings[i].route_message(domain_id=domain_id, dst_user_id=users[0],
+                                         src_user_id=users[i], msg_to_send=msg)
         print("wait queue: 10")
         total = wait_results(10)
         assert total == 10
 
     def test_07_route_message_with_cache(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(core_nodes):
             msg = {b'aaaaa': 1, b'bbbb': "BBBBBBB from %d" % i}
-            networkings[i].route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                         dst_user_id=users[0], msg_to_send=msg)
+            networkings[i].route_message(domain_id=domain_id, dst_user_id=users[0],
+                                         src_user_id=users[i], msg_to_send=msg)
         print("wait queue: 10")
         total = wait_results(10)
         assert total == 10
 
     def test_08_route_message_inavlid_user(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         dummy_user_id = bbclib.get_new_id("dummy_user_id")
         msg = {KeyType.command:3, KeyType.query_id:4, b'aaaaa': 1, b'bbbb': "CCCCCC from 1"}
-        networkings[1].route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                     dst_user_id=dummy_user_id, msg_to_send=msg)
+        networkings[1].route_message(domain_id=domain_id, dst_user_id=dummy_user_id,
+                                     src_user_id=users[1], msg_to_send=msg)
         total = wait_results(1)
         assert total == 0
 
     def test_09_route_message_overflow_cache(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(core_nodes):
             msg = {b'aaaaa': 1, b'bbbb': "DDDDDD from %d" % i}
-            networkings[1].route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                         dst_user_id=users[i], msg_to_send=msg)
+            networkings[1].route_message(domain_id=domain_id,  dst_user_id=users[i],
+                                         src_user_id=users[1], msg_to_send=msg)
         print("wait queue: 10")
         total = wait_results(10)
         assert total == 10
 
     def test_10_route_message_overflow_cache_again(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(core_nodes):
             msg = {b'aaaaa': 1, b'bbbb': "EEEEEEE from %d" % i}
-            networkings[1].route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                         dst_user_id=users[i], msg_to_send=msg)
+            networkings[1].route_message(domain_id=domain_id, dst_user_id=users[i],
+                                         src_user_id=users[1], msg_to_send=msg)
         print("wait queue: 10")
         total = wait_results(10)
         assert total == 10
 
     def test_11_put(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         resource = b'aaaaaa'
         resource_id = bbclib.get_new_id("dummy_resource_id")
-        networkings[1].put(domain_id=domain_id, asset_group_id=asset_group_id,
-                           resource_id=resource_id, resource=resource)
+        networkings[1].put(domain_id=domain_id, resource_id=resource_id, resource=resource)
         print("wait queue: 9")
         total = wait_results(9)
         assert total == 9
 
     def test_12_get(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         query_entry = query_management.QueryEntry(expire_after=10,
                                                   callback_expire=get_test_func_failure,
                                                   data={KeyType.domain_id: domain_id,
@@ -238,7 +237,7 @@ class TestBBcNetwork(object):
         assert total == 1
 
     def test_12_get_failure(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         resource_id = bbclib.get_new_id("dummy_resource_id")
         query_entry = query_management.QueryEntry(expire_after=10,
                                                   callback_expire=get_test_func_failure,
@@ -254,12 +253,12 @@ class TestBBcNetwork(object):
         assert total == 0
 
     def test_13_leave_domain(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(2, core_nodes):
             networkings[i].remove_domain(domain_id)
         time.sleep(1)
         networkings[0].domains[domain_id].print_peerlist()
-    """
+
 
 if __name__ == '__main__':
     pytest.main()

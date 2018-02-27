@@ -49,14 +49,14 @@ class MessageProcessor(bbc_app.Callback):
             event = objs[reference.transaction_id].events[reference.event_index_in_ref]
             if clients[self.idx]['user_id'] in event.mandatory_approvers:
                 signature = txobj.sign(keypair=clients[self.idx]['keypair'])
-                clients[self.idx]['app'].sendback_signature(asset_group_id, dat[KeyType.source_user_id], i, signature)
+                clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], i, signature)
                 return
 
 
 class TestBBcAppClient(object):
 
     def test_00_setup(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         print("domain_id =", binascii.b2a_hex(domain_id))
 
         global msg_processor
@@ -67,14 +67,14 @@ class TestBBcAppClient(object):
         for i in range(client_num):
             msg_processor[i] = MessageProcessor(index=i)
             domain_setup_utility(i, domain_id)  # system administrator
-            make_client(index=i, core_port_increment=i, callback=msg_processor[i], asset_group_id=asset_group_id)
+            make_client(index=i, core_port_increment=i, callback=msg_processor[i])
         time.sleep(1)
 
         global cores, clients
         cores, clients = get_core_client()
 
     def test_10_setup_network(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         ret = clients[0]['app'].get_domain_peerlist(domain_id=domain_id)
         assert ret
         dat = msg_processor[0].synchronize()
@@ -93,7 +93,7 @@ class TestBBcAppClient(object):
             cores[i].storage_manager.set_storage_path(domain_id)
 
     def test_11_register(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         for cl in clients:
             ret = cl['app'].register_to_core()
             assert ret
@@ -102,34 +102,34 @@ class TestBBcAppClient(object):
         time.sleep(10)
 
     def test_12_make_transaction(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         user = clients[0]['user_id']
         transactions[0] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
         transactions[0].events[0].asset.add(user_id=user, asset_file=b"data=1")
         sig = transactions[0].sign(keypair=clients[0]['keypair'])
         transactions[0].add_signature(user_id=clients[0]['user_id'], signature=sig)
-        ret = clients[0]['app'].insert_transaction(asset_group_id, transactions[0])
+        ret = clients[0]['app'].insert_transaction(transactions[0])
         assert ret
         msg_processor[0].synchronize()
         print("txid:", binascii.b2a_hex(transactions[0].digest()))
 
     def test_13_search_transaction(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
-        ret = clients[4]['app'].search_transaction(asset_group_id, transactions[0].digest())
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        ret = clients[4]['app'].search_transaction(transactions[0].digest())
         assert ret
         dat = wait_check_result_msg_type(msg_processor[4], bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION)
         assert dat[KeyType.status] == ESUCCESS
 
     def test_14_remove_transaction(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
-        cores[1].ledger_manager.remove(domain_id, asset_group_id, transactions[0].digest())
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        cores[1].ledger_manager.remove(domain_id, transactions[0].digest())
 
-        ret = cores[1].ledger_manager.find_locally(domain_id, asset_group_id,
-                                                   transactions[0].digest(), ResourceType.Transaction_data)
+        ret = cores[1].ledger_manager.find_transaction_locally(domain_id, transactions[0].digest())
         assert ret is None
 
     def test_15_search_transaction(self):
-        ret = clients[1]['app'].search_transaction(asset_group_id, transactions[0].digest())
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        ret = clients[1]['app'].search_transaction(transactions[0].digest())
         assert ret
         dat = msg_processor[1].synchronize()
         assert dat[KeyType.status] == 0
@@ -137,29 +137,26 @@ class TestBBcAppClient(object):
         tx_obj = bbclib.recover_transaction_object_from_rawdata(dat[KeyType.transaction_data])
         print("txid:", binascii.b2a_hex(tx_obj.digest()))
         print("--- find_locally again ---")
-        ret = cores[1].ledger_manager.find_locally(domain_id, asset_group_id,
-                                                   transactions[0].digest(), ResourceType.Transaction_data)
+        ret = cores[1].ledger_manager.find_transaction_locally(domain_id, transactions[0].digest())
         assert ret is not None
 
     def test_16_forge_transaction(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
-        cores[2].ledger_manager.remove(domain_id, asset_group_id, transactions[0].digest())
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        cores[2].ledger_manager.remove(domain_id, transactions[0].digest())
 
         transactions[1] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id)
         transactions[1].events[0].asset.add(user_id=clients[1]['user_id'], asset_file=b"data=2")
         sig = transactions[0].sign(keypair=clients[0]['keypair'])
         transactions[1].add_signature(user_id=clients[0]['user_id'], signature=sig)
         txdata = transactions[1].serialize()
-        cores[2].ledger_manager.insert_locally(domain_id, asset_group_id, transactions[0].digest(),
-                                               ResourceType.Transaction_data, txdata)
-        ret = cores[2].ledger_manager.find_locally(domain_id, asset_group_id,
-                                                   transactions[0].digest(), ResourceType.Transaction_data)
+        cores[2].ledger_manager.insert_transaction_locally(domain_id, transactions[0].digest(), txdata)
+        ret = cores[2].ledger_manager.find_transaction_locally(domain_id, transactions[0].digest())
         print("forged_transaction:", binascii.b2a_hex(ret))
         print("forged_txid:", binascii.b2a_hex(transactions[1].digest()))
 
     def test_17_search_transaction(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
-        ret = clients[2]['app'].search_transaction(asset_group_id, transactions[0].digest())
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        ret = clients[2]['app'].search_transaction(transactions[0].digest())
         assert ret
         dat = wait_check_result_msg_type(msg_processor[2], bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION)
         assert dat[KeyType.status] == ESUCCESS
@@ -177,7 +174,7 @@ class TestBBcAppClient(object):
         print(dat[KeyType.asset_file])
 
     def test_21_remove_asset(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         asset_id = transactions[0].events[0].asset.asset_id
         cores[3].storage_manager.remove(domain_id, asset_group_id, asset_id)
 
@@ -185,7 +182,7 @@ class TestBBcAppClient(object):
         assert ret is None
 
     def test_22_search_asset(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         asset_id = transactions[0].events[0].asset.asset_id
         ret = clients[3]['app'].search_asset(asset_group_id, asset_id)
         assert ret
@@ -198,7 +195,7 @@ class TestBBcAppClient(object):
         print(ret)
 
     def test_23_forge_asset(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         asset_id = transactions[0].events[0].asset.asset_id
         asset_id_str = binascii.b2a_hex(asset_id).decode()
         filepath = cores[3].storage_manager.storage_path[domain_id][asset_group_id]+"/%s" % asset_id_str
@@ -210,7 +207,7 @@ class TestBBcAppClient(object):
         print(ret)
 
     def test_24_search_asset(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
         asset_id = transactions[0].events[0].asset.asset_id
         ret = clients[3]['app'].search_asset(asset_group_id, asset_id)
         assert ret
@@ -223,10 +220,9 @@ class TestBBcAppClient(object):
         print(ret)
 
     def test_30_forge_transaction_and_asset(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
 
-        ret = cores[4].ledger_manager.find_locally(domain_id, asset_group_id,
-                                                   transactions[0].digest(), ResourceType.Transaction_data)
+        ret = cores[4].ledger_manager.find_transaction_locally(domain_id, transactions[0].digest())
         print("forged_transaction:", binascii.b2a_hex(ret))
         print("forged_txid:", binascii.b2a_hex(transactions[1].digest()))
 
@@ -243,7 +239,7 @@ class TestBBcAppClient(object):
         print(ret)
 
     def test_31_search_asset(self):
-        print("-----", sys._getframe().f_code.co_name, "-----")
+        print("\n----", sys._getframe().f_code.co_name, "-----")
         asset_id = transactions[0].events[0].asset.asset_id
         ret = clients[3]['app'].search_asset(asset_group_id, asset_id)
         assert ret

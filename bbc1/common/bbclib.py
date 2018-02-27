@@ -516,7 +516,7 @@ class BBcTransaction:
         if len(self.cross_refs) > 0:
             for i, cross in enumerate(self.cross_refs):
                 print("[%d]" % i)
-                print("  asset_group_id:", binascii.b2a_hex(cross.asset_group_id))
+                print("  domain_id:", binascii.b2a_hex(cross.domain_id))
                 print("  transaction_id:", binascii.b2a_hex(cross.transaction_id))
         else:
             print("  None")
@@ -766,19 +766,19 @@ class BBcAsset:
 
 
 class BBcCrossRef:
-    def __init__(self, asset_group_id=None, transaction_id=None):
-        self.asset_group_id = asset_group_id
+    def __init__(self, domain_id=None, transaction_id=None):
+        self.domain_id = domain_id
         self.transaction_id = transaction_id
 
     def serialize(self):
-        dat = bytearray(to_bigint(self.asset_group_id))
+        dat = bytearray(to_bigint(self.domain_id))
         dat.extend(to_bigint(self.transaction_id))
         return bytes(dat)
 
     def deserialize(self, data):
         ptr = 0
         try:
-            ptr, self.asset_group_id = get_bigint(ptr, data)
+            ptr, self.domain_id = get_bigint(ptr, data)
             ptr, self.transaction_id = get_bigint(ptr, data)
         except:
             return False

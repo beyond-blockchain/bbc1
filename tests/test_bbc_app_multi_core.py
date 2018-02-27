@@ -55,7 +55,7 @@ class MessageProcessor(bbc_app.Callback):
             event = objs[reference.transaction_id].events[reference.event_index_in_ref]
             if clients[self.idx]['user_id'] in event.mandatory_approvers:
                 signature = txobj.sign(keypair=clients[self.idx]['keypair'])
-                clients[self.idx]['app'].sendback_signature(asset_group_id, dat[KeyType.source_user_id], i, signature)
+                clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], i, signature)
                 return
 
     def proc_resp_search_asset(self, dat):
@@ -89,7 +89,7 @@ class TestBBcAppClient(object):
         for i in range(client_num):
             msg_processor[i] = MessageProcessor(index=i)
             domain_setup_utility(i, domain_id)  # system administrator
-            make_client(index=i, core_port_increment=i, callback=msg_processor[i], asset_group_id=asset_group_id)
+            make_client(index=i, core_port_increment=i, callback=msg_processor[i])
         time.sleep(1)
 
         global cores, clients
@@ -147,19 +147,21 @@ class TestBBcAppClient(object):
         if len(cross_ref_list) > 0:
             transactions[0].add(cross_ref=cross_ref_list.pop(0))
 
+        transactions[0].get_sig_index(user)
         sig = transactions[0].sign(keypair=clients[0]['keypair'])
         assert sig is not None
         if sig is None:
             print(bbclib.error_text)
             import os
             os._exit(1)
-        transactions[0].add_signature(signature=sig)
+        transactions[0].add_signature(user_id=user, signature=sig)
         transactions[0].dump()
         transactions[0].digest()
         print("register transaction=", binascii.b2a_hex(transactions[0].transaction_id))
-        ret = clients[0]['app'].insert_transaction(asset_group_id, transactions[0])
+        ret = clients[0]['app'].insert_transaction(transactions[0])
         assert ret
         msg_processor[0].synchronize()
+        time.sleep(2)
 
     def test_13_gather_signature(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -171,7 +173,7 @@ class TestBBcAppClient(object):
             transactions[1].add(cross_ref=cross_ref_list.pop(0))
 
         reference = bbclib.add_reference_to_transaction(asset_group_id, transactions[1], prev_tx, 0)
-        ret = clients[1]['app'].gather_signatures(asset_group_id, transactions[1], reference_obj=reference)
+        ret = clients[1]['app'].gather_signatures(transactions[1], reference_obj=reference)
         assert ret
         dat = msg_processor[1].synchronize()
         assert dat[KeyType.status] == ESUCCESS
@@ -181,7 +183,7 @@ class TestBBcAppClient(object):
         transactions[1].dump()
         transactions[1].digest()
         print("register transaction=", binascii.b2a_hex(transactions[1].transaction_id))
-        ret = clients[1]['app'].insert_transaction(asset_group_id, transactions[1])
+        ret = clients[1]['app'].insert_transaction(transactions[1])
         assert ret
         msg_processor[1].synchronize()
 
@@ -210,14 +212,14 @@ class TestBBcAppClient(object):
     def test_20_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         print("find txid=", binascii.b2a_hex(transactions[0].transaction_id))
-        ret = clients[4]['app'].search_transaction(asset_group_id, transactions[0].transaction_id)
+        ret = clients[4]['app'].search_transaction(transactions[0].transaction_id)
         assert ret
         dat = msg_processor[4].synchronize()
         assert dat[KeyType.status] == 0
 
     def test_21_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = clients[4]['app'].search_transaction(asset_group_id, b'4898g9fh')  # NG is expected
+        ret = clients[4]['app'].search_transaction(b'4898g9fh')  # NG is expected
         assert ret
         print("* should be NG *")
         dat = msg_processor[4].synchronize()
@@ -227,7 +229,7 @@ class TestBBcAppClient(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(1, client_num):
             msg = "message to %d" % i
-            ret = clients[0]['app'].send_message(msg, asset_group_id, clients[i]['user_id'])
+            ret = clients[0]['app'].send_message(msg, clients[i]['user_id'])
             assert ret
         for i in range(1, client_num):
             print("recv=",msg_processor[i].synchronize()[KeyType.message])
@@ -236,7 +238,7 @@ class TestBBcAppClient(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(1, client_num):
             msg = "message to %d: %s" % (i, large_data)
-            ret = clients[0]['app'].send_message(msg, asset_group_id, clients[i]['user_id'])
+            ret = clients[0]['app'].send_message(msg, clients[i]['user_id'])
             assert ret
         for i in range(1, client_num):
             print("recv=",msg_processor[i].synchronize()[KeyType.message])
@@ -248,13 +250,13 @@ class TestBBcAppClient(object):
             if k == i:
                 continue
             msg = "message to %d" % i
-            ret = clients[i]['app'].send_message(msg, asset_group_id, clients[k]['user_id'])
+            ret = clients[i]['app'].send_message(msg, clients[k]['user_id'])
             print("recv=",msg_processor[k].synchronize()[KeyType.message])
 
     def test_33_messaging(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         msg = "message to X"
-        ret = clients[0]['app'].send_message(msg, asset_group_id, bbclib.get_new_id("xxxxx"))
+        ret = clients[0]['app'].send_message(msg, bbclib.get_new_id("xxxxx"))
         print("recv=",msg_processor[0].synchronize())
 
     def test_97_get_stat(self):

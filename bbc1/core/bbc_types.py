@@ -22,11 +22,11 @@ from bbc1.common.message_key_types import to_2byte
 
 class ResourceType:
     Transaction_data = 0
-    Asset_ID = 1
-    Asset_file = 2
-    Edge_incoming = 3
-    Edge_outgoing = 4
-    Owner_asset = 5
+    Asset_info = 1
+    Asset_ID = 2
+    Asset_file = 3
+    Edge_incoming = 4
+    Edge_outgoing = 5
 
 
 class InfraMessageTypeBase:

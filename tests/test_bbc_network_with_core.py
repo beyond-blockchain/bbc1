@@ -158,8 +158,8 @@ class TestBBcNetworkWithCore(object):
         for i in range(core_nodes):
             msg = {KeyType.domain_id: domain_id, KeyType.destination_user_id: users[0],
                    b'data': "AAAAAA from %d" % i}
-            cores[i].networking.route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                              dst_user_id=users[0], msg_to_send=msg)
+            cores[i].networking.route_message(domain_id=domain_id, dst_user_id=users[0],
+                                              src_user_id=users[i], msg_to_send=msg)
         print("wait queue: 10")
         total = wait_results(10)
         assert total == 10
@@ -169,8 +169,8 @@ class TestBBcNetworkWithCore(object):
         for i in range(core_nodes):
             msg = {KeyType.domain_id: domain_id, KeyType.destination_user_id: users[0],
                    b'data': "BBBBBB from %d" % i}
-            cores[i].networking.route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                              dst_user_id=users[0], msg_to_send=msg)
+            cores[i].networking.route_message(domain_id=domain_id, dst_user_id=users[0],
+                                              src_user_id=users[i], msg_to_send=msg)
         print("wait queue: 10")
         total = wait_results(10)
         assert total == 10
@@ -179,8 +179,8 @@ class TestBBcNetworkWithCore(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         dummy_user_id = bbclib.get_new_id("dummy_user_id")
         msg = {KeyType.command:3, KeyType.query_id:4, b'aaaaa': 1, b'bbbb': "CCCCCC from 1"}
-        cores[1].networking.route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                          dst_user_id=dummy_user_id, msg_to_send=msg)
+        cores[1].networking.route_message(domain_id=domain_id, dst_user_id=dummy_user_id,
+                                          src_user_id=users[1], msg_to_send=msg)
         total = wait_results(1)
         assert total == 0
 
@@ -188,8 +188,8 @@ class TestBBcNetworkWithCore(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(core_nodes):
             msg = {b'aaaaa': 1, b'bbbb': "DDDDDD from %d" % i}
-            cores[1].networking.route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                              dst_user_id=users[0], msg_to_send=msg)
+            cores[1].networking.route_message(domain_id=domain_id, dst_user_id=users[0],
+                                              src_user_id=users[1], msg_to_send=msg)
         print("wait queue: 10")
         total = wait_results(10)
         assert total == 10
@@ -198,8 +198,8 @@ class TestBBcNetworkWithCore(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(core_nodes):
             msg = {b'aaaaa': 1, b'bbbb': "EEEEEEE from %d" % i}
-            cores[1].networking.route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                              dst_user_id=users[0], msg_to_send=msg)
+            cores[1].networking.route_message(domain_id=domain_id, dst_user_id=users[0],
+                                              src_user_id=users[1], msg_to_send=msg)
         print("wait queue: 10")
         total = wait_results(10)
         assert total == 10
@@ -213,11 +213,10 @@ class TestBBcNetworkWithCore(object):
         sig = transaction.sign(keypair=keypair)
         transaction.add_signature(user_id=users[0], signature=sig)
         transaction.digest()
-        ret = cores[3].ledger_manager.insert_locally(domain_id, asset_group_id, transaction.transaction_id,
-                                                     ResourceType.Transaction_data, transaction.serialize())
+        ret = cores[3].ledger_manager.insert_transaction_locally(domain_id, transaction.transaction_id,
+                                                                 transaction.serialize())
         time.sleep(2)
-        ret = cores[3].ledger_manager.find_locally(domain_id, asset_group_id,
-                                                   transaction.transaction_id, ResourceType.Transaction_data)
+        ret = cores[3].ledger_manager.find_transaction_locally(domain_id, transaction.transaction_id)
         assert ret is not None
 
     def test_12_get(self):

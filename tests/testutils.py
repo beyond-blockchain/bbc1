@@ -60,7 +60,7 @@ def domain_setup_utility(core_port_increment, dom_id, network_module=None):
     cl.unregister_from_core()
 
 
-def make_client(index, core_port_increment, callback=None, connect_to_core=True, asset_group_id=None):
+def make_client(index, core_port_increment, callback=None, connect_to_core=True):
     keypair = bbclib.KeyPair()
     keypair.generate()
     clients[index]['user_id'] = bbclib.get_new_id("user_%i" % index)

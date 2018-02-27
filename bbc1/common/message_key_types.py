@@ -148,6 +148,7 @@ class KeyType:
     resource_id = to_4byte(0, 0x40)
     resource_type = to_4byte(1, 0x40)
     resource = to_4byte(2, 0x40)
+    sql = to_4byte(3, 0x40)
 
     user_id = to_4byte(0, 0x50)
     source_user_id = to_4byte(1, 0x50)

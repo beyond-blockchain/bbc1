@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
 import os
 import sqlite3
+import binascii
 
 import sys
 sys.path.extend(["../../"])
 from bbc1.common import logger
-from bbc1.core.bbc_types import ResourceType
 
-import binascii
 
-transaction_db_definition = [
-    ["transaction_id", "BLOB"], ["asset_group_id", "BLOB"], ["transaction_data", "BLOB"],
+transaction_tbl_definition = [
+    ["transaction_id", "BLOB"], ["transaction_data", "BLOB"],
 ]
 
-auxiliary_db_definition = [
-    ["id", "INTEGER"], ["resource_id", "BLOB"], ["asset_group_id", "BLOB"],
-    ["resource_type", "INTEGER"], ["data", "BLOB"],
+asset_info_definition = [
+    ["id", "INTEGER"], ["transaction_id", "BLOB"], ["asset_group_id", "BLOB"],
+    ["asset_id", "BLOB"], ["user_id", "BLOB"],
+]
+
+topology_info_definition = [
+    ["id", "INTEGER"], ["transaction_id", "BLOB"], ["resource_type", "INTEGER"], ["resource_id", "BLOB"]
 ]
 
 
@@ -67,9 +70,11 @@ class BBcLedger:
         self.db[domain_id] = dict()
         self.db_cur[domain_id] = dict()
         self.create_table_in_db(domain_id, 'transaction_db', 'transaction_table',
-                                transaction_db_definition, primary_keys=[0], indices=[0])
-        self.create_table_in_db(domain_id, 'auxiliary_db', 'auxiliary_table',
-                                auxiliary_db_definition, primary_keys=[0], indices=[1, 3])
+                                transaction_tbl_definition, primary_key=0, indices=[0])
+        self.create_table_in_db(domain_id, 'auxiliary_db', 'asset_info_table',
+                                asset_info_definition, primary_key=0, indices=[1, 2, 3, 4])
+        self.create_table_in_db(domain_id, 'auxiliary_db', 'topology_table',
+                                topology_info_definition, primary_key=0, indices=[1, 2, 3])
 
     def open_db(self, domain_id, dbname):
         """
@@ -97,7 +102,7 @@ class BBcLedger:
         self.db_cur[domain_id][dbname].close()
         self.db[domain_id][dbname].close()
 
-    def create_table_in_db(self, domain_id, dbname, tbl, tbl_definition, primary_keys=[], indices=[]):
+    def create_table_in_db(self, domain_id, dbname, tbl, tbl_definition, primary_key=0, indices=[]):
         """
         (internal use) Create a new table in a DB
 
@@ -116,10 +121,7 @@ class BBcLedger:
         sql = "CREATE TABLE %s " % tbl
         sql += "("
         sql += ", ".join(["%s %s" % (d[0],d[1]) for d in tbl_definition])
-        if len(primary_keys) > 0:
-            sql += ", PRIMARY KEY ("
-            sql += ", ".join(tbl_definition[p][0] for p in primary_keys)
-            sql += ")"
+        sql += ", PRIMARY KEY ("+tbl_definition[primary_key][0]+")"
         sql += ");"
         self.exec_sql(domain_id, dbname, sql)
         for idx in indices:
@@ -183,89 +185,104 @@ class BBcLedger:
                                      "select * from sqlite_master where type='table' and name=?", name)
         return ret
 
-    def find_locally(self, domain_id, asset_group_id, resource_id, resource_type, want_newest=False):
+    def find_transaction_locally(self, domain_id, transaction_id):
         """
-        Find data by ID
-
+        Find transaction data
         :param domain_id:
-        :param asset_group_id
-        :param resource_id:   Transaction_ID or Asset_ID
-        :param resource_type: ResourceType value
-        :param want_newest:   If True, the entry having the biggest ID in the same condition is required
-        :return:              data, data_type
+        :param transaction_id:
+        :return:
         """
-        if resource_type == ResourceType.Transaction_data:
-            row = self.exec_sql_fetchone(domain_id, "transaction_db",
-                                         "select * from transaction_table where transaction_id = ? AND asset_group_id = ?",
-                                         resource_id, asset_group_id)
-            if row is not None:
-                return row[2]
-        else:
-            if want_newest:
-                row = self.exec_sql_fetchone(domain_id, "auxiliary_db",
-                                             "select * from auxiliary_table where resource_id = ? AND "
-                                             "asset_group_id = ? AND resource_type = ? order by id desc",
-                                             resource_id, asset_group_id, resource_type)
-            else:
-                row = self.exec_sql_fetchone(domain_id, "auxiliary_db",
-                                             "select * from auxiliary_table where resource_id = ? AND "
-                                             "asset_group_id = ? AND resource_type = ?",
-                                             resource_id, asset_group_id, resource_type)
-            if row is not None:
-                return row[4]
+        row = self.exec_sql_fetchone(domain_id, "transaction_db",
+                                     "select * from transaction_table where transaction_id = ?", transaction_id)
+        if row is not None:
+            return row[1]
         return None
 
-    def insert_locally(self, domain_id, asset_group_id, resource_id, resource_type, data, require_uniqueness=True):
+    def find_by_sql_in_local_auxiliary_db(self, domain_id, sql, *dat):
+        """
+        find entries by SQL
+        :param domain_id:
+        :param sql:
+        :param *dat:
+        :return:
+        """
+        return self.exec_sql(domain_id, "auxiliary_db", sql, *dat)
+
+    def insert_transaction_locally(self, domain_id, transaction_id, data):
         """
         Insert data in the local ledger
 
         :param domain_id:
-        :param asset_group_id:
-        :param resource_id:     Transaction_ID, Asset_ID, or Owner_ID
-        :param resource_type:   ResourceType value
-        :param data:            Transaction Data (serialized), Transacrtion_ID, or Node_ID
+        :param transaction_id:  Transaction_ID
+        :param data:            Transaction Data (serialized)
         :param require_uniqueness: Ignore uniqueness if True
         :return: True/False
         """
-        if resource_type == ResourceType.Transaction_data:
-            if self.exec_sql_fetchone(domain_id, "transaction_db",
-                                      "select * from transaction_table where transaction_id = ? AND asset_group_id = ?",
-                                      resource_id, asset_group_id) is not None:
-                return False
-            sql = "insert into transaction_table values (?, ?, ?)"
-            self.exec_sql(domain_id, "transaction_db", sql, resource_id, asset_group_id, data)
-
-        else:
-            if require_uniqueness and self.exec_sql_fetchone(domain_id, "auxiliary_db",
-                                                             "select * from auxiliary_table where resource_id = ? AND "
-                                                             "asset_group_id = ? AND resource_type = ?",
-                                                             resource_id, asset_group_id, resource_type) is not None:
-                self.logger.debug("Found duplicate transaction ID")
-                return False
-            sql = "insert into auxiliary_table(resource_id, asset_group_id, resource_type, data) values (?, ?, ?, ?)"
-            self.exec_sql(domain_id, "auxiliary_db", sql, resource_id, asset_group_id, resource_type, data)
-
+        if self.exec_sql_fetchone(domain_id, "transaction_db",
+                                  "select * from transaction_table where transaction_id = ?",
+                                  transaction_id) is not None:
+            return False
+        self.exec_sql(domain_id, "transaction_db", "insert into transaction_table values (?, ?)", transaction_id, data)
         return True
 
-    def remove(self, domain_id, asset_group_id, resource_id):
+    def insert_asset_info_locally(self, domain_id, transaction_id, asset_group_id, asset_id, user_id):
         """
-        Remove data
+        Insert data in the local ledger
 
         :param domain_id:
+        :param transaction_id:
         :param asset_group_id:
-        :param resource_id:     Transaction_ID, Asset_ID, or Owner_ID
+        :param asset_id:
+        :param user_id:
+        :return: True/False
+        """
+        if self.exec_sql_fetchone(domain_id, "auxiliary_db",
+                                  "select * from asset_info_table where transaction_id = ? AND asset_group_id = ? AND asset_id = ? AND user_id = ?",
+                                  transaction_id, asset_group_id, asset_id, user_id) is not None:
+            return False
+        self.exec_sql(domain_id, "auxiliary_db", "insert into asset_info_table (transaction_id, asset_group_id, "
+                                                 "asset_id, user_id) values (?, ?, ?, ?)",
+                      transaction_id, asset_group_id, asset_id, user_id)
+        return True
+
+    def insert_topology_info_locally(self, domain_id, transaction_id, resource_type, resource_id):
+        """
+        Insert topology data for transactions
+        :param domain_id:
+        :param transaction_id:
+        :param resource_type:
+        :param resource_id:
+        :return:
+        """
+        if self.exec_sql_fetchone(domain_id, "auxiliary_db",
+                                  "select * from topology_table where transaction_id = ? AND resource_type = ? AND resource_id = ?",
+                                  transaction_id, resource_type, resource_id) is not None:
+            return False
+        self.exec_sql(domain_id, "auxiliary_db", "insert into topology_table (transaction_id, resource_type, "
+                                                 "resource_id) values (?, ?, ?)",
+                      transaction_id, resource_type, resource_id)
+        return True
+
+    def remove(self, domain_id, transaction_id):
+        """
+        Remove all data with the specified transaction_id
+
+        :param domain_id:
+        :param transaction_id:  Transaction_ID
         :return: True/False
         """
         if self.exec_sql_fetchone(domain_id, "transaction_db",
-                                  "select * from transaction_table where transaction_id = ? AND asset_group_id = ?",
-                                  resource_id, asset_group_id) is not None:
+                                  "select * from transaction_table where transaction_id = ?", transaction_id) is not None:
             self.exec_sql(domain_id, "transaction_db",
-                          "delete from transaction_table where asset_group_id = ? and transaction_id = ?",
-                          asset_group_id, resource_id)
+                          "delete from transaction_table where transaction_id = ?", transaction_id)
         if self.exec_sql_fetchone(domain_id, "auxiliary_db",
-                                  "select * from auxiliary_table where resource_id = ? AND asset_group_id = ?",
-                                  resource_id, asset_group_id) is not None:
+                                  "select * from asset_info_table where transaction_id = ?", transaction_id) is not None:
             self.exec_sql(domain_id, "auxiliary_db",
-                          "delete from auxiliary_table where asset_group_id = ? and resource_id = ?",
-                          asset_group_id, resource_id)
+                          "delete from asset_info_table where transaction_id = ?", transaction_id)
+        if self.exec_sql_fetchone(domain_id, "auxiliary_db",
+                                  "select * from topology_table where transaction_id = ?", transaction_id) is not None:
+            self.exec_sql(domain_id, "auxiliary_db",
+                          "delete from topology_table where transaction_id = ?", transaction_id)
+            self.exec_sql(domain_id, "auxiliary_db",
+                          "delete from topology_table where resource_id = ?", transaction_id)
         return True
