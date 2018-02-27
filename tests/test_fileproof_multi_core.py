@@ -176,6 +176,7 @@ class TestFileProofClient(object):
         store_transaction.get_sig_index(user_ids[0])
         store_transaction.add_signature(user_id=user_ids[0], signature=sig)
         store_transaction.digest()
+        store_transaction.dump()
 
         global transaction_id, asset_id
         transaction_id = store_transaction.transaction_id

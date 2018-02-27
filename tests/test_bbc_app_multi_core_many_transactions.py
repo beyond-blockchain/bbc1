@@ -161,7 +161,6 @@ class TestBBcAppClient(object):
             txobj.references[result[0]].add_signature(user_id=result[1], signature=result[2])
 
             txobj.digest()
-            txobj.dump()
             ret = cl['app'].insert_transaction(txobj)
             assert ret
             msg_processor[i].synchronize()

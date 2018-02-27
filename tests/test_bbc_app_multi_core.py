@@ -25,6 +25,7 @@ clients = None
 domain_id = bbclib.get_new_id("testdomain")
 asset_group_id = bbclib.get_new_id("asset_group_1")
 transactions = [None for i in range(client_num)]
+transaction_dat = None
 cross_ref_list = []
 
 msg_processor = [None for i in range(client_num)]
@@ -157,6 +158,8 @@ class TestBBcAppClient(object):
         transactions[0].add_signature(user_id=user, signature=sig)
         transactions[0].dump()
         transactions[0].digest()
+        global transaction_dat
+        transaction_dat = transactions[0].serialize()
         print("register transaction=", binascii.b2a_hex(transactions[0].transaction_id))
         ret = clients[0]['app'].insert_transaction(transactions[0])
         assert ret
@@ -211,6 +214,8 @@ class TestBBcAppClient(object):
 
     def test_20_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
+        transactions[0] = bbclib.BBcTransaction()
+        transactions[0].deserialize(transaction_dat)
         print("find txid=", binascii.b2a_hex(transactions[0].transaction_id))
         ret = clients[4]['app'].search_transaction(transactions[0].transaction_id)
         assert ret

@@ -4,7 +4,8 @@ import pytest
 import binascii
 import sys
 sys.path.extend(["../"])
-from bbc1.common.bbclib import BBcTransaction, BBcEvent, BBcReference, BBcAsset, BBcCrossRef, KeyPair, KeyType
+from bbc1.common.bbclib import BBcTransaction, BBcEvent, BBcReference, BBcWitness, BBcRelation, BBcAsset, \
+    BBcCrossRef, KeyPair, KeyType
 from bbc1.common import bbclib
 
 user_id = bbclib.get_new_id("user_id_test1")
@@ -86,6 +87,8 @@ class TestBBcLib(object):
         transaction1.add(cross_ref=dummy_cross_ref1)
         dummy_cross_ref2 = BBcCrossRef(domain_id=domain_id, transaction_id=transaction2_id)
         transaction1.add(cross_ref=dummy_cross_ref2)
+        witness = BBcWitness()
+        transaction1.add(witness=witness)
 
         sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
                                 private_key=keypair1.private_key,
@@ -117,7 +120,7 @@ class TestBBcLib(object):
         assert ret
         print(" --> asset_file (after recover):", asset_tmp.asset_file)
 
-    def test_04_transaction2_with_reference(self):
+    def test_04_transaction_with_reference(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         global transaction2, event3, asset3
         asset3 = BBcAsset()
@@ -146,7 +149,7 @@ class TestBBcLib(object):
 
         transaction2.dump()
 
-    def test_05_transaction3_with_reference(self):
+    def test_05_transaction_with_reference2(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         asset1 = BBcAsset()
         asset1.add(user_id=user_id, asset_body=b'ccccc')
@@ -165,15 +168,13 @@ class TestBBcLib(object):
         transaction2.add(cross_ref=[dummy_cross_ref])
 
         sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
-                                private_key=keypair2.private_key,
-                                public_key=keypair2.public_key)
+                                private_key=keypair2.private_key, public_key=keypair2.public_key)
         if sig is None:
             print(bbclib.error_text)
             assert sig
         reference.add_signature(user_id=user_id2, signature=sig)
         sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
-                                private_key=keypair1.private_key,
-                                public_key=keypair1.public_key)
+                                private_key=keypair1.private_key, public_key=keypair1.public_key)
         if sig is None:
             print(bbclib.error_text)
             assert sig
@@ -181,7 +182,63 @@ class TestBBcLib(object):
 
         transaction1.dump()
 
-    def test_06_proof(self):
+    def test_06_transaction_with_witness(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        witness = BBcWitness()
+
+        global transaction1
+        transaction1 = BBcTransaction()
+        transaction1.add(witness=witness)
+
+        witness.add_witness(user_id)
+        witness.add_witness(user_id2)
+
+        sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
+                                private_key=keypair2.private_key, public_key=keypair2.public_key)
+        if sig is None:
+            print(bbclib.error_text)
+            assert sig
+        witness.add_signature(user_id=user_id2, signature=sig)
+
+        sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
+                                private_key=keypair1.private_key, public_key=keypair1.public_key)
+        if sig is None:
+            print(bbclib.error_text)
+            assert sig
+        witness.add_signature(user_id=user_id, signature=sig)
+
+        transaction1.dump()
+
+    def test_06_transaction_with_relation_and_witness(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        asset1 = BBcAsset()
+        asset1.add(user_id=user_id, asset_body=b'ccccc')
+        transaction1 = bbclib.make_transaction_with_relation(asset_group_id=asset_group_id, asset=asset1)
+        bbclib.add_relation_pointer(transaction1.relations[0], transaction2.digest(), None)
+
+        transaction1 = bbclib.make_transaction_with_witness(transaction1)
+        transaction1.witness.add_witness(user_id)
+        transaction1.witness.add_witness(user_id2)
+
+        sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
+                                private_key=keypair2.private_key,
+                                public_key=keypair2.public_key)
+        if sig is None:
+            print(bbclib.error_text)
+            assert sig
+        transaction1.witness.add_signature(user_id=user_id2, signature=sig)
+
+        sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
+                                private_key=keypair1.private_key,
+                                public_key=keypair1.public_key)
+        if sig is None:
+            print(bbclib.error_text)
+            assert sig
+        transaction1.witness.add_signature(user_id=user_id, signature=sig)
+
+        transaction1.dump()
+
+    def test_07_proof(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
 
         digest = transaction1.digest()
@@ -191,7 +248,7 @@ class TestBBcLib(object):
             print(bbclib.error_text)
             assert ret
 
-    def test_07_proof(self):
+    def test_08_proof(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         transaction1.timestamp = transaction1.timestamp + 1
         digest = transaction1.digest()

@@ -686,9 +686,30 @@ class BBcCoreService:
 
         for reference in txobj.references:
             self.ledger_manager.insert_topology_info_locally(domain_id, txobj.transaction_id,
-                                                             ResourceType.Edge_outgoing, reference.transaction_id)
-            self.ledger_manager.insert_topology_info_locally(domain_id, txobj.transaction_id,
-                                                             ResourceType.Edge_incoming, reference.transaction_id)
+                                                             ResourceType.Edge, reference.transaction_id)
+            self.ledger_manager.insert_topology_info_locally(domain_id, reference.transaction_id,
+                                                             ResourceType.Edge, txobj.transaction_id)
+
+        for idx, rtn in enumerate(txobj.relations):
+            asset_group_id = rtn.asset_group_id
+            asset_group_ids.append(asset_group_id)
+            if rtn.asset is not None:
+                asid = rtn.asset.asset_id
+                user_id = rtn.asset.user_id
+                if asset_files is not None and asid in asset_files.keys():
+                    if not self.storage_manager.store_locally(domain_id, asset_group_id, asid, asset_files[asid]):
+                        rollback_flag = True
+                        break
+                    registered_asset_in_storage.append([asset_group_id, asid])
+                if not self.ledger_manager.insert_asset_info_locally(domain_id, txobj.transaction_id,
+                                                                     asset_group_id, asid, user_id):
+                    rollback_flag = True
+                    break
+            for pt in rtn.pointers:
+                self.ledger_manager.insert_topology_info_locally(domain_id, txobj.transaction_id,
+                                                                 ResourceType.Edge, pt.transaction_id)
+                self.ledger_manager.insert_topology_info_locally(domain_id, pt.transaction_id,
+                                                                 ResourceType.Edge, txobj.transaction_id)
 
         if rollback_flag:
             self.ledger_manager.remove(domain_id, txobj.transaction_id)
@@ -888,7 +909,6 @@ class BBcCoreService:
         :param query_entry:
         :return:
         """
-        print("check_asset_in_response")
         domain_id = query_entry.data[KeyType.domain_id]
         asset_group_id = query_entry.data[KeyType.asset_group_id]
         if query_entry.data[KeyType.resource_type] == ResourceType.Transaction_data:
