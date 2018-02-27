@@ -65,7 +65,7 @@ def store_proc(data, approver_id, txid=None):
     transaction.events[0].add(mandatory_approver=approver_id, asset_group_id=asset_group_id)
     transaction.events[0].asset.add(user_id=user_id, asset_body=data)
     if txid:
-        bbc_app_client.search_transaction(asset_group_id, txid)
+        bbc_app_client.search_transaction(txid)
         response_data = bbc_app_client.callback.synchronize()
         if response_data[KeyType.status] < ESUCCESS:
             print("ERROR: ", response_data[KeyType.reason].decode())
@@ -84,7 +84,7 @@ def store_proc(data, approver_id, txid=None):
     transaction.digest()
     transaction.dump()
 
-    ret = bbc_app_client.insert_transaction(asset_group_id, transaction)
+    ret = bbc_app_client.insert_transaction(transaction)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
@@ -153,8 +153,9 @@ def chown(new_owner,asid):
     get_transaction.deserialize(response_data[KeyType.transaction_data])
     transaction_id = get_transaction.transaction_id
     transaction_info = store_proc(data, approver_id=binascii.unhexlify(new_owner),txid=transaction_id)
-    bbc_app_client.send_message(transaction_info, asset_group_id, binascii.unhexlify(new_owner))
+    bbc_app_client.send_message(transaction_info, binascii.unhexlify(new_owner))
     print("Transfer is done.....")
+
 
 if __name__ == '__main__':
     if(not os.path.exists(PRIVATE_KEY) and not os.path.exists(PUBLIC_KEY)):

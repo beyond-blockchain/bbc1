@@ -161,11 +161,10 @@ class BBcAppClient:
         """
         self.user_id = identifier
 
-    def make_message_structure(self, asset_group_id, cmd):
+    def make_message_structure(self, cmd):
         """
         (internal use) make a base message structure for sending to the core node
 
-        :param asset_group_id:
         :param cmd:
         :return:
         """
@@ -181,8 +180,6 @@ class BBcAppClient:
             KeyType.query_id: self.query_id,
             KeyType.status: ESUCCESS,
         }
-        if asset_group_id is not None:
-            msg[KeyType.asset_group_id] = asset_group_id
         return msg
 
     def send_msg(self, dat):
@@ -213,7 +210,7 @@ class BBcAppClient:
         :param storage_path:
         :return:
         """
-        dat = self.make_message_structure(None, MsgType.REQUEST_SETUP_DOMAIN)
+        dat = self.make_message_structure(MsgType.REQUEST_SETUP_DOMAIN)
         dat[KeyType.domain_id] = domain_id
         if module_name is not None:
             dat[KeyType.network_module] = module_name
@@ -229,7 +226,7 @@ class BBcAppClient:
         :param domain_id:
         :return:
         """
-        dat = self.make_message_structure(None, MsgType.REQUEST_GET_PEERLIST)
+        dat = self.make_message_structure(MsgType.REQUEST_GET_PEERLIST)
         dat[KeyType.domain_id] = domain_id
         return self.send_msg(dat)
 
@@ -244,7 +241,7 @@ class BBcAppClient:
         :param port:
         :return:
         """
-        dat = self.make_message_structure(None, MsgType.REQUEST_SET_STATIC_NODE)
+        dat = self.make_message_structure(MsgType.REQUEST_SET_STATIC_NODE)
         dat[KeyType.domain_id] = domain_id
         dat[KeyType.peer_info] = [node_id, ipv4, ipv6, port]
         return self.send_msg(dat)
@@ -261,7 +258,7 @@ class BBcAppClient:
         """
         if ipv4 is None and ipv6 is None:
             return
-        dat = self.make_message_structure(None, MsgType.DOMAIN_PING)
+        dat = self.make_message_structure(MsgType.DOMAIN_PING)
         dat[KeyType.domain_id] = domain_id
         if ipv4 is not None:
             dat[KeyType.ipv4_address] = ipv4
@@ -276,7 +273,7 @@ class BBcAppClient:
         :param domain_id:
         :return:
         """
-        dat = self.make_message_structure(None, MsgType.REQUEST_PING_TO_ALL)
+        dat = self.make_message_structure(MsgType.REQUEST_PING_TO_ALL)
         dat[KeyType.domain_id] = domain_id
         return self.send_msg(dat)
 
@@ -286,7 +283,7 @@ class BBcAppClient:
         :param domain_id:
         :return:
         """
-        dat = self.make_message_structure(None, MsgType.REQUEST_ALIVE_CHECK)
+        dat = self.make_message_structure(MsgType.REQUEST_ALIVE_CHECK)
         dat[KeyType.domain_id] = domain_id
         return self.send_msg(dat)
 
@@ -296,7 +293,7 @@ class BBcAppClient:
 
         :return:
         """
-        dat = self.make_message_structure(None, MsgType.REQUEST_GET_CONFIG)
+        dat = self.make_message_structure(MsgType.REQUEST_GET_CONFIG)
         return self.send_msg(dat)
 
     def get_domain_list(self):
@@ -305,7 +302,7 @@ class BBcAppClient:
 
         :return:
         """
-        dat = self.make_message_structure(None, MsgType.REQUEST_GET_DOMAINLIST)
+        dat = self.make_message_structure(MsgType.REQUEST_GET_DOMAINLIST)
         return self.send_msg(dat)
 
     def manipulate_ledger_subsystem(self, enable=False, domain_id=None):
@@ -316,7 +313,7 @@ class BBcAppClient:
         :param domain_id: 
         :return:
         """
-        dat = self.make_message_structure(None, MsgType.REQUEST_MANIP_LEDGER_SUBSYS)
+        dat = self.make_message_structure(MsgType.REQUEST_MANIP_LEDGER_SUBSYS)
         dat[KeyType.ledger_subsys_manip] = enable
         dat[KeyType.domain_id] = domain_id
         return self.send_msg(dat)
@@ -327,7 +324,7 @@ class BBcAppClient:
 
         :return:
         """
-        dat = self.make_message_structure(None, MsgType.REGISTER)
+        dat = self.make_message_structure(MsgType.REGISTER)
         self.send_msg(dat)
         return True
 
@@ -337,7 +334,7 @@ class BBcAppClient:
 
         :return:
         """
-        dat = self.make_message_structure(None, MsgType.UNREGISTER)
+        dat = self.make_message_structure(MsgType.UNREGISTER)
         return self.send_msg(dat)
 
     def request_insert_completion_notification(self, asset_group_id, flag):
@@ -348,9 +345,10 @@ class BBcAppClient:
         :return:
         """
         if flag:
-            dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_INSERT_NOTIFICATION)
+            dat = self.make_message_structure(MsgType.REQUEST_INSERT_NOTIFICATION)
         else:
-            dat = self.make_message_structure(asset_group_id, MsgType.CANCEL_INSERT_NOTIFICATION)
+            dat = self.make_message_structure(MsgType.CANCEL_INSERT_NOTIFICATION)
+        dat[KeyType.asset_group_id] = asset_group_id
         return self.send_msg(dat)
 
     def get_cross_refs(self, asset_group_id, number):
@@ -361,15 +359,14 @@ class BBcAppClient:
         :param number:
         :return:
         """
-        dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_CROSS_REF)
+        dat = self.make_message_structure(MsgType.REQUEST_CROSS_REF)
         dat[KeyType.count] = number
         return self.send_msg(dat)
 
-    def gather_signatures(self, asset_group_id, tx_obj, reference_obj=None, destinations=None, asset_files=None):
+    def gather_signatures(self, tx_obj, reference_obj=None, destinations=None, asset_files=None):
         """
         Request to gather signatures from the specified user_ids
 
-        :param asset_group_id:
         :param tx_obj:
         :param reference_obj: BBcReference object
         :param destinations: list of destination user_ids
@@ -378,7 +375,7 @@ class BBcAppClient:
         """
         if reference_obj is None and destinations is None:
             return False
-        dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_GATHER_SIGNATURE)
+        dat = self.make_message_structure(MsgType.REQUEST_GATHER_SIGNATURE)
         dat[KeyType.transaction_data] = tx_obj.serialize()
         if reference_obj is not None:
             dat[KeyType.destination_user_ids] = reference_obj.get_destinations()
@@ -392,18 +389,17 @@ class BBcAppClient:
             dat[KeyType.all_asset_files] = asset_files
         return self.send_msg(dat)
 
-    def sendback_signature(self, asset_group_id, dst, ref_index, sig, query_id=None):
+    def sendback_signature(self, dst, ref_index, sig, query_id=None):
         """
         Send back the signed transaction to the source
 
-        :param asset_group_id:
         :param dst:
         :param ref_index: Which reference in transaction the signature is for
         :param sig:
         :param query_id:
         :return:
         """
-        dat = self.make_message_structure(asset_group_id, MsgType.RESPONSE_SIGNATURE)
+        dat = self.make_message_structure(MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dst
         dat[KeyType.ref_index] = ref_index
         dat[KeyType.signature] = sig.serialize()
@@ -411,17 +407,16 @@ class BBcAppClient:
             dat[KeyType.query_id] = query_id
         return self.send_msg(dat)
 
-    def sendback_denial_of_sign(self, asset_group_id, dst, reason_text, query_id=None):
+    def sendback_denial_of_sign(self, dst, reason_text, query_id=None):
         """
         Send back the denial of sign the transaction
 
-        :param asset_group_id:
         :param dst:
         :param reason_text:
         :param query_id:
         :return:
         """
-        dat = self.make_message_structure(asset_group_id, MsgType.RESPONSE_SIGNATURE)
+        dat = self.make_message_structure(MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dst
         dat[KeyType.status] = EOTHER
         dat[KeyType.reason] = reason_text
@@ -429,7 +424,7 @@ class BBcAppClient:
             dat[KeyType.query_id] = query_id
         return self.send_msg(dat)
 
-    def insert_transaction(self, asset_group_id, tx_obj):
+    def insert_transaction(self, tx_obj):
         """
         Request to insert a legitimate transaction
 
@@ -439,7 +434,7 @@ class BBcAppClient:
         """
         if tx_obj.transaction_id is None:
             tx_obj.digest()
-        dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_INSERT)
+        dat = self.make_message_structure(MsgType.REQUEST_INSERT)
         dat[KeyType.transaction_data] = tx_obj.serialize()
         ast = dict()
         for evt in tx_obj.events:
@@ -459,19 +454,19 @@ class BBcAppClient:
         :param asset_id:
         :return:
         """
-        dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_SEARCH_ASSET)
+        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_ASSET)
+        dat[KeyType.asset_group_id] = asset_group_id
         dat[KeyType.asset_id] = asset_id
         return self.send_msg(dat)
 
-    def search_transaction(self, asset_group_id, transaction_id):
+    def search_transaction(self, transaction_id):
         """
         Search request for transaction_data
 
-        :param asset_group_id:
         :param transaction_id:
         :return:
         """
-        dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_SEARCH_TRANSACTION)
+        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_TRANSACTION)
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
@@ -483,7 +478,8 @@ class BBcAppClient:
         :param user_id: user_id of the asset owner
         :return: The transaction_data that includes asset with the specified user_id
         """
-        dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_SEARCH_USERID)
+        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_USERID)
+        dat[KeyType.asset_group_id] = asset_group_id
         dat[KeyType.user_id] = user_id
         return self.send_msg(dat)
 
@@ -495,8 +491,9 @@ class BBcAppClient:
         :param transaction_id:
         :return:
         """
-        dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_REGISTER_HASH_IN_SUBSYS)
+        dat = self.make_message_structure(MsgType.REQUEST_REGISTER_HASH_IN_SUBSYS)
         dat[KeyType.transaction_id] = transaction_id
+        dat[KeyType.asset_group_id] = asset_group_id
         return self.send_msg(dat)
 
     def verify_in_ledger_subsystem(self, asset_group_id, transaction_id):
@@ -507,8 +504,9 @@ class BBcAppClient:
         :param transaction_id:
         :return:
         """
-        dat = self.make_message_structure(asset_group_id, MsgType.REQUEST_VERIFY_HASH_IN_SUBSYS)
+        dat = self.make_message_structure(MsgType.REQUEST_VERIFY_HASH_IN_SUBSYS)
         dat[KeyType.transaction_id] = transaction_id
+        dat[KeyType.asset_group_id] = asset_group_id
         return self.send_msg(dat)
 
     def get_stats(self):
@@ -516,19 +514,18 @@ class BBcAppClient:
         Get statistics of bbc_core
         :return:
         """
-        dat = self.make_message_structure(None, MsgType.REQUEST_GET_STATS)
+        dat = self.make_message_structure(MsgType.REQUEST_GET_STATS)
         return self.send_msg(dat)
 
-    def send_message(self, msg, asset_group_id, dst_user_id):
+    def send_message(self, msg, dst_user_id):
         """
         Send peer-to-peer message to the specified user_id
 
         :param msg:
-        :param asset_group_id:
         :param dst_user_id:
         :return:
         """
-        dat = self.make_message_structure(asset_group_id, MsgType.MESSAGE)
+        dat = self.make_message_structure(MsgType.MESSAGE)
         dat[KeyType.destination_user_id] = dst_user_id
         dat[KeyType.message] = msg
         return self.send_msg(dat)

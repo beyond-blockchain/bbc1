@@ -70,7 +70,7 @@ def get_txid_from_asid(asset_group, asid):
 
 def add_ref_tx(asset_group,transaction,ref_tx,ref_index):
     bbc_app_client = setup_bbc_client()
-    bbc_app_client.search_transaction(asset_group, ref_tx)
+    bbc_app_client.search_transaction(ref_tx)
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
         print("ERROR: ", response_data[KeyType.reason].decode())
@@ -119,7 +119,7 @@ def sendback_exception_asset(approver_id, asset_group, asid):
     transaction.digest()
     transaction.dump()
 
-    ret = bbc_app_client.insert_transaction(asset_group, transaction)
+    ret = bbc_app_client.insert_transaction(transaction)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
@@ -133,7 +133,7 @@ def sendback_exception_asset(approver_id, asset_group, asid):
                               asset_ids=transaction.events[0].asset.asset_id)
 
     txinfo = [transaction.transaction_id, transaction.events[0].asset.asset_id]
-    bbc_app_client.send_message(transaction_info, binascii.unhexlify(new_owner), asset_group)
+    bbc_app_client.send_message(txinfo, binascii.unhexlify(new_owner), asset_group)
     print("Transfer is done.....")
 
 
@@ -169,7 +169,7 @@ def execute_escrow():
 
     # Add reference
     print("Add reference")
-    land_client.search_transaction(land_asset_group, landtx_id)
+    land_client.search_transaction(landtx_id)
     response_data = land_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
         print("ERROR: ", response_data[KeyType.reason].decode())
@@ -177,7 +177,7 @@ def execute_escrow():
     prev_tx = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
     reference = bbclib.add_reference_to_transaction(land_asset_group, transaction, prev_tx, 0)
 
-    coin_client.search_transaction(coin_asset_group, cointx_id)
+    coin_client.search_transaction(cointx_id)
     response_data = coin_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
         print("ERROR: ", response_data[KeyType.reason].decode())
@@ -193,7 +193,7 @@ def execute_escrow():
     transaction.references[0].add_signature(user_id=user_id, signature=sig)
 
     print("Get signature from LegalAffairsBureau")
-    land_client.gather_signatures(land_asset_group, transaction, destinations=[LAB_id])
+    land_client.gather_signatures(transaction, destinations=[LAB_id])
     response_data = land_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
         print("Rejected because ", response_data[KeyType.reason].decode(), "")
@@ -206,7 +206,7 @@ def execute_escrow():
     transaction.dump()
 
     print("insert coin asset group")
-    ret = coin_client.insert_transaction(coin_asset_group, transaction)
+    ret = coin_client.insert_transaction(transaction)
     assert ret
     response_data = coin_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
@@ -220,7 +220,7 @@ def execute_escrow():
     landtxinfo = [transaction.transaction_id, transaction.events[1].asset.asset_id]
 
     print("insert land asset group")
-    ret = land_client.insert_transaction(land_asset_group, transaction)
+    ret = land_client.insert_transaction(transaction)
     assert ret
     response_data = land_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
