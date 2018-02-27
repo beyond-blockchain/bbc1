@@ -9,7 +9,7 @@ from bbc1.common import bbclib
 
 user_id = bbclib.get_new_id("user_id_test1")
 user_id2 = bbclib.get_new_id("user_id_test2")
-#domain_id = bbclib.get_new_id("testdomain")
+domain_id = bbclib.get_new_id("testdomain")
 asset_group_id = bbclib.get_new_id("asset_group_1")
 transaction1_id = bbclib.get_new_id("transaction_1")
 transaction2_id = bbclib.get_new_id("transaction_2")
@@ -82,9 +82,9 @@ class TestBBcLib(object):
         global transaction1
         transaction1 = BBcTransaction()
         transaction1.add(event=[event1, event2])
-        dummy_cross_ref1 = BBcCrossRef(asset_group_id=asset_group_id, transaction_id=transaction1_id)
+        dummy_cross_ref1 = BBcCrossRef(domain_id=domain_id, transaction_id=transaction1_id)
         transaction1.add(cross_ref=dummy_cross_ref1)
-        dummy_cross_ref2 = BBcCrossRef(asset_group_id=asset_group_id, transaction_id=transaction2_id)
+        dummy_cross_ref2 = BBcCrossRef(domain_id=domain_id, transaction_id=transaction2_id)
         transaction1.add(cross_ref=dummy_cross_ref2)
         witness = BBcWitness()
         transaction1.add(witness=witness)
@@ -134,8 +134,8 @@ class TestBBcLib(object):
         reference2 = BBcReference(asset_group_id=asset_group_id,
                                   transaction=transaction2, ref_transaction=transaction1, event_index_in_ref=0)
         transaction2.add(reference=reference2)
-        dummy_cross_ref3 = BBcCrossRef(transaction_id=transaction1_id, asset_group_id=asset_group_id)
-        dummy_cross_ref4 = BBcCrossRef(transaction_id=transaction2_id, asset_group_id=asset_group_id)
+        dummy_cross_ref3 = BBcCrossRef(domain_id=domain_id, transaction_id=transaction1_id)
+        dummy_cross_ref4 = BBcCrossRef(domain_id=domain_id, transaction_id=transaction2_id)
         transaction2.add(cross_ref=[dummy_cross_ref3, dummy_cross_ref4])
 
         sig = transaction2.sign(key_type=KeyType.ECDSA_SECP256k1,
@@ -163,7 +163,7 @@ class TestBBcLib(object):
         reference = BBcReference(asset_group_id=asset_group_id,
                                  transaction=transaction1, ref_transaction=transaction2, event_index_in_ref=0)
         transaction1.add(reference=reference)
-        dummy_cross_ref = BBcCrossRef(transaction_id=transaction1_id, asset_group_id=asset_group_id)
+        dummy_cross_ref = BBcCrossRef(domain_id=domain_id, transaction_id=transaction1_id)
         transaction2.add(cross_ref=[dummy_cross_ref])
 
         sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
@@ -228,47 +228,3 @@ class TestBBcLib(object):
         digest = transaction1.digest()
         ret = transaction1.signatures[0].verify(digest)
         assert not ret
-
-    def test_09_size_change(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        asset_group_id2 = bbclib.get_new_id("asset_group_2")
-
-        txobj = BBcTransaction()
-        asset = BBcAsset()
-        asset.add(user_id=user_id, asset_body=b"0"*1500)
-        event = BBcEvent(asset_group_id=asset_group_id2)
-        event.add(asset=asset)
-        txobj.add(event=event)
-        sig = txobj.sign(key_type=KeyType.ECDSA_SECP256k1, private_key=keypair1.private_key, public_key=keypair1.public_key)
-        if sig is None:
-            print(bbclib.error_text)
-            assert sig
-            txobj.add_signature(signature=sig)
-        print("***** before max size change *****")
-        txobj.dump()
-
-        txobj = BBcTransaction()
-        asset = BBcAsset(max_body_size=2000)
-        asset.add(user_id=user_id, asset_body=b"0"*1500)
-        event = BBcEvent(asset_group_id=asset_group_id2)
-        event.add(asset=asset)
-        txobj.add(event=event)
-        sig = txobj.sign(key_type=KeyType.ECDSA_SECP256k1, private_key=keypair1.private_key, public_key=keypair1.public_key)
-        if sig is None:
-            print(bbclib.error_text)
-            assert sig
-            txobj.add_signature(signature=sig)
-        print("***** after max size change (2000bytes) *****")
-        txobj.dump()
-
-        bbclib.set_max_body_size(asset_group_id2, 3000)
-
-        txobj = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id2)
-        txobj.events[0].asset.add(user_id=user_id, asset_body=b"0"*2500)
-        sig = txobj.sign(key_type=KeyType.ECDSA_SECP256k1, private_key=keypair1.private_key, public_key=keypair1.public_key)
-        if sig is None:
-            print(bbclib.error_text)
-            assert sig
-            txobj.add_signature(signature=sig)
-        print("***** after max size change(3000bytes) *****")
-        txobj.dump()

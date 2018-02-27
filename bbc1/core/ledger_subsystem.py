@@ -257,16 +257,15 @@ class LedgerSubsystem:
         self.core.ledger_manager.create_table_in_db(domain_id, DB_NAME,
                             'merkle_leaf_table',
                             merkle_leaf_db_definition,
-                            primary_keys=[0], indices=[1, 2])
+                            primary_key=0, indices=[1, 2])
         self.core.ledger_manager.create_table_in_db(domain_id, DB_NAME,
                             'merkle_branch_table',
                             merkle_branch_db_definition,
-                            primary_keys=[0], indices=[1, 2])
+                            primary_key=0, indices=[1, 2])
         self.core.ledger_manager.create_table_in_db(domain_id, DB_NAME,
                             'merkle_root_table',
                             merkle_root_db_definition,
-                            primary_keys=[0], indices=[0])
-
+                            primary_key=0, indices=[0])
 
     def subsystem_loop(self):
         self.logger.debug("Start subsystem_loop")

@@ -174,13 +174,13 @@
   <div class="section" id="module-ledger_subsystem">
 <span id="ledger-subsystem-module"></span><h1>ledger_subsystem module<a class="headerlink" href="#module-ledger_subsystem" title="Permalink to this headline">¶</a></h1>
 <p>Copyright (c) 2017 beyond-blockchain.org.</p>
-<p>Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;);
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at</p>
 <blockquote>
 <div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
 <p>Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an &#8220;AS IS&#8221; BASIS,
+distributed under the License is distributed on an “AS IS” BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.</p>
@@ -190,14 +190,14 @@ limitations under the License.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#ledger_subsystem.LedgerSubsystem" title="ledger_subsystem.LedgerSubsystem"><code class="xref py py-obj docutils literal"><span class="pre">LedgerSubsystem</span></code></a>(config[,&nbsp;enabled,&nbsp;dbtype,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#ledger_subsystem.LedgerSubsystem" title="ledger_subsystem.LedgerSubsystem"><code class="xref py py-obj docutils literal"><span class="pre">LedgerSubsystem</span></code></a>(config[,&nbsp;core,&nbsp;enabled,&nbsp;…])</td>
 <td>Abstraction of an underlying ledger subsystem that is typically a blockchain.</td>
 </tr>
 </tbody>
 </table>
 <dl class="class">
 <dt id="ledger_subsystem.LedgerSubsystem">
-<em class="property">class </em><code class="descclassname">ledger_subsystem.</code><code class="descname">LedgerSubsystem</code><span class="sig-paren">(</span><em>config</em>, <em>enabled=False</em>, <em>dbtype='sqlite'</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">ledger_subsystem.</code><code class="descname">LedgerSubsystem</code><span class="sig-paren">(</span><em>config</em>, <em>core=None</em>, <em>enabled=False</em>, <em>dbtype='sqlite'</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Abstraction of an underlying ledger subsystem that is typically a
 blockchain. This takes one transaction each to record and verifies its
@@ -209,23 +209,8 @@ root digests only to the underlying ledger.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="ledger_subsystem.LedgerSubsystem.check_table_existence">
-<code class="descname">check_table_existence</code><span class="sig-paren">(</span><em>dbname</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.check_table_existence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.check_table_existence" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="ledger_subsystem.LedgerSubsystem.close_db">
-<code class="descname">close_db</code><span class="sig-paren">(</span><em>dbname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.close_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.close_db" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="ledger_subsystem.LedgerSubsystem.close_merkle_tree">
 <code class="descname">close_merkle_tree</code><span class="sig-paren">(</span><em>jTemp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.close_merkle_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.close_merkle_tree" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="ledger_subsystem.LedgerSubsystem.create_table_in_db">
-<code class="descname">create_table_in_db</code><span class="sig-paren">(</span><em>dbname</em>, <em>tbl</em>, <em>tbl_definition</em>, <em>primary_keys=[]</em>, <em>indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.create_table_in_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.create_table_in_db" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -257,23 +242,8 @@ root digests only to the underlying ledger.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="ledger_subsystem.LedgerSubsystem.exec_sql">
-<code class="descname">exec_sql</code><span class="sig-paren">(</span><em>dbname</em>, <em>sql</em>, <em>*dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.exec_sql"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.exec_sql" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="ledger_subsystem.LedgerSubsystem.exec_sql_fetchone">
-<code class="descname">exec_sql_fetchone</code><span class="sig-paren">(</span><em>dbname</em>, <em>sql</em>, <em>*dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.exec_sql_fetchone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.exec_sql_fetchone" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="ledger_subsystem.LedgerSubsystem.get_merkle_base">
 <code class="descname">get_merkle_base</code><span class="sig-paren">(</span><em>digest</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.get_merkle_base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.get_merkle_base" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="ledger_subsystem.LedgerSubsystem.open_db">
-<code class="descname">open_db</code><span class="sig-paren">(</span><em>dbname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.open_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.open_db" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -285,8 +255,8 @@ root digests only to the underlying ledger.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>asset_group_id</strong> &#8211; asset group</li>
-<li><strong>transaction_id</strong> &#8211; transaction to register</li>
+<li><strong>asset_group_id</strong> – asset group</li>
+<li><strong>transaction_id</strong> – transaction to register</li>
 </ul>
 </td>
 </tr>
@@ -296,6 +266,16 @@ root digests only to the underlying ledger.</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.set_domain">
+<code class="descname">set_domain</code><span class="sig-paren">(</span><em>domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.set_domain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.set_domain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ledger_subsystem.LedgerSubsystem.set_domain_internal">
+<code class="descname">set_domain_internal</code><span class="sig-paren">(</span><em>domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ledger_subsystem.html#LedgerSubsystem.set_domain_internal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ledger_subsystem.LedgerSubsystem.set_domain_internal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="ledger_subsystem.LedgerSubsystem.subsystem_loop">
@@ -321,8 +301,8 @@ root digests only to the underlying ledger.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>asset_group_id</strong> &#8211; asset group</li>
-<li><strong>transaction_id</strong> &#8211; transaction to verify its existence</li>
+<li><strong>asset_group_id</strong> – asset group</li>
+<li><strong>transaction_id</strong> – transaction to verify its existence</li>
 </ul>
 </td>
 </tr>

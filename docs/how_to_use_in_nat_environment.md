@@ -129,7 +129,7 @@ $ source .bbc1_venv/bin/activate
 
 Then, we connect a node with the other node over the configured domain using `bbc_ping.py` as follows.
 ```shell
-$ python bbc_ping.py <domain id> <destination address> <destination address>
+$ python bbc_ping.py <domain id> <destination address> <destination port>
 ```
 
 For the case of `node 1` and `node 2` in the exemplary diagram, we execute the following commands.

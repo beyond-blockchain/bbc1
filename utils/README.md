@@ -84,6 +84,22 @@ This script is a simplified tool to setup domain and static connection between t
     If you use "-6" in addition, dst_address must be also IPv6 address. The same thing goes for "-4" or default.
     As a result of this command, the bbc_core creates a domain with the given domain_id. After creating the domain, the core sends *domain_ping* to the specified destination. When the receiver of domain_ping is joining the domain, the receiver adds the sender node as the peer node. Then, the receiver sends back a normal bbc ping message, so that the sender can find the receiver node as the peer node. Note that the receiver must have the specified domain_id. If not, nothing happens.
 
+## bbc_setup.py
+This script is for creating domain and updating peer list of the connecting bbc_core.
+
+* Create a new domain
+    ```
+    python -d [domain_id_string]
+    ```
+    [domain_id_string] is a hex string of the domain ID.
+    By default, the bbc_setup.py connects to the bbc_core at port 9000 on the localhost.
+    If you want to specify the bbc_core, -4, -6 and -p options configures the IPv4, IPv6 and TCP port number to connect, respectively.
+
+* Make the bbc_core send ping to its neighbors to update its peer list
+    ```
+    python -d [domain_id_string] --ping_to_neighbors
+    ```
+
 ## subsystem_tool.py
 This script is for the ledger_subsystem. You can enable/disable ledger_subsystem, and register/verify transaction_id in the ledger subsystem.
 

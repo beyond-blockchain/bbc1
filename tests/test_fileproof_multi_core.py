@@ -35,20 +35,13 @@ asset_id = None
 large_data = b"aaaaaaaaaa" * 200
 
 
-def asset_group_setup(client):
-    client.domain_setup(domain_id)
-    client.callback.synchronize()
-    client.register_asset_group(domain_id=domain_id, asset_group_id=asset_group_id)
-    client.callback.synchronize()
-    print("Domain %s and asset_group %s are created." % (binascii.b2a_hex(domain_id[:4]).decode(),
-                                                        binascii.b2a_hex(asset_group_id[:4]).decode()))
-    print("Setup is done.")
-
-
 def setup_bbc_client(port_increase=0, user_id=None):
     bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT+port_increase, loglevel="all")
     bbc_app_client.set_user_id(user_id)
+    bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_callback(bbc_app.Callback())
+    bbc_app_client.domain_setup(domain_id)
+    bbc_app_client.callback.synchronize()
     return bbc_app_client
 
 
@@ -63,7 +56,7 @@ def create_transaction_object_and_send_sign_req(idx, receiver_user_id, ref_txids
     txobj.events[0].add(mandatory_approver=receiver_user_id)
 
     for i, ref_txid in enumerate(ref_txids):
-        clients[idx].search_transaction(asset_group_id, ref_txid)
+        clients[idx].search_transaction(ref_txid)
         response_data = clients[idx].callback.synchronize()
         assert response_data[KeyType.status] == ESUCCESS
         prev_tx = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
@@ -76,8 +69,7 @@ def create_transaction_object_and_send_sign_req(idx, receiver_user_id, ref_txids
 
     asset_id = txobj.events[0].asset.asset_id
     asset_files = {asset_id: file_data}
-    ret = clients[idx].gather_signatures(asset_group_id, txobj, destinations=[receiver_user_id],
-                                         asset_files=asset_files)
+    ret = clients[idx].gather_signatures(txobj, destinations=[receiver_user_id], asset_files=asset_files)
     assert ret
     return txobj
 
@@ -87,8 +79,7 @@ def wait_for_transaction_msg(bbc_app_client=None):
     if KeyType.transaction_data not in response_data or KeyType.all_asset_files not in response_data:
         print("**** Invalid message is received...")
         print(response_data)
-        bbc_app_client.sendback_denial_of_sign(asset_group_id, response_data[KeyType.source_user_id],
-                                               "Invalid message is received.")
+        bbc_app_client.sendback_denial_of_sign(response_data[KeyType.source_user_id], "Invalid message is received.")
         assert False
     return response_data
 
@@ -111,7 +102,7 @@ def pick_valid_transaction_info(received_data=None, bbc_app_client=None):
 
 def insert_signed_transaction_to_bbc_core(tx_obj=None, bbc_app_client=None):
     print("Insert the transaction into BBc-1")
-    ret = bbc_app_client.insert_transaction(asset_group_id, tx_obj)
+    ret = bbc_app_client.insert_transaction(tx_obj)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
     assert response_data[KeyType.status] == ESUCCESS
@@ -133,8 +124,6 @@ class TestFileProofClient(object):
 
         for i in range(client_num):
             clients[i] = setup_bbc_client(i, user_ids[i])
-            asset_group_setup(clients[i])
-            clients[i].set_asset_group_id(asset_group_id)
             ret = clients[i].register_to_core()
             assert ret
             keypairs[i] = bbclib.KeyPair()
@@ -191,13 +180,13 @@ class TestFileProofClient(object):
         global transaction_id, asset_id
         transaction_id = store_transaction.transaction_id
         asset_id = store_transaction.events[0].asset.asset_id
-        clients[0].insert_transaction(asset_group_id, store_transaction)
+        clients[0].insert_transaction(store_transaction)
         response_data = clients[0].callback.synchronize()
         if response_data[KeyType.status] < ESUCCESS:
             print("ERROR: ", response_data[KeyType.reason].decode())
             assert False
 
-    def test_11_store_file(self):
+    def test_11_verify_file(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         # -- verify by user_1
         ret = clients[1].search_asset(asset_group_id, asset_id)
@@ -228,7 +217,7 @@ class TestFileProofClient(object):
         txobj, source_id = pick_valid_transaction_info(received_data=recvdat,
                                                        bbc_app_client=clients[1])
         signature = txobj.sign(keypair=keypairs[1])
-        clients[1].sendback_signature(asset_group_id, source_id, -1, signature)
+        clients[1].sendback_signature(source_id, -1, signature)
 
         # -- sender
         response_data = clients[0].callback.synchronize()
@@ -238,7 +227,7 @@ class TestFileProofClient(object):
         transfer_tx.digest()
         insert_signed_transaction_to_bbc_core(tx_obj=transfer_tx, bbc_app_client=clients[0])
         transaction_info = ["testfile", transfer_tx.transaction_id]
-        clients[0].send_message(transaction_info, asset_group_id, user_ids[1])
+        clients[0].send_message(transaction_info, user_ids[1])
 
         # -- receiver
         response_data = clients[1].callback.synchronize(timeout=10)

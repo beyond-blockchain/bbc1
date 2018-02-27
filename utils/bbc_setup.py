@@ -42,12 +42,14 @@ def wait_check_result_msg_type(callback, msg_type):
 
 def argument_parser():
     argparser = argparse.ArgumentParser(description='Send domain ping to crate domain and static node info.')
-    argparser.add_argument('-4', '--ip4address', action='store', help='bbc_core address (IPv4) to control')
-    argparser.add_argument('-6', '--ip6address', action='store', help='bbc_core address (IPv6) to control')
+    argparser.add_argument('-4', '--ip4address', action='store', default="127.0.0.1", help='bbc_core address (IPv4)')
+    argparser.add_argument('-6', '--ip6address', action='store', help='bbc_core address (IPv6)')
     argparser.add_argument('-p', '--port', action='store', default=DEFAULT_CORE_PORT,  help='port number of bbc_core')
-    argparser.add_argument('domain_id', action='store', nargs='?', default=None,  help='domain_id string')
-    argparser.add_argument('dst_address', action='store', nargs='?', help='destination IPv4/v6 address string')
-    argparser.add_argument('dst_port', action='store', nargs='?', default=DEFAULT_P2P_PORT+1,  help='port number')
+    argparser.add_argument('-d', '--domain_id', action='store', default=None, help='domain_id to setup')
+    argparser.add_argument('--ping_to_neighbors', action='store_true', help='make the bbc_core send ping to all '
+                                                                           'neighbors')
+    argparser.add_argument('-i', '--id', action='store',  help='SHA256 ID calculation from the given strings')
+    argparser.add_argument('-t', '--timebaseid', action='store',  help='SHA256 ID calculation from the given strings including timestamp')
     return argparser.parse_args()
 
 
@@ -66,32 +68,35 @@ def send_domain_ping(bbcclient, domain_id, addr, port):
 if __name__ == '__main__':
     port = None
     parsed_args = argument_parser()
-    addr = "127.0.0.1"
+    if parsed_args.domain_id is None:
+        print("### -d option is mandatory!")
+        sys.exit(1)
+    if parsed_args.id:
+        value = bbclib.get_new_id(parsed_args.id, include_timestamp=False)
+        print(bbclib.convert_id_to_string(value))
+        sys.exit(0)
+    if parsed_args.timebaseid:
+        value = bbclib.get_new_id(parsed_args.id, include_timestamp=True)
+        print(bbclib.convert_id_to_string(value))
+        sys.exit(0)
+
     if parsed_args.ip4address:
         addr = parsed_args.ip4address
     if parsed_args.ip6address:
         addr = parsed_args.ip6address
     port = parsed_args.port
-
     bbcclient = bbc_app.BBcAppClient(host=addr, port=port, loglevel="all")
 
     domain_id = bbclib.convert_idstring_to_bytes(parsed_args.domain_id)
+
+    if parsed_args.ping_to_neighbors:
+        print("ping to all neighbor bbc_cores")
+        bbcclient.ping_to_all_neighbors(domain_id)
+        time.sleep(1)
+        sys.exit(0)
+
     bbcclient.domain_setup(domain_id, "simple_cluster")
     dat = wait_check_result_msg_type(bbcclient.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_DOMAIN)
     assert dat[KeyType.status] == ESUCCESS
-
-    send_domain_ping(bbcclient, domain_id, parsed_args.dst_address, parsed_args.dst_port)
-
-    print("*** wait 5 sec, checking peer_list in the core ***")
-    time.sleep(5)
-    bbcclient.get_domain_peerlist(domain_id=domain_id)
-    dat = bbcclient.callback.synchronize()
-    print("====== peer list =====")
-    for k in range(len(dat)):
-        node_id, ipv4, ipv6, port = dat[k]
-        if k == 0:
-            print("*myself*    %s, %s, %s, %d" % (binascii.b2a_hex(node_id[:4]), ipv4, ipv6, port))
-        else:
-            print("            %s, %s, %s, %d" % (binascii.b2a_hex(node_id[:4]), ipv4, ipv6, port))
 
     sys.exit(0)

@@ -37,8 +37,6 @@ else:
 
 
 domain_global_0 = binascii.a2b_hex("0000000000000000000000000000000000000000000000000000000000000000")
-DEFAULT_MAX_BODY_SIZE = 256
-max_bodysize_conf = dict()
 
 error_code = -1
 error_text = ""
@@ -56,11 +54,6 @@ def reset_error():
     global error_text
     error_code = ESUCCESS
     error_text = ""
-
-
-def set_max_body_size(asset_group_id, body_size):
-    global max_bodysize_conf
-    max_bodysize_conf[asset_group_id] = body_size
 
 
 def get_new_id(seed_str=None, include_timestamp=True):
@@ -102,7 +95,7 @@ def make_transaction_for_base_asset(asset_group_id=None, event_num=1, witness=Fa
     transaction = BBcTransaction()
     for i in range(event_num):
         evt = BBcEvent(asset_group_id=asset_group_id)
-        ast = BBcAsset(max_body_size=max_bodysize_conf.get(asset_group_id, DEFAULT_MAX_BODY_SIZE))
+        ast = BBcAsset()
         evt.add(asset=ast)
         transaction.add(event=evt)
     if witness:
@@ -240,9 +233,16 @@ class KeyPair:
 
     def sign(self, digest):
         if self.type == KeyType.ECDSA_SECP256k1:
-            signature = (c_byte * 64)()
-            libbbcsig.sign(self.private_key_len, self.private_key, 32, digest, signature)
-            return bytes(signature)
+            sig_r = (c_byte * 32)()
+            sig_s = (c_byte * 32)()
+            sig_r_len = (c_byte * 4)()  # Adjust size according to the expected size of sig_r and sig_s. Default:uint32.
+            sig_s_len = (c_byte * 4)()
+            libbbcsig.sign(self.private_key_len, self.private_key, 32, digest, sig_r, sig_s, sig_r_len, sig_s_len)
+            sig_r_len = int.from_bytes(bytes(sig_r_len), "little")
+            sig_s_len = int.from_bytes(bytes(sig_s_len), "little")
+            sig_r = binascii.a2b_hex("00"*(32-sig_r_len) + bytes(sig_r)[:sig_r_len].hex())
+            sig_s = binascii.a2b_hex("00"*(32-sig_s_len) + bytes(sig_s)[:sig_s_len].hex())
+            return bytes(bytearray(sig_r)+bytearray(sig_s))
         else:
             set_error(code=EOTHER, txt="sig_type %d is not supported" % self.type)
             return None
@@ -562,7 +562,7 @@ class BBcTransaction:
             for i, cross in enumerate(self.cross_refs):
                 print("[%d]" % i)
                 if cross is not None:
-                    print("  asset_group_id:", binascii.b2a_hex(cross.asset_group_id))
+                    print("  domain_id:", binascii.b2a_hex(cross.domain_id))
                     print("  transaction_id:", binascii.b2a_hex(cross.transaction_id))
                 else:
                     print("  -- None (invalid)")
@@ -650,7 +650,7 @@ class BBcEvent:
                 self.option_approvers.append(appr)
             ptr, astsize = get_n_byte_int(ptr, 4, data)
             ptr, astdata = get_n_bytes(ptr, astsize, data)
-            self.asset = BBcAsset(max_body_size=max_bodysize_conf.get(self.asset_group_id, DEFAULT_MAX_BODY_SIZE))
+            self.asset = BBcAsset()
             self.asset.deserialize(astdata)
         except:
             return False
@@ -763,7 +763,7 @@ class BBcWitness:
 
 
 class BBcAsset:
-    def __init__(self, max_body_size=DEFAULT_MAX_BODY_SIZE):
+    def __init__(self):
         self.asset_id = None
         self.user_id = None
         self.nonce = get_random_value()
@@ -772,7 +772,6 @@ class BBcAsset:
         self.asset_file_digest = None
         self.asset_body_size = 0
         self.asset_body = []
-        self.max_body_size = max_body_size
 
     def add(self, user_id=None, asset_file=None, asset_body=None):
         if user_id is not None:
@@ -782,15 +781,10 @@ class BBcAsset:
             self.asset_file_size = len(asset_file)
             self.asset_file_digest = hashlib.sha256(asset_file).digest()
         if asset_body is not None:
-            if len(asset_body) > self.max_body_size:
-                self.asset_file = asset_body
-                self.asset_file_size = len(asset_body)
-                self.asset_file_digest = hashlib.sha256(asset_body).digest()
-            else:
-                self.asset_body = asset_body
-                if isinstance(asset_body, str):
-                    self.asset_body = asset_body.encode()
-                self.asset_body_size = len(asset_body)
+            self.asset_body = asset_body
+            if isinstance(asset_body, str):
+                self.asset_body = asset_body.encode()
+            self.asset_body_size = len(asset_body)
         self.digest()
 
     def digest(self):
@@ -856,19 +850,19 @@ class BBcAsset:
 
 
 class BBcCrossRef:
-    def __init__(self, asset_group_id=None, transaction_id=None):
-        self.asset_group_id = asset_group_id
+    def __init__(self, domain_id=None, transaction_id=None):
+        self.domain_id = domain_id
         self.transaction_id = transaction_id
 
     def serialize(self):
-        dat = bytearray(to_bigint(self.asset_group_id))
+        dat = bytearray(to_bigint(self.domain_id))
         dat.extend(to_bigint(self.transaction_id))
         return bytes(dat)
 
     def deserialize(self, data):
         ptr = 0
         try:
-            ptr, self.asset_group_id = get_bigint(ptr, data)
+            ptr, self.domain_id = get_bigint(ptr, data)
             ptr, self.transaction_id = get_bigint(ptr, data)
         except:
             return False
@@ -882,8 +876,6 @@ class ServiceMessageType:
     RESPONSE_GET_PEERLIST = 3
     REQUEST_SET_STATIC_NODE = 4
     RESPONSE_SET_STATIC_NODE = 5
-    REQUEST_SETUP_ASSET_GROUP = 6
-    RESPONSE_SETUP_ASSET_GROUP = 7
     REQUEST_GET_CONFIG = 8
     RESPONSE_GET_CONFIG = 9
     REQUEST_MANIP_LEDGER_SUBSYS = 10
@@ -895,6 +887,8 @@ class ServiceMessageType:
     CANCEL_INSERT_NOTIFICATION = 16
     REQUEST_GET_STATS = 17
     RESPONSE_GET_STATS = 18
+    REQUEST_PING_TO_ALL = 19
+    REQUEST_ALIVE_CHECK = 20
 
     REGISTER = 32
     UNREGISTER = 33
@@ -948,14 +942,14 @@ class NodeInfo:
     def __init__(self, node_id=domain_global_0, ipv4=None, ipv6=None, port=None):
         self.node_id = node_id
         if ipv4 is None or len(ipv4) == 0:
-            self.ipv4 = "0.0.0.0"
+            self.ipv4 = None
         else:
             if isinstance(ipv4, bytes):
                 self.ipv4 = ipv4.decode()
             else:
                 self.ipv4 = ipv4
         if ipv6 is None or len(ipv6) == 0:
-            self.ipv6 = "::"
+            self.ipv6 = None
         else:
             if isinstance(ipv6, bytes):
                 self.ipv6 = ipv6.decode()
@@ -979,6 +973,11 @@ class NodeInfo:
     def __len__(self):
         return len(self.node_id)
 
+    def __str__(self):
+        output = "[node_id=%s, ipv4=%s, ipv6=%s, port=%d, time=%d]" % (binascii.b2a_hex(self.node_id), self.ipv4,
+                                                                       self.ipv6, self.port, self.updated_at)
+        return output
+
     def touch(self):
         self.updated_at = time.time()
         self.is_alive = True
@@ -997,16 +996,26 @@ class NodeInfo:
         self.updated_at = time.time()
 
     def get_nodeinfo(self):
-        ipv4 = socket.inet_pton(socket.AF_INET, self.ipv4)
-        ipv6 = socket.inet_pton(socket.AF_INET6, self.ipv6)
-        return self.node_id, ipv4, ipv6, socket.htons(self.port).to_bytes(2, 'little')
+        if self.ipv4 is not None:
+            ipv4 = socket.inet_pton(socket.AF_INET, self.ipv4)
+        else:
+            ipv4 = socket.inet_pton(socket.AF_INET, "0.0.0.0")
+        if self.ipv6 is not None:
+            ipv6 = socket.inet_pton(socket.AF_INET6, self.ipv6)
+        else:
+            ipv6 = socket.inet_pton(socket.AF_INET6, "::")
+        return self.node_id, ipv4, ipv6, socket.htons(self.port).to_bytes(2, 'big'), \
+               int(self.updated_at).to_bytes(8, 'big')
 
-    def recover_nodeinfo(self, node_id, ipv4, ipv6, port):
+    def recover_nodeinfo(self, node_id, ipv4, ipv6, port, updated_at=0):
         self.node_id = node_id
-        self.ipv4 = socket.inet_ntop(socket.AF_INET, ipv4)
-        self.ipv6 = socket.inet_ntop(socket.AF_INET6, ipv6)
-        self.port = socket.ntohs(int.from_bytes(port, 'little'))
-        self.touch()
+        if ipv4 != socket.inet_pton(socket.AF_INET, "0.0.0.0"):
+            self.ipv4 = socket.inet_ntop(socket.AF_INET, ipv4)
+        if ipv6 != socket.inet_pton(socket.AF_INET6, "::"):
+            self.ipv6 = socket.inet_ntop(socket.AF_INET6, ipv6)
+        self.port = socket.ntohs(int.from_bytes(port, 'big'))
+        if updated_at > 0:
+            self.updated_at = updated_at
 
 
 class StorageType:

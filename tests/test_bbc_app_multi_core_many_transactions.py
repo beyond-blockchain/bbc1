@@ -10,7 +10,7 @@ from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
 from bbc1.common.bbc_error import *
 from bbc1.app import bbc_app
-from testutils import prepare, get_core_client, start_core_thread, make_client, domain_and_asset_group_setup
+from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 
 
 LOGLEVEL = 'debug'
@@ -48,7 +48,7 @@ class MessageProcessor(bbc_app.Callback):
             event = objs[reference.transaction_id].events[reference.event_index_in_ref]
             if clients[self.idx]['user_id'] in event.mandatory_approvers:
                 signature = txobj.sign(keypair=clients[self.idx]['keypair'])
-                clients[self.idx]['app'].sendback_signature(asset_group_id, dat[KeyType.source_user_id], i, signature)
+                clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], i, signature)
                 return
 
 
@@ -62,11 +62,11 @@ class TestBBcAppClient(object):
         prepare(core_num=core_num, client_num=client_num, loglevel=LOGLEVEL)
         for i in range(core_num):
             start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i)
-            domain_and_asset_group_setup(i, domain_id, asset_group_id)  # system administrator
+            domain_setup_utility(i, domain_id)  # system administrator
         time.sleep(1)
         for i in range(client_num):
             msg_processor[i] = MessageProcessor(index=i)
-            make_client(index=i, core_port_increment=i, callback=msg_processor[i], asset_group_id=asset_group_id)
+            make_client(index=i, core_port_increment=i, callback=msg_processor[i])
         time.sleep(1)
 
         global cores, clients
@@ -86,8 +86,13 @@ class TestBBcAppClient(object):
             assert ret
             ret = msg_processor[i].synchronize()
             print("[%d] set_peer result is %s" %(i, ret))
+            clients[i]['app'].ping_to_all_neighbors(domain_id)
+        time.sleep(2)
 
+        clients[0]['app'].broadcast_peerlist_to_all_neighbors(domain_id)
+        print("** wait 3 sec to finish alive_check")
         time.sleep(3)
+        assert len(cores[1].networking.domains[domain_id].id_ip_mapping) == core_num-1
         for i in range(core_num):
             cores[i].networking.domains[domain_id].print_peerlist()
 
@@ -123,7 +128,7 @@ class TestBBcAppClient(object):
 
             transactions[i].digest()
             print("register transaction=", binascii.b2a_hex(transactions[i].transaction_id))
-            ret = cl['app'].insert_transaction(asset_group_id, transactions[i])
+            ret = cl['app'].insert_transaction(transactions[i])
             assert ret
             print("  ----> wait insert")
             msg_processor[i].synchronize()
@@ -148,7 +153,7 @@ class TestBBcAppClient(object):
             txobj.events[0].add(reference_index=0, mandatory_approver=clients[other_user]['user_id'])
 
             reference = bbclib.add_reference_to_transaction(asset_group_id, txobj, transactions[i], 0)
-            ret = cl['app'].gather_signatures(asset_group_id, txobj, reference_obj=reference)
+            ret = cl['app'].gather_signatures(txobj, reference_obj=reference)
             assert ret
             dat = msg_processor[i].synchronize()
             assert dat[KeyType.status] == ESUCCESS
@@ -157,7 +162,7 @@ class TestBBcAppClient(object):
 
             txobj.digest()
             txobj.dump()
-            ret = cl['app'].insert_transaction(asset_group_id, txobj)
+            ret = cl['app'].insert_transaction(txobj)
             assert ret
             msg_processor[i].synchronize()
             transactions[i] = txobj

@@ -1,4 +1,8 @@
-#!/usr/bin/env python
+#!/bin/sh
+""":" .
+
+exec python "$0" "$@"
+"""
 # -*- coding: utf-8 -*-
 """
 Copyright (c) 2017 beyond-blockchain.org.
@@ -41,22 +45,19 @@ user_id = None
 key_pair = None
 
 
-def asset_group_setup():
+def domain_setup():
     tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
     tmpclient.domain_setup(domain_id, "simple_cluster")
     tmpclient.callback.synchronize()
-    tmpclient.register_asset_group(domain_id=domain_id, asset_group_id=asset_group_id)
-    tmpclient.callback.synchronize()
     tmpclient.unregister_from_core()
-    print("Domain %s and asset_group %s are created." % (binascii.b2a_hex(domain_id[:4]).decode(),
-                                                        binascii.b2a_hex(asset_group_id[:4]).decode()))
+    print("Domain %s is created." % (binascii.b2a_hex(domain_id[:4]).decode()))
     print("Setup is done.")
 
 
 def setup_bbc_client():
     bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
     bbc_app_client.set_user_id(user_id)
-    bbc_app_client.set_asset_group_id(asset_group_id)
+    bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_callback(bbc_app.Callback())
     ret = bbc_app_client.register_to_core()
     assert ret
@@ -94,7 +95,7 @@ def create_transaction_object_for_filedata(receiver_name, receiver_user_id, ref_
     witness.add_witness(receiver_user_id)
 
     for i, ref_txid in enumerate(ref_txids):
-        bbc_app_client.search_transaction(asset_group_id, ref_txid)
+        bbc_app_client.search_transaction(ref_txid)
         response_data = bbc_app_client.callback.synchronize()
         if response_data[KeyType.status] < ESUCCESS:
             print("ERROR: ", response_data[KeyType.reason].decode())
@@ -104,8 +105,7 @@ def create_transaction_object_for_filedata(receiver_name, receiver_user_id, ref_
 
     asset_id = transaction.events[0].asset.asset_id
     asset_files = {asset_id: file_data}
-    ret = bbc_app_client.gather_signatures(asset_group_id, transaction, destinations=[receiver_user_id],
-                                           asset_files=asset_files)
+    ret = bbc_app_client.gather_signatures(transaction, destinations=[receiver_user_id], asset_files=asset_files)
     if not ret:
         print("Failed to send sign request")
         sys.exit(0)
@@ -127,7 +127,7 @@ def create_transaction_object_for_filedata(receiver_name, receiver_user_id, ref_
 
 def insert_signed_transaction_to_bbc_core(transaction=None, bbc_app_client=None, file_name=None):
     print("Insert the transaction into BBc-1")
-    ret = bbc_app_client.insert_transaction(asset_group_id, transaction)
+    ret = bbc_app_client.insert_transaction(transaction)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
@@ -138,7 +138,7 @@ def insert_signed_transaction_to_bbc_core(transaction=None, bbc_app_client=None,
 
 def send_transaction_info_msg(bbc_app_client=None, transaction=None, file_name=None, receiver_user_id=None):
     transaction_info = [os.path.basename(file_name), transaction.transaction_id]
-    bbc_app_client.send_message(transaction_info, asset_group_id, receiver_user_id)
+    bbc_app_client.send_message(transaction_info, receiver_user_id)
 
 
 def wait_for_transaction_msg(bbc_app_client=None):
@@ -148,7 +148,7 @@ def wait_for_transaction_msg(bbc_app_client=None):
     if KeyType.transaction_data not in response_data or KeyType.all_asset_files not in response_data:
         print("**** Invalid message is received...")
         print(response_data)
-        bbc_app_client.sendback_denial_of_sign(asset_group_id, response_data[KeyType.source_user_id],
+        bbc_app_client.sendback_denial_of_sign(response_data[KeyType.source_user_id],
                                                "Invalid message is received.")
         sys.exit(1)
     return response_data
@@ -162,8 +162,7 @@ def pick_valid_transaction_info(received_data=None, bbc_app_client=None):
     if asset_id not in asset_files:
         print("**** No valid file is received...")
         print(received_data)
-        bbc_app_client.sendback_denial_of_sign(asset_group_id, received_data[KeyType.source_user_id],
-                                               "No valid file is received.")
+        bbc_app_client.sendback_denial_of_sign(received_data[KeyType.source_user_id], "No valid file is received.")
         sys.exit(1)
 
     file_to_obtain = asset_files[asset_id]
@@ -180,7 +179,7 @@ def prompt_user_to_accept_the_file(bbc_app_client=None, source_id=None):
     print("====> Do you want to accept the file?")
     answer = input('(Y/N) >> ')
     if answer != "Y":
-        bbc_app_client.sendback_denial_of_sign(asset_group_id, source_id, "Denied to accept the file")
+        bbc_app_client.sendback_denial_of_sign(source_id, "Denied to accept the file")
         sys.exit(1)
 
 
@@ -211,7 +210,7 @@ def store_proc(file, txid=None):
                                           asset_body=user_info,
                                           asset_file=data)
     if txid:
-        bbc_app_client.search_transaction(asset_group_id, txid)
+        bbc_app_client.search_transaction(txid)
         response_data = bbc_app_client.callback.synchronize()
         if response_data[KeyType.status] < ESUCCESS:
             print("ERROR: ", response_data[KeyType.reason].decode())
@@ -230,7 +229,7 @@ def store_proc(file, txid=None):
         store_transaction.add_signature(user_id=user_id, signature=sig)
     store_transaction.digest()
 
-    ret = bbc_app_client.insert_transaction(asset_group_id, store_transaction)
+    ret = bbc_app_client.insert_transaction(store_transaction)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
@@ -361,7 +360,7 @@ def enter_file_wait_mode():
 
     prompt_user_to_accept_the_file(bbc_app_client=bbc_app_client, source_id=source_id)
     signature = transaction.sign(keypair=key_pair)
-    bbc_app_client.sendback_signature(asset_group_id, source_id, -1, signature)
+    bbc_app_client.sendback_signature(source_id, -1, signature)
     filename, transaction_id = wait_for_file_info_msg(bbc_app_client=bbc_app_client)
 
     bbc_app.store_id_mappings(os.path.basename(filename.decode()),
@@ -474,7 +473,7 @@ if __name__ == '__main__':
     if parsed_args.command_type == "keypair":
         create_keypair()
     elif parsed_args.command_type == "setup":
-        asset_group_setup()
+        domain_setup()
     else:
         user_name = parsed_args.user
         user_id = bbclib.get_new_id(user_name, include_timestamp=False)
