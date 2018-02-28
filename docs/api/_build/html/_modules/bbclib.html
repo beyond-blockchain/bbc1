@@ -99,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../bbc_network.html">bbc_network module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbc_storage.html">bbc_storage module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbclib.html">bbclib module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_types.html">bbc_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ledger_subsystem.html">ledger_subsystem module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../message_key_types.html">message_key_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../p2p_domain0.html">p2p_domain0 module</a></li>
@@ -195,7 +196,8 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
 
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;../../&quot;</span><span class="p">)</span>
+<span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s2">&quot;../..&quot;</span><span class="p">))</span>
 <span class="kn">from</span> <span class="nn">bbc1.common.bbc_error</span> <span class="k">import</span> <span class="o">*</span>
 
 <span class="n">directory</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
@@ -208,8 +210,6 @@
 
 
 <span class="n">domain_global_0</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="s2">&quot;0000000000000000000000000000000000000000000000000000000000000000&quot;</span><span class="p">)</span>
-<span class="n">DEFAULT_MAX_BODY_SIZE</span> <span class="o">=</span> <span class="mi">256</span>
-<span class="n">max_bodysize_conf</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
 <span class="n">error_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 <span class="n">error_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -227,11 +227,6 @@
     <span class="k">global</span> <span class="n">error_text</span>
     <span class="n">error_code</span> <span class="o">=</span> <span class="n">ESUCCESS</span>
     <span class="n">error_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
-
-
-<div class="viewcode-block" id="set_max_body_size"><a class="viewcode-back" href="../bbclib.html#bbclib.set_max_body_size">[docs]</a><span class="k">def</span> <span class="nf">set_max_body_size</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">body_size</span><span class="p">):</span>
-    <span class="k">global</span> <span class="n">max_bodysize_conf</span>
-    <span class="n">max_bodysize_conf</span><span class="p">[</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">body_size</span></div>
 
 
 <div class="viewcode-block" id="get_new_id"><a class="viewcode-back" href="../bbclib.html#bbclib.get_new_id">[docs]</a><span class="k">def</span> <span class="nf">get_new_id</span><span class="p">(</span><span class="n">seed_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_timestamp</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -269,13 +264,15 @@
     <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="make_transaction_for_base_asset"><a class="viewcode-back" href="../bbclib.html#bbclib.make_transaction_for_base_asset">[docs]</a><span class="k">def</span> <span class="nf">make_transaction_for_base_asset</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_num</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="make_transaction_for_base_asset"><a class="viewcode-back" href="../bbclib.html#bbclib.make_transaction_for_base_asset">[docs]</a><span class="k">def</span> <span class="nf">make_transaction_for_base_asset</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">witness</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">transaction</span> <span class="o">=</span> <span class="n">BBcTransaction</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">event_num</span><span class="p">):</span>
         <span class="n">evt</span> <span class="o">=</span> <span class="n">BBcEvent</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="n">asset_group_id</span><span class="p">)</span>
-        <span class="n">ast</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">(</span><span class="n">max_body_size</span><span class="o">=</span><span class="n">max_bodysize_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">DEFAULT_MAX_BODY_SIZE</span><span class="p">))</span>
+        <span class="n">ast</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">()</span>
         <span class="n">evt</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">asset</span><span class="o">=</span><span class="n">ast</span><span class="p">)</span>
         <span class="n">transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">evt</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">witness</span><span class="p">:</span>
+        <span class="n">transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">witness</span><span class="o">=</span><span class="n">BBcWitness</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">transaction</span></div>
 
 
@@ -286,6 +283,46 @@
         <span class="k">return</span> <span class="kc">None</span>
     <span class="n">transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">reference</span><span class="o">=</span><span class="n">ref</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ref</span></div>
+
+
+<div class="viewcode-block" id="make_transaction_with_relation"><a class="viewcode-back" href="../bbclib.html#bbclib.make_transaction_with_relation">[docs]</a><span class="k">def</span> <span class="nf">make_transaction_with_relation</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">base_transaction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">base_transaction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">base_transaction</span> <span class="o">=</span> <span class="n">BBcTransaction</span><span class="p">()</span>
+    <span class="n">rtn</span> <span class="o">=</span> <span class="n">BBcRelation</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="n">asset_group_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">asset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">asset</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">()</span>
+    <span class="n">rtn</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">asset</span><span class="o">=</span><span class="n">asset</span><span class="p">)</span>
+    <span class="n">base_transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">relation</span><span class="o">=</span><span class="n">rtn</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">base_transaction</span></div>
+
+
+<div class="viewcode-block" id="add_relation_pointer"><a class="viewcode-back" href="../bbclib.html#bbclib.add_relation_pointer">[docs]</a><span class="k">def</span> <span class="nf">add_relation_pointer</span><span class="p">(</span><span class="n">relation</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">):</span>
+    <span class="n">pointer</span> <span class="o">=</span> <span class="n">BBcPointer</span><span class="p">(</span><span class="n">transaction_id</span><span class="o">=</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="n">asset_id</span><span class="p">)</span>
+    <span class="n">relation</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pointer</span><span class="o">=</span><span class="n">pointer</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_relation_with_asset_group_id"><a class="viewcode-back" href="../bbclib.html#bbclib.get_relation_with_asset_group_id">[docs]</a><span class="k">def</span> <span class="nf">get_relation_with_asset_group_id</span><span class="p">(</span><span class="n">txobj</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">):</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">txobj</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="o">==</span> <span class="n">asset_group_id</span><span class="p">:</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="get_relation_with_asset_id"><a class="viewcode-back" href="../bbclib.html#bbclib.get_relation_with_asset_id">[docs]</a><span class="k">def</span> <span class="nf">get_relation_with_asset_id</span><span class="p">(</span><span class="n">txobj</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">):</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">txobj</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">asset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">r</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">asset_id</span> <span class="o">==</span> <span class="n">asset_id</span><span class="p">:</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="make_transaction_with_witness"><a class="viewcode-back" href="../bbclib.html#bbclib.make_transaction_with_witness">[docs]</a><span class="k">def</span> <span class="nf">make_transaction_with_witness</span><span class="p">(</span><span class="n">base_transaction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">base_transaction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">base_transaction</span> <span class="o">=</span> <span class="n">BBcTransaction</span><span class="p">()</span>
+    <span class="n">wit</span> <span class="o">=</span> <span class="n">BBcWitness</span><span class="p">()</span>
+    <span class="n">base_transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">witness</span><span class="o">=</span><span class="n">wit</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">base_transaction</span></div>
 
 
 <div class="viewcode-block" id="recover_transaction_object_from_rawdata"><a class="viewcode-back" href="../bbclib.html#bbclib.recover_transaction_object_from_rawdata">[docs]</a><span class="k">def</span> <span class="nf">recover_transaction_object_from_rawdata</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
@@ -409,9 +446,16 @@
 
 <div class="viewcode-block" id="KeyPair.sign"><a class="viewcode-back" href="../bbclib.html#bbclib.KeyPair.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digest</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">ECDSA_SECP256k1</span><span class="p">:</span>
-            <span class="n">signature</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">64</span><span class="p">)()</span>
-            <span class="n">libbbcsig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">private_key_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">private_key</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
-            <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">signature</span><span class="p">)</span>
+            <span class="n">sig_r</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)()</span>
+            <span class="n">sig_s</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)()</span>
+            <span class="n">sig_r_len</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)()</span>  <span class="c1"># Adjust size according to the expected size of sig_r and sig_s. Default:uint32.</span>
+            <span class="n">sig_s_len</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)()</span>
+            <span class="n">libbbcsig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">private_key_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">private_key</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">sig_r</span><span class="p">,</span> <span class="n">sig_s</span><span class="p">,</span> <span class="n">sig_r_len</span><span class="p">,</span> <span class="n">sig_s_len</span><span class="p">)</span>
+            <span class="n">sig_r_len</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">sig_r_len</span><span class="p">),</span> <span class="s2">&quot;little&quot;</span><span class="p">)</span>
+            <span class="n">sig_s_len</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">sig_s_len</span><span class="p">),</span> <span class="s2">&quot;little&quot;</span><span class="p">)</span>
+            <span class="n">sig_r</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="s2">&quot;00&quot;</span><span class="o">*</span><span class="p">(</span><span class="mi">32</span><span class="o">-</span><span class="n">sig_r_len</span><span class="p">)</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">sig_r</span><span class="p">)[:</span><span class="n">sig_r_len</span><span class="p">]</span><span class="o">.</span><span class="n">hex</span><span class="p">())</span>
+            <span class="n">sig_s</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_hex</span><span class="p">(</span><span class="s2">&quot;00&quot;</span><span class="o">*</span><span class="p">(</span><span class="mi">32</span><span class="o">-</span><span class="n">sig_s_len</span><span class="p">)</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">sig_s</span><span class="p">)[:</span><span class="n">sig_s_len</span><span class="p">]</span><span class="o">.</span><span class="n">hex</span><span class="p">())</span>
+            <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">(</span><span class="n">sig_r</span><span class="p">)</span><span class="o">+</span><span class="nb">bytearray</span><span class="p">(</span><span class="n">sig_s</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">set_error</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">EOTHER</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;sig_type </span><span class="si">%d</span><span class="s2"> is not supported&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span></div>
@@ -479,13 +523,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">references</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">witness</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cross_refs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signatures</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">userid_sigidx_mapping</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transaction_base_digest</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="BBcTransaction.add"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcTransaction.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cross_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcTransaction.add"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcTransaction.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">relation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">witness</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cross_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">event</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
@@ -496,6 +542,14 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">references</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">references</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">relation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">relation</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">relation</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">relation</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">witness</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">witness</span><span class="o">.</span><span class="n">transaction</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">witness</span> <span class="o">=</span> <span class="n">witness</span>
         <span class="k">if</span> <span class="n">cross_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cross_ref</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cross_refs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">cross_ref</span><span class="p">)</span>
@@ -535,6 +589,18 @@
             <span class="n">refe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">references</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
             <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_4byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">refe</span><span class="p">)))</span>
             <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">refe</span><span class="p">)</span>
+        <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">)):</span>
+            <span class="n">rtn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_4byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rtn</span><span class="p">)))</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">rtn</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">witness</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">witness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">witness</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_4byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">witness</span><span class="p">)))</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">witness</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">for_id</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">transaction_base_digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
 
@@ -584,6 +650,25 @@
                 <span class="n">refe</span> <span class="o">=</span> <span class="n">BBcReference</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="n">refe</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">refdata</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">references</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">refe</span><span class="p">)</span>
+
+            <span class="n">ptr</span><span class="p">,</span> <span class="n">rtn_num</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">relations</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rtn_num</span><span class="p">):</span>
+                <span class="n">ptr</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="n">ptr</span><span class="p">,</span> <span class="n">rtndata</span> <span class="o">=</span> <span class="n">get_n_bytes</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="n">rtn</span> <span class="o">=</span> <span class="n">BBcRelation</span><span class="p">()</span>
+                <span class="n">rtn</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">rtndata</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rtn</span><span class="p">)</span>
+
+            <span class="n">ptr</span><span class="p">,</span> <span class="n">witness_num</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">witness_num</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">witness</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ptr</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="n">ptr</span><span class="p">,</span> <span class="n">witnessdata</span> <span class="o">=</span> <span class="n">get_n_bytes</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">witness</span> <span class="o">=</span> <span class="n">BBcWitness</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">witness</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">witnessdata</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">witness</span><span class="o">.</span><span class="n">transaction</span> <span class="o">=</span> <span class="bp">self</span>
 
             <span class="n">ptr</span><span class="p">,</span> <span class="n">cross_num</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cross_refs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -647,7 +732,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;transaction_id: None&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;version:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;timestamp:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Event[]:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Event[]:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">evt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">):</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%d</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
@@ -684,22 +769,73 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reference[]:&quot;</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">references</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">references</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">refe</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">references</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">refe</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">refe</span><span class="o">.</span><span class="n">transaction_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  asset_group_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">refe</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  transaction_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">refe</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  event_index_in_ref:&quot;</span><span class="p">,</span> <span class="n">refe</span><span class="o">.</span><span class="n">event_index_in_ref</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  sig_index:&quot;</span><span class="p">,</span> <span class="n">refe</span><span class="o">.</span><span class="n">sig_indices</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  -- None (invalid)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  None&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Relation[]:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rtn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">):</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%d</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  asset_group_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">refe</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">))</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  transaction_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">refe</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">))</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  event_index_in_ref:&quot;</span><span class="p">,</span> <span class="n">refe</span><span class="o">.</span><span class="n">event_index_in_ref</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  sig_index:&quot;</span><span class="p">,</span> <span class="n">refe</span><span class="o">.</span><span class="n">sig_indices</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  asset_group_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">rtn</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  Pointers[]:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rtn</span><span class="o">.</span><span class="n">pointers</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rtn</span><span class="o">.</span><span class="n">pointers</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">rtn</span><span class="o">.</span><span class="n">pointers</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">pt</span><span class="o">.</span><span class="n">transaction_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     transaction_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     transaction_id: NONE&quot;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">pt</span><span class="o">.</span><span class="n">asset_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     asset_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">asset_id</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     asset_id: NONE&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     NONE&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  Asset:&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">rtn</span><span class="o">.</span><span class="n">asset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     asset_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">rtn</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">asset_id</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">rtn</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     user_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">rtn</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">user_id</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     user_id: NONE&quot;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     nonce:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">rtn</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">nonce</span><span class="p">))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     file_size:&quot;</span><span class="p">,</span> <span class="n">rtn</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">asset_file_size</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">rtn</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">asset_file_digest</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     file_digest:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">rtn</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">asset_file_digest</span><span class="p">))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     body_size:&quot;</span><span class="p">,</span> <span class="n">rtn</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">asset_body_size</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     body:&quot;</span><span class="p">,</span> <span class="n">rtn</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">asset_body</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    NONE&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  None&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Witness:&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">witness</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">witness</span><span class="o">.</span><span class="n">sig_indices</span><span class="p">)):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%d</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">witness</span><span class="o">.</span><span class="n">user_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  user_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">witness</span><span class="o">.</span><span class="n">user_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  sig_index:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">witness</span><span class="o">.</span><span class="n">sig_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  -- None (invalid)&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  None&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cross_Ref[]:&quot;</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_refs</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_refs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cross</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_refs</span><span class="p">):</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%d</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  asset_group_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">cross</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">))</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  transaction_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">cross</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">cross</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  domain_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">cross</span><span class="o">.</span><span class="n">domain_id</span><span class="p">))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  transaction_id:&quot;</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">cross</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  -- None (invalid)&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  None&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature[]:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature[]:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signatures</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signatures</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sig</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signatures</span><span class="p">):</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%d</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
@@ -781,7 +917,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">option_approvers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">appr</span><span class="p">)</span>
             <span class="n">ptr</span><span class="p">,</span> <span class="n">astsize</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
             <span class="n">ptr</span><span class="p">,</span> <span class="n">astdata</span> <span class="o">=</span> <span class="n">get_n_bytes</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">astsize</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">(</span><span class="n">max_body_size</span><span class="o">=</span><span class="n">max_bodysize_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">DEFAULT_MAX_BODY_SIZE</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">astdata</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -857,8 +993,134 @@
         <span class="k">return</span> <span class="kc">True</span></div></div>
 
 
+<div class="viewcode-block" id="BBcRelation"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcRelation">[docs]</a><span class="k">class</span> <span class="nc">BBcRelation</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">asset_group_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="BBcRelation.add"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcRelation.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pointer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">asset_group_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">asset_group_id</span>
+        <span class="k">if</span> <span class="n">pointer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pointer</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">pointer</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pointer</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">asset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="o">=</span> <span class="n">asset</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcRelation.serialize"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcRelation.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">))</span>
+        <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">)):</span>
+            <span class="n">pt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pt</span><span class="p">)))</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ast</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_4byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ast</span><span class="p">)))</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcRelation.deserialize"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcRelation.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">get_bigint</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="n">ptr</span><span class="p">,</span> <span class="n">pt_num</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pt_num</span><span class="p">):</span>
+                <span class="n">ptr</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="n">ptr</span><span class="p">,</span> <span class="n">ptdata</span> <span class="o">=</span> <span class="n">get_n_bytes</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="n">pt</span> <span class="o">=</span> <span class="n">BBcPointer</span><span class="p">()</span>
+                <span class="n">pt</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">ptdata</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">ptr</span><span class="p">,</span> <span class="n">astsize</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">astsize</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">()</span>
+                <span class="n">ptr</span><span class="p">,</span> <span class="n">astdata</span> <span class="o">=</span> <span class="n">get_n_bytes</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">astsize</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">astdata</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+
+<div class="viewcode-block" id="BBcPointer"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcPointer">[docs]</a><span class="k">class</span> <span class="nc">BBcPointer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="o">=</span> <span class="n">asset_id</span>
+
+<div class="viewcode-block" id="BBcPointer.add"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcPointer.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">transaction_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="k">if</span> <span class="n">asset_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="o">=</span> <span class="n">asset_id</span></div>
+
+<div class="viewcode-block" id="BBcPointer.serialize"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcPointer.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcPointer.deserialize"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcPointer.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="n">get_bigint</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="n">ptr</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">num</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="o">=</span> <span class="n">get_bigint</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+
+<div class="viewcode-block" id="BBcWitness"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcWitness">[docs]</a><span class="k">class</span> <span class="nc">BBcWitness</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BBcWitness.add_witness"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcWitness.add_witness">[docs]</a>    <span class="k">def</span> <span class="nf">add_witness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transaction</span><span class="o">.</span><span class="n">get_sig_index</span><span class="p">(</span><span class="n">user_id</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="BBcWitness.add_signature"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcWitness.add_signature">[docs]</a>    <span class="k">def</span> <span class="nf">add_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span><span class="o">.</span><span class="n">add_signature</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcWitness.serialize"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcWitness.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span><span class="p">)):</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcWitness.deserialize"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcWitness.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ptr</span><span class="p">,</span> <span class="n">signum</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">signum</span><span class="p">):</span>
+                <span class="n">ptr</span><span class="p">,</span> <span class="n">uid</span> <span class="o">=</span> <span class="n">get_bigint</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">user_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+                <span class="n">ptr</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+
 <div class="viewcode-block" id="BBcAsset"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcAsset">[docs]</a><span class="k">class</span> <span class="nc">BBcAsset</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_body_size</span><span class="o">=</span><span class="n">DEFAULT_MAX_BODY_SIZE</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span> <span class="o">=</span> <span class="n">get_random_value</span><span class="p">()</span>
@@ -867,7 +1129,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_digest</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asset_body_size</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asset_body</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_body_size</span> <span class="o">=</span> <span class="n">max_body_size</span>
 
 <div class="viewcode-block" id="BBcAsset.add"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcAsset.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_body</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -877,15 +1138,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">asset_file</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">asset_file</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">asset_body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">asset_body</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_body_size</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">asset_file</span> <span class="o">=</span> <span class="n">asset_body</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">asset_body</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">asset_body</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">asset_body</span> <span class="o">=</span> <span class="n">asset_body</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">asset_body</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">asset_body</span> <span class="o">=</span> <span class="n">asset_body</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">asset_body_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">asset_body</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset_body</span> <span class="o">=</span> <span class="n">asset_body</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">asset_body</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">asset_body</span> <span class="o">=</span> <span class="n">asset_body</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset_body_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">asset_body</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="BBcAsset.digest"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcAsset.digest">[docs]</a>    <span class="k">def</span> <span class="nf">digest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -951,19 +1207,19 @@
 
 
 <div class="viewcode-block" id="BBcCrossRef"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcCrossRef">[docs]</a><span class="k">class</span> <span class="nc">BBcCrossRef</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">asset_group_id</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span> <span class="o">=</span> <span class="n">domain_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="n">transaction_id</span>
 
 <div class="viewcode-block" id="BBcCrossRef.serialize"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcCrossRef.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">))</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">))</span>
         <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">))</span>
         <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BBcCrossRef.deserialize"><a class="viewcode-back" href="../bbclib.html#bbclib.BBcCrossRef.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">get_bigint</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span> <span class="o">=</span> <span class="n">get_bigint</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
             <span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="n">get_bigint</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -977,8 +1233,6 @@
     <span class="n">RESPONSE_GET_PEERLIST</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">REQUEST_SET_STATIC_NODE</span> <span class="o">=</span> <span class="mi">4</span>
     <span class="n">RESPONSE_SET_STATIC_NODE</span> <span class="o">=</span> <span class="mi">5</span>
-    <span class="n">REQUEST_SETUP_ASSET_GROUP</span> <span class="o">=</span> <span class="mi">6</span>
-    <span class="n">RESPONSE_SETUP_ASSET_GROUP</span> <span class="o">=</span> <span class="mi">7</span>
     <span class="n">REQUEST_GET_CONFIG</span> <span class="o">=</span> <span class="mi">8</span>
     <span class="n">RESPONSE_GET_CONFIG</span> <span class="o">=</span> <span class="mi">9</span>
     <span class="n">REQUEST_MANIP_LEDGER_SUBSYS</span> <span class="o">=</span> <span class="mi">10</span>
@@ -991,6 +1245,7 @@
     <span class="n">REQUEST_GET_STATS</span> <span class="o">=</span> <span class="mi">17</span>
     <span class="n">RESPONSE_GET_STATS</span> <span class="o">=</span> <span class="mi">18</span>
     <span class="n">REQUEST_PING_TO_ALL</span> <span class="o">=</span> <span class="mi">19</span>
+    <span class="n">REQUEST_ALIVE_CHECK</span> <span class="o">=</span> <span class="mi">20</span>
 
     <span class="n">REGISTER</span> <span class="o">=</span> <span class="mi">32</span>
     <span class="n">UNREGISTER</span> <span class="o">=</span> <span class="mi">33</span>

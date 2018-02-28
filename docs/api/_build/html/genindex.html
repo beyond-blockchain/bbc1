@@ -99,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bbc_network.html">bbc_network module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bbc_storage.html">bbc_storage module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bbclib.html">bbclib module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bbc_types.html">bbc_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ledger_subsystem.html">ledger_subsystem module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="message_key_types.html">message_key_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="p2p_domain0.html">p2p_domain0 module</a></li>
@@ -203,6 +204,10 @@
       <ul>
         <li><a href="bbclib.html#bbclib.BBcEvent.add">(bbclib.BBcEvent method)</a>
 </li>
+        <li><a href="bbclib.html#bbclib.BBcPointer.add">(bbclib.BBcPointer method)</a>
+</li>
+        <li><a href="bbclib.html#bbclib.BBcRelation.add">(bbclib.BBcRelation method)</a>
+</li>
         <li><a href="bbclib.html#bbclib.BBcSignature.add">(bbclib.BBcSignature method)</a>
 </li>
         <li><a href="bbclib.html#bbclib.BBcTransaction.add">(bbclib.BBcTransaction method)</a>
@@ -214,7 +219,7 @@
 </li>
       <li><a href="query_management.html#query_management.Ticker.add_entry">add_entry() (query_management.Ticker method)</a>
 </li>
-      <li><a href="p2p_domain0.html#p2p_domain0.AssetGroupInfo.add_node">add_node() (p2p_domain0.AssetGroupInfo method)</a>
+      <li><a href="p2p_domain0.html#p2p_domain0.DomainInfo.add_node">add_node() (p2p_domain0.DomainInfo method)</a>
 </li>
       <li><a href="bbc_network.html#bbc_network.DomainBase.add_peer_node">add_peer_node() (bbc_network.DomainBase method)</a>
 
@@ -226,24 +231,30 @@
 </li>
       <li><a href="bbclib.html#bbclib.add_reference_to_transaction">add_reference_to_transaction() (in module bbclib)</a>
 </li>
+      <li><a href="bbclib.html#bbclib.add_relation_pointer">add_relation_pointer() (in module bbclib)</a>
+</li>
       <li><a href="bbclib.html#bbclib.BBcReference.add_signature">add_signature() (bbclib.BBcReference method)</a>
 
       <ul>
         <li><a href="bbclib.html#bbclib.BBcTransaction.add_signature">(bbclib.BBcTransaction method)</a>
 </li>
+        <li><a href="bbclib.html#bbclib.BBcWitness.add_signature">(bbclib.BBcWitness method)</a>
+</li>
       </ul></li>
-      <li><a href="bbc_network.html#bbc_network.BBcNetwork.add_static_node_to_domain">add_static_node_to_domain() (bbc_network.BBcNetwork method)</a>
-</li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.ADVERTISE_ASSET_GROUP">ADVERTISE_ASSET_GROUP (bbc_network.InfraMessageTypeBase attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="p2p_domain0.html#p2p_domain0.NetworkDomain.advertise_asset_group_info">advertise_asset_group_info() (p2p_domain0.NetworkDomain method)</a>
+      <li><a href="bbc_network.html#bbc_network.BBcNetwork.add_static_node_to_domain">add_static_node_to_domain() (bbc_network.BBcNetwork method)</a>
 </li>
-      <li><a href="simple_cluster.html#simple_cluster.NetworkDomain.advertise_domain_info">advertise_domain_info() (simple_cluster.NetworkDomain method)</a>
+      <li><a href="bbclib.html#bbclib.BBcWitness.add_witness">add_witness() (bbclib.BBcWitness method)</a>
 </li>
-      <li><a href="message_key_types.html#message_key_types.KeyType.advertise_in_domain0">advertise_in_domain0 (message_key_types.KeyType attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.ADVERTISE_DOMAIN_INFO">ADVERTISE_DOMAIN_INFO (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
+      <li><a href="p2p_domain0.html#p2p_domain0.NetworkDomain.advertise_domain_info">advertise_domain_info() (p2p_domain0.NetworkDomain method)</a>
+
+      <ul>
+        <li><a href="simple_cluster.html#simple_cluster.NetworkDomain.advertise_domain_info">(simple_cluster.NetworkDomain method)</a>
+</li>
+      </ul></li>
       <li><a href="bbc_network.html#bbc_network.DomainBase.alive_check">alive_check() (bbc_network.DomainBase method)</a>
 
       <ul>
@@ -258,21 +269,17 @@
         <li><a href="ledger_subsystem.html#ledger_subsystem.Queue.append_msg">(ledger_subsystem.Queue method)</a>
 </li>
       </ul></li>
-      <li><a href="bbc_ledger.html#bbc_ledger.ResourceType.Asset_file">Asset_file (bbc_ledger.ResourceType attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.ResourceType.Asset_file">Asset_file (bbc_types.ResourceType attribute)</a>
 </li>
       <li><a href="message_key_types.html#message_key_types.KeyType.asset_file">asset_file (message_key_types.KeyType attribute)</a>
 </li>
       <li><a href="message_key_types.html#message_key_types.KeyType.asset_group_id">asset_group_id (message_key_types.KeyType attribute)</a>
 </li>
-      <li><a href="message_key_types.html#message_key_types.KeyType.asset_group_list">asset_group_list (message_key_types.KeyType attribute)</a>
-</li>
-      <li><a href="bbc_core.html#bbc_core.BBcCoreService.asset_group_setup">asset_group_setup() (bbc_core.BBcCoreService method)</a>
-</li>
-      <li><a href="bbc_ledger.html#bbc_ledger.ResourceType.Asset_ID">Asset_ID (bbc_ledger.ResourceType attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.ResourceType.Asset_ID">Asset_ID (bbc_types.ResourceType attribute)</a>
 </li>
       <li><a href="message_key_types.html#message_key_types.KeyType.asset_id">asset_id (message_key_types.KeyType attribute)</a>
 </li>
-      <li><a href="p2p_domain0.html#p2p_domain0.AssetGroupInfo">AssetGroupInfo (class in p2p_domain0)</a>
+      <li><a href="bbc_types.html#bbc_types.ResourceType.Asset_info">Asset_info (bbc_types.ResourceType attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -296,16 +303,18 @@
 </li>
       <li><a href="bbc_storage.html#module-bbc_storage">bbc_storage (module)</a>
 </li>
+      <li><a href="bbc_types.html#module-bbc_types">bbc_types (module)</a>
+</li>
       <li><a href="bbc_app.html#bbc_app.BBcAppClient">BBcAppClient (class in bbc_app)</a>
 </li>
       <li><a href="bbclib.html#bbclib.BBcAsset">BBcAsset (class in bbclib)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbc_config.html#bbc_config.BBcConfig">BBcConfig (class in bbc_config)</a>
 </li>
       <li><a href="bbc_core.html#bbc_core.BBcCoreService">BBcCoreService (class in bbc_core)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbclib.html#bbclib.BBcCrossRef">BBcCrossRef (class in bbclib)</a>
 </li>
       <li><a href="bbclib.html#bbclib.BBcEvent">BBcEvent (class in bbclib)</a>
@@ -316,13 +325,21 @@
 </li>
       <li><a href="bbc_network.html#bbc_network.BBcNetwork">BBcNetwork (class in bbc_network)</a>
 </li>
+      <li><a href="bbclib.html#bbclib.BBcPointer">BBcPointer (class in bbclib)</a>
+</li>
       <li><a href="bbclib.html#bbclib.BBcReference">BBcReference (class in bbclib)</a>
+</li>
+      <li><a href="bbclib.html#bbclib.BBcRelation">BBcRelation (class in bbclib)</a>
 </li>
       <li><a href="bbclib.html#bbclib.BBcSignature">BBcSignature (class in bbclib)</a>
 </li>
       <li><a href="bbc_storage.html#bbc_storage.BBcStorage">BBcStorage (class in bbc_storage)</a>
 </li>
       <li><a href="bbclib.html#bbclib.BBcTransaction">BBcTransaction (class in bbclib)</a>
+</li>
+      <li><a href="bbclib.html#bbclib.BBcWitness">BBcWitness (class in bbclib)</a>
+</li>
+      <li><a href="bbc_app.html#bbc_app.BBcAppClient.broadcast_peerlist_to_all_neighbors">broadcast_peerlist_to_all_neighbors() (bbc_app.BBcAppClient method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -350,16 +367,18 @@
 </li>
       <li><a href="bbc_ledger.html#bbc_ledger.BBcLedger.close_db">close_db() (bbc_ledger.BBcLedger method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.close_merkle_tree">close_merkle_tree() (ledger_subsystem.LedgerSubsystem method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="message_key_types.html#message_key_types.KeyType.command">command (message_key_types.KeyType attribute)</a>
 
       <ul>
         <li><a href="command.html#module-command">(module)</a>
 </li>
       </ul></li>
+      <li><a href="bbc_core.html#bbc_core.BBcCoreService.configure_domain">configure_domain() (bbc_core.BBcCoreService method)</a>
+</li>
       <li><a href="bbclib.html#bbclib.convert_id_to_string">convert_id_to_string() (in module bbclib)</a>
 </li>
       <li><a href="bbclib.html#bbclib.convert_idstring_to_bytes">convert_idstring_to_bytes() (in module bbclib)</a>
@@ -369,6 +388,8 @@
       <li><a href="message_key_types.html#message_key_types.KeyType.count">count (message_key_types.KeyType attribute)</a>
 </li>
       <li><a href="bbc_network.html#bbc_network.BBcNetwork.create_domain">create_domain() (bbc_network.BBcNetwork method)</a>
+</li>
+      <li><a href="bbc_storage.html#bbc_storage.BBcStorage.create_new_directory">create_new_directory() (bbc_storage.BBcStorage method)</a>
 </li>
       <li><a href="bbc_app.html#bbc_app.Callback.create_queue">create_queue() (bbc_app.Callback method)</a>
 </li>
@@ -388,7 +409,7 @@
 </li>
       <li><a href="query_management.html#query_management.Ticker.del_entry">del_entry() (query_management.Ticker method)</a>
 </li>
-      <li><a href="p2p_domain0.html#p2p_domain0.NetworkDomain.delete_asset_group_from_info">delete_asset_group_from_info() (p2p_domain0.NetworkDomain method)</a>
+      <li><a href="p2p_domain0.html#p2p_domain0.NetworkDomain.delete_domain_from_info">delete_domain_from_info() (p2p_domain0.NetworkDomain method)</a>
 </li>
       <li><a href="bbclib.html#bbclib.BBcAsset.deserialize">deserialize() (bbclib.BBcAsset method)</a>
 
@@ -397,11 +418,17 @@
 </li>
         <li><a href="bbclib.html#bbclib.BBcEvent.deserialize">(bbclib.BBcEvent method)</a>
 </li>
+        <li><a href="bbclib.html#bbclib.BBcPointer.deserialize">(bbclib.BBcPointer method)</a>
+</li>
         <li><a href="bbclib.html#bbclib.BBcReference.deserialize">(bbclib.BBcReference method)</a>
+</li>
+        <li><a href="bbclib.html#bbclib.BBcRelation.deserialize">(bbclib.BBcRelation method)</a>
 </li>
         <li><a href="bbclib.html#bbclib.BBcSignature.deserialize">(bbclib.BBcSignature method)</a>
 </li>
         <li><a href="bbclib.html#bbclib.BBcTransaction.deserialize">(bbclib.BBcTransaction method)</a>
+</li>
+        <li><a href="bbclib.html#bbclib.BBcWitness.deserialize">(bbclib.BBcWitness method)</a>
 </li>
       </ul></li>
       <li><a href="message_key_types.html#message_key_types.deserialize_data">deserialize_data() (in module message_key_types)</a>
@@ -416,14 +443,14 @@
 </li>
       <li><a href="bbclib.html#bbclib.NodeInfo.detect_disconnect">detect_disconnect() (bbclib.NodeInfo method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbclib.html#bbclib.BBcAsset.digest">digest() (bbclib.BBcAsset method)</a>
 
       <ul>
         <li><a href="bbclib.html#bbclib.BBcTransaction.digest">(bbclib.BBcTransaction method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.disable">disable() (ledger_subsystem.LedgerSubsystem method)</a>
 </li>
       <li><a href="bbc_app.html#bbc_app.Callback.dispatch">dispatch() (bbc_app.Callback method)</a>
@@ -444,7 +471,7 @@
         <li><a href="simple_cluster.html#simple_cluster.NetworkDomain.domain_manager_loop">(simple_cluster.NetworkDomain method)</a>
 </li>
       </ul></li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.DOMAIN_PING">DOMAIN_PING (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.DOMAIN_PING">DOMAIN_PING (bbc_types.InfraMessageTypeBase attribute)</a>
 
       <ul>
         <li><a href="bbclib.html#bbclib.ServiceMessageType.DOMAIN_PING">(bbclib.ServiceMessageType attribute)</a>
@@ -458,6 +485,8 @@
 </li>
       <li><a href="bbc_network.html#bbc_network.DomainBase">DomainBase (class in bbc_network)</a>
 </li>
+      <li><a href="p2p_domain0.html#p2p_domain0.DomainInfo">DomainInfo (class in p2p_domain0)</a>
+</li>
       <li><a href="bbclib.html#bbclib.BBcTransaction.dump">dump() (bbclib.BBcTransaction method)</a>
 </li>
   </ul></td>
@@ -468,18 +497,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbclib.html#bbclib.KeyType.ECDSA_SECP256k1">ECDSA_SECP256k1 (bbclib.KeyType attribute)</a>
 </li>
-      <li><a href="bbc_ledger.html#bbc_ledger.ResourceType.Edge_incoming">Edge_incoming (bbc_ledger.ResourceType attribute)</a>
-</li>
-      <li><a href="bbc_ledger.html#bbc_ledger.ResourceType.Edge_outgoing">Edge_outgoing (bbc_ledger.ResourceType attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.ResourceType.Edge">Edge (bbc_types.ResourceType attribute)</a>
 </li>
       <li><a href="ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.enable">enable() (ledger_subsystem.LedgerSubsystem method)</a>
 </li>
       <li><a href="bbc_core.html#bbc_core.BBcCoreService.error_reply">error_reply() (bbc_core.BBcCoreService method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbc_core.html#bbc_core.error_response">error_response() (in module bbc_core)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="query_management.html#query_management.exec_func_after">exec_func_after() (in module query_management)</a>
 </li>
       <li><a href="bbc_ledger.html#bbc_ledger.BBcLedger.exec_sql">exec_sql() (bbc_ledger.BBcLedger method)</a>
@@ -500,10 +527,12 @@
 </li>
       <li><a href="bbclib.html#bbclib.StorageType.FILESYSTEM">FILESYSTEM (bbclib.StorageType attribute)</a>
 </li>
-      <li><a href="bbc_ledger.html#bbc_ledger.BBcLedger.find_locally">find_locally() (bbc_ledger.BBcLedger method)</a>
+      <li><a href="bbc_ledger.html#bbc_ledger.BBcLedger.find_by_sql_in_local_auxiliary_db">find_by_sql_in_local_auxiliary_db() (bbc_ledger.BBcLedger method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="bbc_ledger.html#bbc_ledger.BBcLedger.find_transaction_locally">find_transaction_locally() (bbc_ledger.BBcLedger method)</a>
+</li>
       <li><a href="query_management.html#query_management.QueryEntry.fire">fire() (query_management.QueryEntry method)</a>
 </li>
       <li><a href="query_management.html#query_management.QueryEntry.force_expire">force_expire() (query_management.QueryEntry method)</a>
@@ -523,8 +552,6 @@
       <li><a href="bbc_network.html#bbc_network.BBcNetwork.get">get() (bbc_network.BBcNetwork method)</a>
 </li>
       <li><a href="bbclib.html#bbclib.BBcAsset.get_asset_file">get_asset_file() (bbclib.BBcAsset method)</a>
-</li>
-      <li><a href="bbc_config.html#bbc_config.BBcConfig.get_asset_group_config">get_asset_group_config() (bbc_config.BBcConfig method)</a>
 </li>
       <li><a href="bbc_app.html#bbc_app.BBcAppClient.get_bbc_config">get_bbc_config() (bbc_app.BBcAppClient method)</a>
 </li>
@@ -556,10 +583,10 @@
 </li>
       <li><a href="logger.html#logger.get_logger">get_logger() (in module logger)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.get_merkle_base">get_merkle_base() (ledger_subsystem.LedgerSubsystem method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbc_network.html#bbc_network.BBcNetwork.get_my_socket_info">get_my_socket_info() (bbc_network.BBcNetwork method)</a>
 </li>
       <li><a href="bbclib.html#bbclib.get_n_byte_int">get_n_byte_int() (in module bbclib)</a>
@@ -576,7 +603,7 @@
 </li>
       <li><a href="bbclib.html#bbclib.NodeInfo.get_nodeinfo">get_nodeinfo() (bbclib.NodeInfo method)</a>
 </li>
-      <li><a href="p2p_domain0.html#p2p_domain0.AssetGroupInfo.get_nodes">get_nodes() (p2p_domain0.AssetGroupInfo method)</a>
+      <li><a href="p2p_domain0.html#p2p_domain0.DomainInfo.get_nodes">get_nodes() (p2p_domain0.DomainInfo method)</a>
 </li>
       <li><a href="bbclib.html#bbclib.KeyPair.get_private_key_in_der">get_private_key_in_der() (bbclib.KeyPair method)</a>
 </li>
@@ -587,6 +614,10 @@
       <li><a href="bbclib.html#bbclib.get_random_value">get_random_value() (in module bbclib)</a>
 </li>
       <li><a href="bbclib.html#bbclib.BBcReference.get_referred_transaction">get_referred_transaction() (bbclib.BBcReference method)</a>
+</li>
+      <li><a href="bbclib.html#bbclib.get_relation_with_asset_group_id">get_relation_with_asset_group_id() (in module bbclib)</a>
+</li>
+      <li><a href="bbclib.html#bbclib.get_relation_with_asset_id">get_relation_with_asset_id() (in module bbclib)</a>
 </li>
       <li><a href="bbc_network.html#bbc_network.DomainBase.get_resource">get_resource() (bbc_network.DomainBase method)</a>
 
@@ -620,9 +651,11 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase">InfraMessageTypeBase (class in bbc_network)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase">InfraMessageTypeBase (class in bbc_types)</a>
 </li>
-      <li><a href="bbc_ledger.html#bbc_ledger.BBcLedger.insert_locally">insert_locally() (bbc_ledger.BBcLedger method)</a>
+      <li><a href="bbc_ledger.html#bbc_ledger.BBcLedger.insert_asset_info_locally">insert_asset_info_locally() (bbc_ledger.BBcLedger method)</a>
+</li>
+      <li><a href="bbc_ledger.html#bbc_ledger.BBcLedger.insert_topology_info_locally">insert_topology_info_locally() (bbc_ledger.BBcLedger method)</a>
 </li>
       <li><a href="bbc_app.html#bbc_app.BBcAppClient.insert_transaction">insert_transaction() (bbc_app.BBcAppClient method)</a>
 
@@ -632,13 +665,13 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="bbc_ledger.html#bbc_ledger.BBcLedger.insert_transaction_locally">insert_transaction_locally() (bbc_ledger.BBcLedger method)</a>
+</li>
       <li><a href="message_key_types.html#message_key_types.KeyType.ipv4_address">ipv4_address (message_key_types.KeyType attribute)</a>
 </li>
       <li><a href="message_key_types.html#message_key_types.KeyType.ipv6_address">ipv6_address (message_key_types.KeyType attribute)</a>
 </li>
       <li><a href="bbclib.html#bbclib.is_less_than">is_less_than() (in module bbclib)</a>
-</li>
-      <li><a href="bbc_network.html#bbc_network.DomainBase.is_registered_user">is_registered_user() (bbc_network.DomainBase method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -704,11 +737,13 @@
 </li>
       <li><a href="bbclib.html#bbclib.make_transaction_for_base_asset">make_transaction_for_base_asset() (in module bbclib)</a>
 </li>
-      <li><a href="bbc_app.html#bbc_app.BBcAppClient.manipulate_ledger_subsystem">manipulate_ledger_subsystem() (bbc_app.BBcAppClient method)</a>
+      <li><a href="bbclib.html#bbclib.make_transaction_with_relation">make_transaction_with_relation() (in module bbclib)</a>
+</li>
+      <li><a href="bbclib.html#bbclib.make_transaction_with_witness">make_transaction_with_witness() (in module bbclib)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="message_key_types.html#message_key_types.KeyType.max_body_size">max_body_size (message_key_types.KeyType attribute)</a>
+      <li><a href="bbc_app.html#bbc_app.BBcAppClient.manipulate_ledger_subsystem">manipulate_ledger_subsystem() (bbc_app.BBcAppClient method)</a>
 </li>
       <li><a href="message_key_types.html#message_key_types.KeyType.merkle_tree">merkle_tree (message_key_types.KeyType attribute)</a>
 </li>
@@ -720,7 +755,7 @@
 </li>
       <li><a href="message_key_types.html#module-message_key_types">message_key_types (module)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.MESSAGE_TO_USER">MESSAGE_TO_USER (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.MESSAGE_TO_USER">MESSAGE_TO_USER (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
       <li><a href="bbclib.html#bbclib.KeyPair.mk_keyobj_from_private_key">mk_keyobj_from_private_key() (bbclib.KeyPair method)</a>
 </li>
@@ -752,13 +787,13 @@
 </li>
       <li><a href="bbclib.html#bbclib.StorageType.NONE">NONE (bbclib.StorageType attribute)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.NOTIFY_CROSS_REF">NOTIFY_CROSS_REF (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.NOTIFY_CROSS_REF">NOTIFY_CROSS_REF (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.NOTIFY_INSERTED">NOTIFY_INSERTED (bbclib.ServiceMessageType attribute)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.NOTIFY_LEAVE">NOTIFY_LEAVE (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.NOTIFY_LEAVE">NOTIFY_LEAVE (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.NOTIFY_PEERLIST">NOTIFY_PEERLIST (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.NOTIFY_PEERLIST">NOTIFY_PEERLIST (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -767,10 +802,6 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbc_ledger.html#bbc_ledger.BBcLedger.open_db">open_db() (bbc_ledger.BBcLedger method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="bbc_ledger.html#bbc_ledger.ResourceType.Owner_asset">Owner_asset (bbc_ledger.ResourceType attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -794,7 +825,7 @@
 </li>
       <li><a href="message_key_types.html#message_key_types.KeyType.peer_list">peer_list (message_key_types.KeyType attribute)</a>
 </li>
-      <li><a href="p2p_domain0.html#p2p_domain0.NetworkDomain.periodic_advertising_asset_group_info">periodic_advertising_asset_group_info() (p2p_domain0.NetworkDomain method)</a>
+      <li><a href="p2p_domain0.html#p2p_domain0.NetworkDomain.periodic_advertising_domain_info">periodic_advertising_domain_info() (p2p_domain0.NetworkDomain method)</a>
 </li>
       <li><a href="bbc_app.html#bbc_app.BBcAppClient.ping_to_all_neighbors">ping_to_all_neighbors() (bbc_app.BBcAppClient method)</a>
 
@@ -810,7 +841,7 @@
 </li>
       <li><a href="bbclib.html#bbclib.BBcReference.prepare_reference">prepare_reference() (bbclib.BBcReference method)</a>
 </li>
-      <li><a href="p2p_domain0.html#p2p_domain0.NetworkDomain.print_asset_group_info">print_asset_group_info() (p2p_domain0.NetworkDomain method)</a>
+      <li><a href="p2p_domain0.html#p2p_domain0.NetworkDomain.print_domain_info">print_domain_info() (p2p_domain0.NetworkDomain method)</a>
 </li>
       <li><a href="bbc_network.html#bbc_network.DomainBase.print_peerlist">print_peerlist() (bbc_network.DomainBase method)</a>
 
@@ -822,8 +853,6 @@
 </li>
       <li><a href="bbc_app.html#bbc_app.Callback.proc_notify_inserted">proc_notify_inserted() (bbc_app.Callback method)</a>
 </li>
-      <li><a href="bbc_app.html#bbc_app.Callback.proc_resp_asset_group_setup">proc_resp_asset_group_setup() (bbc_app.Callback method)</a>
-</li>
       <li><a href="bbc_app.html#bbc_app.Callback.proc_resp_cross_ref">proc_resp_cross_ref() (bbc_app.Callback method)</a>
 </li>
       <li><a href="bbc_app.html#bbc_app.Callback.proc_resp_domain_setup">proc_resp_domain_setup() (bbc_app.Callback method)</a>
@@ -832,10 +861,10 @@
 </li>
       <li><a href="bbc_app.html#bbc_app.Callback.proc_resp_get_config">proc_resp_get_config() (bbc_app.Callback method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbc_app.html#bbc_app.Callback.proc_resp_get_domainlist">proc_resp_get_domainlist() (bbc_app.Callback method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbc_app.html#bbc_app.Callback.proc_resp_get_peerlist">proc_resp_get_peerlist() (bbc_app.Callback method)</a>
 </li>
       <li><a href="bbc_app.html#bbc_app.Callback.proc_resp_get_stats">proc_resp_get_stats() (bbc_app.Callback method)</a>
@@ -862,7 +891,7 @@
 </li>
       <li><a href="bbc_core.html#bbc_core.BBcCoreService.process">process() (bbc_core.BBcCoreService method)</a>
 </li>
-      <li><a href="p2p_domain0.html#p2p_domain0.NetworkDomain.process_ADVERTISE_ASSET_GROUP">process_ADVERTISE_ASSET_GROUP() (p2p_domain0.NetworkDomain method)</a>
+      <li><a href="p2p_domain0.html#p2p_domain0.NetworkDomain.process_ADVERTISE_DOMAIN_INFO">process_ADVERTISE_DOMAIN_INFO() (p2p_domain0.NetworkDomain method)</a>
 </li>
       <li><a href="bbc_network.html#bbc_network.DomainBase.process_message">process_message() (bbc_network.DomainBase method)</a>
 
@@ -944,8 +973,6 @@
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.REGISTER">REGISTER (bbclib.ServiceMessageType attribute)</a>
 </li>
-      <li><a href="bbc_app.html#bbc_app.BBcAppClient.register_asset_group">register_asset_group() (bbc_app.BBcAppClient method)</a>
-</li>
       <li><a href="bbc_app.html#bbc_app.BBcAppClient.register_in_ledger_subsystem">register_in_ledger_subsystem() (bbc_app.BBcAppClient method)</a>
 </li>
       <li><a href="bbc_app.html#bbc_app.BBcAppClient.register_to_core">register_to_core() (bbc_app.BBcAppClient method)</a>
@@ -966,7 +993,7 @@
       </ul></li>
       <li><a href="bbc_network.html#bbc_network.BBcNetwork.remove_domain">remove_domain() (bbc_network.BBcNetwork method)</a>
 </li>
-      <li><a href="p2p_domain0.html#p2p_domain0.AssetGroupInfo.remove_entry">remove_entry() (p2p_domain0.AssetGroupInfo method)</a>
+      <li><a href="p2p_domain0.html#p2p_domain0.DomainInfo.remove_entry">remove_entry() (p2p_domain0.DomainInfo method)</a>
 </li>
       <li><a href="bbc_core.html#bbc_core.BBcCoreService.remove_from_notification_list">remove_from_notification_list() (bbc_core.BBcCoreService method)</a>
 </li>
@@ -980,11 +1007,13 @@
 </li>
       <li><a href="bbc_network.html#bbc_network.DomainBase.renew_peerlist">renew_peerlist() (bbc_network.DomainBase method)</a>
 </li>
+      <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_ALIVE_CHECK">REQUEST_ALIVE_CHECK (bbclib.ServiceMessageType attribute)</a>
+</li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_CROSS_REF">REQUEST_CROSS_REF (bbclib.ServiceMessageType attribute)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.REQUEST_FIND_USER">REQUEST_FIND_USER (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.REQUEST_FIND_USER">REQUEST_FIND_USER (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.REQUEST_FIND_VALUE">REQUEST_FIND_VALUE (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.REQUEST_FIND_VALUE">REQUEST_FIND_VALUE (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_GATHER_SIGNATURE">REQUEST_GATHER_SIGNATURE (bbclib.ServiceMessageType attribute)</a>
 </li>
@@ -1004,14 +1033,14 @@
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_MANIP_LEDGER_SUBSYS">REQUEST_MANIP_LEDGER_SUBSYS (bbclib.ServiceMessageType attribute)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.REQUEST_PING">REQUEST_PING (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.REQUEST_PING">REQUEST_PING (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_PING_TO_ALL">REQUEST_PING_TO_ALL (bbclib.ServiceMessageType attribute)</a>
 </li>
-      <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_REGISTER_HASH_IN_SUBSYS">REQUEST_REGISTER_HASH_IN_SUBSYS (bbclib.ServiceMessageType attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_REGISTER_HASH_IN_SUBSYS">REQUEST_REGISTER_HASH_IN_SUBSYS (bbclib.ServiceMessageType attribute)</a>
+</li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_SEARCH_ASSET">REQUEST_SEARCH_ASSET (bbclib.ServiceMessageType attribute)</a>
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_SEARCH_TRANSACTION">REQUEST_SEARCH_TRANSACTION (bbclib.ServiceMessageType attribute)</a>
@@ -1020,13 +1049,11 @@
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_SET_STATIC_NODE">REQUEST_SET_STATIC_NODE (bbclib.ServiceMessageType attribute)</a>
 </li>
-      <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_SETUP_ASSET_GROUP">REQUEST_SETUP_ASSET_GROUP (bbclib.ServiceMessageType attribute)</a>
-</li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_SETUP_DOMAIN">REQUEST_SETUP_DOMAIN (bbclib.ServiceMessageType attribute)</a>
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_SIGNATURE">REQUEST_SIGNATURE (bbclib.ServiceMessageType attribute)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.REQUEST_STORE">REQUEST_STORE (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.REQUEST_STORE">REQUEST_STORE (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.REQUEST_VERIFY_HASH_IN_SUBSYS">REQUEST_VERIFY_HASH_IN_SUBSYS (bbclib.ServiceMessageType attribute)</a>
 </li>
@@ -1042,7 +1069,7 @@
 </li>
       <li><a href="message_key_types.html#message_key_types.KeyType.resource_type">resource_type (message_key_types.KeyType attribute)</a>
 </li>
-      <li><a href="bbc_ledger.html#bbc_ledger.ResourceType">ResourceType (class in bbc_ledger)</a>
+      <li><a href="bbc_types.html#bbc_types.ResourceType">ResourceType (class in bbc_types)</a>
 </li>
       <li><a href="simple_cluster.html#simple_cluster.NetworkDomain.respond_find_node">respond_find_node() (simple_cluster.NetworkDomain method)</a>
 </li>
@@ -1054,9 +1081,9 @@
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.RESPONSE_CROSS_REF">RESPONSE_CROSS_REF (bbclib.ServiceMessageType attribute)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.RESPONSE_FIND_USER">RESPONSE_FIND_USER (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.RESPONSE_FIND_USER">RESPONSE_FIND_USER (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.RESPONSE_FIND_VALUE">RESPONSE_FIND_VALUE (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.RESPONSE_FIND_VALUE">RESPONSE_FIND_VALUE (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.RESPONSE_GATHER_SIGNATURE">RESPONSE_GATHER_SIGNATURE (bbclib.ServiceMessageType attribute)</a>
 </li>
@@ -1072,7 +1099,7 @@
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.RESPONSE_MANIP_LEDGER_SUBSYS">RESPONSE_MANIP_LEDGER_SUBSYS (bbclib.ServiceMessageType attribute)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.RESPONSE_PING">RESPONSE_PING (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.RESPONSE_PING">RESPONSE_PING (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.RESPONSE_REGISTER_HASH_IN_SUBSYS">RESPONSE_REGISTER_HASH_IN_SUBSYS (bbclib.ServiceMessageType attribute)</a>
 </li>
@@ -1084,15 +1111,13 @@
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.RESPONSE_SET_STATIC_NODE">RESPONSE_SET_STATIC_NODE (bbclib.ServiceMessageType attribute)</a>
 </li>
-      <li><a href="bbclib.html#bbclib.ServiceMessageType.RESPONSE_SETUP_ASSET_GROUP">RESPONSE_SETUP_ASSET_GROUP (bbclib.ServiceMessageType attribute)</a>
-</li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.RESPONSE_SETUP_DOMAIN">RESPONSE_SETUP_DOMAIN (bbclib.ServiceMessageType attribute)</a>
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.RESPONSE_SIGNATURE">RESPONSE_SIGNATURE (bbclib.ServiceMessageType attribute)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.RESPONSE_STORE">RESPONSE_STORE (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.RESPONSE_STORE">RESPONSE_STORE (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.RESPONSE_STORE_COPY">RESPONSE_STORE_COPY (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.RESPONSE_STORE_COPY">RESPONSE_STORE_COPY (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
       <li><a href="bbclib.html#bbclib.ServiceMessageType.RESPONSE_VERIFY_HASH_IN_SUBSYS">RESPONSE_VERIFY_HASH_IN_SUBSYS (bbclib.ServiceMessageType attribute)</a>
 </li>
@@ -1179,22 +1204,28 @@
 </li>
         <li><a href="bbclib.html#bbclib.BBcEvent.serialize">(bbclib.BBcEvent method)</a>
 </li>
+        <li><a href="bbclib.html#bbclib.BBcPointer.serialize">(bbclib.BBcPointer method)</a>
+</li>
         <li><a href="bbclib.html#bbclib.BBcReference.serialize">(bbclib.BBcReference method)</a>
+</li>
+        <li><a href="bbclib.html#bbclib.BBcRelation.serialize">(bbclib.BBcRelation method)</a>
 </li>
         <li><a href="bbclib.html#bbclib.BBcSignature.serialize">(bbclib.BBcSignature method)</a>
 </li>
         <li><a href="bbclib.html#bbclib.BBcTransaction.serialize">(bbclib.BBcTransaction method)</a>
 </li>
-      </ul></li>
-      <li><a href="bbclib.html#bbclib.ServiceMessageType">ServiceMessageType (class in bbclib)</a>
+        <li><a href="bbclib.html#bbclib.BBcWitness.serialize">(bbclib.BBcWitness method)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="bbc_app.html#bbc_app.BBcAppClient.set_asset_group_id">set_asset_group_id() (bbc_app.BBcAppClient method)</a>
+      <li><a href="bbclib.html#bbclib.ServiceMessageType">ServiceMessageType (class in bbclib)</a>
 </li>
       <li><a href="bbc_app.html#bbc_app.BBcAppClient.set_callback">set_callback() (bbc_app.BBcAppClient method)</a>
 </li>
       <li><a href="ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.set_domain">set_domain() (ledger_subsystem.LedgerSubsystem method)</a>
+</li>
+      <li><a href="bbc_app.html#bbc_app.BBcAppClient.set_domain_id">set_domain_id() (bbc_app.BBcAppClient method)</a>
 </li>
       <li><a href="ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.set_domain_internal">set_domain_internal() (ledger_subsystem.LedgerSubsystem method)</a>
 </li>
@@ -1203,8 +1234,6 @@
       <li><a href="bbclib.html#bbclib.set_error">set_error() (in module bbclib)</a>
 </li>
       <li><a href="bbc_app.html#bbc_app.Callback.set_logger">set_logger() (bbc_app.Callback method)</a>
-</li>
-      <li><a href="bbclib.html#bbclib.set_max_body_size">set_max_body_size() (in module bbclib)</a>
 </li>
       <li><a href="bbc_network.html#bbc_network.DomainBase.set_refresh_timer">set_refresh_timer() (bbc_network.DomainBase method)</a>
 </li>
@@ -1230,13 +1259,15 @@
 </li>
       <li><a href="message_key_types.html#message_key_types.KeyType.source_user_id">source_user_id (message_key_types.KeyType attribute)</a>
 </li>
+      <li><a href="message_key_types.html#message_key_types.KeyType.sql">sql (message_key_types.KeyType attribute)</a>
+</li>
       <li><a href="bbc_network.html#bbc_network.DomainBase.start_domain_manager">start_domain_manager() (bbc_network.DomainBase method)</a>
 </li>
       <li><a href="bbc_app.html#bbc_app.BBcAppClient.start_receiver_loop">start_receiver_loop() (bbc_app.BBcAppClient method)</a>
 </li>
       <li><a href="bbc_core.html#bbc_core.BBcCoreService.start_server">start_server() (bbc_core.BBcCoreService method)</a>
 </li>
-      <li><a href="bbc_network.html#bbc_network.InfraMessageTypeBase.START_TO_REFRESH">START_TO_REFRESH (bbc_network.InfraMessageTypeBase attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.InfraMessageTypeBase.START_TO_REFRESH">START_TO_REFRESH (bbc_types.InfraMessageTypeBase attribute)</a>
 </li>
       <li><a href="message_key_types.html#message_key_types.KeyType.stats">stats (message_key_types.KeyType attribute)</a>
 </li>
@@ -1302,7 +1333,7 @@
 </li>
       <li><a href="bbclib.html#bbclib.NodeInfo.touch">touch() (bbclib.NodeInfo method)</a>
 </li>
-      <li><a href="bbc_ledger.html#bbc_ledger.ResourceType.Transaction_data">Transaction_data (bbc_ledger.ResourceType attribute)</a>
+      <li><a href="bbc_types.html#bbc_types.ResourceType.Transaction_data">Transaction_data (bbc_types.ResourceType attribute)</a>
 </li>
       <li><a href="message_key_types.html#message_key_types.KeyType.transaction_data">transaction_data (message_key_types.KeyType attribute)</a>
 </li>
@@ -1336,9 +1367,9 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="p2p_domain0.html#p2p_domain0.NetworkDomain.update_asset_group_info">update_asset_group_info() (p2p_domain0.NetworkDomain method)</a>
-</li>
       <li><a href="bbc_config.html#bbc_config.BBcConfig.update_config">update_config() (bbc_config.BBcConfig method)</a>
+</li>
+      <li><a href="p2p_domain0.html#p2p_domain0.NetworkDomain.update_domain_info">update_domain_info() (p2p_domain0.NetworkDomain method)</a>
 </li>
       <li><a href="query_management.html#query_management.QueryEntry.update_expiration_time">update_expiration_time() (query_management.QueryEntry method)</a>
 </li>

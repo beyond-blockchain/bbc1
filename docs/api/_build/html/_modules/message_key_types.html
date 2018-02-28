@@ -99,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../bbc_network.html">bbc_network module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbc_storage.html">bbc_storage module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbclib.html">bbclib module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_types.html">bbc_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ledger_subsystem.html">ledger_subsystem module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../message_key_types.html">message_key_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../p2p_domain0.html">p2p_domain0 module</a></li>
@@ -309,8 +310,6 @@
     <span class="n">storage_path</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
     <span class="n">peer_info</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
     <span class="n">peer_list</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
-    <span class="n">advertise_in_domain0</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
-    <span class="n">asset_group_list</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
     <span class="n">domain_list</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
     <span class="n">bbc_configuration</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
     <span class="n">ipv4_address</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
@@ -318,11 +317,11 @@
     <span class="n">port_number</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
     <span class="n">external_ip4addr</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
     <span class="n">external_ip6addr</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
-    <span class="n">max_body_size</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
 
     <span class="n">resource_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">)</span>
     <span class="n">resource_type</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">)</span>
     <span class="n">resource</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">)</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">)</span>
 
     <span class="n">user_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x50</span><span class="p">)</span>
     <span class="n">source_user_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x50</span><span class="p">)</span>

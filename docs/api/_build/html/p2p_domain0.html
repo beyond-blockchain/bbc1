@@ -195,22 +195,22 @@ limitations under the License.</p>
 </tbody>
 </table>
 <dl class="class">
-<dt id="p2p_domain0.AssetGroupInfo">
-<em class="property">class </em><code class="descclassname">p2p_domain0.</code><code class="descname">AssetGroupInfo</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>del_func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#AssetGroupInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.AssetGroupInfo" title="Permalink to this definition">¶</a></dt>
+<dt id="p2p_domain0.DomainInfo">
+<em class="property">class </em><code class="descclassname">p2p_domain0.</code><code class="descname">DomainInfo</code><span class="sig-paren">(</span><em>domain_id</em>, <em>del_func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#DomainInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.DomainInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
-<dt id="p2p_domain0.AssetGroupInfo.add_node">
-<code class="descname">add_node</code><span class="sig-paren">(</span><em>node_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#AssetGroupInfo.add_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.AssetGroupInfo.add_node" title="Permalink to this definition">¶</a></dt>
+<dt id="p2p_domain0.DomainInfo.add_node">
+<code class="descname">add_node</code><span class="sig-paren">(</span><em>node_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#DomainInfo.add_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.DomainInfo.add_node" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="p2p_domain0.AssetGroupInfo.get_nodes">
-<code class="descname">get_nodes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#AssetGroupInfo.get_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.AssetGroupInfo.get_nodes" title="Permalink to this definition">¶</a></dt>
+<dt id="p2p_domain0.DomainInfo.get_nodes">
+<code class="descname">get_nodes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#DomainInfo.get_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.DomainInfo.get_nodes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="p2p_domain0.AssetGroupInfo.remove_entry">
-<code class="descname">remove_entry</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#AssetGroupInfo.remove_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.AssetGroupInfo.remove_entry" title="Permalink to this definition">¶</a></dt>
+<dt id="p2p_domain0.DomainInfo.remove_entry">
+<code class="descname">remove_entry</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#DomainInfo.remove_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.DomainInfo.remove_entry" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -221,8 +221,8 @@ limitations under the License.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">bbc1.core.simple_cluster.NetworkDomain</span></code></p>
 <p>Compose a simple core node cluster</p>
 <dl class="method">
-<dt id="p2p_domain0.NetworkDomain.advertise_asset_group_info">
-<code class="descname">advertise_asset_group_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#NetworkDomain.advertise_asset_group_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.NetworkDomain.advertise_asset_group_info" title="Permalink to this definition">¶</a></dt>
+<dt id="p2p_domain0.NetworkDomain.advertise_domain_info">
+<code class="descname">advertise_domain_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#NetworkDomain.advertise_domain_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.NetworkDomain.advertise_domain_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Advertise domain information in domain_global_0</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -235,14 +235,14 @@ limitations under the License.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="p2p_domain0.NetworkDomain.delete_asset_group_from_info">
-<code class="descname">delete_asset_group_from_info</code><span class="sig-paren">(</span><em>asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#NetworkDomain.delete_asset_group_from_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.NetworkDomain.delete_asset_group_from_info" title="Permalink to this definition">¶</a></dt>
+<dt id="p2p_domain0.NetworkDomain.delete_domain_from_info">
+<code class="descname">delete_domain_from_info</code><span class="sig-paren">(</span><em>domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#NetworkDomain.delete_domain_from_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.NetworkDomain.delete_domain_from_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>(internal use) delete asset_group_id</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>asset_group_id</strong> – </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> – </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -265,18 +265,18 @@ limitations under the License.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="p2p_domain0.NetworkDomain.periodic_advertising_asset_group_info">
-<code class="descname">periodic_advertising_asset_group_info</code><span class="sig-paren">(</span><em>query_entry=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#NetworkDomain.periodic_advertising_asset_group_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.NetworkDomain.periodic_advertising_asset_group_info" title="Permalink to this definition">¶</a></dt>
+<dt id="p2p_domain0.NetworkDomain.periodic_advertising_domain_info">
+<code class="descname">periodic_advertising_domain_info</code><span class="sig-paren">(</span><em>query_entry=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#NetworkDomain.periodic_advertising_domain_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.NetworkDomain.periodic_advertising_domain_info" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="p2p_domain0.NetworkDomain.print_asset_group_info">
-<code class="descname">print_asset_group_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#NetworkDomain.print_asset_group_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.NetworkDomain.print_asset_group_info" title="Permalink to this definition">¶</a></dt>
+<dt id="p2p_domain0.NetworkDomain.print_domain_info">
+<code class="descname">print_domain_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#NetworkDomain.print_domain_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.NetworkDomain.print_domain_info" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="p2p_domain0.NetworkDomain.process_ADVERTISE_ASSET_GROUP">
-<code class="descname">process_ADVERTISE_ASSET_GROUP</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#NetworkDomain.process_ADVERTISE_ASSET_GROUP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.NetworkDomain.process_ADVERTISE_ASSET_GROUP" title="Permalink to this definition">¶</a></dt>
+<dt id="p2p_domain0.NetworkDomain.process_ADVERTISE_DOMAIN_INFO">
+<code class="descname">process_ADVERTISE_DOMAIN_INFO</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#NetworkDomain.process_ADVERTISE_DOMAIN_INFO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.NetworkDomain.process_ADVERTISE_DOMAIN_INFO" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -302,16 +302,16 @@ limitations under the License.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="p2p_domain0.NetworkDomain.update_asset_group_info">
-<code class="descname">update_asset_group_info</code><span class="sig-paren">(</span><em>source_node_id</em>, <em>asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#NetworkDomain.update_asset_group_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.NetworkDomain.update_asset_group_info" title="Permalink to this definition">¶</a></dt>
-<dd><p>(internal use) update asset_group info (self.asset_group_list)</p>
+<dt id="p2p_domain0.NetworkDomain.update_domain_info">
+<code class="descname">update_domain_info</code><span class="sig-paren">(</span><em>source_node_id</em>, <em>domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2p_domain0.html#NetworkDomain.update_domain_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2p_domain0.NetworkDomain.update_domain_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>(internal use) update asset_group info (self.domain_list)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>source_node_id</strong> – </li>
-<li><strong>asset_group_id</strong> – </li>
+<li><strong>domain_id</strong> – </li>
 </ul>
 </td>
 </tr>

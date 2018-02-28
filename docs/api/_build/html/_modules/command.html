@@ -99,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../bbc_network.html">bbc_network module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbc_storage.html">bbc_storage module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbclib.html">bbclib module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_types.html">bbc_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ledger_subsystem.html">ledger_subsystem module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../message_key_types.html">message_key_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../p2p_domain0.html">p2p_domain0 module</a></li>
@@ -197,7 +198,8 @@
 
 <div class="viewcode-block" id="parser"><a class="viewcode-back" href="../command.html#command.parser">[docs]</a><span class="k">def</span> <span class="nf">parser</span><span class="p">():</span>
     <span class="n">usage</span> <span class="o">=</span> <span class="s1">&#39;python </span><span class="si">{}</span><span class="s1"> [--coreport &lt;number&gt;] [--p2pport &lt;number&gt;] [--workingdir &lt;dir&gt;] &#39;</span> \
-            <span class="s1">&#39;[--config &lt;filename&gt;] [--globaldomain] [--ip4addr &lt;IP addr&gt;] [--ip6addr &lt;IPv6 addr&gt;] &#39;</span> \
+            <span class="s1">&#39;[--config &lt;filename&gt;] [--globaldomain] [--ledgersubsystem] &#39;</span> \
+            <span class="s1">&#39;[--ip4addr &lt;IP addr&gt;] [--ip6addr &lt;IPv6 addr&gt;] &#39;</span> \
             <span class="s1">&#39;[--log &lt;filename&gt;] [--verbose_level &lt;string&gt;] [--daemon] [--kill] [--help]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
     <span class="n">argparser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span><span class="n">usage</span><span class="o">=</span><span class="n">usage</span><span class="p">)</span>
     <span class="n">argparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-cp&#39;</span><span class="p">,</span> <span class="s1">&#39;--coreport&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_CORE_PORT</span><span class="p">,</span>
@@ -211,6 +213,9 @@
     <span class="n">argparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--globaldomain&#39;</span><span class="p">,</span>
                            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;connect with domain_global_0&#39;</span><span class="p">)</span>
+    <span class="n">argparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--ledgersubsystem&#39;</span><span class="p">,</span>
+                           <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;use ledger_subsystem&#39;</span><span class="p">)</span>
     <span class="n">argparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--ip4addr&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;IPv4 address exposed to the external network&#39;</span><span class="p">)</span>
     <span class="n">argparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--ip6addr&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
