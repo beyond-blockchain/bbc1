@@ -37,7 +37,7 @@ class TestBBcAppClient(object):
             domain_setup_utility(i, domain_ids[i%domain_num])
         time.sleep(1)
         for i in range(client_num):
-            make_client(index=i, core_port_increment=i%core_num, asset_group_id=asset_group_ids[i%domain_num])
+            make_client(index=i, core_port_increment=i%core_num)
         time.sleep(1)
         # client: i*3 = domain[0], i*3+1 = domain[1], i*3+2 = domain[2]
 

@@ -71,7 +71,7 @@ class TestBBcAppClient(object):
             if core_num > 1:
                 cni = i
             msg_processor[i] = MessageProcessor(index=i)
-            make_client(index=i, core_port_increment=cni, callback=msg_processor[i], asset_group_id=asset_group_id)
+            make_client(index=i, core_port_increment=cni, callback=msg_processor[i])
         time.sleep(1)
 
         global cores, clients
@@ -133,7 +133,7 @@ class TestBBcAppClient(object):
 
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
-            ret = cl['app'].insert_transaction(asset_group_id, transactions[i])
+            ret = cl['app'].insert_transaction(transactions[i])
             assert ret
             print("  ----> wait for notification")
             for j in range(client_num):
@@ -172,7 +172,7 @@ class TestBBcAppClient(object):
 
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
-            ret = cl['app'].insert_transaction(asset_group_id, transactions[i])
+            ret = cl['app'].insert_transaction(transactions[i])
             assert ret
             msg_processor[i].synchronize()
 
@@ -202,7 +202,7 @@ class TestBBcAppClient(object):
 
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
-            ret = cl['app'].insert_transaction(asset_group_id, transactions[i])
+            ret = cl['app'].insert_transaction(transactions[i])
             assert ret
             print("  ----> wait for notification")
             for j in range(client_num):

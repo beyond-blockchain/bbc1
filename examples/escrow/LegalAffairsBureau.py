@@ -90,7 +90,7 @@ def recive():
         list = cur.fetchall()
         if len(list) != 0:
             print("Ref tx has alredy been referenced")
-            bbc_app_client.sendback_denial_of_sign(asset_group_id, recvdat[KeyType.source_user_id], "Ref tx has alredy been referenced")
+            bbc_app_client.sendback_denial_of_sign(recvdat[KeyType.source_user_id], "Ref tx has alredy been referenced")
             return 0;
         else:
             print("Ref tx has not been referenced.")
@@ -99,7 +99,7 @@ def recive():
             list = cur.fetchall()
             if len(list) == 0:
                 print("ref tx is not found")
-                bbc_app_client.sendback_denial_of_sign(asset_group_id, recvdat[KeyType.source_user_id], "Ref Tx is not found")
+                bbc_app_client.sendback_denial_of_sign(recvdat[KeyType.source_user_id], "Ref Tx is not found")
                 return 0;
             else:
                 print("Ref is correct, insert tx to our DB.")
@@ -113,7 +113,7 @@ def recive():
         con.commit()
 
     signature = transaction.sign(keypair=key_pair)
-    bbc_app_client.sendback_signature(asset_group_id ,recvdat[KeyType.source_user_id],0,signature)
+    bbc_app_client.sendback_signature(recvdat[KeyType.source_user_id],0,signature)
 
 if __name__ == '__main__':
     if(not os.path.exists(PRIVATE_KEY) and not os.path.exists(PUBLIC_KEY)):

@@ -197,8 +197,8 @@ class BBcNetwork:
             return
         self.domains[domain_id].leave_domain()
         del self.domains[domain_id]
-        if self.use_global:
-            self.domains[bbclib.domain_global_0].advertise_asset_group_info()
+        if self.use_global and bbclib.domain_global_0 in self.domains:
+            self.domains[bbclib.domain_global_0].advertise_domain_info()
         self.core.stats.update_stats_decrement("network", "num_domains", 1)
 
     def add_static_node_to_domain(self, domain_id, node_id, ipv4, ipv6, port):
@@ -357,31 +357,30 @@ class BBcNetwork:
             return
         self.domains[domain_id].get_resource(query_entry)
 
-    def put(self, domain_id=None, asset_group_id=None, resource_id=None,
-            resource_type=ResourceType.Transaction_data, resource=None):
+    def put(self, domain_id=None, resource_id=None, resource_type=ResourceType.Transaction_data,
+            resource=None, asset_group_id=None):
         """
         Put data in the DHT
 
         :param domain_id:
-        :param asset_group_id:
         :param resource_id:
         :param resource_type:
         :param resource:
+        :param asset_group_id:
         :return:
         """
         if domain_id not in self.domains:
             return
         self.logger.debug("[%s] *** put(resource_id=%s) ****" % (self.domains[domain_id].shortname,
                                                                  binascii.b2a_hex(resource_id[:4])))
-        self.domains[domain_id].put_resource(asset_group_id, resource_id, resource_type, resource)
+        self.domains[domain_id].put_resource(resource_id, resource_type, resource, asset_group_id)
 
-    def route_message(self, domain_id=ZEROS, asset_group_id=None, dst_user_id=None, src_user_id=None,
+    def route_message(self, domain_id=ZEROS, dst_user_id=None, src_user_id=None,
                       msg_to_send=None, payload_type=PayloadType.Type_msgpack):
         """
         Find the destination host and send it
 
         :param domain_id:
-        :param asset_group_id:
         :param src_user_id:   source user
         :param dst_user_id:   destination user
         :param msg_to_send:   content to send
@@ -403,7 +402,6 @@ class BBcNetwork:
                                                   callback_error=self.domains[domain_id].send_p2p_message,
                                                   interval=INTERVAL_RETRY,
                                                   data={KeyType.domain_id: domain_id,
-                                                        KeyType.asset_group_id: asset_group_id,
                                                         KeyType.source_node_id: src_user_id,
                                                         KeyType.resource_id: dst_user_id,
                                                         'payload_type': payload_type,
@@ -443,7 +441,7 @@ class BBcNetwork:
         :return:
         """
         dat = query_entry.data['msg_to_send']
-        msg = bbc_core.make_message_structure(dat[KeyType.command], query_entry.data[KeyType.asset_group_id],
+        msg = bbc_core.make_message_structure(dat[KeyType.command],
                                               query_entry.data[KeyType.source_node_id], dat[KeyType.query_id])
         self.core.error_reply(msg=msg, err_code=ENODESTINATION, txt="cannot find core node")
 
@@ -469,12 +467,12 @@ class BBcNetwork:
             self.domains[domain_id].unregister_user_id(user_id)
             self.core.stats.update_stats_decrement("network", "user_num", 1)
 
-    def disseminate_cross_ref(self, transaction_id, asset_group_id):
+    def disseminate_cross_ref(self, domain_id, transaction_id):
         """
         disseminate transaction_id in the network (domain_global_0)
 
+        :param domain_id:
         :param transaction_id:
-        :param asset_group_id:
         :return:
         """
         if self.use_global:
@@ -482,12 +480,12 @@ class BBcNetwork:
                                                                     msg_type=InfraMessageTypeBase.NOTIFY_CROSS_REF)
             data = bytearray()
             data.extend(to_2byte(1))
-            data.extend(asset_group_id)
+            data.extend(domain_id)
             data.extend(transaction_id)
             msg[KeyType.cross_refs] = bytes(data)
             self.domains[bbclib.domain_global_0].random_send(msg, NUM_CROSS_REF_COPY)
         else:
-            self.core.add_cross_ref_into_list(asset_group_id, transaction_id)
+            self.core.add_cross_ref_into_list(domain_id, transaction_id)
 
     def send_message_in_network(self, nodeinfo, payload_type, msg):
         """
@@ -1000,11 +998,11 @@ class DomainBase:
                 count = struct.unpack(">H", dat[:2])[0]
                 ptr = 2
                 for i in range(count):
-                    asset_group_id = bytes(dat[ptr:ptr+32])
+                    domain_id = bytes(dat[ptr:ptr+32])
                     ptr += 32
                     transaction_id = bytes(dat[ptr:ptr+32])
                     ptr += 32
-                    self.network.core.add_cross_ref_into_list(asset_group_id, transaction_id)
+                    self.network.core.add_cross_ref_into_list(domain_id, transaction_id)
 
         elif msg[KeyType.p2p_msg_type] == InfraMessageTypeBase.NOTIFY_PEERLIST:
             self.renew_peerlist(msg[KeyType.peer_list])
@@ -1066,13 +1064,14 @@ class DomainBase:
         msg = self.make_message(dst_node_id=target_id, nonce=nonce, msg_type=InfraMessageTypeBase.RESPONSE_PING)
         return self.send_message_to_peer(msg, self.default_payload_type)
 
-    def send_store(self, target_id, nonce, asset_group_id, resource_id, resource, resource_type):
+    def send_store(self, target_id, nonce, resource_id, resource, resource_type, asset_group_id=None):
         op_type = InfraMessageTypeBase.REQUEST_STORE
         msg = self.make_message(dst_node_id=target_id, nonce=nonce, msg_type=op_type)
-        msg[KeyType.asset_group_id] = asset_group_id
         msg[KeyType.resource_id] = resource_id
         msg[KeyType.resource] = resource
         msg[KeyType.resource_type] = resource_type
+        if asset_group_id is not None:
+            msg[KeyType.asset_group_id] = asset_group_id
         return self.send_message_to_peer(msg, self.default_payload_type)
 
     def respond_store(self, target_id, nonce):
@@ -1096,7 +1095,7 @@ class DomainBase:
     def get_resource(self, query_entry):
         pass
 
-    def put_resource(self, asset_group_id, resource_id, resource_type, resource):
+    def put_resource(self, resource_id, resource_type, resource, asset_group_id):
         pass
 
     def send_p2p_message(self, query_entry):

@@ -23,6 +23,7 @@ clients = None
 domain_id = bbclib.get_new_id("testdomain")
 asset_group_id = bbclib.get_new_id("asset_group_1")
 transactions = [None for i in range(client_num)]
+transaction_dat = None
 cross_ref_list = [[] for i in range(client_num)]
 
 msg_processor = [None for i in range(client_num)]
@@ -38,7 +39,7 @@ class MessageProcessor(bbc_app.Callback):
         txobj = bbclib.BBcTransaction()
         txobj.deserialize(dat[KeyType.transaction_data])
         signature = txobj.sign(keypair=clients[self.idx]['keypair'])
-        clients[self.idx]['app'].sendback_signature(asset_group_id, dat[KeyType.source_user_id], signature)
+        clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], signature)
 
     def proc_resp_insert(self, dat):
         if KeyType.transaction_id in dat:
@@ -76,7 +77,7 @@ class TestBBcAppClient(object):
         time.sleep(1)
         for i in range(client_num):
             msg_processor[i] = MessageProcessor(index=i)
-            make_client(index=i, core_port_increment=0, callback=msg_processor[i], asset_group_id=asset_group_id)
+            make_client(index=i, core_port_increment=0, callback=msg_processor[i])
         time.sleep(1)
 
         global cores, clients
@@ -114,8 +115,10 @@ class TestBBcAppClient(object):
         transactions[0].add_signature(user_id=clients[0]['user_id'], signature=sig)
         transactions[0].dump()
         transactions[0].digest()
+        global transaction_dat
+        transaction_dat = transactions[0].serialize()
         print("register transaction=", binascii.b2a_hex(transactions[0].transaction_id))
-        ret = clients[0]['app'].insert_transaction(asset_group_id, transactions[0])
+        ret = clients[0]['app'].insert_transaction(transactions[0])
         assert ret
         msg_processor[0].synchronize()
 
@@ -146,16 +149,17 @@ class TestBBcAppClient(object):
 
     def test_10_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        transactions[0].digest()
+        transactions[0] = bbclib.BBcTransaction()
+        transactions[0].deserialize(transaction_dat)
         print("find txid=", binascii.b2a_hex(transactions[0].transaction_id))
-        ret = clients[0]['app'].search_transaction(asset_group_id, transactions[0].transaction_id)
+        ret = clients[0]['app'].search_transaction(transactions[0].transaction_id)
         assert ret
         dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION)
         assert dat[KeyType.status] == ESUCCESS
 
     def test_11_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = clients[0]['app'].search_transaction(asset_group_id, b'4898g9fh')  # NG is expected
+        ret = clients[0]['app'].search_transaction(b'4898g9fh')  # NG is expected
         assert ret
         print("* should be NG *")
         dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION)
@@ -165,7 +169,7 @@ class TestBBcAppClient(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(1, client_num):
             msg = "message from %d" % i
-            ret = clients[0]['app'].send_message(msg, asset_group_id, clients[i]['user_id'])
+            ret = clients[0]['app'].send_message(msg, clients[i]['user_id'])
             assert ret
         for i in range(1, client_num):
             print("recv=",msg_processor[i].synchronize()[KeyType.message])

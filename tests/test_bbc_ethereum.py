@@ -6,8 +6,7 @@ import subprocess
 import time
 
 import sys
-sys.path.append('.')
-sys.path.append('..')
+sys.path.extend(["../"])
 from bbc1.core import bbc_config
 from bbc1.core.ethereum import setup
 from bbc1.core.ethereum import bbc_ethereum

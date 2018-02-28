@@ -72,7 +72,7 @@ def store_proc(data, approver_id,txid=None):
     store_transaction.events[0].add(option_approver=LAB_id)
 
     if txid:
-        bbc_app_client.search_transaction(asset_group_id, txid)
+        bbc_app_client.search_transaction(txid)
         response_data = bbc_app_client.callback.synchronize()
         if response_data[KeyType.status] < ESUCCESS:
             print("ERROR: ", response_data[KeyType.reason].decode())
@@ -91,7 +91,7 @@ def store_proc(data, approver_id,txid=None):
     store_transaction.add_signature(user_id=user_id, signature=sig)
 
     # Get signature from LegalAffairsBureau
-    bbc_app_client.gather_signatures(asset_group_id, store_transaction,destinations=[LAB_id])
+    bbc_app_client.gather_signatures(store_transaction,destinations=[LAB_id])
     response_data = bbc_app_client.callback.synchronize()
 
     if response_data[KeyType.status] < ESUCCESS:
@@ -104,7 +104,7 @@ def store_proc(data, approver_id,txid=None):
     store_transaction.digest()
     store_transaction.dump()
 
-    ret = bbc_app_client.insert_transaction(asset_group_id, store_transaction)
+    ret = bbc_app_client.insert_transaction(store_transaction)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
@@ -166,8 +166,9 @@ def chown(new_owner,asid):
     get_transaction.deserialize(response_data[KeyType.transaction_data])
     transaction_id = get_transaction.transaction_id
     transaction_info = store_proc(data,approver_id=binascii.unhexlify(new_owner),txid=transaction_id)
-    bbc_app_client.send_message(transaction_info, asset_group_id, binascii.unhexlify(new_owner))
+    bbc_app_client.send_message(transaction_info, binascii.unhexlify(new_owner))
     print("Transfer is done.....")
+
 
 if __name__ == '__main__':
     if(not os.path.exists(PRIVATE_KEY) and not os.path.exists(PUBLIC_KEY)):

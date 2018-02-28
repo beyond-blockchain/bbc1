@@ -251,7 +251,7 @@ SQL style only (for PoC alpha version)</p>
 
 <dl class="method">
 <dt id="bbc_ledger.BBcLedger.create_table_in_db">
-<code class="descname">create_table_in_db</code><span class="sig-paren">(</span><em>domain_id</em>, <em>dbname</em>, <em>tbl</em>, <em>tbl_definition</em>, <em>primary_keys=[]</em>, <em>indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_ledger.html#BBcLedger.create_table_in_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.BBcLedger.create_table_in_db" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_table_in_db</code><span class="sig-paren">(</span><em>domain_id</em>, <em>dbname</em>, <em>tbl</em>, <em>tbl_definition</em>, <em>primary_key=0</em>, <em>indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_ledger.html#BBcLedger.create_table_in_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.BBcLedger.create_table_in_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>(internal use) Create a new table in a DB</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -321,27 +321,27 @@ SQL style only (for PoC alpha version)</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bbc_ledger.BBcLedger.find_locally">
-<code class="descname">find_locally</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>resource_id</em>, <em>resource_type</em>, <em>want_newest=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_ledger.html#BBcLedger.find_locally"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.BBcLedger.find_locally" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find data by ID</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> – </td>
-</tr>
-</tbody>
-</table>
-<p>:param asset_group_id
-:param resource_id:   Transaction_ID or Asset_ID
-:param resource_type: ResourceType value
-:param want_newest:   If True, the entry having the biggest ID in the same condition is required
-:return:              data, data_type</p>
+<dt id="bbc_ledger.BBcLedger.find_by_sql_in_local_auxiliary_db">
+<code class="descname">find_by_sql_in_local_auxiliary_db</code><span class="sig-paren">(</span><em>domain_id</em>, <em>sql</em>, <em>*dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_ledger.html#BBcLedger.find_by_sql_in_local_auxiliary_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.BBcLedger.find_by_sql_in_local_auxiliary_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>find entries by SQL
+:param domain_id:
+:param sql:
+:param <a href="#id1"><span class="problematic" id="id2">*</span></a>dat:
+:return:</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bbc_ledger.BBcLedger.insert_locally">
-<code class="descname">insert_locally</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>resource_id</em>, <em>resource_type</em>, <em>data</em>, <em>require_uniqueness=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_ledger.html#BBcLedger.insert_locally"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.BBcLedger.insert_locally" title="Permalink to this definition">¶</a></dt>
+<dt id="bbc_ledger.BBcLedger.find_transaction_locally">
+<code class="descname">find_transaction_locally</code><span class="sig-paren">(</span><em>domain_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_ledger.html#BBcLedger.find_transaction_locally"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.BBcLedger.find_transaction_locally" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find transaction data
+:param domain_id:
+:param transaction_id:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_ledger.BBcLedger.insert_asset_info_locally">
+<code class="descname">insert_asset_info_locally</code><span class="sig-paren">(</span><em>domain_id</em>, <em>transaction_id</em>, <em>asset_group_id</em>, <em>asset_id</em>, <em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_ledger.html#BBcLedger.insert_asset_info_locally"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.BBcLedger.insert_asset_info_locally" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert data in the local ledger</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -349,10 +349,43 @@ SQL style only (for PoC alpha version)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>domain_id</strong> – </li>
+<li><strong>transaction_id</strong> – </li>
 <li><strong>asset_group_id</strong> – </li>
-<li><strong>resource_id</strong> – Transaction_ID, Asset_ID, or Owner_ID</li>
-<li><strong>resource_type</strong> – ResourceType value</li>
-<li><strong>data</strong> – Transaction Data (serialized), Transacrtion_ID, or Node_ID</li>
+<li><strong>asset_id</strong> – </li>
+<li><strong>user_id</strong> – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">True/False</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_ledger.BBcLedger.insert_topology_info_locally">
+<code class="descname">insert_topology_info_locally</code><span class="sig-paren">(</span><em>domain_id</em>, <em>transaction_id</em>, <em>resource_type</em>, <em>resource_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_ledger.html#BBcLedger.insert_topology_info_locally"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.BBcLedger.insert_topology_info_locally" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert topology data for transactions
+:param domain_id:
+:param transaction_id:
+:param resource_type:
+:param resource_id:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_ledger.BBcLedger.insert_transaction_locally">
+<code class="descname">insert_transaction_locally</code><span class="sig-paren">(</span><em>domain_id</em>, <em>transaction_id</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_ledger.html#BBcLedger.insert_transaction_locally"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.BBcLedger.insert_transaction_locally" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert data in the local ledger</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>domain_id</strong> – </li>
+<li><strong>transaction_id</strong> – Transaction_ID</li>
+<li><strong>data</strong> – Transaction Data (serialized)</li>
 <li><strong>require_uniqueness</strong> – Ignore uniqueness if True</li>
 </ul>
 </td>
@@ -387,16 +420,15 @@ SQL style only (for PoC alpha version)</p>
 
 <dl class="method">
 <dt id="bbc_ledger.BBcLedger.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>resource_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_ledger.html#BBcLedger.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.BBcLedger.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove data</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>domain_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_ledger.html#BBcLedger.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.BBcLedger.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all data with the specified transaction_id</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>domain_id</strong> – </li>
-<li><strong>asset_group_id</strong> – </li>
-<li><strong>resource_id</strong> – Transaction_ID, Asset_ID, or Owner_ID</li>
+<li><strong>transaction_id</strong> – Transaction_ID</li>
 </ul>
 </td>
 </tr>
@@ -406,42 +438,6 @@ SQL style only (for PoC alpha version)</p>
 </tbody>
 </table>
 </dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="bbc_ledger.ResourceType">
-<em class="property">class </em><code class="descclassname">bbc_ledger.</code><code class="descname">ResourceType</code><a class="reference internal" href="_modules/bbc_ledger.html#ResourceType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_ledger.ResourceType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<dl class="attribute">
-<dt id="bbc_ledger.ResourceType.Asset_ID">
-<code class="descname">Asset_ID</code><em class="property"> = 1</em><a class="headerlink" href="#bbc_ledger.ResourceType.Asset_ID" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_ledger.ResourceType.Asset_file">
-<code class="descname">Asset_file</code><em class="property"> = 2</em><a class="headerlink" href="#bbc_ledger.ResourceType.Asset_file" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_ledger.ResourceType.Edge_incoming">
-<code class="descname">Edge_incoming</code><em class="property"> = 3</em><a class="headerlink" href="#bbc_ledger.ResourceType.Edge_incoming" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_ledger.ResourceType.Edge_outgoing">
-<code class="descname">Edge_outgoing</code><em class="property"> = 4</em><a class="headerlink" href="#bbc_ledger.ResourceType.Edge_outgoing" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_ledger.ResourceType.Owner_asset">
-<code class="descname">Owner_asset</code><em class="property"> = 5</em><a class="headerlink" href="#bbc_ledger.ResourceType.Owner_asset" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_ledger.ResourceType.Transaction_data">
-<code class="descname">Transaction_data</code><em class="property"> = 0</em><a class="headerlink" href="#bbc_ledger.ResourceType.Transaction_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 

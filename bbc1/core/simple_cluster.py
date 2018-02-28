@@ -132,15 +132,14 @@ class NetworkDomain(DomainBase):
             self.process_RESPONSE_FIND_VALUE(msg)
 
         elif msg[KeyType.p2p_msg_type] == InfraMessageTypeBase.REQUEST_FIND_USER:
-            if KeyType.resource_id not in msg or KeyType.asset_group_id not in msg:
+            if KeyType.resource_id not in msg:
                 return
-            asset_group_id = msg[KeyType.asset_group_id]
             user_id = msg[KeyType.resource_id]
             if user_id in self.registered_user_id:
                 target_id = msg[KeyType.source_node_id]
                 nonce = msg[KeyType.nonce]
                 resource_id = msg[KeyType.resource_id]
-                self.respond_find_node(target_id, nonce, asset_group_id, resource_id)
+                self.respond_find_node(target_id, nonce, resource_id)
 
         elif msg[KeyType.p2p_msg_type] == InfraMessageTypeBase.RESPONSE_FIND_USER:
             self.add_peer_node(msg[KeyType.source_node_id], ip4, from_addr)
@@ -155,20 +154,19 @@ class NetworkDomain(DomainBase):
 
     def process_REQUEST_STORE(self, msg):
         domain_id = msg[KeyType.domain_id]
-        asset_group_id = msg[KeyType.asset_group_id]
         resource_type = msg[KeyType.resource_type]
         resource_id = msg[KeyType.resource_id]
         resource = msg[KeyType.resource]
         if resource_type == ResourceType.Transaction_data:
-            self.network.core.insert_transaction(domain_id, asset_group_id, resource, None, no_network_put=True)
+            self.network.core.insert_transaction(domain_id, resource, None, no_network_put=True)
         elif resource_type == ResourceType.Asset_file:
             # TODO: need to check validity of the file
+            asset_group_id = msg[KeyType.asset_group_id]
             self.network.core.storage_manager.store_locally(self.domain_id, asset_group_id, resource_id, resource)
         self.respond_store(msg[KeyType.source_node_id], msg[KeyType.nonce])
 
     def process_REQUEST_FIND_VALUE(self, msg):
         domain_id = msg[KeyType.domain_id]
-        asset_group_id = msg[KeyType.asset_group_id]
         resource_id = msg[KeyType.resource_id]
         resource_type = msg[KeyType.resource_type]
         result = None
@@ -176,22 +174,23 @@ class NetworkDomain(DomainBase):
                           (self.shortname, resource_type, binascii.b2a_hex(resource_id[:4])))
         if resource_type == ResourceType.Asset_file:
             # resource_id is asset_id
+            asset_group_id = msg[KeyType.asset_group_id]
             result = self.network.core.storage_manager.get_locally(domain_id, asset_group_id, resource_id)
         elif resource_type == ResourceType.Transaction_data:
             # resource_id is txid
-            result = self.network.core.ledger_manager.find_locally(domain_id, asset_group_id,
-                                                                   resource_id, resource_type)
+            result = self.network.core.ledger_manager.find_transaction_locally(domain_id, resource_id)
         elif resource_type == ResourceType.Asset_ID:
             # resource_id at this point is asset_id
-            res = self.network.core.ledger_manager.find_locally(domain_id, asset_group_id,
-                                                                resource_id, resource_type)  # res=txid
-            if res is None:
+            sql = msg[KeyType.sql].decode()
+            asset_group_id = msg[KeyType.asset_group_id]
+            row = self.network.core.ledger_manager.find_by_sql_in_local_auxiliary_db(domain_id, sql, asset_group_id,
+                                                                                     resource_id)
+            if len(row) == 0:
                 result = None
             else:
-                resource_id = res
+                resource_id = row[0][0]
                 resource_type = ResourceType.Transaction_data
-                result = self.network.core.ledger_manager.find_locally(domain_id, asset_group_id,
-                                                                       resource_id, resource_type)
+                result = self.network.core.ledger_manager.find_transaction_locally(domain_id, resource_id)
 
         self.respond_find_value(msg[KeyType.source_node_id], msg[KeyType.nonce],
                                 resource_id=resource_id, resource=result, resource_type=resource_type)
@@ -207,14 +206,15 @@ class NetworkDomain(DomainBase):
         else:
             query_entry.callback_error()
 
-    def send_find_value(self, target_id, nonce, asset_group_id, resource_id, resource_type):
+    def send_find_value(self, target_id, nonce, resource_id, resource_type, extra_info={}):
         self.logger.debug("[%s] send_find_value to %s about %s" % (self.shortname,
                                                                    binascii.b2a_hex(target_id[:4]),
                                                                    binascii.b2a_hex(resource_id[:4])))
         msg = self.make_message(dst_node_id=target_id, nonce=nonce, msg_type=InfraMessageTypeBase.REQUEST_FIND_VALUE)
-        msg[KeyType.asset_group_id] = asset_group_id
         msg[KeyType.resource_id] = resource_id
         msg[KeyType.resource_type] = resource_type
+        for k in extra_info.keys():
+            msg[k] = extra_info[k]
         return self.send_message_to_peer(msg, self.default_payload_type)
 
     def respond_find_value(self, target_id, nonce, asset_group_id=None,
@@ -229,9 +229,8 @@ class NetworkDomain(DomainBase):
                               (self.shortname, binascii.b2a_hex(resource[:4])))
         return self.send_message_to_peer(msg, self.default_payload_type)
 
-    def respond_find_node(self, target_id, nonce, asset_group_id=None, resource_id=None):
+    def respond_find_node(self, target_id, nonce, resource_id=None):
         msg = self.make_message(dst_node_id=target_id, nonce=nonce, msg_type=InfraMessageTypeBase.RESPONSE_FIND_USER)
-        msg[KeyType.asset_group_id] = asset_group_id
         msg[KeyType.resource_id] = resource_id
         return self.send_message_to_peer(msg, self.default_payload_type)
 
@@ -248,36 +247,43 @@ class NetworkDomain(DomainBase):
             query_entry.force_expire()
             return
         neighbor_list = list(self.get_neighbor_nodes())
-        asset_group_id = query_entry.data[KeyType.asset_group_id]
         resource_id = query_entry.data[KeyType.resource_id]
         resource_type = query_entry.data[KeyType.resource_type]
         target_id = neighbor_list[self.node_pointer_index]
         self.node_pointer_index = (self.node_pointer_index+1) % len(neighbor_list)
         query_entry.update(fire_after=INTERVAL_RETRY, callback_error=self.get_resource)
-        self.send_find_value(target_id, query_entry.nonce, asset_group_id, resource_id, resource_type)
+        extra_info = dict()
+        if KeyType.sql in query_entry.data:
+            extra_info[KeyType.sql] = query_entry.data[KeyType.sql]
+        if KeyType.asset_group_id in query_entry.data:
+            extra_info[KeyType.asset_group_id] = query_entry.data[KeyType.asset_group_id]
+        self.send_find_value(target_id, query_entry.nonce, resource_id, resource_type, extra_info)
 
-    def put_resource(self, asset_group_id, resource_id, resource_type, resource):
+    def put_resource(self, resource_id, resource_type, resource, asset_group_id):
         for nd in self.get_neighbor_nodes():
             entry = query_management.QueryEntry(expire_after=30,
                                                 callback_expire=None,
                                                 callback_error=self.resend_resource,
                                                 data={'target_id': nd,
-                                                      KeyType.asset_group_id: asset_group_id,
                                                       KeyType.resource_id: resource_id,
                                                       KeyType.resource: resource,
                                                       KeyType.resource_type: resource_type},
                                                 retry_count=2)
+            if asset_group_id is not None:
+                entry.data[KeyType.asset_group_id] = asset_group_id
             entry.update(INTERVAL_RETRY)
-            self.send_store(nd, entry.nonce, asset_group_id, resource_id, resource, resource_type)
+            self.send_store(nd, entry.nonce, resource_id, resource, resource_type, asset_group_id)
 
     def resend_resource(self, query_entry):
         target_id = query_entry.data['target_id']
-        asset_group_id = query_entry.data[KeyType.asset_group_id]
         resource_id = query_entry.data[KeyType.resource_id]
         resource = query_entry.data[KeyType.resource]
         resource_type = query_entry.data[KeyType.resource_type]
+        asset_group_id = None
+        if KeyType.asset_group_id in query_entry.data:
+            asset_group_id = query_entry.data[KeyType.asset_group_id]
         query_entry.update(INTERVAL_RETRY)
-        self.send_store(target_id, query_entry.nonce, asset_group_id, resource_id, resource, resource_type)
+        self.send_store(target_id, query_entry.nonce, resource_id, resource, resource_type, asset_group_id)
 
     def send_p2p_message(self, query_entry):
         """
@@ -286,7 +292,6 @@ class NetworkDomain(DomainBase):
         :param query_entry:
         :return:
         """
-        asset_group_id = query_entry.data[KeyType.asset_group_id]
         user_id = query_entry.data[KeyType.resource_id]
         if user_id in self.registered_user_id:
             # TODO: can remove this condition
@@ -308,11 +313,9 @@ class NetworkDomain(DomainBase):
         :return:
         """
         user_id = query_entry.data[KeyType.resource_id]
-        asset_group_id = query_entry.data[KeyType.asset_group_id]
         nonce = query_entry.nonce
         msg = self.make_message(dst_node_id=ZEROS, nonce=nonce, msg_type=InfraMessageTypeBase.REQUEST_FIND_USER)
         msg[KeyType.resource_id] = user_id
-        msg[KeyType.asset_group_id] = asset_group_id
         for nd in self.get_neighbor_nodes():
             if nd == self.node_id:
                 continue
