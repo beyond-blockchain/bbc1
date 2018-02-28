@@ -128,6 +128,22 @@ def add_relation_pointer(relation, transaction_id, asset_id):
     relation.add(pointer=pointer)
 
 
+def get_relation_with_asset_group_id(txobj, asset_group_id):
+    ret = list()
+    for r in txobj.relations:
+        if r.asset_group_id == asset_group_id:
+            ret.append(r)
+    return ret
+
+
+def get_relation_with_asset_id(txobj, asset_id):
+    ret = list()
+    for r in txobj.relations:
+        if r.asset is not None and r.asset.asset_id == asset_id:
+            ret.append(r)
+    return ret
+
+
 def make_transaction_with_witness(base_transaction=None):
     if base_transaction is None:
         base_transaction = BBcTransaction()
@@ -594,16 +610,19 @@ class BBcTransaction:
             for i, rtn in enumerate(self.relations):
                 print("[%d]" % i)
                 print("  asset_group_id:", binascii.b2a_hex(rtn.asset_group_id))
+                print("  Pointers[]:", len(rtn.pointers))
                 if len(rtn.pointers) > 0:
-                    print("  Pointers[]:")
-                    for i, pt in enumerate(rtn.pointers):
-                        print("    transaction_id:", binascii.b2a_hex(pt.transaction_id))
-                        if pt.asset_id is not None:
-                            print("    asset_id:", binascii.b2a_hex(pt.asset_id))
+                    for pt in rtn.pointers:
+                        if pt.transaction_id is not None:
+                            print("     transaction_id:", binascii.b2a_hex(pt.transaction_id))
                         else:
-                            print("    asset_id: NONE")
+                            print("     transaction_id: NONE")
+                        if pt.asset_id is not None:
+                            print("     asset_id:", binascii.b2a_hex(pt.asset_id))
+                        else:
+                            print("     asset_id: NONE")
                 else:
-                    print("    NONE")
+                    print("     NONE")
                 print("  Asset:")
                 if rtn.asset is not None:
                     print("     asset_id:", binascii.b2a_hex(rtn.asset.asset_id))
