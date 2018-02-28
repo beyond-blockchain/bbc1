@@ -1,6 +1,12 @@
 Change log
 ======
 
+## v0.9
+* Change APIs in bbc_app.py (remove asset_group_id options)
+* Modify schemas of bbc_ledger tables
+* Introduce BBcRelation/BBcPointer/BBcWitness class as parts of BBcTransaction
+* Fix several bugs
+
 ## v0.8.2
 * Eliminate the concept of "registering asset_group_id" to bbc_core
 * Unlimit the size of BBcAsset body

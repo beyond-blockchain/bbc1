@@ -99,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../bbc_network.html">bbc_network module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbc_storage.html">bbc_storage module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbclib.html">bbclib module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_types.html">bbc_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ledger_subsystem.html">ledger_subsystem module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../message_key_types.html">message_key_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../p2p_domain0.html">p2p_domain0 module</a></li>
@@ -429,16 +430,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">ledger_manager</span><span class="o">.</span><span class="n">create_table_in_db</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">DB_NAME</span><span class="p">,</span>
                             <span class="s1">&#39;merkle_leaf_table&#39;</span><span class="p">,</span>
                             <span class="n">merkle_leaf_db_definition</span><span class="p">,</span>
-                            <span class="n">primary_keys</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+                            <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">ledger_manager</span><span class="o">.</span><span class="n">create_table_in_db</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">DB_NAME</span><span class="p">,</span>
                             <span class="s1">&#39;merkle_branch_table&#39;</span><span class="p">,</span>
                             <span class="n">merkle_branch_db_definition</span><span class="p">,</span>
-                            <span class="n">primary_keys</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+                            <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">ledger_manager</span><span class="o">.</span><span class="n">create_table_in_db</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">DB_NAME</span><span class="p">,</span>
                             <span class="s1">&#39;merkle_root_table&#39;</span><span class="p">,</span>
                             <span class="n">merkle_root_db_definition</span><span class="p">,</span>
-                            <span class="n">primary_keys</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
-
+                            <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="LedgerSubsystem.subsystem_loop"><a class="viewcode-back" href="../ledger_subsystem.html#ledger_subsystem.LedgerSubsystem.subsystem_loop">[docs]</a>    <span class="k">def</span> <span class="nf">subsystem_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Start subsystem_loop&quot;</span><span class="p">)</span>
