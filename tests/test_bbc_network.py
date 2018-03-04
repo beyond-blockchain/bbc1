@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
+import shutil
 import binascii
 import queue
 import random
@@ -77,9 +78,17 @@ class DummyCore:
         def set_storage_path(self, domain_id, storage_type, storage_path):
             pass
 
+    class UserMessageRouting:
+        def add_domain(self, domain_id):
+            pass
+
+        def remove_domain(self, domain_id):
+            pass
+
     def __init__(self):
         self.ledger_manager = DummyCore.DB()
         self.storage_manager = DummyCore.Storage()
+        self.user_message_routing = DummyCore.UserMessageRouting()
         self.stats = bbc_stats.BBcStats()
 
     def send_message(self, data):
@@ -99,43 +108,59 @@ class TestBBcNetwork(object):
 
     def test_01_start(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
+
         dummycore = DummyCore()
-        from bbc1.core import simple_cluster
-        simple_cluster.FORWARD_CACHE_SIZE = 5
         global networkings, nodes, conf
         for i, nw in enumerate(networkings):
+            shutil.rmtree(".bbc1-%d"%i)
             config = bbc_config.BBcConfig(directory=".bbc1-%d"%i)
             networkings[i] = bbc_network.BBcNetwork(core=dummycore, config=config, p2p_port=6641+i, loglevel=LOGLEVEL)
             networkings[i].create_domain(network_module="simple_cluster", domain_id=domain_id)
-            nodes[i] = networkings[i].domains[domain_id].node_id
+            nodes[i] = networkings[i].domains[domain_id]['neighbor'].my_node_id
             assert nodes[i] is not None
             assert networkings[i].ip_address != ''
             print("IPv4: %s, IPv6 %s, port: %d" % (networkings[i].ip_address, networkings[i].ip6_address,
                                                    networkings[i].port))
-        for i in range(core_nodes):
-            networkings[i].register_user_id(domain_id, users[i])
 
     def test_02_set_initial_peer(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(core_nodes):
-            networkings[i].domains[domain_id].add_peer_node(node_id=nodes[0],
-                                                            ip4=True,
-                                                            addr_info=(networkings[0].ip_address, networkings[0].port))
-            networkings[i].domains[domain_id].print_peerlist()
+            networkings[i].add_neighbor(domain_id=domain_id, node_id=nodes[0],
+                                        ip4=True, from_addr=(networkings[0].ip_address, networkings[0].port))
+            print(networkings[i].domains[domain_id]['neighbor'].show_list())
 
     def test_03_send_ping(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        for i in range(1, core_nodes):
-            print("node=%d: ping_to:%s"%(i, binascii.b2a_hex(nodes[0])))
-            ret = networkings[i].domains[domain_id].send_ping(nodes[0], None)
-            assert ret
+        for from_idx in range(core_nodes):
+            for to_idx in range(from_idx+1, core_nodes):
+                print("ping from node_idx=%d to %d" % (from_idx, to_idx))
+                ipv4 = networkings[to_idx].ip_address
+                ipv6 = networkings[to_idx].ip6_address
+                port = networkings[to_idx].port
+                networkings[from_idx].send_domain_ping(domain_id=domain_id, ipv4=ipv4, ipv6=ipv6, port=port,
+                                                       is_static=True)
         print("sleep 2 seconds")
         time.sleep(2)
-        networkings[0].domains[domain_id].print_peerlist()
+        for i in range(core_nodes):
+            print(networkings[i].domains[domain_id]['neighbor'].show_list())
+            assert len(list(networkings[i].domains[domain_id]['neighbor'].nodeinfo_list.keys())) == core_nodes-1
 
-        ret = networkings[2].domains[domain_id].send_ping(nodes[3], None)
-        assert not ret
+    def test_04_leave_domain(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        networkings[core_nodes-1].remove_domain(domain_id)
+        time.sleep(2)
+        for i in range(core_nodes-1):
+            print(networkings[i].domains[domain_id]['neighbor'].show_list())
+            assert len(list(networkings[i].domains[domain_id]['neighbor'].nodeinfo_list.keys())) == core_nodes-2
 
+    def test_05_save_list(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        networkings[1].save_all_static_node_list()
+        with open(".bbc1-%d/config.json" % 1, "r") as f:
+            dat = f.read()
+        print(dat)
+
+    """
     def test_04_alive_check(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         networkings[0].domains[domain_id].alive_check()
@@ -258,7 +283,7 @@ class TestBBcNetwork(object):
             networkings[i].remove_domain(domain_id)
         time.sleep(1)
         networkings[0].domains[domain_id].print_peerlist()
-
+    """
 
 if __name__ == '__main__':
     pytest.main()
