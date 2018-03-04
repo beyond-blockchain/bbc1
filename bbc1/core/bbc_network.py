@@ -212,6 +212,7 @@ class BBcNetwork:
                 network=self, config=self.config,
                 domain_id=domain_id, node_id=node_id,
                 loglevel=self.logger.level, logname=self.logname)
+        self.core.user_message_routing.add_domain(domain_id)
         self.domains[domain_id][InfraMessageType.CATEGORY_DATA] = DataRouting(domain_id=domain_id)
 
         self.core.stats.update_stats_increment("network", "num_domains", 1)
@@ -234,6 +235,7 @@ class BBcNetwork:
         }
         self.broadcast_message_in_network(domain_id=domain_id, payload_type=PayloadType.Type_msgpack, msg=msg)
         del self.domains[domain_id]
+        self.core.user_message_routing.remove_domain(domain_id)
         self.core.stats.update_stats_decrement("network", "num_domains", 1)
 
     def save_all_static_node_list(self):
