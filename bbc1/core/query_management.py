@@ -79,7 +79,7 @@ class Ticker:
         return nonce
 
     def get_entry(self, nonce):
-        return self.queries.get(nonce)
+        return self.queries.get(nonce, None)
 
     def del_entry(self, nonce):
         entry = self.queries[nonce]

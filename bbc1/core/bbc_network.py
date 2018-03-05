@@ -122,7 +122,6 @@ class BBcNetwork:
     def __init__(self, config, core=None, p2p_port=None, use_global=True, external_ip4addr=None, external_ip6addr=None,
                  loglevel="all", logname=None):
         self.core = core
-        self.user_message_routing = core.user_message_routing
         self.logger = logger.get_logger(key="bbc_network", level=loglevel, logname=logname)
         self.logname = logname
         self.config = config
@@ -174,22 +173,6 @@ class BBcNetwork:
         return socket.inet_pton(socket.AF_INET, ipv4), socket.inet_pton(socket.AF_INET6, ipv6), port, \
                int(time.time()).to_bytes(8, 'big')
 
-    def get_user_message_routing(self, domain_id):
-        """
-        Return user_message_routing object for the specified domain_id
-        :param domain_id:
-        :return:
-        """
-        return self.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
-
-    def get_data_routing(self, domain_id):
-        """
-        Return data_routing object for the specified domain_id
-        :param domain_id:
-        :return:
-        """
-        return self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
-
     def create_domain(self, domain_id=ZEROS, network_module=None, get_new_node_id=False):
         """
         Create domain and register user in the domain
@@ -232,7 +215,7 @@ class BBcNetwork:
                 network=self, config=self.config,
                 domain_id=domain_id, node_id=node_id,
                 loglevel=self.logger.level, logname=self.logname)
-        self.core.user_message_routing.add_domain(domain_id)
+        self.domains[domain_id][InfraMessageCategory.CATEGORY_USER] = UserMessageRouting(self, domain_id)
         self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA] = DataRouting(domain_id=domain_id)
 
         self.core.stats.update_stats_increment("network", "num_domains", 1)
@@ -250,12 +233,11 @@ class BBcNetwork:
         msg = {
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_NETWORK,
             KeyType.domain_id: domain_id,
-            KeyType.source_node_id: self.domains[domain_id]['neighbor'].my_node_id,
             KeyType.command: BBcNetwork.NOTIFY_LEAVE,
         }
         self.broadcast_message_in_network(domain_id=domain_id, payload_type=PayloadType.Type_msgpack, msg=msg)
-        self.core.user_message_routing.remove_domain(domain_id)
         self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].stop_all_timers()
+        self.domains[domain_id][InfraMessageCategory.CATEGORY_USER].stop_all_timers()
         del self.domains[domain_id]
         self.core.stats.update_stats_decrement("network", "num_domains", 1)
 
@@ -305,9 +287,10 @@ class BBcNetwork:
         return True
 
     def domain_ping(self, query_entry):
+        domain_id = query_entry.data[KeyType.domain_id]
         msg = {
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_NETWORK,
-            KeyType.domain_id: query_entry.data[KeyType.domain_id],
+            KeyType.domain_id: domain_id,
             KeyType.node_id: query_entry.data[KeyType.node_id],
             KeyType.domain_ping: 0,
             KeyType.nonce: query_entry.nonce,
@@ -329,7 +312,7 @@ class BBcNetwork:
                                                              query_entry.data[KeyType.peer_info].port))
         query_entry.update(fire_after=1)
         self.core.stats.update_stats_increment("network", "domain_ping_send", 1)
-        self.send_message_in_network(query_entry.data[KeyType.peer_info], PayloadType.Type_msgpack, msg)
+        self.send_message_in_network(query_entry.data[KeyType.peer_info], PayloadType.Type_msgpack, domain_id, msg)
 
     def receive_domain_ping(self, domain_id, ip4, from_addr, msg):
         """
@@ -387,7 +370,7 @@ class BBcNetwork:
             else:
                 msg[KeyType.external_ip6addr] = self.ip6_address
             nodeinfo = NodeInfo(ipv4=ipv4, ipv6=ipv6, port=port)
-            self.send_message_in_network(nodeinfo, PayloadType.Type_msgpack, msg)
+            self.send_message_in_network(nodeinfo, PayloadType.Type_msgpack, domain_id, msg)
 
     def invalidate_neighbor(self, query_entry):
         """
@@ -402,15 +385,19 @@ class BBcNetwork:
         except:
             pass
 
-    def send_message_in_network(self, nodeinfo, payload_type, msg):
+    def send_message_in_network(self, nodeinfo, payload_type, domain_id, msg):
         """
         Send message over a domain network
 
         :param nodeinfo: NodeInfo object
         :param payload_type: PayloadType value
+        :param domain_id: domain to send in
         :param msg:  data body
         :return:
         """
+        if nodeinfo is None:
+            nodeinfo = self.domains[domain_id]['neighbor'].nodeinfo_list[msg[KeyType.destination_node_id]]
+        msg[KeyType.source_node_id] = self.domains[domain_id]['neighbor'].my_node_id
         data_to_send = message_key_types.make_message(payload_type, msg)
         if len(data_to_send) > TCP_THRESHOLD_SIZE:
             send_data_by_tcp(ipv4=nodeinfo.ipv4, ipv6=nodeinfo.ipv6, port=nodeinfo.port, msg=data_to_send)
@@ -436,7 +423,7 @@ class BBcNetwork:
             return
         for node_id, nodeinfo in self.domains[domain_id]['neighbor'].nodeinfo_list.items():
             msg[KeyType.destination_node_id] = node_id
-            self.send_message_in_network(nodeinfo, payload_type, msg)
+            self.send_message_in_network(nodeinfo, payload_type, domain_id, msg)
 
     def add_neighbor(self, domain_id, node_id, ip4, from_addr, is_static=False):
         """
@@ -480,12 +467,12 @@ class BBcNetwork:
         if msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_NETWORK:
             self.process_message(domain_id, ip4, from_addr, msg)
 
-        elif msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_USER:
-            self.user_message_routing.process_message(domain_id, msg)
-        else:
-            if msg[KeyType.infra_msg_type] in [InfraMessageCategory.CATEGORY_DATA, InfraMessageCategory.CATEGORY_TOPOLOGY]:
-                self.add_neighbor(domain_id, msg[KeyType.source_node_id], ip4, from_addr)
-                self.domains[domain_id][msg[KeyType.infra_msg_type]].process_message(ip4, from_addr, msg)
+        elif msg[KeyType.infra_msg_type] in [InfraMessageCategory.CATEGORY_USER, InfraMessageCategory.CATEGORY_DATA]:
+            self.add_neighbor(domain_id, msg[KeyType.source_node_id], ip4, from_addr)
+            self.domains[domain_id][msg[KeyType.infra_msg_type]].process_message(msg)
+        elif msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_TOPOLOGY:
+            self.add_neighbor(domain_id, msg[KeyType.source_node_id], ip4, from_addr)
+            self.domains[domain_id][msg[KeyType.infra_msg_type]].process_message(ip4, from_addr, msg)
 
     def process_message(self, domain_id, ip4, from_addr, msg):
         """

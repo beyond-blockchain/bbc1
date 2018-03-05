@@ -41,6 +41,7 @@ from bbc1.core import bbc_network, bbc_storage, query_management, bbc_stats
 from bbc1.core.bbc_config import BBcConfig
 from bbc1.core.bbc_types import ResourceType
 from bbc1.core.bbc_ledger import BBcLedger
+from bbc1.core.user_message_routing import UserMessageRouting
 from bbc1.core import command
 from bbc1.common.bbc_error import *
 
@@ -117,6 +118,7 @@ class BBcCoreService:
         self.cross_ref_list = []
         self.ledger_manager = BBcLedger(self.config)
         self.storage_manager = bbc_storage.BBcStorage(self.config)
+        self.user_message_routing = UserMessageRouting(core=self, loglevel=loglevel, logname=logname)
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port, use_global=use_global,
                                                  external_ip4addr=ip4addr, external_ip6addr=ip6addr,
                                                  loglevel=loglevel, logname=logname)
@@ -155,7 +157,7 @@ class BBcCoreService:
             self.storage_manager.set_storage_path(domain_id, storage_type=storage_type, storage_path=storage_path)
 
     def quit_program(self):
-        self.networking.save_all_peer_lists()
+        self.networking.save_all_static_node_list()
         self.config.update_config()
         os._exit(0)
 
@@ -170,45 +172,15 @@ class BBcCoreService:
         except KeyboardInterrupt:
             pass
 
-    def send_message(self, dat, sock=None):
-        """
-        Send message to bbc_app (TCP client)
-        :param dat:
-        :return:
-        """
-        if sock is None:
-            if KeyType.destination_user_id not in dat:
-                self.logger.warn("invalid message")
-                return
-        self.logger.debug("[port:%d] send_message to %s" % (self.networking.port,
-                                                            binascii.b2a_hex(dat[KeyType.destination_user_id][:4])))
-        try:
-            user_id = dat[KeyType.destination_user_id]
-            if sock is None:
-                sock = self.user_id_sock_mapping[user_id]
-            sock.sendall(message_key_types.make_message(PayloadType.Type_msgpack, dat))
-        except Exception as e:
-            self.logger.error("send error: %s" % dat)
-            traceback.print_exc()
-            return False
-        return True
-
-    def send_raw_message(self, socket, dat):
-        try:
-            socket.sendall(message_key_types.make_message(PayloadType.Type_msgpack, dat))
-        except Exception as e:
-            self.logger.error("send error (raw): %s" % e)
-        return True
-
     def send_to_other_user(self, domain_id, dst_user_id, src_user_id, msg):
         if dst_user_id in self.user_id_sock_mapping:
-            return self.send_message(msg)
+            return self.user_message_routing.send_message_to_user(msg)
         return self.networking.route_message(domain_id, dst_user_id, src_user_id, msg)
 
     def error_reply(self, msg=None, err_code=EINVALID_COMMAND, txt=""):
         msg[KeyType.status] = err_code
         msg[KeyType.reason] = txt
-        self.send_message(msg)
+        self.user_message_routing.send_message_to_user(msg)
 
     def handler(self, socket, address):
         """
@@ -297,7 +269,7 @@ class BBcCoreService:
                                                      dat[KeyType.transaction_id],
                                                      dat[KeyType.source_user_id], dat[KeyType.query_id])
             if result is not None:
-                self.send_message(result)
+                self.user_message_routing.send_message_to_user(result)
 
         elif cmd == MsgType.REQUEST_SEARCH_ASSET:
             if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.asset_id], dat):
@@ -310,7 +282,7 @@ class BBcCoreService:
                                                dat[KeyType.asset_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
             if isinstance(result, dict):
                 retmsg.update(result)
-                self.send_message(retmsg)
+                self.user_message_routing.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_SEARCH_USERID:
             if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.user_id], dat):
@@ -320,7 +292,7 @@ class BBcCoreService:
                                                                dat[KeyType.user_id],
                                                                dat[KeyType.source_user_id], dat[KeyType.query_id])
             if result is not None:
-                self.send_message(result)
+                self.user_message_routing.send_message_to_user(result)
 
         elif cmd == MsgType.REQUEST_GATHER_SIGNATURE:
             if not self.param_check([KeyType.domain_id, KeyType.transaction_data], dat):
@@ -344,7 +316,7 @@ class BBcCoreService:
                 self.error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt=ret)
             else:
                 retmsg.update(ret)
-                self.send_message(retmsg)
+                self.user_message_routing.send_message_to_user(retmsg)
 
         elif cmd == MsgType.RESPONSE_SIGNATURE:
             if not self.param_check([KeyType.domain_id, KeyType.destination_user_id, KeyType.source_user_id], dat):
@@ -373,7 +345,7 @@ class BBcCoreService:
             retmsg = make_message_structure(MsgType.RESPONSE_CROSS_REF,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.cross_refs] = self.pop_cross_refs(num=num)
-            self.send_message(retmsg)
+            self.user_message_routing.send_message_to_user(retmsg)
 
         elif cmd == MsgType.MESSAGE:
             if not self.param_check([KeyType.domain_id, KeyType.source_user_id,
@@ -394,7 +366,7 @@ class BBcCoreService:
                 retmsg = make_message_structure(MsgType.RESPONSE_REGISTER_HASH_IN_SUBSYS,
                                                 dat[KeyType.source_user_id], dat[KeyType.query_id])
                 retmsg[KeyType.asset_group_id] = dat[KeyType.asset_group_id]
-                self.send_message(retmsg)
+                self.user_message_routing.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_VERIFY_HASH_IN_SUBSYS:
             if not self.param_check([KeyType.asset_group_id, KeyType.transaction_id], dat):
@@ -409,13 +381,13 @@ class BBcCoreService:
                 result = self.ledger_subsystem.verify_transaction(asset_group_id=asset_group_id,
                                                                   transaction_id=transaction_id)
                 retmsg[KeyType.merkle_tree] = result
-                self.send_message(retmsg)
+                self.user_message_routing.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_GET_STATS:
             retmsg = make_message_structure(MsgType.RESPONSE_GET_STATS,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.stats] = self.stats.get_stats()
-            self.send_message(retmsg, sock=socket)
+            self.user_message_routing.send_message_to_user(retmsg, sock=socket)
 
         elif cmd == MsgType.REGISTER:
             if not self.param_check([KeyType.domain_id, KeyType.source_user_id], dat):
@@ -425,11 +397,13 @@ class BBcCoreService:
             domain_id = dat[KeyType.domain_id]
             self.logger.debug("[%s] register_user: %s" % (binascii.b2a_hex(domain_id[:2]),
                                                           binascii.b2a_hex(user_id[:4])))
-            self.networking.register_user_id(domain_id, user_id)
-            self.user_id_sock_mapping[user_id] = socket
+            self.user_message_routing.register_user(domain_id, user_id, socket)
             return False, user_id
 
         elif cmd == MsgType.UNREGISTER:
+            user_id = dat[KeyType.source_user_id]
+            domain_id = dat[KeyType.domain_id]
+            self.user_message_routing.unregister_user(domain_id, user_id, socket)
             return True, None
 
         elif cmd == MsgType.REQUEST_SETUP_DOMAIN:
@@ -442,7 +416,7 @@ class BBcCoreService:
                 self.configure_domain(domain_id, nw_module=dat.get(KeyType.network_module, "simple_cluster"),
                                       storage_type=dat.get(KeyType.storage_type, StorageType.FILESYSTEM),
                                       storage_path=dat.get(KeyType.storage_path, None))
-            self.send_raw_message(socket, retmsg)
+            self.user_message_routing.send_message_to_user(retmsg, sock=socket)
 
         elif cmd == MsgType.REQUEST_GET_PEERLIST:
             domain_id = dat[KeyType.domain_id]
@@ -451,7 +425,7 @@ class BBcCoreService:
             if domain_id in self.networking.domains:
                 retmsg[KeyType.domain_id] = domain_id
                 retmsg[KeyType.peer_list] = self.networking.domains[domain_id].make_peer_list()
-            self.send_raw_message(socket, retmsg)
+            self.user_message_routing.send_message_to_user(retmsg, sock=socket)
 
         elif cmd == MsgType.REQUEST_SET_STATIC_NODE:
             retmsg = make_message_structure(MsgType.RESPONSE_SET_STATIC_NODE,
@@ -466,14 +440,14 @@ class BBcCoreService:
                 self.config.update_config()
                 retmsg[KeyType.domain_id] = domain_id
                 retmsg[KeyType.result] = True
-            self.send_raw_message(socket, retmsg)
+            self.user_message_routing.send_message_to_user(retmsg, sock=socket)
 
         elif cmd == MsgType.REQUEST_GET_CONFIG:
             retmsg = make_message_structure(MsgType.RESPONSE_GET_CONFIG,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             jsondat = self.config.get_json_config()
             retmsg[KeyType.bbc_configuration] = jsondat
-            self.send_raw_message(socket, retmsg)
+            self.user_message_routing.send_message_to_user(retmsg, sock=socket)
 
         elif cmd == MsgType.REQUEST_GET_DOMAINLIST:
             retmsg = make_message_structure(MsgType.RESPONSE_GET_DOMAINLIST,
@@ -483,7 +457,7 @@ class BBcCoreService:
             for domain_id in self.networking.domains:
                 data.extend(domain_id)
             retmsg[KeyType.domain_list] = bytes(data)
-            self.send_raw_message(socket, retmsg)
+            self.user_message_routing.send_message_to_user(retmsg, sock=socket)
 
         elif cmd == MsgType.DOMAIN_PING:
             if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.port_number], dat):
@@ -515,7 +489,7 @@ class BBcCoreService:
                 else:
                     self.ledger_subsystem.disable()
                 self.ledger_subsystem.set_domain(dat[KeyType.domain_id])
-                self.send_raw_message(socket, retmsg)
+                self.user_message_routing.send_message_to_user(retmsg, sock=socket)
 
         elif cmd == MsgType.REQUEST_INSERT_NOTIFICATION:
             domain_id = dat[KeyType.domain_id]
@@ -727,7 +701,7 @@ class BBcCoreService:
                         notifmsg = make_message_structure(MsgType.NOTIFY_INSERTED, user_id, None)
                         notifmsg[KeyType.asset_group_id] = asset_group_id
                         notifmsg[KeyType.transaction_id] = txobj.transaction_id
-                        ret = self.send_message(notifmsg)
+                        ret = self.user_message_routing.send_message_to_user(notifmsg)
                         if not ret:
                             dellist.append(user_id)
                     for uid in dellist:
@@ -900,7 +874,7 @@ class BBcCoreService:
                 self.networking.get(query_entry)
                 return None
             query_entry.data['response_info'][KeyType.asset_file] = asset_file
-        self.send_message(query_entry.data['response_info'])
+        self.user_message_routing.send_message_to_user(query_entry.data['response_info'])
 
     def check_asset_in_response(self, query_entry):
         """
@@ -937,7 +911,7 @@ class BBcCoreService:
             query_entry.data['response_info'][KeyType.asset_file] = query_entry.data[KeyType.resource]
             self.storage_manager.store_locally(domain_id, asset_group_id, query_entry.data[KeyType.asset_id],
                                                query_entry.data[KeyType.resource])
-        self.send_message(query_entry.data['response_info'])
+        self.user_message_routing.send_message_to_user(query_entry.data['response_info'])
 
     def search_transaction_by_txid(self, domain_id, txid, source_id, query_id):
         """
@@ -1030,7 +1004,7 @@ class BBcCoreService:
         :return:
         """
         response_info.update(dat)
-        self.send_message(response_info)
+        self.user_message_routing.send_message_to_user(response_info)
 
     def send_error_response(self, response_info):
         """
@@ -1056,7 +1030,7 @@ class BBcCoreService:
                                                        query_entry.data[KeyType.resource])
         response_info = query_entry.data['response_info']
         response_info[KeyType.transaction_data] = query_entry.data[KeyType.resource]
-        self.send_message(response_info)
+        self.user_message_routing.send_message_to_user(response_info)
 
     def failure_response(self, query_entry):
         """

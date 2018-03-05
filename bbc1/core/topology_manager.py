@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import time
 import socket
 import random
 import binascii
@@ -24,7 +23,7 @@ import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core.bbc_types import InfraMessageCategory
-from bbc1.core import bbc_network, query_management
+from bbc1.core import query_management
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
 from bbc1.common import logger
 
@@ -104,7 +103,7 @@ class TopologyManagerBase:
     def update_refresh_timer_entry(self, new_entry=True):
         rand_interval = random.randint(int(TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL * 2 / 3),
                                        int(TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL * 4 / 3))
-        self.logger.debug("update_refresh_timer_entry:", rand_interval)
+        self.logger.debug("update_refresh_timer_entry: %d" % rand_interval)
         if new_entry:
             self.neighbor_refresh_timer_entry = query_management.QueryEntry(
                 expire_after=rand_interval, data={"is_refresh": True},
@@ -122,7 +121,6 @@ class TopologyManagerBase:
         msg = {
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_TOPOLOGY,
             KeyType.domain_id: self.domain_id,
-            KeyType.source_node_id: self.my_node_id,
             KeyType.command: TopologyManagerBase.NOTIFY_NEIGHBOR_LIST,
             KeyType.peer_list: self.make_neighbor_list(),
         }

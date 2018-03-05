@@ -41,23 +41,6 @@ def get_random_data(length=16):
     return "".join([random.choice(source_str) for x in range(length)])
 
 
-def wait_results(count):
-    total = 0
-    for i in range(count):
-        total += result_queue.get()
-    return total
-
-
-def get_test_func_success(query_entry):
-    print("get_test_func_success: ", query_entry.data[KeyType.resource])
-    result_queue.put(1)
-
-
-def get_test_func_failure(query_entry):
-    print("get_test_func_failure()")
-    result_queue.put(0)
-
-
 class DummyCore:
     class DB:
         def add_domain(self, domain_id):
@@ -92,18 +75,6 @@ class DummyCore:
         self.storage_manager = DummyCore.Storage()
         self.user_message_routing = DummyCore.UserMessageRouting()
         self.stats = bbc_stats.BBcStats()
-
-    def send_message(self, data):
-        print("[Core] recv=%s" % data)
-        result_queue.put(1)
-
-    def error_reply(self, msg=None, err_code=0, txt=""):
-        print("[Core] error=%s" % txt)
-        result_queue.put(0)
-
-    def insert_transaction(self, asset_group_id, txdata, asset_files, no_network_put=False):
-        print("[Core] insert_transaction")
-        result_queue.put(1)
 
 
 class TestBBcNetwork(object):
@@ -177,135 +148,11 @@ class TestBBcNetwork(object):
 
     def test_09_save_list(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        networkings[1].save_all_static_node_list()
-        with open(".bbc1-%d/config.json" % 1, "r") as f:
+        networkings[0].save_all_static_node_list()
+        with open(".bbc1-%d/config.json" % 0, "r") as f:
             dat = f.read()
         print(dat)
 
-    """
-    def test_04_alive_check(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        networkings[0].domains[domain_id].alive_check()
-        print("alive checking. need to wait 16 sec")
-        time.sleep(16)
-        networkings[1].domains[domain_id].print_peerlist()
-        assert len(networkings[1].domains[domain_id].id_ip_mapping) == core_nodes-1
-
-        ret = networkings[2].domains[domain_id].send_ping(nodes[3], None)
-        assert ret
-
-        for i in range(0, core_nodes):
-            networkings[i].domains[domain_id].print_peerlist()
-
-    def test_05_send_ping(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        for i in range(1, core_nodes):
-            k = random.randint(0,9)
-            if i == k:
-                continue
-            print("node=%d: ping_to:%s"%(i, binascii.b2a_hex(nodes[k])))
-            ret = networkings[i].domains[domain_id].send_ping(nodes[k], None)
-            assert ret
-        print("sleep 2 seconds")
-        time.sleep(2)
-        networkings[0].domains[domain_id].print_peerlist()
-
-    def test_06_route_message(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        for i in range(core_nodes):
-            msg = {b'aaaaa': 1, b'bbbb': "AAAAAA from %d" % i}
-            networkings[i].route_message(domain_id=domain_id, dst_user_id=users[0],
-                                         src_user_id=users[i], msg_to_send=msg)
-        print("wait queue: 10")
-        total = wait_results(10)
-        assert total == 10
-
-    def test_07_route_message_with_cache(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        for i in range(core_nodes):
-            msg = {b'aaaaa': 1, b'bbbb': "BBBBBBB from %d" % i}
-            networkings[i].route_message(domain_id=domain_id, dst_user_id=users[0],
-                                         src_user_id=users[i], msg_to_send=msg)
-        print("wait queue: 10")
-        total = wait_results(10)
-        assert total == 10
-
-    def test_08_route_message_inavlid_user(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        dummy_user_id = bbclib.get_new_id("dummy_user_id")
-        msg = {KeyType.command:3, KeyType.query_id:4, b'aaaaa': 1, b'bbbb': "CCCCCC from 1"}
-        networkings[1].route_message(domain_id=domain_id, dst_user_id=dummy_user_id,
-                                     src_user_id=users[1], msg_to_send=msg)
-        total = wait_results(1)
-        assert total == 0
-
-    def test_09_route_message_overflow_cache(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        for i in range(core_nodes):
-            msg = {b'aaaaa': 1, b'bbbb': "DDDDDD from %d" % i}
-            networkings[1].route_message(domain_id=domain_id,  dst_user_id=users[i],
-                                         src_user_id=users[1], msg_to_send=msg)
-        print("wait queue: 10")
-        total = wait_results(10)
-        assert total == 10
-
-    def test_10_route_message_overflow_cache_again(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        for i in range(core_nodes):
-            msg = {b'aaaaa': 1, b'bbbb': "EEEEEEE from %d" % i}
-            networkings[1].route_message(domain_id=domain_id, dst_user_id=users[i],
-                                         src_user_id=users[1], msg_to_send=msg)
-        print("wait queue: 10")
-        total = wait_results(10)
-        assert total == 10
-
-    def test_11_put(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        resource = b'aaaaaa'
-        resource_id = bbclib.get_new_id("dummy_resource_id")
-        networkings[1].put(domain_id=domain_id, resource_id=resource_id, resource=resource)
-        print("wait queue: 9")
-        total = wait_results(9)
-        assert total == 9
-
-    def test_12_get(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        query_entry = query_management.QueryEntry(expire_after=10,
-                                                  callback_expire=get_test_func_failure,
-                                                  data={KeyType.domain_id: domain_id,
-                                                        KeyType.asset_group_id: asset_group_id,
-                                                        KeyType.resource_id: sample_resource_id,
-                                                        KeyType.resource_type: ResourceType.Transaction_data},
-                                                  retry_count=3)
-        query_entry.update(2, callback=get_test_func_success)
-        networkings[1].get(query_entry)
-        print("wait queue: 1")
-        total = wait_results(1)
-        assert total == 1
-
-    def test_12_get_failure(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        resource_id = bbclib.get_new_id("dummy_resource_id")
-        query_entry = query_management.QueryEntry(expire_after=10,
-                                                  callback_expire=get_test_func_failure,
-                                                  data={KeyType.domain_id: domain_id,
-                                                        KeyType.asset_group_id: asset_group_id,
-                                                        KeyType.resource_id: resource_id,
-                                                        KeyType.resource_type: ResourceType.Transaction_data},
-                                                  retry_count=3)
-        query_entry.update(2, callback=get_test_func_success)
-        networkings[2].get(query_entry)
-        print("wait queue: 1")
-        total = wait_results(1)
-        assert total == 0
-
-    def test_13_leave_domain(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        for i in range(2, core_nodes):
-            networkings[i].remove_domain(domain_id)
-        time.sleep(1)
-        networkings[0].domains[domain_id].print_peerlist()
-    """
 
 if __name__ == '__main__':
     pytest.main()

@@ -121,7 +121,7 @@ class KeyType:
     command = to_4byte(8)   # command type
     message = to_4byte(9)
     domain_ping = to_4byte(10)   # send directly to bbc_network without node_id in the domain
-    p2p_msg_type = to_4byte(11)  # message type in p2p network
+    infra_msg_type = to_4byte(11)  # message type in p2p network
     query_id = to_4byte(12)      # query_id from bbc_app
     nonce = to_4byte(13)
     count = to_4byte(14)
@@ -144,6 +144,7 @@ class KeyType:
     port_number = to_4byte(11, 0x30)
     external_ip4addr = to_4byte(12, 0x30)
     external_ip6addr = to_4byte(13, 0x30)
+    static_entry = to_4byte(14, 0x30)
 
     resource_id = to_4byte(0, 0x40)
     resource_type = to_4byte(1, 0x40)
@@ -170,5 +171,4 @@ class KeyType:
     all_asset_files = to_4byte(4, 0x70)
     signature = to_4byte(5, 0x70)
     cross_refs = to_4byte(6, 0x70)
-
 
