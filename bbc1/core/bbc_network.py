@@ -32,12 +32,11 @@ import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core import bbc_core
 from bbc1.core.bbc_config import DEFAULT_P2P_PORT
-from bbc1.core.bbc_types import ResourceType, InfraMessageType
+from bbc1.core.bbc_types import ResourceType, InfraMessageCategory
 from bbc1.core.topology_manager import TopologyManagerBase
 from bbc1.core.user_message_routing import UserMessageRouting
 from bbc1.core.data_routing import DataRouting
 from bbc1.core import query_management
-from bbc1.common.bbclib import NodeInfo
 from bbc1.common import bbclib, message_key_types
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
 from bbc1.common import logger
@@ -96,10 +95,30 @@ def convert_to_string(array):
     return array
 
 
+def is_less_than(val_a, val_b):
+    """
+    return True if val_a is less than val_b (evaluate as integer)
+    :param val_a:
+    :param val_b:
+    :return:
+    """
+    size = len(val_a)
+    if size != len(val_b):
+        return False
+    for i in reversed(range(size)):
+        if val_a[i] < val_b[i]:
+            return True
+        elif val_a[i] > val_b[i]:
+            return False
+    return False
+
+
 class BBcNetwork:
     """
     Socket and thread management for infrastructure layers
     """
+    NOTIFY_LEAVE = to_2byte(0)
+
     def __init__(self, config, core=None, p2p_port=None, use_global=True, external_ip4addr=None, external_ip6addr=None,
                  loglevel="all", logname=None):
         self.core = core
@@ -161,7 +180,7 @@ class BBcNetwork:
         :param domain_id:
         :return:
         """
-        return self.domains[domain_id][InfraMessageType.CATEGORY_USER]
+        return self.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
 
     def get_data_routing(self, domain_id):
         """
@@ -169,7 +188,7 @@ class BBcNetwork:
         :param domain_id:
         :return:
         """
-        return self.domains[domain_id][InfraMessageType.CATEGORY_DATA]
+        return self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
 
     def create_domain(self, domain_id=ZEROS, network_module=None, get_new_node_id=False):
         """
@@ -205,15 +224,16 @@ class BBcNetwork:
         self.domains[domain_id]['neighbor'] = NeighborInfo(domain_id=domain_id, node_id=node_id,
                                                            sock=self.get_my_socket_info())
         if nw_module is None:
-            self.domains[domain_id][InfraMessageType.CATEGORY_TOPOLOGY] = TopologyManagerBase(network=self,
-                                                                                              domain_id=domain_id)
+            self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY] = TopologyManagerBase(network=self,
+                                                                                                  domain_id=domain_id,
+                                                                                                  node_id=node_id)
         else:
-            self.domains[domain_id][InfraMessageType.CATEGORY_TOPOLOGY] = nw_module.TopologyManager(
+            self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY] = nw_module.TopologyManager(
                 network=self, config=self.config,
                 domain_id=domain_id, node_id=node_id,
                 loglevel=self.logger.level, logname=self.logname)
         self.core.user_message_routing.add_domain(domain_id)
-        self.domains[domain_id][InfraMessageType.CATEGORY_DATA] = DataRouting(domain_id=domain_id)
+        self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA] = DataRouting(domain_id=domain_id)
 
         self.core.stats.update_stats_increment("network", "num_domains", 1)
         return True
@@ -228,14 +248,15 @@ class BBcNetwork:
         if domain_id not in self.domains:
             return
         msg = {
-            KeyType.infra_msg_type: InfraMessageType.CATEGORY_NETWORK,
+            KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_NETWORK,
             KeyType.domain_id: domain_id,
             KeyType.source_node_id: self.domains[domain_id]['neighbor'].my_node_id,
-            KeyType.command: InfraMessageType.NOTIFY_LEAVE,
+            KeyType.command: BBcNetwork.NOTIFY_LEAVE,
         }
         self.broadcast_message_in_network(domain_id=domain_id, payload_type=PayloadType.Type_msgpack, msg=msg)
-        del self.domains[domain_id]
         self.core.user_message_routing.remove_domain(domain_id)
+        self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].stop_all_timers()
+        del self.domains[domain_id]
         self.core.stats.update_stats_decrement("network", "num_domains", 1)
 
     def save_all_static_node_list(self):
@@ -275,6 +296,7 @@ class BBcNetwork:
         nodeinfo = NodeInfo(ipv4=ipv4, ipv6=ipv6, port=port, is_static=is_static)
         query_entry = query_management.QueryEntry(expire_after=10,
                                                   callback_error=self.domain_ping,
+                                                  callback_expire=self.invalidate_neighbor,
                                                   data={KeyType.domain_id: domain_id,
                                                         KeyType.node_id: node_id,
                                                         KeyType.peer_info: nodeinfo},
@@ -284,7 +306,7 @@ class BBcNetwork:
 
     def domain_ping(self, query_entry):
         msg = {
-            KeyType.infra_msg_type: InfraMessageType.CATEGORY_NETWORK,
+            KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_NETWORK,
             KeyType.domain_id: query_entry.data[KeyType.domain_id],
             KeyType.node_id: query_entry.data[KeyType.node_id],
             KeyType.domain_ping: 0,
@@ -342,16 +364,14 @@ class BBcNetwork:
             self.logger.debug("no other node_id")
             return
 
-        is_new = self.add_neighbor(domain_id=domain_id, node_id=node_id, ip4=ip4, from_addr=from_addr,
-                                   is_static=is_static)
-        if is_new:
-            self.domains[domain_id][InfraMessageType.CATEGORY_TOPOLOGY].notify_neighbor_update(node_id, is_new=True)
+        self.add_neighbor(domain_id=domain_id, node_id=node_id, ip4=ip4, from_addr=from_addr, is_static=is_static)
+
         if msg[KeyType.domain_ping] == 1:
             query_entry = ticker.get_entry(msg[KeyType.nonce])
             query_entry.deactivate()
         else:
             msg = {
-                KeyType.infra_msg_type: InfraMessageType.CATEGORY_NETWORK,
+                KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_NETWORK,
                 KeyType.domain_id: domain_id,
                 KeyType.node_id: self.domains[domain_id]['neighbor'].my_node_id,
                 KeyType.domain_ping: 1,
@@ -368,6 +388,19 @@ class BBcNetwork:
                 msg[KeyType.external_ip6addr] = self.ip6_address
             nodeinfo = NodeInfo(ipv4=ipv4, ipv6=ipv6, port=port)
             self.send_message_in_network(nodeinfo, PayloadType.Type_msgpack, msg)
+
+    def invalidate_neighbor(self, query_entry):
+        """
+        Set the flag of the nodeinfo false
+        :param query_entry:
+        :return:
+        """
+        domain_id = query_entry.data[KeyType.domain_id]
+        node_id = query_entry.data[KeyType.node_id]
+        try:
+            self.domains[domain_id]['neighbor'].nodelist[node_id].is_alive = False
+        except:
+            pass
 
     def send_message_in_network(self, nodeinfo, payload_type, msg):
         """
@@ -399,6 +432,8 @@ class BBcNetwork:
         :param msg:
         :return:
         """
+        if domain_id not in self.domains:
+            return
         for node_id, nodeinfo in self.domains[domain_id]['neighbor'].nodeinfo_list.items():
             msg[KeyType.destination_node_id] = node_id
             self.send_message_in_network(nodeinfo, payload_type, msg)
@@ -413,6 +448,8 @@ class BBcNetwork:
         :param is_static:
         :return:
         """
+        if domain_id not in self.domains:
+            return
         if self.domains[domain_id]['neighbor'].my_node_id == node_id:
             return None
         if ip4:
@@ -421,6 +458,8 @@ class BBcNetwork:
         else:
             is_new = self.domains[domain_id]['neighbor'].add(node_id=node_id, ipv6=from_addr[0],
                                                              port=from_addr[1], is_static=is_static)
+        if is_new:
+            self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].notify_neighbor_update(node_id, is_new=True)
         return is_new
 
     def process_message_base(self, domain_id, ip4, from_addr, msg, payload_type):
@@ -438,13 +477,13 @@ class BBcNetwork:
         self.logger.debug("[%s] process_message(type=%d)" % (self.domains[domain_id]['name'],
                                                              int.from_bytes(msg[KeyType.infra_msg_type], 'big')))
 
-        if msg[KeyType.infra_msg_type] == InfraMessageType.CATEGORY_NETWORK:
+        if msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_NETWORK:
             self.process_message(domain_id, ip4, from_addr, msg)
 
-        elif msg[KeyType.infra_msg_type] == InfraMessageType.CATEGORY_USER:
+        elif msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_USER:
             self.user_message_routing.process_message(domain_id, msg)
         else:
-            if msg[KeyType.infra_msg_type] in [InfraMessageType.CATEGORY_DATA, InfraMessageType.CATEGORY_TOPOLOGY]:
+            if msg[KeyType.infra_msg_type] in [InfraMessageCategory.CATEGORY_DATA, InfraMessageCategory.CATEGORY_TOPOLOGY]:
                 self.add_neighbor(domain_id, msg[KeyType.source_node_id], ip4, from_addr)
                 self.domains[domain_id][msg[KeyType.infra_msg_type]].process_message(ip4, from_addr, msg)
 
@@ -460,11 +499,11 @@ class BBcNetwork:
         if KeyType.domain_ping in msg:
             self.receive_domain_ping(domain_id, ip4, from_addr, msg)
 
-        elif msg[KeyType.command] == InfraMessageType.NOTIFY_LEAVE:
+        elif msg[KeyType.command] == BBcNetwork.NOTIFY_LEAVE:
             if KeyType.source_node_id in msg:
                 node_id = msg[KeyType.source_node_id]
-                self.domains[domain_id][InfraMessageType.CATEGORY_TOPOLOGY].notify_neighbor_update(node_id,
-                                                                                                   is_new=False)
+                self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].notify_neighbor_update(node_id,
+                                                                                                       is_new=False)
                 self.domains[domain_id]['neighbor'].remove(node_id)
 
     def setup_udp_socket(self):
@@ -625,71 +664,33 @@ class NeighborInfo:
     """
     Manage info of neighbor nodes
     """
+    PURGE_INTERVAL_SEC = 300
+
     def __init__(self, domain_id=None, node_id=None, sock=None):
         self.domain_id = domain_id
         self.my_node_id = node_id
         self.my_socket_info = sock
         self.nodeinfo_list = dict()
+        self.purge_timer = query_management.QueryEntry(expire_after=NeighborInfo.PURGE_INTERVAL_SEC,
+                                                       callback_expire=self.purge, retry_count=3)
+
+    def purge(self, query_entry):
+        for node_id in list(self.nodeinfo_list.keys()):
+            if not self.nodeinfo_list[node_id].is_alive:
+                self.nodeinfo_list.pop(node_id, None)
+        self.purge_timer = query_management.QueryEntry(expire_after=NeighborInfo.PURGE_INTERVAL_SEC,
+                                                       callback_expire=self.purge, retry_count=3)
 
     def add(self, node_id, ipv4=None, ipv6=None, port=None, is_static=False):
         if node_id not in self.nodeinfo_list:
             self.nodeinfo_list[node_id] = NodeInfo(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port, is_static=is_static)
             return True
         else:
-            self.nodeinfo_list[node_id].update(ipv4=ipv4, ipv6=ipv6, port=port)
-            return False
+            change_flag = self.nodeinfo_list[node_id].update(ipv4=ipv4, ipv6=ipv6, port=port)
+            return change_flag
 
     def remove(self, node_id):
         self.nodeinfo_list.pop(node_id, None)
-
-    def renew(self, info):
-        """
-        (internal use) renew nodeinfo_list
-
-        :param info:
-        :return:
-        """
-        count = int.from_bytes(info[:4], 'big')
-        for i in range(count):
-            base = 4 + i * (32 + 4 + 16 + 2 + 8)
-            node_id = info[base:base + 32]
-            if node_id == self.my_node_id:
-                continue
-            ipv4 = info[base + 32:base + 36]
-            ipv6 = info[base + 36:base + 52]
-            port = info[base + 52:base + 54]
-            updated_at = int.from_bytes(info[base + 54:base + 62], 'big')
-            if node_id in self.nodeinfo_list:
-                if self.nodeinfo_list[node_id].updated_at < updated_at:
-                    self.nodeinfo_list[node_id].recover_nodeinfo(node_id, ipv4, ipv6, port, updated_at)
-            else:
-                if updated_at > time.time() - REFRESH_INTERVAL / 2:
-                    self.nodeinfo_list[node_id] = NodeInfo()
-                    self.nodeinfo_list[node_id].recover_nodeinfo(node_id, ipv4, ipv6, port, updated_at)
-
-    def make_list(self):
-        """
-        Make binary neighbor_list (the first entry of the returned result always include the info of the node itself)
-
-        :return: binary data of count,[node_id,ipv4,ipv6,port],[node_id,ipv4,ipv6,port],[node_id,ipv4,ipv6,port],,,,
-        """
-        nodeinfo = bytearray()
-
-        # the node itself
-        nodeinfo.extend(self.my_node_id)
-        for item in self.my_socket_info:
-            nodeinfo.extend(item)
-        count = 1
-
-        # neighboring node
-        for nd in self.nodeinfo_list.keys():
-            count += 1
-            for item in self.nodeinfo_list[nd].get_nodeinfo():
-                nodeinfo.extend(item)
-
-        nodes = bytearray(count.to_bytes(4, 'big'))
-        nodes.extend(nodeinfo)
-        return bytes(nodes)
 
     def show_list(self):
         """
@@ -700,3 +701,86 @@ class NeighborInfo:
         for nodeinfo in self.nodeinfo_list.values():
             result += "%s\n" % nodeinfo
         return result
+
+
+class NodeInfo:
+    """
+    node information entry (socket info)
+    """
+    def __init__(self, node_id=None, ipv4=None, ipv6=None, port=None, is_static=False):
+        self.node_id = node_id
+        if ipv4 is None or len(ipv4) == 0:
+            self.ipv4 = None
+        else:
+            if isinstance(ipv4, bytes):
+                self.ipv4 = ipv4.decode()
+            else:
+                self.ipv4 = ipv4
+        if ipv6 is None or len(ipv6) == 0:
+            self.ipv6 = None
+        else:
+            if isinstance(ipv6, bytes):
+                self.ipv6 = ipv6.decode()
+            else:
+                self.ipv6 = ipv6
+        self.port = port
+        self.is_static = is_static
+        self.created_at = self.updated_at = time.time()
+        self.is_alive = True
+        self.disconnect_at = 0
+
+    def __lt__(self, other):
+        if self.is_alive and other.is_alive:
+            return is_less_than(self.node_id, other.node_id)
+        elif self.is_alive and not other.is_alive:
+            return True
+        elif not self.is_alive and other.is_alive:
+            return False
+        else:
+            return is_less_than(self.node_id, other.node_id)
+
+    def __len__(self):
+        return len(self.node_id)
+
+    def __str__(self):
+        output = "[node_id=%s, ipv4=%s, ipv6=%s, port=%d, alive=%s, static=%s, time=%d]" %\
+                 (binascii.b2a_hex(self.node_id), self.ipv4, self.ipv6, self.port,
+                  self.is_alive, self.is_static, self.updated_at)
+        return output
+
+    def touch(self):
+        self.updated_at = time.time()
+        self.is_alive = True
+
+    def detect_disconnect(self):
+        self.disconnect_at = time.time()
+        self.is_alive = False
+
+    def update(self, ipv4=None, ipv6=None, port=None):
+        change_flag = False
+        if ipv4 is not None and self.ipv4 != ipv4:
+            self.ipv4 = ipv4
+            if self.ipv4 != "127.0.0.1":
+                change_flag = True
+        if ipv6 is not None and self.ipv6 != ipv6:
+            self.ipv6 = ipv6
+            if self.ipv6 != "::":
+                change_flag = True
+        if port is not None and self.port != port:
+            self.port = port
+            change_flag = True
+        self.updated_at = time.time()
+        self.is_alive = True
+        return change_flag
+
+    def get_nodeinfo(self):
+        if self.ipv4 is not None:
+            ipv4 = socket.inet_pton(socket.AF_INET, self.ipv4)
+        else:
+            ipv4 = socket.inet_pton(socket.AF_INET, "0.0.0.0")
+        if self.ipv6 is not None:
+            ipv6 = socket.inet_pton(socket.AF_INET6, self.ipv6)
+        else:
+            ipv6 = socket.inet_pton(socket.AF_INET6, "::")
+        return self.node_id, ipv4, ipv6, socket.htons(self.port).to_bytes(2, 'big'), \
+               int(self.updated_at).to_bytes(8, 'big')
