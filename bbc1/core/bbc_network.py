@@ -35,7 +35,7 @@ from bbc1.core.bbc_config import DEFAULT_P2P_PORT
 from bbc1.core.bbc_types import ResourceType, InfraMessageCategory
 from bbc1.core.topology_manager import TopologyManagerBase
 from bbc1.core.user_message_routing import UserMessageRouting
-from bbc1.core.data_routing import DataRouting
+from bbc1.core.data_handler import DataRouting
 from bbc1.core import query_management
 from bbc1.common import bbclib, message_key_types
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
@@ -63,7 +63,7 @@ def check_my_IPaddresses(target4='8.8.8.8', target6='2001:4860:4860::8888', port
         ip4 = s.getsockname()[0]
         s.close()
     except OSError:
-        ip4 = None
+        ip4 = "127.0.0.1"
     if socket.has_ipv6:
         try:
             s = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
@@ -499,13 +499,12 @@ class BBcNetwork:
 
         :return:
         """
-        if self.ip_address is not None:
-            try:
-                self.socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                self.socket_udp.bind(("0.0.0.0", self.port))
-            except OSError:
-                self.socket_udp = None
-                self.logger.error("UDP Socket error for IPv4")
+        try:
+            self.socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.socket_udp.bind(("0.0.0.0", self.port))
+        except OSError:
+            self.socket_udp = None
+            self.logger.error("UDP Socket error for IPv4")
         if self.ip6_address is not None:
             try:
                 self.socket_udp6 = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
@@ -568,14 +567,13 @@ class BBcNetwork:
 
         :return:
         """
-        if self.ip_address is not None:
-            try:
-                self.listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                self.listen_socket.bind(("0.0.0.0", self.port))
-                self.listen_socket.listen(self.max_connections)
-            except OSError:
-                self.listen_socket = None
-                self.logger.error("TCP Socket error for IPv4")
+        try:
+            self.listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.listen_socket.bind(("0.0.0.0", self.port))
+            self.listen_socket.listen(self.max_connections)
+        except OSError:
+            self.listen_socket = None
+            self.logger.error("TCP Socket error for IPv4")
         if self.ip6_address is not None:
             try:
                 self.listen_socket6 = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
