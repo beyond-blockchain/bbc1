@@ -45,6 +45,18 @@ class UserMessageRouting:
         self.logger = logger.get_logger(key="user_message_routing", level=loglevel, logname=logname)
         self.registered_users = dict()
         self.forwarding_entries = dict()
+        self.on_going_timers = set()
+
+    def stop_all_timers(self):
+        """
+        Cancel all callback of query_entries
+        :return:
+        """
+        for user_id in self.forwarding_entries.keys():
+            if self.forwarding_entries[user_id]['refresh'] is not None:
+                self.forwarding_entries[user_id]['refresh'].deactivate()
+        for q in self.on_going_timers:
+            ticker.get_entry(q).deactivate()
 
     def register_user(self, user_id, socket, is_multicast=False):
         """
@@ -172,6 +184,7 @@ class UserMessageRouting:
                                                           KeyType.message: orig_msg,
                                                       },
                                                       retry_count=0)
+            self.on_going_timers.add(query_entry.nonce)
         msg = {
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_USER,
             KeyType.domain_id: self.domain_id,
@@ -190,6 +203,7 @@ class UserMessageRouting:
         :param query_entry:
         :return:
         """
+        self.on_going_timers.remove(query_entry.nonce)
         msg = query_entry.data[KeyType.message]
         self.forward_message_to_another_node(msg=msg)
 
@@ -199,6 +213,7 @@ class UserMessageRouting:
         :param query_entry:
         :return:
         """
+        self.on_going_timers.remove(query_entry.nonce)
         msg = query_entry.data[KeyType.message]
         msg[KeyType.destination_user_id] = msg[KeyType.source_user_id]
         msg[KeyType.result] = False

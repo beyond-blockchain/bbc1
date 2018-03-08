@@ -49,22 +49,22 @@ class DataHandler:
     REQUEST_SEARCH = to_2byte(2)
     RESPONSE_SEARCH = to_2byte(3)
 
-    def __init__(self, network=None, config=None, domain_id=None, loglevel="all", logname=None):
+    def __init__(self, network=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
         if network is not None:
             self.network = network
             self.core = network.core
         self.logger = logger.get_logger(key="data_handler", level=loglevel, logname=logname)
         self.domain_id = domain_id
         self.domain_id_str = bbclib.convert_id_to_string(domain_id)
-        self.config = config["domains"][bbclib.convert_id_to_string(self.domain_id)]
-        self.working_dir = config["workingdir"]
+        self.config = config
+        self.working_dir = workingdir
         self.storage_root = os.path.join(self.working_dir, self.domain_id_str)
         if not os.path.exists(self.storage_root):
             os.makedirs(self.storage_root, exist_ok=True)
         self.use_external_storage = self.storage_setup()
+        self.send_copy_to_all_neighbors = None
         self.db_adaptor = None
         self.db_cur = None
-        self.db_managing_nodes = list()
         self.dbs = list()
         self.db_setup()
 
@@ -74,6 +74,10 @@ class DataHandler:
         :return:
         """
         dbconf = self.config['db']
+        if dbconf['send_copy_to'] == 'all':
+            self.send_copy_to_all_neighbors = "all"
+        elif dbconf['send_copy_to'] == 'custom':
+            self.send_copy_to_all_neighbors = "custom"
         db_type = dbconf.get("db_type", "sqlite")
         if db_type == "sqlite":
             db_name = dbconf.get("db_name", "bbc1_db.sqlite")
@@ -159,9 +163,16 @@ class DataHandler:
                 info.append((txobj.transaction_id, pt.transaction_id))
         return info
 
-    def insert_transaction(self, txdata, txobj=None, asset_files=None):
+    def insert_transaction(self, txdata, txobj=None, asset_files=None, no_replication=False):
+        """
+        Insert transaction data and its asset files
+        :param txdata:
+        :param txobj:
+        :param asset_files:
+        :return:
+        """
         if txobj is None:
-            txobj = self.core.verify_transaction(txdata)
+            txobj = self.core.validate_transaction(txdata, asset_files=asset_files)
             if txobj is None:
                 return False
 
@@ -169,7 +180,8 @@ class DataHandler:
         if ret is None:
             return False
 
-        self.send_replication_to_other_cores(txdata)
+        if not no_replication:
+            self.send_replication_to_other_cores(txdata, asset_files)
 
         rollback_asset = list()
         rollback_asset_file = list()
@@ -213,13 +225,13 @@ class DataHandler:
             return False
         return True
 
-    def send_replication_to_other_cores(self, txdata):
+    def send_replication_to_other_cores(self, txdata, asset_files=None):
         """
         Send replication of transaction data
         :param txdata:
         :return:
         """
-        if len(self.db_managing_nodes) == 0:
+        if self.send_copy_to_all_neighbors is None:
             return
         msg = {
             KeyType.domain_id: self.domain_id,
@@ -227,10 +239,13 @@ class DataHandler:
             KeyType.command: DataHandler.REQUEST_REPLICATION_INSERT,
             KeyType.transaction_data: txdata,
         }
-        for node_id in self.db_managing_nodes:
-            msg[KeyType.destination_node_id] = node_id
-            self.network.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
-                                                 domain_id=self.domain_id, msg=msg)
+        if asset_files is not None:
+            msg[KeyType.all_asset_files] = asset_files
+        if self.send_copy_to_all_neighbors == "all":
+            self.network.broadcast_message_in_network(domain_id=self.domain_id,
+                                                      payload_type=PayloadType.Type_msgpack, msg=msg)
+        elif self.send_copy_to_all_neighbors == "custom":
+            pass  # TODO: implement (destinations determined by TopologyManager)
 
     def remove(self, transaction_id):
         """
@@ -390,7 +405,8 @@ class DataHandler:
             return
 
         if msg[KeyType.command] == DataHandler.REQUEST_REPLICATION_INSERT:
-            self.insert_transaction(msg[KeyType.transaction_data])
+            self.insert_transaction(msg[KeyType.transaction_data],
+                                    asset_files=msg.get(KeyType.all_asset_files, None), no_replication=True)
 
         elif msg[KeyType.command] == DataHandler.RESPONSE_REPLICATION_INSERT:
             pass

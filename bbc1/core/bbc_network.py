@@ -35,7 +35,7 @@ from bbc1.core.bbc_config import DEFAULT_P2P_PORT
 from bbc1.core.bbc_types import ResourceType, InfraMessageCategory
 from bbc1.core.topology_manager import TopologyManagerBase
 from bbc1.core.user_message_routing import UserMessageRouting
-from bbc1.core.data_handler import DataRouting
+from bbc1.core.data_handler import DataHandler
 from bbc1.core import query_management
 from bbc1.common import bbclib, message_key_types
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
@@ -173,29 +173,21 @@ class BBcNetwork:
         return socket.inet_pton(socket.AF_INET, ipv4), socket.inet_pton(socket.AF_INET6, ipv6), port, \
                int(time.time()).to_bytes(8, 'big')
 
-    def create_domain(self, domain_id=ZEROS, network_module=None, get_new_node_id=False):
+    def create_domain(self, domain_id=ZEROS, config=None):
         """
         Create domain and register user in the domain
 
         :param domain_id:
-        :param network_module: string of module script file
-        :param get_new_node_id: If True, the node_id is newly created again
+        :param config: config for the domain
         :return:
         """
         if domain_id in self.domains:
             return False
 
-        if network_module == "simple_cluster":
-            nw_module = None
-        elif network_module is not None:
-            if isinstance(network_module, bytes):
-                network_module = network_module.decode()
-            nw_module = __import__(network_module)
-        else:
-            return None
-
         conf = self.config.get_domain_config(domain_id, create_if_new=True)
-        if 'node_id' not in conf or get_new_node_id:
+        if config is not None:
+            conf.update(config)
+        if 'node_id' not in conf:
             node_id = bbclib.get_random_id()
             conf['node_id'] = bbclib.convert_id_to_string(node_id)
             self.config.update_config()
@@ -203,21 +195,18 @@ class BBcNetwork:
             node_id = bbclib.convert_idstring_to_bytes(conf.get('node_id'))
 
         self.domains[domain_id] = dict()
+        self.domains[domain_id]['node_id'] = node_id
         self.domains[domain_id]['name'] = node_id.hex()[:4]
         self.domains[domain_id]['neighbor'] = NeighborInfo(domain_id=domain_id, node_id=node_id,
                                                            sock=self.get_my_socket_info())
-        if nw_module is None:
-            self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY] = TopologyManagerBase(network=self,
-                                                                                                  domain_id=domain_id,
-                                                                                                  node_id=node_id)
-        else:
-            self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY] = nw_module.TopologyManager(
-                network=self, config=self.config,
-                domain_id=domain_id, node_id=node_id,
-                loglevel=self.logger.level, logname=self.logname)
+        self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY] = TopologyManagerBase(network=self,
+                                                                                              domain_id=domain_id,
+                                                                                              node_id=node_id)
         self.domains[domain_id][InfraMessageCategory.CATEGORY_USER] = UserMessageRouting(self, domain_id)
-        self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA] = DataRouting(domain_id=domain_id)
-
+        workingdir = self.config.get_config()['workingdir']
+        self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA] = DataHandler(self, config=conf,
+                                                                                  workingdir=workingdir,
+                                                                                  domain_id=domain_id)
         self.core.stats.update_stats_increment("network", "num_domains", 1)
         return True
 

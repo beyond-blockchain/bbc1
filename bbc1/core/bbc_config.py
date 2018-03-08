@@ -39,37 +39,17 @@ current_config = {
     'client': {
         'port': DEFAULT_CORE_PORT,
     },
-    'ledger': {
-        'type': "sqlite3",
-        'transaction_db': "bbc_transaction.sqlite3",
-        'auxiliary_db': "bbc_aux.sqlite3",
-        'merkle_db': "bbc_merkle.sqlite3",
-    },
-    'storage': {
-        #'path': "path/to/somewhere",
-        #'path': "/path/to/somewhere",
-    },
+    #'ledger': {
+    #'merkle_db': "bbc_merkle.sqlite3",
+    #},
     'network': {
         'p2p_port': DEFAULT_P2P_PORT,
         'max_connections': 100,
-        'modules': {
-            'simple_cluster': {
-                'test': 1,
-            },
-            'p2p_kademlia': {
-                'concurrent_lookup_num': 3,
-                'redundancy': 3,
-                'k_value': 10,
-            },
-        },
     },
     'domains': {
         '0000000000000000000000000000000000000000000000000000000000000000': {
             'module': 'p2p_domain0',
             'static_nodes': {
-                # id : [ipv4, ipv6, port]
-            },
-            'peer_list': {
                 # id : [ipv4, ipv6, port]
             },
         },
@@ -136,11 +116,15 @@ class BBcConfig:
         domain_id_str = bbclib.convert_id_to_string(domain_id)
         if create_if_new and domain_id_str not in self.config['domains']:
             self.config['domains'][domain_id_str] = {
-                'module': 'simple_cluster',
-                'static_nodes': {
-                    # id : [ipv4, ipv6, port]
+                'storage': {
+                    "type": "internal",  # or "external"
                 },
-                'peer_list': {
+                'db': {
+                    "send_copy_to": "all",  # or None/custom
+                    "db_type": "sqlite", # or "mysql"
+                    "db_name": "bbc_ledger.sqlite",
+                },
+                'static_nodes': {
                     # id : [ipv4, ipv6, port]
                 },
             }

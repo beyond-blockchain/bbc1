@@ -37,11 +37,12 @@ sys.path.extend(["../../"])
 from bbc1.common import bbclib, message_key_types, logger
 from bbc1.common.message_key_types import KeyType, PayloadType, to_2byte
 from bbc1.common.bbclib import BBcTransaction, ServiceMessageType as MsgType, StorageType
-from bbc1.core import bbc_network, bbc_storage, query_management, bbc_stats
+from bbc1.core import bbc_network, user_message_routing, data_handler, query_management, bbc_stats
 from bbc1.core.bbc_config import BBcConfig
 from bbc1.core.bbc_types import ResourceType
 from bbc1.core.bbc_ledger import BBcLedger
 from bbc1.core.user_message_routing import UserMessageRouting
+from bbc1.core.data_handler import InfraMessageCategory
 from bbc1.core import command
 from bbc1.common.bbc_error import *
 
@@ -113,12 +114,8 @@ class BBcCoreService:
             core_port = conf['client']['port']
         self.logger.debug("config = %s" % conf)
         self.test_tx_obj = BBcTransaction()
-        self.user_id_sock_mapping = dict()
         self.need_insert_completion_notification = dict()
         self.cross_ref_list = []
-        self.ledger_manager = BBcLedger(self.config)
-        self.storage_manager = bbc_storage.BBcStorage(self.config)
-        self.user_message_routing = UserMessageRouting(core=self, loglevel=loglevel, logname=logname)
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port, use_global=use_global,
                                                  external_ip4addr=ip4addr, external_ip6addr=ip6addr,
                                                  loglevel=loglevel, logname=logname)
@@ -131,6 +128,10 @@ class BBcCoreService:
         for domain_id_str in conf['domains'].keys():
             domain_id = bbclib.convert_idstring_to_bytes(domain_id_str)
             c = self.config.get_domain_config(domain_id)
+
+
+
+            """
             nw_module = c.get('module', 'simple_cluster')
             default_type = StorageType.FILESYSTEM
             if domain_id == bbclib.domain_global_0:
@@ -145,7 +146,7 @@ class BBcCoreService:
             for nd, info in c['peer_list'].items():
                 node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
                 self.networking.domains[domain_id].add_peer_node_ip46(node_id, ipv4, ipv6, port, need_ping=True)
-
+            """
         gevent.signal(signal.SIGINT, self.quit_program)
         if server_start:
             self.start_server(core_port)
@@ -260,17 +261,57 @@ class BBcCoreService:
         if not self.param_check([KeyType.command, KeyType.source_user_id], dat):
             self.logger.debug("message has bad format")
             return False, None
+        if KeyType.domain_id in dat:
+            domain_id = dat[KeyType.domain_id]
+            umr = self.networking.domains[domain_id]
+
         cmd = dat[KeyType.command]
         if cmd == MsgType.REQUEST_SEARCH_TRANSACTION:
             if not self.param_check([KeyType.domain_id, KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_SEARCH_TRANSACTION: bad format")
                 return False, None
-            result = self.search_transaction_by_txid(dat[KeyType.domain_id],
-                                                     dat[KeyType.transaction_id],
-                                                     dat[KeyType.source_user_id], dat[KeyType.query_id])
-            if result is not None:
-                self.user_message_routing.send_message_to_user(result)
+            retmsg = make_message_structure(MsgType.RESPONSE_SEARCH_TRANSACTION,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            txinfo = self.search_transaction_by_txid(domain_id, dat[KeyType.transaction_id])
+            if txinfo is None:
+                self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction")
+            else:
+                retmsg.update(txinfo)
+                umr.send_message_to_user(retmsg)
 
+        elif cmd == MsgType.REQUEST_SEARCH_WITH_CONDITIONS:
+            if not self.param_check([KeyType.domain_id], dat):
+                self.logger.debug("REQUEST_SEARCH_WITH_CONDITIONS: bad format")
+                return False, None
+            retmsg = make_message_structure(MsgType.RESPONSE_SEARCH_WITH_CONDITIONS,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            txinfo = self.search_transaction_with_condition(domain_id,
+                                                            asset_group_id=dat.get(KeyType.asset_group_id, None),
+                                                            asset_id=dat.get(KeyType.asset_id, None),
+                                                            user_id=dat.get(KeyType.user_id, None),
+                                                            count=dat.get(KeyType.count, None))
+            if txinfo is None:
+                self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction")
+            else:
+                retmsg.update(txinfo)
+                umr.send_message_to_user(retmsg)
+
+        # --- TODO: will be obsoleted in v0.10
+        elif cmd == MsgType.REQUEST_SEARCH_USERID:
+            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.user_id], dat):
+                self.logger.debug("REQUEST_SEARCH_USERID: bad format")
+                return False, None
+            retmsg = make_message_structure(MsgType.RESPONSE_SEARCH_USERID,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            txinfo = self.search_transaction_with_condition(domain_id, asset_group_id=dat[KeyType.asset_group_id],
+                                                            user_id=dat[KeyType.user_id])
+            if txinfo is None:
+                self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction")
+            else:
+                retmsg.update(txinfo)
+                umr.send_message_to_user(retmsg)
+
+        # --- TODO: will be obsoleted in v0.10
         elif cmd == MsgType.REQUEST_SEARCH_ASSET:
             if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.asset_id], dat):
                 self.logger.debug("REQUEST_SEARCH_ASSET: bad format")
@@ -278,21 +319,13 @@ class BBcCoreService:
             retmsg = make_message_structure(MsgType.RESPONSE_SEARCH_ASSET,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.asset_group_id] = dat[KeyType.asset_group_id]
-            result = self.search_asset_by_asid(dat[KeyType.domain_id], dat[KeyType.asset_group_id],
-                                               dat[KeyType.asset_id], dat[KeyType.source_user_id], dat[KeyType.query_id])
-            if isinstance(result, dict):
-                retmsg.update(result)
-                self.user_message_routing.send_message_to_user(retmsg)
-
-        elif cmd == MsgType.REQUEST_SEARCH_USERID:
-            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.user_id], dat):
-                self.logger.debug("REQUEST_SEARCH_USERID: bad format")
-                return False, None
-            result = self.search_transaction_by_userid_locally(dat[KeyType.domain_id], dat[KeyType.asset_group_id],
-                                                               dat[KeyType.user_id],
-                                                               dat[KeyType.source_user_id], dat[KeyType.query_id])
-            if result is not None:
-                self.user_message_routing.send_message_to_user(result)
+            txinfo = self.search_transaction_with_condition(domain_id, asset_group_id=dat[KeyType.asset_group_id],
+                                                            asset_id=dat[KeyType.asset_id])
+            if txinfo is None:
+                self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction")
+            else:
+                retmsg.update(txinfo)
+                umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_GATHER_SIGNATURE:
             if not self.param_check([KeyType.domain_id, KeyType.transaction_data], dat):
@@ -538,12 +571,12 @@ class BBcCoreService:
                 if len(self.need_insert_completion_notification[domain_id]) == 0:
                     self.need_insert_completion_notification.pop(domain_id, None)
 
-    def validate_transaction(self, txid, txdata, asset_files=None):
+    def validate_transaction(self, txdata, asset_files=None):
         """
         Validate transaction by verifying signature
 
-        :param txid:                transaction_id
-        :param txdata:              BBcTransaction data
+        :param txid:          transaction_id
+        :param txdata:        BBcTransaction data
         :param asset_files:   dictionary of { asid=>asset_content,,, }
         """
         txobj = BBcTransaction()
@@ -552,10 +585,6 @@ class BBcCoreService:
             self.logger.error("Fail to deserialize transaction data")
             return None
         digest = txobj.digest()
-        if txid is not None and txid != digest:
-            self.logger.error("Bad transaction_id")
-            self.stats.update_stats_increment("transaction", "invalid", 1)
-            return None
 
         for i, sig in enumerate(txobj.signatures):
             try:
@@ -569,12 +598,22 @@ class BBcCoreService:
                 return None
         if asset_files is None:
             return txobj
+
         for idx, evt in enumerate(txobj.events):
             if evt.asset is None:
                 continue
             asid = evt.asset.asset_id
             if asid in asset_files.keys():
                 if evt.asset.asset_file_digest != hashlib.sha256(asset_files[asid]).digest():
+                    self.stats.update_stats_increment("transaction", "invalid", 1)
+                    self.logger.error("Bad asset_id for event[%d]" % idx)
+                    return None
+        for idx, rtn in enumerate(txobj.relations):
+            if rtn.asset is None:
+                continue
+            asid = rtn.asset.asset_id
+            if asid in asset_files.keys():
+                if rtn.asset.asset_file_digest != hashlib.sha256(asset_files[asid]).digest():
                     self.stats.update_stats_increment("transaction", "invalid", 1)
                     self.logger.error("Bad asset_id for event[%d]" % idx)
                     return None
@@ -598,22 +637,28 @@ class BBcCoreService:
                     self.stats.update_stats_increment("asset", "invalid", 1)
                     self.logger.error("Bad asset_id for event[%d]" % idx)
                     return False
+        for idx, rtn in enumerate(txobj.relations):
+            if rtn.asset is None:
+                continue
+            if asid == rtn.asset.asset_id:
+                if rtn.asset.asset_file_digest == hashlib.sha256(asset_file).digest():
+                    return True
+                else:
+                    self.stats.update_stats_increment("asset", "invalid", 1)
+                    self.logger.error("Bad asset_id for event[%d]" % idx)
+                    return False
         self.stats.update_stats_increment("asset", "invalid", 1)
         return False
 
-    def insert_transaction(self, domain_id, txdata, asset_files, no_network_put=False):
+    def insert_transaction(self, domain_id, txdata, asset_files):
         """
-        Insert transaction into ledger subsystem
+        Insert transaction into ledger
 
-        :param domain_id:           domain_id where the transaction is inserted
-        :param txdata:              BBcTransaction data
+        :param domain_id:     domain_id where the transaction is inserted
+        :param txdata:        BBcTransaction data
         :param asset_files:   dictionary of { asid=>asset_content,,, }
-        :param no_network_put:      If false, skip networking.put()
         """
-        if no_network_put:
-            self.stats.update_stats_increment("transaction", "copy_insert_count", 1)
-        else:
-            self.stats.update_stats_increment("transaction", "insert_count", 1)
+        self.stats.update_stats_increment("transaction", "insert_count", 1)
         if domain_id is None:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("No such domain")
@@ -622,104 +667,20 @@ class BBcCoreService:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("Insert is not allowed in domain_global_0")
             return "Insert is not allowed in domain_global_0"
-        txobj = self.validate_transaction(None, txdata, asset_files)
+        txobj = self.validate_transaction(txdata, asset_files)
         if txobj is None:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("Bad transaction format")
             return "Bad transaction format"
         self.logger.debug("[node:%s] insert_transaction %s" %
-                          (binascii.b2a_hex(self.networking.domains[domain_id].node_id[:4]),
-                           binascii.b2a_hex(txobj.transaction_id[:4])))
+                          (self.networking.domains[domain_id]['name'], binascii.b2a_hex(txobj.transaction_id[:4])))
 
-        ret = self.ledger_manager.insert_transaction_locally(domain_id, txobj.transaction_id, txdata)
+        ret = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA].insert_transaction(
+            txdata, txobj=txobj, asset_files=asset_files)
         if not ret:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
-            self.logger.error("[%s] Fail to insert a transaction into the ledger"%
-                              binascii.b2a_hex(self.networking.domains[domain_id].node_id[:4]))
+            self.logger.error("[%s] Fail to insert a transaction into the ledger" % self.networking.domains[domain_id]['name'])
             return "Failed to insert a transaction into the ledger"
-
-        rollback_flag = False
-        registered_asset_in_storage = []
-        asset_group_ids = list()
-        for idx, evt in enumerate(txobj.events):
-            if evt.asset is None:
-                continue
-            asset_group_id = evt.asset_group_id
-            asset_group_ids.append(asset_group_id)
-            asid = evt.asset.asset_id
-            user_id = evt.asset.user_id
-            if asset_files is not None and asid in asset_files.keys():
-                if not self.storage_manager.store_locally(domain_id, asset_group_id, asid, asset_files[asid]):
-                    rollback_flag = True
-                    break
-                registered_asset_in_storage.append([asset_group_id, asid])
-            if not self.ledger_manager.insert_asset_info_locally(domain_id, txobj.transaction_id,
-                                                                 asset_group_id, asid, user_id):
-                rollback_flag = True
-                break
-
-        for reference in txobj.references:
-            self.ledger_manager.insert_topology_info_locally(domain_id, txobj.transaction_id,
-                                                             ResourceType.Edge, reference.transaction_id)
-            self.ledger_manager.insert_topology_info_locally(domain_id, reference.transaction_id,
-                                                             ResourceType.Edge, txobj.transaction_id)
-
-        for idx, rtn in enumerate(txobj.relations):
-            asset_group_id = rtn.asset_group_id
-            asset_group_ids.append(asset_group_id)
-            if rtn.asset is not None:
-                asid = rtn.asset.asset_id
-                user_id = rtn.asset.user_id
-                if asset_files is not None and asid in asset_files.keys():
-                    if not self.storage_manager.store_locally(domain_id, asset_group_id, asid, asset_files[asid]):
-                        rollback_flag = True
-                        break
-                    registered_asset_in_storage.append([asset_group_id, asid])
-                if not self.ledger_manager.insert_asset_info_locally(domain_id, txobj.transaction_id,
-                                                                     asset_group_id, asid, user_id):
-                    rollback_flag = True
-                    break
-            for pt in rtn.pointers:
-                self.ledger_manager.insert_topology_info_locally(domain_id, txobj.transaction_id,
-                                                                 ResourceType.Edge, pt.transaction_id)
-                self.ledger_manager.insert_topology_info_locally(domain_id, pt.transaction_id,
-                                                                 ResourceType.Edge, txobj.transaction_id)
-
-        if rollback_flag:
-            self.ledger_manager.remove(domain_id, txobj.transaction_id)
-            if len(registered_asset_in_storage) > 0:
-                for asset_group_id, asid in registered_asset_in_storage:
-                    self.storage_manager.remove(domain_id, asset_group_id, asid)
-                self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
-                return "Failed to insert"
-
-        if domain_id in self.need_insert_completion_notification:
-            for asset_group_id in asset_group_ids:
-                if asset_group_id in self.need_insert_completion_notification[domain_id]:
-                    dellist = list()
-                    for user_id in self.need_insert_completion_notification[domain_id][asset_group_id]:
-                        notifmsg = make_message_structure(MsgType.NOTIFY_INSERTED, user_id, None)
-                        notifmsg[KeyType.asset_group_id] = asset_group_id
-                        notifmsg[KeyType.transaction_id] = txobj.transaction_id
-                        ret = self.user_message_routing.send_message_to_user(notifmsg)
-                        if not ret:
-                            dellist.append(user_id)
-                    for uid in dellist:
-                        self.remove_from_notification_list(domain_id, asset_group_id, uid)
-
-        if no_network_put:
-            return None
-
-        if len(txobj.cross_refs) > 0 or len(self.cross_ref_list) < 3:
-            self.networking.disseminate_cross_ref(domain_id, txobj.transaction_id)
-
-        self.networking.put(domain_id=domain_id, resource_id=txobj.transaction_id,
-                            resource_type=ResourceType.Transaction_data, resource=txdata)
-        if self.storage_manager.get_storage_type(domain_id) is not None:
-            for asset_group_id, asid in registered_asset_in_storage:
-                self.networking.put(domain_id=domain_id, resource_id=asid,
-                                    resource_type=ResourceType.Asset_file,
-                                    resource=asset_files[asid], asset_group_id=asset_group_id)
         return {KeyType.transaction_id: txobj.transaction_id}
 
     def distribute_transaction_to_gather_signatures(self, domain_id, dat):
@@ -731,197 +692,30 @@ class BBcCoreService:
         :return:
         """
         destinations = dat[KeyType.destination_user_ids]
+        msg = make_message_structure(MsgType.REQUEST_SIGNATURE, None, dat[KeyType.query_id])
+        msg[KeyType.source_user_id] = dat[KeyType.source_user_id]
         for dst in destinations:
             if dst == dat[KeyType.source_user_id]:
                 continue
-            msg = make_message_structure(MsgType.REQUEST_SIGNATURE, dst, dat[KeyType.query_id])
-            msg[KeyType.source_user_id] = dat[KeyType.source_user_id]
+            msg[KeyType.destination_user_id] = dst
+            if KeyType.hint in dat:
+                msg[KeyType.hint] = dat[KeyType.hint]
             msg[KeyType.transaction_data] = dat[KeyType.transaction_data]
             if KeyType.transactions in dat:
                 msg[KeyType.transactions] = dat[KeyType.transactions]
             if KeyType.all_asset_files in dat:
                 msg[KeyType.all_asset_files] = dat[KeyType.all_asset_files]
-            if not self.send_to_other_user(domain_id, dst, dat[KeyType.source_user_id], msg):
+            if not self.networking.domains[domain_id].user_message_routing.send_message_to_user(msg):
                 return False
         return True
 
-    def search_asset_by_asid(self, domain_id, asset_group_id, asid, source_id, query_id):
-        """
-        Search asset in the storage by asset_id. If not found, search it in the network
-
-        :param domain_id:        domain_id where the transaction is inserted
-        :param asset_group_id:   asset_group_id to search in
-        :param asid:        asset_id in byte format
-        :param source_id: the user_id of the sender
-        :param query_id:
-        :return: dictionary data of transaction_data, asset_file (if exists)
-        """
-        self.stats.update_stats_increment("asset", "search_count", 1)
-        response_info = make_message_structure(MsgType.RESPONSE_SEARCH_ASSET, source_id, query_id)
-        response_info[KeyType.asset_group_id] = asset_group_id
-        if domain_id is None:
-            self.stats.update_stats_increment("asset", "search_fail_count", 1)
-            self.logger.error("No such domain")
-            return None
-        response_info[KeyType.asset_id] = asid
-
-        sql = "SELECT DISTINCT transaction_id FROM asset_info_table WHERE asset_group_id = ? AND asset_id = ?"
-        row = self.ledger_manager.find_by_sql_in_local_auxiliary_db(domain_id, sql, asset_group_id, asid)
-
-        if len(row) == 0:
-            query_entry = query_management.QueryEntry(expire_after=DURATION_GIVEUP_GET,
-                                                      callback_expire=self.failure_response,
-                                                      data={'response_info': response_info,
-                                                            KeyType.domain_id: domain_id,
-                                                            KeyType.sql: sql,
-                                                            KeyType.asset_group_id: asset_group_id,
-                                                            KeyType.resource_id: asid,
-                                                            KeyType.asset_id: asid,
-                                                            KeyType.resource_type: ResourceType.Asset_ID},
-                                                      retry_count=GET_RETRY_COUNT)
-            query_entry.update(fire_after=INTERVAL_RETRY, callback=self.search_transaction_for_asset)
-            self.networking.get(query_entry)
-            return None
-
-        txid = row[0][0]
-        txdata = self.ledger_manager.find_transaction_locally(domain_id, txid)
-        if txdata is not None:
-            txobj = self.validate_transaction(txid, txdata)
-            if txobj is None:
-                txdata = None
-                self.ledger_manager.remove(domain_id, asset_group_id, txid)
-
-        if txdata is None:
-            query_entry = query_management.QueryEntry(expire_after=DURATION_GIVEUP_GET,
-                                                      callback_expire=self.failure_response,
-                                                      data={'response_info': response_info,
-                                                            KeyType.domain_id: domain_id,
-                                                            KeyType.resource_id: txid,
-                                                            KeyType.asset_id: asid,
-                                                            KeyType.resource_type: ResourceType.Transaction_data},
-                                                      retry_count=GET_RETRY_COUNT)
-            query_entry.update(fire_after=INTERVAL_RETRY, callback=self.check_asset_in_response)
-            self.networking.get(query_entry)
-            return None
-
-        response_info[KeyType.transaction_data] = txdata
-        if check_transaction_if_having_asset_file(txdata, asid):
-            asset_file = self.storage_manager.get_locally(domain_id, asset_group_id, asid)  # FIXME: to support storage_type=NONE
-            if asset_file is not None:
-                if not self.validate_asset_file(txobj, asid, asset_file):
-                    asset_file = None
-                    self.storage_manager.remove(domain_id, asset_group_id, asid)
-            if asset_file is None:
-                query_entry = query_management.QueryEntry(expire_after=DURATION_GIVEUP_GET,
-                                                          callback_expire=self.failure_response,
-                                                          data={'response_info': response_info,
-                                                                KeyType.domain_id: domain_id,
-                                                                KeyType.asset_group_id: asset_group_id,
-                                                                KeyType.asset_id: asid,
-                                                                KeyType.resource_id: asid,
-                                                                KeyType.resource_type: ResourceType.Asset_file},
-                                                          retry_count=GET_RETRY_COUNT)
-                query_entry.update(fire_after=INTERVAL_RETRY, callback=self.check_asset_in_response)
-                self.networking.get(query_entry)
-                return None
-            response_info[KeyType.asset_file] = asset_file
-        return response_info
-
-    def search_transaction_for_asset(self, query_entry):
-        """
-        (internal use) Search transaction that includes the specified asset_id
-
-        :param query_entry:
-        :return:
-        """
-        print("search_transaction_for_asset")
-        self.stats.update_stats_increment("transaction", "search_count", 1)
-        domain_id = query_entry.data[KeyType.domain_id]
-        if query_entry.data[KeyType.resource_type] == ResourceType.Asset_ID:  # resource is txid that includes the asset
-            txid = query_entry.data[KeyType.resource]
-            txdata = self.ledger_manager.find_transaction_locally(domain_id, txid)
-        else:
-            txid = query_entry.data[KeyType.resource_id]
-            txdata = query_entry.data[KeyType.resource]
-
-        if txdata is not None:
-            txobj = self.validate_transaction(txid, txdata, None)
-            if txobj is None:
-                txdata = None
-                self.ledger_manager.remove(domain_id, txid)
-        if txdata is None:
-            del query_entry.data[KeyType.resource]
-            query_entry.data.update({KeyType.resource_id: txid, KeyType.resource_type: ResourceType.Transaction_data})
-            query_entry.retry_count = GET_RETRY_COUNT
-            query_entry.update(fire_after=INTERVAL_RETRY, callback=self.check_asset_in_response)
-            self.networking.get(query_entry)
-            return
-
-        query_entry.data['response_info'][KeyType.transaction_data] = txdata
-        asid = query_entry.data[KeyType.asset_id]
-        asset_group_id = query_entry.data[KeyType.asset_group_id]
-        if check_transaction_if_having_asset_file(txdata, asid):
-            asset_file = self.storage_manager.get_locally(domain_id, asset_group_id, asid)  # FIXME: to support storage_type=NONE
-            if asset_file is not None:
-                if not self.validate_asset_file(txobj, asid, asset_file):
-                    asset_file = None
-                    self.storage_manager.remove(domain_id, asset_group_id, asid)
-            if asset_file is None:
-                del query_entry.data[KeyType.resource]
-                query_entry.data.update({KeyType.resource_id: asid, KeyType.resource_type: ResourceType.Asset_file})
-                query_entry.retry_count = GET_RETRY_COUNT
-                query_entry.update(fire_after=INTERVAL_RETRY, callback=self.check_asset_in_response)
-                self.networking.get(query_entry)
-                return None
-            query_entry.data['response_info'][KeyType.asset_file] = asset_file
-        self.user_message_routing.send_message_to_user(query_entry.data['response_info'])
-
-    def check_asset_in_response(self, query_entry):
-        """
-        (internal use) Check asset in the transaction
-
-        :param query_entry:
-        :return:
-        """
-        domain_id = query_entry.data[KeyType.domain_id]
-        asset_group_id = query_entry.data[KeyType.asset_group_id]
-        if query_entry.data[KeyType.resource_type] == ResourceType.Transaction_data:
-            # FIXME: too redundant with the latter half of search_transaction_for_asset()
-            txdata = query_entry.data[KeyType.resource]
-            query_entry.data['response_info'][KeyType.transaction_data] = txdata
-            asid = query_entry.data[KeyType.asset_id]
-            if check_transaction_if_having_asset_file(txdata, asid):
-                asset_file = self.storage_manager.get_locally(domain_id, asset_group_id, asid)  # FIXME: to support storage_type=NONE
-                txobj = BBcTransaction()
-                txobj.deserialize(txdata)
-                if asset_file is not None:
-                    if not self.validate_asset_file(txobj, asid, asset_file):
-                        asset_file = None
-                        self.storage_manager.remove(domain_id, asset_group_id, asid)
-                if asset_file is None:
-                    del query_entry.data[KeyType.resource]
-                    query_entry.data.update({KeyType.resource_id: asid, KeyType.resource_type: ResourceType.Asset_file})
-                    query_entry.retry_count = GET_RETRY_COUNT
-                    query_entry.update(fire_after=INTERVAL_RETRY, callback=self.check_asset_in_response)
-                    self.networking.get(query_entry)
-                    return None
-                query_entry.data['response_info'][KeyType.asset_file] = asset_file
-                self.storage_manager.store_locally(domain_id, asset_group_id, asid, asset_file)
-        else:
-            query_entry.data['response_info'][KeyType.asset_file] = query_entry.data[KeyType.resource]
-            self.storage_manager.store_locally(domain_id, asset_group_id, query_entry.data[KeyType.asset_id],
-                                               query_entry.data[KeyType.resource])
-        self.user_message_routing.send_message_to_user(query_entry.data['response_info'])
-
-    def search_transaction_by_txid(self, domain_id, txid, source_id, query_id):
+    def search_transaction_by_txid(self, domain_id, txid):
         """
         Search transaction_data by transaction_id
 
         :param domain_id:        domain_id where the transaction is inserted
         :param txid:  transaction_id
-        :param source_id: the user_id of the sender
-        :param query_id:
-        :return: response data including transaction_data
+        :return: transaction_data and asset_files
         """
         self.stats.update_stats_increment("transaction", "search_count", 1)
         if domain_id is None:
@@ -930,58 +724,42 @@ class BBcCoreService:
         if txid is None:
             self.logger.error("Transaction_id must not be None")
             return None
-        txdata = self.ledger_manager.find_transaction_locally(domain_id, txid)
-        if txdata is not None and self.validate_transaction(txid, txdata) is None:
-            txdata = None
-            self.ledger_manager.remove(domain_id, txid)
-        response_info = make_message_structure(MsgType.RESPONSE_SEARCH_TRANSACTION, source_id, query_id)
-        if txdata is None:
-            query_entry = query_management.QueryEntry(expire_after=DURATION_GIVEUP_GET,
-                                                      callback_expire=self.failure_response,
-                                                      data={'response_info': response_info,
-                                                            KeyType.domain_id: domain_id,
-                                                            KeyType.resource_id: txid,
-                                                            KeyType.resource_type: ResourceType.Transaction_data},
-                                                      retry_count=GET_RETRY_COUNT)
-            query_entry.update(fire_after=INTERVAL_RETRY, callback=self.succeed_to_find_transaction)
-            self.networking.get(query_entry)
+
+        dh = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
+        ret_txobj, ret_asset_files = dh.search_transaction(transaction_id=txid)
+        if ret_txobj is None or len(ret_txobj) == 0:
             return None
-        response_info[KeyType.transaction_data] = txdata
+
+        response_info = dict()
+        response_info[KeyType.transaction_data] = ret_txobj[0].transaction_data
+        response_info[KeyType.transaction_id] = txid
+        if len(ret_asset_files) > 0:
+            response_info[KeyType.all_asset_files] = ret_asset_files
         return response_info
 
-    def search_transaction_by_userid_locally(self, domain_id, asset_group_id, user_id, source_id, query_id, count=1):
+    def search_transaction_with_condition(self, domain_id, asset_group_id=None, asset_id=None, user_id=None, count=1):
         """
-        Local search a latest transaction that includes the asset owned by the specified user_id
-        :param domain_id:        domain_id where the transaction is inserted
+        Search transactions that match given conditions
+        :param domain_id:
+        :param asset_group_id:
         :param asset_group_id:
         :param user_id:
-        :param source_id: the user_id of the sender
-        :param query_id:
         :return: response data including transaction_data, if a transaction is not found in the local DB, None is returned.
         """
         if domain_id is None:
             self.logger.error("No such domain")
             return None
 
-        sql = "SELECT DISTINCT transaction_id FROM asset_info_table WHERE asset_group_id = ? AND user_id = ? " \
-              "ORDER BY id DESC limit ?"
-        row = self.ledger_manager.find_by_sql_in_local_auxiliary_db(domain_id, sql, asset_group_id, user_id, count)
-        if len(row) == 0:
+        dh = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
+        ret_txobj, ret_asset_files = dh.search_transaction(asset_group_id=asset_group_id, asset_id=asset_id,
+                                                           user_id=user_id, count=count)
+        if ret_txobj is None or len(ret_txobj) == 0:
             return None
 
-        response_info = make_message_structure(MsgType.RESPONSE_SEARCH_USERID, source_id, query_id)
-        for r in row:
-            txid = r[0]
-            txdata = self.ledger_manager.find_transaction_locally(domain_id, txid)
-            if txdata is not None and self.validate_transaction(txid, txdata) is None:
-                self.ledger_manager.remove(domain_id, txid)
-                return None
-            if len(row) == 1:
-                response_info[KeyType.transaction_data] = txdata
-            else:
-                if KeyType.transactions not in response_info:
-                    response_info[KeyType.transactions] = list()
-                response_info[KeyType.transactions].append(txdata)
+        response_info = dict()
+        response_info[KeyType.transactions] = ret_txobj
+        if len(ret_asset_files) > 0:
+            response_info[KeyType.all_asset_files] = ret_asset_files
         return response_info
 
     def add_cross_ref_into_list(self, domain_id, txid):
@@ -1017,35 +795,6 @@ class BBcCoreService:
             self.error_reply(msg=response_info, err_code=ENOTRANSACTION, txt="Cannot find transaction data")
         elif response_info[b'cmd'] == MsgType.RESPONSE_SEARCH_ASSET:
             self.error_reply(msg=response_info, err_code=ENOASSET, txt="Cannot find asset")
-
-    def succeed_to_find_transaction(self, query_entry):
-        """
-        (internal use) Called when transaction search is successful
-
-        :param query_entry:
-        :return:
-        """
-        self.ledger_manager.insert_transaction_locally(query_entry.data[KeyType.domain_id],
-                                                       query_entry.data[KeyType.resource_id],
-                                                       query_entry.data[KeyType.resource])
-        response_info = query_entry.data['response_info']
-        response_info[KeyType.transaction_data] = query_entry.data[KeyType.resource]
-        self.user_message_routing.send_message_to_user(response_info)
-
-    def failure_response(self, query_entry):
-        """
-        (internal use) Called when transaction search fails
-
-        :param query_entry:
-        :return:
-        """
-        response_info = query_entry.data['response_info']
-        if query_entry.data[KeyType.resource_type] == ResourceType.Transaction_data:
-            self.error_reply(msg=response_info, err_code=ENOTRANSACTION, txt="Cannot find transaction")
-        elif query_entry.data[KeyType.resource_type] == ResourceType.Asset_ID:
-            self.error_reply(msg=response_info, err_code=ENOASSET, txt="Cannot find asset")
-        elif query_entry.data[KeyType.resource_type] == ResourceType.Asset_file:
-            self.error_reply(msg=response_info, err_code=ENOTINSTORAGE, txt="Cannot find asset file")
 
 
 def daemonize(pidfile=PID_FILE):

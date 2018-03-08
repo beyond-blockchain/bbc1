@@ -116,7 +116,7 @@ class TestBBcNetwork(object):
             config = bbc_config.BBcConfig(directory=".bbc1-%d"%i)
             networkings[i] = bbc_network.BBcNetwork(core=dummy_cores[i], config=config, p2p_port=6641+i, loglevel=LOGLEVEL)
             dummy_cores[i].networking = networkings[i]
-            networkings[i].create_domain(network_module="simple_cluster", domain_id=domain_id)
+            networkings[i].create_domain(domain_id=domain_id)
             user_routings[i] = networkings[i].domains[domain_id][InfraMessageCategory.CATEGORY_USER]
             nodes[i] = networkings[i].domains[domain_id]['neighbor'].my_node_id
             assert nodes[i] is not None

@@ -357,6 +357,7 @@ class BBcTransaction:
         self.userid_sigidx_mapping = dict()
         self.transaction_id = None
         self.transaction_base_digest = None
+        self.transaction_data = None
         if deserialize is not None:
             self.deserialize(deserialize)
 
@@ -517,6 +518,7 @@ class BBcTransaction:
                 sig.deserialize(sigdata)
                 self.signatures.append(sig)
             self.digest()
+            self.transaction_data = data
         except Exception as e:
             print("Transaction data deserialize: %s" % e)
             print(traceback.format_exc())
@@ -1094,8 +1096,10 @@ class ServiceMessageType:
     RESPONSE_SEARCH_TRANSACTION = 69
     REQUEST_SEARCH_USERID = 70
     RESPONSE_SEARCH_USERID = 71
-    REQUEST_CROSS_REF = 72
-    RESPONSE_CROSS_REF = 73
+    REQUEST_SEARCH_WITH_CONDITIONS = 72
+    RESPONSE_SEARCH_WITH_CONDITIONS = 73
+    REQUEST_CROSS_REF = 74
+    RESPONSE_CROSS_REF = 75
 
     REQUEST_REGISTER_HASH_IN_SUBSYS = 128
     RESPONSE_REGISTER_HASH_IN_SUBSYS = 129

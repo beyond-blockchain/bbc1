@@ -22,7 +22,6 @@ transactions = list()
 
 data_handler =None
 config = {
-    "workingdir": "testdir",
     "domains": {
         bbclib.convert_id_to_string(domain_id): {
             "storage": {
@@ -42,7 +41,8 @@ class TestDataHandler(object):
     def test_01_setup(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         global data_handler
-        data_handler = DataHandler(config=config, domain_id=domain_id)
+        conf = config["domains"][bbclib.convert_id_to_string(domain_id)]
+        data_handler = DataHandler(config=conf, workingdir="testdir", domain_id=domain_id)
 
         global transactions
         for i in range(10):
@@ -93,6 +93,7 @@ class TestDataHandler(object):
         ret_txobj, ret_asset_files = data_handler.search_transaction(transaction_id=transactions[0].transaction_id)
         assert len(ret_txobj) == 1
         assert len(ret_asset_files) == 1
+        print(ret_txobj)
 
     def test_05_insert_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -122,6 +123,7 @@ class TestDataHandler(object):
                                                                      user_id=user_id1, count=0)
         assert len(ret_txobj) == 10
         assert len(ret_asset_files) == 10
+        pprint.pprint(ret_txobj, width=200)
         pprint.pprint(ret_asset_files, width=200)
 
     def test_09_search_transaction_topology(self):

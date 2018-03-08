@@ -126,6 +126,7 @@ class KeyType:
     nonce = to_4byte(13)
     count = to_4byte(14)
     stats = to_4byte(15)
+    hint = to_4byte(16)
 
     ledger_subsys_manip = to_4byte(0, 0x20)     # enable/disable ledger_subsystem
     ledger_subsys_register = to_4byte(1, 0x20)

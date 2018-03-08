@@ -90,7 +90,7 @@ class TestBBcNetwork(object):
                 shutil.rmtree(".bbc1-%d"%i)
             config = bbc_config.BBcConfig(directory=".bbc1-%d"%i)
             networkings[i] = bbc_network.BBcNetwork(core=dummycore, config=config, p2p_port=6641+i, loglevel=LOGLEVEL)
-            networkings[i].create_domain(network_module="simple_cluster", domain_id=domain_id)
+            networkings[i].create_domain(domain_id=domain_id)
             nodes[i] = networkings[i].domains[domain_id]['neighbor'].my_node_id
             assert nodes[i] is not None
             assert networkings[i].ip_address != ''
