@@ -345,7 +345,7 @@ class BBcSignature:
 
 
 class BBcTransaction:
-    def __init__(self, version=0):
+    def __init__(self, version=0, deserialize=None):
         self.version = version
         self.timestamp = int(time.time())
         self.events = []
@@ -357,6 +357,8 @@ class BBcTransaction:
         self.userid_sigidx_mapping = dict()
         self.transaction_id = None
         self.transaction_base_digest = None
+        if deserialize is not None:
+            self.deserialize(deserialize)
 
     def add(self, event=None, reference=None, relation=None, witness=None, cross_ref=None):
         if event is not None:
@@ -1099,107 +1101,6 @@ class ServiceMessageType:
     RESPONSE_REGISTER_HASH_IN_SUBSYS = 129
     REQUEST_VERIFY_HASH_IN_SUBSYS = 130
     RESPONSE_VERIFY_HASH_IN_SUBSYS = 131
-
-
-def is_less_than(val_a, val_b):
-    """
-    return True if val_a is less than val_b (evaluate as integer)
-    :param val_a:
-    :param val_b:
-    :return:
-    """
-    size = len(val_a)
-    if size != len(val_b):
-        return False
-    for i in reversed(range(size)):
-        if val_a[i] < val_b[i]:
-            return True
-        elif val_a[i] > val_b[i]:
-            return False
-    return False
-
-
-class NodeInfo:
-    """
-    node information entry (socket info)
-    """
-    def __init__(self, node_id=domain_global_0, ipv4=None, ipv6=None, port=None):
-        self.node_id = node_id
-        if ipv4 is None or len(ipv4) == 0:
-            self.ipv4 = None
-        else:
-            if isinstance(ipv4, bytes):
-                self.ipv4 = ipv4.decode()
-            else:
-                self.ipv4 = ipv4
-        if ipv6 is None or len(ipv6) == 0:
-            self.ipv6 = None
-        else:
-            if isinstance(ipv6, bytes):
-                self.ipv6 = ipv6.decode()
-            else:
-                self.ipv6 = ipv6
-        self.port = port
-        self.created_at = self.updated_at = time.time()
-        self.is_alive = False
-        self.disconnect_at = 0
-
-    def __lt__(self, other):
-        if self.is_alive and other.is_alive:
-            return is_less_than(self.node_id, other.node_id)
-        elif self.is_alive and not other.is_alive:
-            return True
-        elif not self.is_alive and other.is_alive:
-            return False
-        else:
-            return is_less_than(self.node_id, other.node_id)
-
-    def __len__(self):
-        return len(self.node_id)
-
-    def __str__(self):
-        output = "[node_id=%s, ipv4=%s, ipv6=%s, port=%d, time=%d]" % (binascii.b2a_hex(self.node_id), self.ipv4,
-                                                                       self.ipv6, self.port, self.updated_at)
-        return output
-
-    def touch(self):
-        self.updated_at = time.time()
-        self.is_alive = True
-
-    def detect_disconnect(self):
-        self.disconnect_at = time.time()
-        self.is_alive = False
-
-    def update(self, ipv4=None, ipv6=None, port=None):
-        if ipv4 is not None:
-            self.ipv4 = ipv4
-        if ipv6 is not None:
-            self.ipv6 = ipv6
-        if port is not None:
-            self.port = port
-        self.updated_at = time.time()
-
-    def get_nodeinfo(self):
-        if self.ipv4 is not None:
-            ipv4 = socket.inet_pton(socket.AF_INET, self.ipv4)
-        else:
-            ipv4 = socket.inet_pton(socket.AF_INET, "0.0.0.0")
-        if self.ipv6 is not None:
-            ipv6 = socket.inet_pton(socket.AF_INET6, self.ipv6)
-        else:
-            ipv6 = socket.inet_pton(socket.AF_INET6, "::")
-        return self.node_id, ipv4, ipv6, socket.htons(self.port).to_bytes(2, 'big'), \
-               int(self.updated_at).to_bytes(8, 'big')
-
-    def recover_nodeinfo(self, node_id, ipv4, ipv6, port, updated_at=0):
-        self.node_id = node_id
-        if ipv4 != socket.inet_pton(socket.AF_INET, "0.0.0.0"):
-            self.ipv4 = socket.inet_ntop(socket.AF_INET, ipv4)
-        if ipv6 != socket.inet_pton(socket.AF_INET6, "::"):
-            self.ipv6 = socket.inet_ntop(socket.AF_INET6, ipv6)
-        self.port = socket.ntohs(int.from_bytes(port, 'big'))
-        if updated_at > 0:
-            self.updated_at = updated_at
 
 
 class StorageType:
