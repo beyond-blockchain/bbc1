@@ -1057,11 +1057,11 @@ class BBcCrossRef:
         return True
 
 
-class ServiceMessageType:
+class MsgType:
     REQUEST_SETUP_DOMAIN = 0
     RESPONSE_SETUP_DOMAIN = 1
-    REQUEST_GET_PEERLIST = 2
-    RESPONSE_GET_PEERLIST = 3
+    REQUEST_GET_PEERLIST = 2        # TODO: will obsolete in v0.10
+    RESPONSE_GET_PEERLIST = 3       # TODO: will obsolete in v0.10
     REQUEST_SET_STATIC_NODE = 4
     RESPONSE_SET_STATIC_NODE = 5
     REQUEST_GET_CONFIG = 8
@@ -1077,6 +1077,8 @@ class ServiceMessageType:
     RESPONSE_GET_STATS = 18
     REQUEST_PING_TO_ALL = 19
     REQUEST_ALIVE_CHECK = 20
+    REQUEST_GET_NEIGHBORLIST = 21
+    RESPONSE_GET_NEIGHBORLIST = 22
 
     REGISTER = 32
     UNREGISTER = 33

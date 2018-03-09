@@ -118,15 +118,16 @@ class KeyType:
     reason = to_4byte(1)    # text
     result = to_4byte(2)    # True/False
 
-    command = to_4byte(8)   # command type
-    message = to_4byte(9)
-    domain_ping = to_4byte(10)   # send directly to bbc_network without node_id in the domain
-    infra_msg_type = to_4byte(11)  # message type in p2p network
+    infra_msg_type = to_4byte(8)  # message type in p2p network
+    command = to_4byte(9)   # command type
+    infra_command = to_4byte(10)
+    domain_ping = to_4byte(11)   # send directly to bbc_network without node_id in the domain
     query_id = to_4byte(12)      # query_id from bbc_app
-    nonce = to_4byte(13)
-    count = to_4byte(14)
-    stats = to_4byte(15)
-    hint = to_4byte(16)
+    message = to_4byte(13)
+    nonce = to_4byte(14)
+    count = to_4byte(15)
+    stats = to_4byte(16)
+    hint = to_4byte(17)
 
     ledger_subsys_manip = to_4byte(0, 0x20)     # enable/disable ledger_subsystem
     ledger_subsys_register = to_4byte(1, 0x20)
@@ -136,8 +137,8 @@ class KeyType:
     network_module = to_4byte(0, 0x30)
     storage_type = to_4byte(1, 0x30)
     storage_path = to_4byte(2, 0x30)
-    peer_info = to_4byte(3, 0x30)
-    peer_list = to_4byte(4, 0x30)
+    node_info = to_4byte(3, 0x30)
+    peer_list = to_4byte(4, 0x30)   # TODO: will obsoleted in v0.10
     domain_list = to_4byte(7, 0x30)
     bbc_configuration = to_4byte(8, 0x30)
     ipv4_address = to_4byte(9, 0x30)
@@ -146,6 +147,7 @@ class KeyType:
     external_ip4addr = to_4byte(12, 0x30)
     external_ip6addr = to_4byte(13, 0x30)
     static_entry = to_4byte(14, 0x30)
+    neighbor_list = to_4byte(15, 0x30)
 
     resource_id = to_4byte(0, 0x40)
     resource_type = to_4byte(1, 0x40)

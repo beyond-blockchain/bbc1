@@ -22,7 +22,7 @@ import sys
 sys.path.extend(["../../"])
 from bbc1.common import bbclib
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
-from bbc1.core.bbc_types import InfraMessageTypeBase
+from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.core import query_management, simple_cluster
 
 
@@ -96,7 +96,7 @@ class NetworkDomain(simple_cluster.NetworkDomain):
                 data[0:2] = to_2byte(count-1)
                 data.extend(domain_id)
 
-        msg = self.make_message(dst_node_id=None, msg_type=InfraMessageTypeBase.ADVERTISE_DOMAIN_INFO)
+        msg = self.make_message(dst_node_id=None, msg_type=InfraMessageCategory.ADVERTISE_DOMAIN_INFO)
         msg[KeyType.domain_list] = bytes(data)
         for nd in self.id_ip_mapping.keys():
             msg[KeyType.destination_node_id] = nd
@@ -145,7 +145,7 @@ class NetworkDomain(simple_cluster.NetworkDomain):
         """
         super(NetworkDomain, self).process_message(ip4, from_addr, msg)
 
-        if msg[KeyType.p2p_msg_type] == InfraMessageTypeBase.ADVERTISE_DOMAIN_INFO:
+        if msg[KeyType.infra_msg_type] == InfraMessageCategory.ADVERTISE_DOMAIN_INFO:
             if KeyType.domain_list not in msg or KeyType.source_node_id not in msg:
                 return
             self.add_peer_node(msg[KeyType.source_node_id], ip4, from_addr)

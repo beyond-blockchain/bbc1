@@ -48,6 +48,11 @@ class DataHandler:
     RESPONSE_REPLICATION_INSERT = to_2byte(1)
     REQUEST_SEARCH = to_2byte(2)
     RESPONSE_SEARCH = to_2byte(3)
+    REQUEST_INSERTED_NOTIFICATION = to_2byte(4)
+    CANCEL_INSERTED_NOTIFICATION = to_2byte(5)
+    CROSS_REF_NOTIFICATION = to_2byte(6)
+    REQUEST_VERIFY = to_2byte(7)
+    RESPONSE_VERIFY = to_2byte(8)
 
     def __init__(self, network=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
         if network is not None:
@@ -174,19 +179,21 @@ class DataHandler:
         if txobj is None:
             txobj = self.core.validate_transaction(txdata, asset_files=asset_files)
             if txobj is None:
-                return False
+                return None
 
         ret = self.exec_sql("INSERT INTO transaction_table VALUES (?, ?)", txobj.transaction_id, txdata)
         if ret is None:
-            return False
+            return None
 
         if not no_replication:
             self.send_replication_to_other_cores(txdata, asset_files)
 
+        asset_group_ids = set()
         rollback_asset = list()
         rollback_asset_file = list()
         rollback_flag = False
         for asset_group_id, asset_id, user_id, fileflag in self.get_asset_info(txobj):
+            asset_group_ids.add(asset_group_id)
             ret = self.exec_sql("INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id) "
                                 "VALUES (?, ?, ?, ?)",
                                 txobj.transaction_id, asset_group_id, asset_id, user_id)
@@ -222,8 +229,8 @@ class DataHandler:
             if not self.use_external_storage:
                 for asset_group_id, asset_id in rollback_asset_file:
                     self.remove_in_storage(asset_group_id, asset_id)
-            return False
-        return True
+            return None
+        return asset_group_ids
 
     def send_replication_to_other_cores(self, txdata, asset_files=None):
         """
@@ -426,6 +433,81 @@ class DataHandler:
         elif msg[KeyType.command] == DataHandler.RESPONSE_SEARCH:
             if msg[KeyType.result]:
                 self.insert_transaction(msg[KeyType.transaction_data])
+
+        elif msg[KeyType.command] == DataHandler.REQUEST_INSERTED_NOTIFICATION:
+            self.core.register_to_notification_list(self.domain_id, msg[KeyType.asset_group_id], msg[KeyType.source_user_id])
+
+        elif msg[KeyType.command] == DataHandler.CANCEL_INSERTED_NOTIFICATION:
+            self.core.remove_from_notification_list(self.domain_id, msg[KeyType.asset_group_id], msg[KeyType.source_user_id])
+
+
+class DataHandlerDomain0(DataHandler):
+    INITIAL_ACCEPT_LIMIT = 10
+
+    def __init__(self, network=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
+        if network is not None:
+            self.network = network
+            self.core = network.core
+        self.logger = logger.get_logger(key="data_handler", level=loglevel, logname=logname)
+        self.domain_id = domain_id
+        self.domain_id_str = bbclib.convert_id_to_string(domain_id)
+        self.config = config
+        self.working_dir = workingdir
+        self.cross_ref_accept_limit = dict()
+
+    def close_db(self):
+        pass
+
+    def exec_sql(self, sql, *args):
+        pass
+
+    def get_asset_info(self, txobj):
+        pass
+
+    def get_topology_info(self, txobj):
+        pass
+
+    def insert_transaction(self, txdata, txobj=None, asset_files=None, no_replication=False):
+        return True
+
+    def send_replication_to_other_cores(self, txdata, asset_files=None):
+        pass
+
+    def remove(self, transaction_id):
+        pass
+
+    def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None, count=1):
+        return None, None
+
+    def search_transaction_topology(self, transaction_id, reverse_link=False):
+        return None
+
+    def store_in_storage(self, asset_group_id, asset_id, content):
+        return True
+
+    def get_in_storage(self, asset_group_id, asset_id):
+        return None
+
+    def remove_in_storage(self, asset_group_id, asset_id):
+        pass
+
+    def process_message(self, msg):
+        if KeyType.command not in msg:
+            return
+
+        if msg[KeyType.command] == DataHandler.CROSS_REF_NOTIFICATION:
+            if KeyType.domain_id not in msg or KeyType.transaction_id not in msg:
+                return
+            domain_id = msg[KeyType.domain_id]
+            if domain_id not in self.cross_ref_accept_limit:
+                self.cross_ref_accept_limit[domain_id] = DataHandlerDomain0.INITIAL_ACCEPT_LIMIT
+            if self.cross_ref_accept_limit[domain_id] > 0:
+                self.core.add_cross_ref_into_list(domain_id, msg[KeyType.transaction_id])
+                self.cross_ref_accept_limit[domain_id] -= 1
+
+        if msg[KeyType.command] == DataHandler.REQUEST_VERIFY:
+            domain_id = msg[KeyType.domain_id]
+            transaction_id = msg[KeyType.transaction_id]
 
 
 class DbAdaptor:

@@ -101,7 +101,7 @@ class TestBBcNetwork(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(core_nodes-5):
             networkings[i].add_neighbor(domain_id=domain_id, node_id=nodes[0],
-                                        ip4=True, from_addr=(networkings[0].ip_address, networkings[0].port))
+                                        ipv4=networkings[0].ip_address, port=networkings[0].port)
             print(networkings[i].domains[domain_id]['neighbor'].show_list())
 
     def test_03_wait_and_show(self):

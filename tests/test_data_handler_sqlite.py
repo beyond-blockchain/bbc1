@@ -5,7 +5,6 @@ import pprint
 import sys
 sys.path.extend(["../"])
 from bbc1.common import bbclib
-from bbc1.core import bbc_ledger, bbc_config
 from bbc1.core.data_handler import DataHandler
 
 user_id1 = bbclib.get_new_id("destination_id_test1")
@@ -28,6 +27,7 @@ config = {
                 "type": "internal",
             },
             "db": {
+                'send_copy_to': "all",
                 "db_type": "sqlite",
                 "db_name": "testdb",
             },
@@ -85,7 +85,8 @@ class TestDataHandler(object):
         asset_files = {
             transactions[0].relations[0].asset.asset_id: transactions[0].relations[0].asset.asset_file,
         }
-        ret = data_handler.insert_transaction(transactions[0].serialize(), transactions[0], asset_files=asset_files)
+        ret = data_handler.insert_transaction(transactions[0].serialize(), transactions[0],
+                                              asset_files=asset_files, no_replication=True)
         assert ret
 
     def test_04_search_transaction(self):
@@ -97,7 +98,7 @@ class TestDataHandler(object):
 
     def test_05_insert_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = data_handler.insert_transaction(transactions[0].serialize(), transactions[0])
+        ret = data_handler.insert_transaction(transactions[0].serialize(), transactions[0], no_replication=True)
         assert not ret
 
     def test_06_remove_transaction(self):
@@ -114,7 +115,8 @@ class TestDataHandler(object):
             asset_files = {
                 transactions[i].relations[0].asset.asset_id: transactions[i].relations[0].asset.asset_file,
             }
-            ret = data_handler.insert_transaction(transactions[i].serialize(), transactions[i], asset_files=asset_files)
+            ret = data_handler.insert_transaction(transactions[i].serialize(), transactions[i],
+                                                  asset_files=asset_files, no_replication=True)
             assert ret
 
     def test_08_search_transaction_by_user_id(self):

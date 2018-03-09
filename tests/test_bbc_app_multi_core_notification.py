@@ -79,27 +79,21 @@ class TestBBcAppClient(object):
 
     def test_10_setup_network(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-
-        ret = clients[0]['app'].get_domain_peerlist(domain_id=domain_id)
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        ret = clients[0]['app'].get_domain_neighborlist(domain_id=domain_id)
         assert ret
         dat = msg_processor[0].synchronize()
-        print("[0] nodeinfo=",dat[0])
+        print("[0] nodeinfo=", dat[0])
         node_id, ipv4, ipv6, port = dat[0]
 
         for i in range(1, client_num):
-            ret = clients[i]['app'].set_domain_static_node(domain_id, node_id, ipv4, ipv6, port)
-            assert ret
-            ret = msg_processor[i].synchronize()
-            print("[%d] set_peer result is %s" %(i, ret))
-            clients[i]['app'].ping_to_all_neighbors(domain_id)
-        time.sleep(2)
+            clients[i]['app'].send_domain_ping(domain_id, ipv4, ipv6, port)
+        print("*** wait 5 seconds ***")
+        time.sleep(5)
 
-        cores[0].networking.domains[domain_id].alive_check()
-        print("** wait 16 sec to finish alive_check")
-        time.sleep(16)
-        assert len(cores[1].networking.domains[domain_id].id_ip_mapping) == core_num-1
         for i in range(core_num):
-            cores[i].networking.domains[domain_id].print_peerlist()
+            print(cores[i].networking.domains[domain_id]['neighbor'].show_list())
+            assert len(cores[i].networking.domains[domain_id]['neighbor'].nodeinfo_list) == core_num - 1
 
     def test_11_register(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -109,8 +103,7 @@ class TestBBcAppClient(object):
         time.sleep(1)
         for cl in clients:
             assert cl['app'].request_insert_completion_notification(asset_group_id, True)
-        print("---- wait 10 sec ----")
-        time.sleep(10)
+        time.sleep(1)
 
     def test_12_make_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -133,18 +126,31 @@ class TestBBcAppClient(object):
 
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
-            ret = cl['app'].insert_transaction(transactions[i])
-            assert ret
+            cl['app'].insert_transaction(transactions[i])
             print("  ----> wait for notification")
             for j in range(client_num):
-                retdat = msg_processor[j].synchronize()
-                print("[%d] notification txid=%s, asset_group=%s" % (
-                    j, binascii.b2a_hex(retdat[KeyType.transaction_id]),
-                    binascii.b2a_hex(retdat[KeyType.asset_group_id])
-                ))
-
-            msg_processor[i].synchronize()
-            print("    ==> got notification")
+                if i == j:
+                    for k in range(2):
+                        retdat = msg_processor[j].synchronize()
+                        assert KeyType.transaction_id in retdat
+                        if retdat[KeyType.command] == bbclib.MsgType.RESPONSE_INSERT:
+                            assert retdat[KeyType.transaction_id] == transactions[i].transaction_id
+                            print("[%d] inserted" % i)
+                        elif retdat[KeyType.command] == bbclib.MsgType.NOTIFY_INSERTED:
+                            assert KeyType.asset_group_id in retdat
+                            print("[%d] notification txid=%s, asset_group=%s" % (
+                                j, binascii.b2a_hex(retdat[KeyType.transaction_id]),
+                                binascii.b2a_hex(retdat[KeyType.asset_group_id])
+                            ))
+                else:
+                    retdat = msg_processor[j].synchronize()
+                    assert retdat[KeyType.command] == bbclib.MsgType.NOTIFY_INSERTED
+                    assert KeyType.transaction_id in retdat
+                    assert KeyType.asset_group_id in retdat
+                    print("[%d] notification txid=%s, asset_group=%s" % (
+                        j, binascii.b2a_hex(retdat[KeyType.transaction_id]),
+                        binascii.b2a_hex(retdat[KeyType.asset_group_id])
+                    ))
 
     def test_20_cancel_notification(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -172,9 +178,10 @@ class TestBBcAppClient(object):
 
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
-            ret = cl['app'].insert_transaction(transactions[i])
-            assert ret
-            msg_processor[i].synchronize()
+            cl['app'].insert_transaction(transactions[i])
+            dat = msg_processor[i].synchronize()
+            assert KeyType.transaction_id in dat
+            assert dat[KeyType.transaction_id] == transactions[i].transaction_id
 
     def test_22_enable_notification(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -202,18 +209,31 @@ class TestBBcAppClient(object):
 
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
-            ret = cl['app'].insert_transaction(transactions[i])
-            assert ret
+            cl['app'].insert_transaction(transactions[i])
             print("  ----> wait for notification")
             for j in range(client_num):
-                retdat = msg_processor[j].synchronize()
-                print("[%d] notification txid=%s, asset_group=%s" % (
-                    j, binascii.b2a_hex(retdat[KeyType.transaction_id]),
-                    binascii.b2a_hex(retdat[KeyType.asset_group_id])
-                ))
-
-            msg_processor[i].synchronize()
-            print("    ==> got notification")
+                if i == j:
+                    for k in range(2):
+                        retdat = msg_processor[j].synchronize()
+                        assert KeyType.transaction_id in retdat
+                        if retdat[KeyType.command] == bbclib.MsgType.RESPONSE_INSERT:
+                            assert retdat[KeyType.transaction_id] == transactions[i].transaction_id
+                            print("[%d] inserted" % i)
+                        elif retdat[KeyType.command] == bbclib.MsgType.NOTIFY_INSERTED:
+                            assert KeyType.asset_group_id in retdat
+                            print("[%d] notification txid=%s, asset_group=%s" % (
+                                j, binascii.b2a_hex(retdat[KeyType.transaction_id]),
+                                binascii.b2a_hex(retdat[KeyType.asset_group_id])
+                            ))
+                else:
+                    retdat = msg_processor[j].synchronize()
+                    assert retdat[KeyType.command] == bbclib.MsgType.NOTIFY_INSERTED
+                    assert KeyType.transaction_id in retdat
+                    assert KeyType.asset_group_id in retdat
+                    print("[%d] notification txid=%s, asset_group=%s" % (
+                        j, binascii.b2a_hex(retdat[KeyType.transaction_id]),
+                        binascii.b2a_hex(retdat[KeyType.asset_group_id])
+                    ))
 
     @pytest.mark.unregister
     def test_98_unregister(self):

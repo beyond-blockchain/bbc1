@@ -35,7 +35,7 @@ from bbc1.core.bbc_config import DEFAULT_P2P_PORT
 from bbc1.core.bbc_types import ResourceType, InfraMessageCategory
 from bbc1.core.topology_manager import TopologyManagerBase
 from bbc1.core.user_message_routing import UserMessageRouting
-from bbc1.core.data_handler import DataHandler
+from bbc1.core.data_handler import DataHandler, DataHandlerDomain0
 from bbc1.core import query_management
 from bbc1.common import bbclib, message_key_types
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
@@ -77,9 +77,9 @@ def check_my_IPaddresses(target4='8.8.8.8', target6='2001:4860:4860::8888', port
 
 def send_data_by_tcp(ipv4=None, ipv6=None, port=DEFAULT_P2P_PORT, msg=None):
     def worker():
-        if ipv6 is not None:
+        if ipv6 is not None and ipv6 != "::":
             conn = socket.create_connection((ipv6, port))
-        elif ipv4 is not None:
+        elif ipv4 is not None and ipv4 != "0.0.0.0":
             conn = socket.create_connection((ipv4, port))
         else:
             return
@@ -204,9 +204,12 @@ class BBcNetwork:
                                                                                               node_id=node_id)
         self.domains[domain_id][InfraMessageCategory.CATEGORY_USER] = UserMessageRouting(self, domain_id)
         workingdir = self.config.get_config()['workingdir']
-        self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA] = DataHandler(self, config=conf,
-                                                                                  workingdir=workingdir,
-                                                                                  domain_id=domain_id)
+        if domain_id == ZEROS:
+            self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA] = DataHandlerDomain0(self, domain_id=domain_id)
+        else:
+            self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA] = DataHandler(self, config=conf,
+                                                                                      workingdir=workingdir,
+                                                                                      domain_id=domain_id)
         self.core.stats.update_stats_increment("network", "num_domains", 1)
         return True
 
@@ -224,7 +227,7 @@ class BBcNetwork:
             KeyType.domain_id: domain_id,
             KeyType.command: BBcNetwork.NOTIFY_LEAVE,
         }
-        self.broadcast_message_in_network(domain_id=domain_id, payload_type=PayloadType.Type_msgpack, msg=msg)
+        self.broadcast_message_in_network(domain_id=domain_id, msg=msg)
         self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].stop_all_timers()
         self.domains[domain_id][InfraMessageCategory.CATEGORY_USER].stop_all_timers()
         del self.domains[domain_id]
@@ -236,7 +239,7 @@ class BBcNetwork:
 
         :return:
         """
-        self.logger.info("Saving the current peer lists")
+        self.logger.info("Saving the neighbor list")
         for domain_id in self.domains.keys():
             conf = self.config.get_domain_config(domain_id)
             conf['static_node'] = dict()
@@ -270,7 +273,7 @@ class BBcNetwork:
                                                   callback_expire=self.invalidate_neighbor,
                                                   data={KeyType.domain_id: domain_id,
                                                         KeyType.node_id: node_id,
-                                                        KeyType.peer_info: nodeinfo},
+                                                        KeyType.node_info: nodeinfo},
                                                   retry_count=3)
         self.domain_ping(query_entry)
         return True
@@ -283,7 +286,7 @@ class BBcNetwork:
             KeyType.node_id: query_entry.data[KeyType.node_id],
             KeyType.domain_ping: 0,
             KeyType.nonce: query_entry.nonce,
-            KeyType.static_entry: query_entry.data[KeyType.peer_info].is_static,
+            KeyType.static_entry: query_entry.data[KeyType.node_info].is_static,
         }
         if self.external_ip4addr is not None:
             msg[KeyType.external_ip4addr] = self.external_ip4addr
@@ -293,17 +296,17 @@ class BBcNetwork:
             msg[KeyType.external_ip6addr] = self.external_ip6addr
         else:
             msg[KeyType.external_ip6addr] = self.ip6_address
-        if query_entry.data[KeyType.peer_info].ipv6 is not None:
-            self.logger.debug("Send domain_ping to %s:%d" % (query_entry.data[KeyType.peer_info].ipv6,
-                                                             query_entry.data[KeyType.peer_info].port))
+        if query_entry.data[KeyType.node_info].ipv6 is not None:
+            self.logger.debug("Send domain_ping to %s:%d" % (query_entry.data[KeyType.node_info].ipv6,
+                                                             query_entry.data[KeyType.node_info].port))
         else:
-            self.logger.debug("Send domain_ping to %s:%d" % (query_entry.data[KeyType.peer_info].ipv4,
-                                                             query_entry.data[KeyType.peer_info].port))
+            self.logger.debug("Send domain_ping to %s:%d" % (query_entry.data[KeyType.node_info].ipv4,
+                                                             query_entry.data[KeyType.node_info].port))
         query_entry.update(fire_after=1)
         self.core.stats.update_stats_increment("network", "domain_ping_send", 1)
-        self.send_message_in_network(query_entry.data[KeyType.peer_info], PayloadType.Type_msgpack, domain_id, msg)
+        self.send_message_in_network(query_entry.data[KeyType.node_info], PayloadType.Type_msgpack, domain_id, msg)
 
-    def receive_domain_ping(self, domain_id, ip4, from_addr, msg):
+    def receive_domain_ping(self, domain_id, ip4, ipv6, port, msg):
         """
         Process received domain_ping. If KeyType.domain_ping value is 1, the sender of the ping is registered as static
 
@@ -321,13 +324,8 @@ class BBcNetwork:
         ipv4 = msg.get(KeyType.external_ip4addr, None)
         ipv6 = msg.get(KeyType.external_ip6addr, None)
         is_static = msg.get(KeyType.static_entry, False)
-        if ipv4 is None and ip4:
-            ipv4 = from_addr[0]
-        if ipv6 is None and not ip4:
-            ipv6 = from_addr[0]
-        port = from_addr[1]
 
-        self.logger.debug("Receive domain_ping for domain %s from %s" % (binascii.b2a_hex(domain_id[:4]), from_addr))
+        self.logger.debug("Receive domain_ping for domain %s from %s" % (binascii.b2a_hex(domain_id[:4]), (ipv4, ipv6)))
         self.logger.debug(msg)
         if domain_id not in self.domains:
             self.logger.debug("no domain_id")
@@ -336,7 +334,7 @@ class BBcNetwork:
             self.logger.debug("no other node_id")
             return
 
-        self.add_neighbor(domain_id=domain_id, node_id=node_id, ip4=ip4, from_addr=from_addr, is_static=is_static)
+        self.add_neighbor(domain_id=domain_id, node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port, is_static=is_static)
 
         if msg[KeyType.domain_ping] == 1:
             query_entry = ticker.get_entry(msg[KeyType.nonce])
@@ -400,7 +398,7 @@ class BBcNetwork:
             self.core.stats.update_stats_increment("network", "message_size_sent_by_udp", len(data_to_send))
             return
 
-    def broadcast_message_in_network(self, domain_id, payload_type, msg):
+    def broadcast_message_in_network(self, domain_id, payload_type=PayloadType.Type_msgpack, msg=None):
         """
         send message to all neighbor nodes
         :param domain_id:
@@ -414,36 +412,33 @@ class BBcNetwork:
             msg[KeyType.destination_node_id] = node_id
             self.send_message_in_network(nodeinfo, payload_type, domain_id, msg)
 
-    def add_neighbor(self, domain_id, node_id, ip4, from_addr, is_static=False):
+    def add_neighbor(self, domain_id, node_id, ipv4=None, ipv6=None, port=None, is_static=False):
         """
         Add node in the neighbor list
         :param domain_id:
+        :param nodeinfo:
         :param node_id:
-        :param ip4:
-        :param from_addr:
+        :param ipv4:      sender ipv4 address
+        :param ipv6:      sender ipv6 address
+        :param port:      sender address and port (None if TCP)
         :param is_static:
         :return:
         """
-        if domain_id not in self.domains:
-            return
-        if self.domains[domain_id]['neighbor'].my_node_id == node_id:
+        if domain_id not in self.domains or self.domains[domain_id]['neighbor'].my_node_id == node_id or port is None:
             return None
-        if ip4:
-            is_new = self.domains[domain_id]['neighbor'].add(node_id=node_id, ipv4=from_addr[0],
-                                                             port=from_addr[1], is_static=is_static)
-        else:
-            is_new = self.domains[domain_id]['neighbor'].add(node_id=node_id, ipv6=from_addr[0],
-                                                             port=from_addr[1], is_static=is_static)
-        if is_new:
+
+        is_new = self.domains[domain_id]['neighbor'].add(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port, is_static=is_static)
+        if is_new is not None and is_new:
             self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].notify_neighbor_update(node_id, is_new=True)
         return is_new
 
-    def process_message_base(self, domain_id, ip4, from_addr, msg, payload_type):
+    def process_message_base(self, domain_id, ipv4, ipv6, port, msg, payload_type):
         """
         (internal use) process received message (common process for any kind of network module)
         :param domain_id: target domain_id of this message
-        :param ip4:       True (from IPv4) / False (from IPv6)
-        :param from_addr: sender address and port (None if TCP)
+        :param ipv4:      sender ipv4 address
+        :param ipv6:      sender ipv6 address
+        :param port:      sender address and port (None if TCP)
         :param msg:       the message body (already deserialized)
         :param payload_type: PayloadType value of msg
         :return:
@@ -454,26 +449,27 @@ class BBcNetwork:
                                                              int.from_bytes(msg[KeyType.infra_msg_type], 'big')))
 
         if msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_NETWORK:
-            self.process_message(domain_id, ip4, from_addr, msg)
+            self.process_message(domain_id, ipv4, ipv6, port, msg)
 
         elif msg[KeyType.infra_msg_type] in [InfraMessageCategory.CATEGORY_USER, InfraMessageCategory.CATEGORY_DATA]:
-            self.add_neighbor(domain_id, msg[KeyType.source_node_id], ip4, from_addr)
+            self.add_neighbor(domain_id, msg[KeyType.source_node_id], ipv4, ipv6, port)
             self.domains[domain_id][msg[KeyType.infra_msg_type]].process_message(msg)
         elif msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_TOPOLOGY:
-            self.add_neighbor(domain_id, msg[KeyType.source_node_id], ip4, from_addr)
-            self.domains[domain_id][msg[KeyType.infra_msg_type]].process_message(ip4, from_addr, msg)
+            self.add_neighbor(domain_id, msg[KeyType.source_node_id], ipv4, ipv6, port)
+            self.domains[domain_id][msg[KeyType.infra_msg_type]].process_message(ipv4, ipv6, port, msg)
 
-    def process_message(self, domain_id, ip4, from_addr, msg):
+    def process_message(self, domain_id, ipv4, ipv6, port, msg):
         """
         (internal use) process received message
         :param domain_id: target domain_id of this message
-        :param ip4:       True (from IPv4) / False (from IPv6)
-        :param from_addr: sender address and port (None if TCP)
+        :param ipv4:      sender ipv4 address
+        :param ipv6:      sender ipv6 address
+        :param port:      sender address and port (None if TCP)
         :param msg:       the message body (already deserialized)
         :return:
         """
-        if KeyType.domain_ping in msg:
-            self.receive_domain_ping(domain_id, ip4, from_addr, msg)
+        if KeyType.domain_ping in msg and port is not None:
+            self.receive_domain_ping(domain_id, ipv4, ipv6, port, msg)
 
         elif msg[KeyType.command] == BBcNetwork.NOTIFY_LEAVE:
             if KeyType.source_node_id in msg:
@@ -528,12 +524,12 @@ class BBcNetwork:
                 rready, wready, xready = select.select(readfds, [], [])
                 for sock in rready:
                     data = None
-                    ip4 = True
+                    ipv4 = None
+                    ipv6 = None
                     if sock is self.socket_udp:
-                        data, addr = self.socket_udp.recvfrom(1500)
+                        data, (ipv4, port) = self.socket_udp.recvfrom(1500)
                     elif sock is self.socket_udp6:
-                        data, addr = self.socket_udp6.recvfrom(1500)
-                        ip4 = False
+                        data, (ipv6, port) = self.socket_udp6.recvfrom(1500)
                     if data is not None:
                         self.core.stats.update_stats_increment("network", "packets_received_by_udp", 1)
                         msg_parser.recv(data)
@@ -543,7 +539,8 @@ class BBcNetwork:
                             if KeyType.domain_id not in msg:
                                 continue
                             if msg[KeyType.domain_id] in self.domains:
-                                self.process_message_base(msg[KeyType.domain_id], ip4, addr, msg, msg_parser.payload_type)
+                                self.process_message_base(msg[KeyType.domain_id], ipv4, ipv6, port,
+                                                          msg, msg_parser.payload_type)
         finally:
             for sock in readfds:
                 sock.close()
@@ -625,8 +622,9 @@ class BBcNetwork:
                                 if msg_parsers[sock].payload_type == PayloadType.Type_msgpack:
                                     if KeyType.destination_node_id not in msg or KeyType.domain_id not in msg:
                                         continue
-                                self.domains[msg[KeyType.domain_id]].process_message_base(True, None, msg,
-                                                                                          msg_parsers[sock].payload_type)
+                                self.process_message_base(msg[KeyType.domain_id], None, None, None,
+                                                          msg, msg_parsers[sock].payload_type)
+
         finally:
             for sock in readfds:
                 sock.close()
@@ -717,8 +715,14 @@ class NodeInfo:
         return len(self.node_id)
 
     def __str__(self):
+        ipv4 = self.ipv4
+        if ipv4 is None:
+            ipv4 = "0.0.0.0"
+        ipv6 = self.ipv6
+        if ipv6 is None:
+            ipv6 = "::"
         output = "[node_id=%s, ipv4=%s, ipv6=%s, port=%d, alive=%s, static=%s, time=%d]" %\
-                 (binascii.b2a_hex(self.node_id), self.ipv4, self.ipv6, self.port,
+                 (binascii.b2a_hex(self.node_id), ipv4, ipv6, self.port,
                   self.is_alive, self.is_static, self.updated_at)
         return output
 
@@ -731,13 +735,19 @@ class NodeInfo:
         self.is_alive = False
 
     def update(self, ipv4=None, ipv6=None, port=None):
-        change_flag = False
+        change_flag = None
         if ipv4 is not None and self.ipv4 != ipv4:
-            self.ipv4 = ipv4
+            if isinstance(ipv4, bytes):
+                self.ipv4 = ipv4.decode()
+            else:
+                self.ipv4 = ipv4
             if self.ipv4 != "127.0.0.1":
                 change_flag = True
         if ipv6 is not None and self.ipv6 != ipv6:
-            self.ipv6 = ipv6
+            if isinstance(ipv6, bytes):
+                self.ipv6 = ipv6.decode()
+            else:
+                self.ipv6 = ipv6
             if self.ipv6 != "::":
                 change_flag = True
         if port is not None and self.port != port:

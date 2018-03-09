@@ -28,7 +28,7 @@ import sys
 sys.path.append("../../")
 
 from bbc1.common import bbclib, message_key_types
-from bbc1.common.bbclib import NodeInfo, ServiceMessageType as MsgType, StorageType
+from bbc1.common.bbclib import MsgType, StorageType
 from bbc1.common.message_key_types import KeyType, PayloadType
 from bbc1.common.bbc_error import *
 from bbc1.common import logger
@@ -200,27 +200,38 @@ class BBcAppClient:
             return None
         return self.query_id
 
-    def domain_setup(self, domain_id, module_name=None, storage_type=StorageType.FILESYSTEM, storage_path=None):
+    def domain_setup(self, domain_id, config=None,
+                     module_name=None, storage_type=StorageType.FILESYSTEM, storage_path=None):
         """
         Set up domain with the specified network module and storage (maybe used by a system administrator)
 
         :param domain_id:
-        :param module_name:
-        :param storage_type: StorageType value
-        :param storage_path:
+        :param config:       in json format
+        :param module_name:  TODO: will be obsoleted in v0.10
+        :param storage_type: TODO: will be obsoleted in v0.10
+        :param storage_path: TODO: will be obsoleted in v0.10
         :return:
         """
         dat = self.make_message_structure(MsgType.REQUEST_SETUP_DOMAIN)
         dat[KeyType.domain_id] = domain_id
-        if module_name is not None:
-            dat[KeyType.network_module] = module_name
-        dat[KeyType.storage_type] = storage_type
-        if storage_path is not None:
-            dat[KeyType.storage_path] = storage_path
+        if config is not None:
+            dat[KeyType.bbc_configuration] = config
+        return self.send_msg(dat)
+
+    def get_domain_neighborlist(self, domain_id):
+        """
+        Get peer list of the domain from the core node (maybe used by a system administrator)
+
+        :param domain_id:
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_GET_NEIGHBORLIST)
+        dat[KeyType.domain_id] = domain_id
         return self.send_msg(dat)
 
     def get_domain_peerlist(self, domain_id):
         """
+        TODO: will be obsoleted in v0.10
         Get peer list of the domain from the core node (maybe used by a system administrator)
 
         :param domain_id:
@@ -243,7 +254,7 @@ class BBcAppClient:
         """
         dat = self.make_message_structure(MsgType.REQUEST_SET_STATIC_NODE)
         dat[KeyType.domain_id] = domain_id
-        dat[KeyType.peer_info] = [node_id, ipv4, ipv6, port]
+        dat[KeyType.node_info] = [node_id, ipv4, ipv6, port]
         return self.send_msg(dat)
 
     def send_domain_ping(self, domain_id, ipv4=None, ipv6=None, port=DEFAULT_P2P_PORT):
@@ -260,11 +271,12 @@ class BBcAppClient:
             return
         dat = self.make_message_structure(MsgType.DOMAIN_PING)
         dat[KeyType.domain_id] = domain_id
-        if ipv4 is not None:
+        if ipv4 is not None and ipv4 != "0.0.0.0":
             dat[KeyType.ipv4_address] = ipv4
-        if ipv6 is not None:
+        if ipv6 is not None and ipv6 != "::":
             dat[KeyType.ipv6_address] = ipv6
         dat[KeyType.port_number] = port
+        dat[KeyType.static_entry] = True
         return self.send_msg(dat)
 
     def ping_to_all_neighbors(self, domain_id):
@@ -351,11 +363,11 @@ class BBcAppClient:
         dat[KeyType.asset_group_id] = asset_group_id
         return self.send_msg(dat)
 
-    def get_cross_refs(self, asset_group_id, number):
+    def get_cross_refs(self, asset_group_id=None, number=1):
         """
         Get cross_refs
 
-        :param asset_group_id:
+        :param asset_group_id:  TODO: will be obsoleted in v0.10
         :param number:
         :return:
         """
@@ -446,15 +458,35 @@ class BBcAppClient:
         dat[KeyType.all_asset_files] = ast
         return self.send_msg(dat)
 
+    def search_transaction_with_condition(self, asset_group_id=None, asset_id=None, user_id=None, count=1):
+        """
+        Search transaction data by asset_group_id/asset_id/user_id
+        :param asset_group_id:
+        :param asset_id:
+        :param user_id:
+        :param count:
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_WITH_CONDITIONS)
+        if asset_group_id is not None:
+            dat[KeyType.asset_group_id] = asset_group_id
+        if asset_id is not None:
+            dat[KeyType.asset_id] = asset_id
+        if user_id is not None:
+            dat[KeyType.user_id] = user_id
+        dat[KeyType.count] = count
+        return self.send_msg(dat)
+
     def search_asset(self, asset_group_id, asset_id):
         """
+        TODO: will be obsoleted in v0.10
         Search request for the specified asset. This would return transaction_data (and asset_file file content)
 
         :param asset_group_id:
         :param asset_id:
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_ASSET)
+        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_WITH_CONDITIONS)
         dat[KeyType.asset_group_id] = asset_group_id
         dat[KeyType.asset_id] = asset_id
         return self.send_msg(dat)
@@ -473,12 +505,12 @@ class BBcAppClient:
     def search_transaction_by_userid(self, asset_group_id, user_id):
         """
         Search request for transaction_data by user_id
-
+        TODO: will be obsoleted in v0.10
         :param asset_group_id:
         :param user_id: user_id of the asset owner
         :return: The transaction_data that includes asset with the specified user_id
         """
-        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_USERID)
+        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_WITH_CONDITIONS)
         dat[KeyType.asset_group_id] = asset_group_id
         dat[KeyType.user_id] = user_id
         return self.send_msg(dat)
@@ -582,10 +614,12 @@ class Callback:
 
         if dat[KeyType.command] == MsgType.RESPONSE_SEARCH_TRANSACTION:
             self.proc_resp_search_transaction(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_ASSET:
-            self.proc_resp_search_asset(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_USERID:
-            self.proc_resp_search_by_userid(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_WITH_CONDITIONS:
+            self.proc_resp_search_with_cndition(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_ASSET:  # TODO: will be obsoleted in v0.10
+            self.proc_resp_search_with_cndition(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_USERID: # TODO: will be obsoleted in v0.10
+            self.proc_resp_search_with_cndition(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GATHER_SIGNATURE:
             self.proc_resp_gather_signature(dat)
         elif dat[KeyType.command] == MsgType.REQUEST_SIGNATURE:
@@ -606,8 +640,10 @@ class Callback:
             self.proc_resp_verify_hash(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SETUP_DOMAIN:
             self.proc_resp_domain_setup(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_GET_PEERLIST:
-            self.proc_resp_get_peerlist(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_GET_PEERLIST: # TODO: will be obsoleted in v0.10
+            self.proc_resp_get_neighborlist(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_GET_NEIGHBORLIST:
+            self.proc_resp_get_neighborlist(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GET_DOMAINLIST:
             self.proc_resp_get_domainlist(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SET_STATIC_NODE:
@@ -674,10 +710,7 @@ class Callback:
     def proc_notify_inserted(self, dat):
         self.queue.put(dat)
 
-    def proc_resp_search_asset(self, dat):
-        self.queue.put(dat)
-
-    def proc_resp_search_by_userid(self, dat):
+    def proc_resp_search_with_cndition(self, dat):
         self.queue.put(dat)
 
     def proc_resp_search_transaction(self, dat):
@@ -704,29 +737,27 @@ class Callback:
     def proc_resp_domain_setup(self, dat):
         self.queue.put(dat)
 
-    def proc_resp_get_peerlist(self, dat):
+    def proc_resp_get_neighborlist(self, dat):
         """
         Return node info
 
         :param dat:
         :return: list of node info (the first one is that of the connecting core)
         """
-        if KeyType.peer_list not in dat:
+        if KeyType.neighbor_list not in dat:
             self.queue.put(None)
             return
-        peerlist = dat[KeyType.peer_list]
+        neighbor_list = dat[KeyType.neighbor_list]
         results = []
-        count = int.from_bytes(peerlist[:4], 'big')
+        count = int.from_bytes(neighbor_list[:4], 'big')
         for i in range(count):
             base = 4 + i*(32+4+16+2+8)
-            node_id = peerlist[base:base+32]
-            ipv4 = peerlist[base+32:base+36]
-            ipv6 = peerlist[base+36:base+52]
-            port = peerlist[base+52:base+54]
-            updated_at = peerlist[base+54:base+62]
-            info = NodeInfo()
-            info.recover_nodeinfo(node_id, ipv4, ipv6, port)
-            results.append([info.node_id, info.ipv4, info.ipv6, info.port])
+            node_id = neighbor_list[base:base+32]
+            ipv4 = socket.inet_ntop(socket.AF_INET, neighbor_list[base + 32:base + 36])
+            ipv6 = socket.inet_ntop(socket.AF_INET6, neighbor_list[base + 36:base + 52])
+            port = socket.ntohs(int.from_bytes(neighbor_list[base + 52:base + 54], 'big'))
+            updated_at = neighbor_list[base+54:base+62]
+            results.append([node_id, ipv4, ipv6, port])
         self.queue.put(results)
 
     def proc_resp_get_domainlist(self, dat):

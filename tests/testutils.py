@@ -53,7 +53,7 @@ def start_core(index, core_port, p2p_port, use_global=False, remove_dir=True):
 
 def domain_setup_utility(core_port_increment, dom_id, network_module=None):
     cl = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT+core_port_increment)
-    cl.domain_setup(dom_id, network_module)
+    cl.domain_setup(dom_id)
     global domain_id
     domain_id = dom_id
     wait_check_result_msg_type(cl.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_DOMAIN)

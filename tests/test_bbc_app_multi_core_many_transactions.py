@@ -74,27 +74,20 @@ class TestBBcAppClient(object):
 
     def test_10_setup_network(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-
-        ret = clients[0]['app'].get_domain_peerlist(domain_id=domain_id)
+        ret = clients[0]['app'].get_domain_neighborlist(domain_id=domain_id)
         assert ret
         dat = msg_processor[0].synchronize()
-        print("[0] nodeinfo=",dat[0])
+        print("[0] nodeinfo=", dat[0])
         node_id, ipv4, ipv6, port = dat[0]
 
         for i in range(1, client_num):
-            ret = clients[i]['app'].set_domain_static_node(domain_id, node_id, ipv4, ipv6, port)
-            assert ret
-            ret = msg_processor[i].synchronize()
-            print("[%d] set_peer result is %s" %(i, ret))
-            clients[i]['app'].ping_to_all_neighbors(domain_id)
-        time.sleep(2)
+            clients[i]['app'].send_domain_ping(domain_id, ipv4, ipv6, port)
+        print("*** wait 5 seconds ***")
+        time.sleep(5)
 
-        clients[0]['app'].broadcast_peerlist_to_all_neighbors(domain_id)
-        print("** wait 3 sec to finish alive_check")
-        time.sleep(3)
-        assert len(cores[1].networking.domains[domain_id].id_ip_mapping) == core_num-1
         for i in range(core_num):
-            cores[i].networking.domains[domain_id].print_peerlist()
+            print(cores[i].networking.domains[domain_id]['neighbor'].show_list())
+            assert len(cores[i].networking.domains[domain_id]['neighbor'].nodeinfo_list) == core_num - 1
 
     def test_11_register(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -102,8 +95,6 @@ class TestBBcAppClient(object):
             ret = cl['app'].register_to_core()
             assert ret
         time.sleep(1)
-        print("---- wait 10 sec ----")
-        time.sleep(10)
 
     def test_12_make_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -128,10 +119,11 @@ class TestBBcAppClient(object):
 
             transactions[i].digest()
             print("register transaction=", binascii.b2a_hex(transactions[i].transaction_id))
-            ret = cl['app'].insert_transaction(transactions[i])
-            assert ret
+            cl['app'].insert_transaction(transactions[i])
             print("  ----> wait insert")
-            msg_processor[i].synchronize()
+            dat = msg_processor[i].synchronize()
+            assert KeyType.transaction_id in dat
+            assert dat[KeyType.transaction_id] == transactions[i].transaction_id
             print("    ==> got insert")
 
         for i in range(len(cores)):
@@ -161,9 +153,10 @@ class TestBBcAppClient(object):
             txobj.references[result[0]].add_signature(user_id=result[1], signature=result[2])
 
             txobj.digest()
-            ret = cl['app'].insert_transaction(txobj)
-            assert ret
-            msg_processor[i].synchronize()
+            cl['app'].insert_transaction(txobj)
+            dat = msg_processor[i].synchronize()
+            assert KeyType.transaction_id in dat
+            assert dat[KeyType.transaction_id] == txobj.transaction_id
             transactions[i] = txobj
 
         for i in range(len(cores)):

@@ -91,13 +91,12 @@ class TopologyManagerBase:
         else:
             self.logger.debug("[%s] notify_neighbor_update" % self.my_node_id.hex()[:4])
 
+        rand_time = random.uniform(0.5, 1) * 5 / (len(self.neighbors.nodeinfo_list) + 1)
         if self.advertise_wait_entry is None:
-            rand_time = random.uniform(0.5, 1) * 5/ (len(self.neighbors.nodeinfo_list)+1)
             self.advertise_wait_entry = query_management.QueryEntry(expire_after=rand_time,
                                                                     callback_expire=self.advertise_neighbor_info,
                                                                     retry_count=0)
         else:
-            rand_time = random.uniform(0.5, 1) * 5 / (len(self.neighbors.nodeinfo_list)+1)
             self.advertise_wait_entry.update_expiration_time(rand_time)
 
     def update_refresh_timer_entry(self, new_entry=True):
@@ -122,7 +121,7 @@ class TopologyManagerBase:
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_TOPOLOGY,
             KeyType.domain_id: self.domain_id,
             KeyType.command: TopologyManagerBase.NOTIFY_NEIGHBOR_LIST,
-            KeyType.peer_list: self.make_neighbor_list(),
+            KeyType.neighbor_list: self.make_neighbor_list(),
         }
         self.network.broadcast_message_in_network(domain_id=self.domain_id,
                                                   payload_type=PayloadType.Type_msgpack, msg=msg)
@@ -180,22 +179,20 @@ class TopologyManagerBase:
         else:
             return True
 
-    def process_message(self, ip4, from_addr, msg):
+    def process_message(self, ipv4, ipv6, port, msg):
         """
         (internal use) process received message
-        :param ip4:
-        :param from_addr:
+        :param ipv4:      sender ipv4 address
+        :param ipv6:      sender ipv6 address
+        :param port:      sender address and port (None if TCP)
         :param msg:
         :return:
         """
         if KeyType.destination_node_id not in msg or KeyType.command not in msg:
             return
-        if msg[KeyType.destination_node_id] != self.my_node_id:
-            # TODO: do forwarding to another node
-            return
         if msg[KeyType.command] == TopologyManagerBase.NOTIFY_NEIGHBOR_LIST:
             self.update_refresh_timer_entry(new_entry=False)
-            diff_flag = self.update_neighbor_list(msg[KeyType.peer_list])
+            diff_flag = self.update_neighbor_list(msg[KeyType.neighbor_list])
             if diff_flag:
                 if self.advertise_wait_entry is None:
                     self.notify_neighbor_update(None)

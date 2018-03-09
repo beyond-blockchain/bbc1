@@ -23,7 +23,7 @@ sys.path.extend(["../../"])
 from bbc1.common.message_key_types import KeyType, PayloadType
 from bbc1.core.bbc_types import ResourceType
 from bbc1.core.bbc_network import DomainBase
-from bbc1.core.bbc_types import InfraMessageTypeBase
+from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.core import query_management
 
 
@@ -113,25 +113,25 @@ class NetworkDomain(DomainBase):
         :param msg:       the message body (already deserialized)
         :return:
         """
-        if msg[KeyType.p2p_msg_type] == InfraMessageTypeBase.REQUEST_STORE:
+        if msg[KeyType.infra_msg_type] == InfraMessageCategory.REQUEST_STORE:
             if KeyType.resource_id not in msg or KeyType.resource not in msg:
                 return
             self.add_peer_node(msg[KeyType.source_node_id], ip4, from_addr)
             self.process_REQUEST_STORE(msg)
 
-        elif msg[KeyType.p2p_msg_type] == InfraMessageTypeBase.REQUEST_FIND_VALUE:
+        elif msg[KeyType.infra_msg_type] == InfraMessageCategory.REQUEST_FIND_VALUE:
             if KeyType.resource_id not in msg or KeyType.resource_type not in msg:
                 return
             self.add_peer_node(msg[KeyType.source_node_id], ip4, from_addr)
             self.process_REQUEST_FIND_VALUE(msg)
 
-        elif msg[KeyType.p2p_msg_type] == InfraMessageTypeBase.RESPONSE_FIND_VALUE:
+        elif msg[KeyType.infra_msg_type] == InfraMessageCategory.RESPONSE_FIND_VALUE:
             if KeyType.resource_id not in msg or KeyType.resource_type not in msg:
                 return
             self.add_peer_node(msg[KeyType.source_node_id], ip4, from_addr)
             self.process_RESPONSE_FIND_VALUE(msg)
 
-        elif msg[KeyType.p2p_msg_type] == InfraMessageTypeBase.REQUEST_FIND_USER:
+        elif msg[KeyType.infra_msg_type] == InfraMessageCategory.REQUEST_FIND_USER:
             if KeyType.resource_id not in msg:
                 return
             user_id = msg[KeyType.resource_id]
@@ -141,7 +141,7 @@ class NetworkDomain(DomainBase):
                 resource_id = msg[KeyType.resource_id]
                 self.respond_find_node(target_id, nonce, resource_id)
 
-        elif msg[KeyType.p2p_msg_type] == InfraMessageTypeBase.RESPONSE_FIND_USER:
+        elif msg[KeyType.infra_msg_type] == InfraMessageCategory.RESPONSE_FIND_USER:
             self.add_peer_node(msg[KeyType.source_node_id], ip4, from_addr)
             if KeyType.resource_id not in msg:
                 return
@@ -210,7 +210,7 @@ class NetworkDomain(DomainBase):
         self.logger.debug("[%s] send_find_value to %s about %s" % (self.shortname,
                                                                    binascii.b2a_hex(target_id[:4]),
                                                                    binascii.b2a_hex(resource_id[:4])))
-        msg = self.make_message(dst_node_id=target_id, nonce=nonce, msg_type=InfraMessageTypeBase.REQUEST_FIND_VALUE)
+        msg = self.make_message(dst_node_id=target_id, nonce=nonce, msg_type=InfraMessageCategory.REQUEST_FIND_VALUE)
         msg[KeyType.resource_id] = resource_id
         msg[KeyType.resource_type] = resource_type
         for k in extra_info.keys():
@@ -219,7 +219,7 @@ class NetworkDomain(DomainBase):
 
     def respond_find_value(self, target_id, nonce, asset_group_id=None,
                            resource_id=None, resource=None, resource_type=None):
-        msg = self.make_message(dst_node_id=target_id, nonce=nonce, msg_type=InfraMessageTypeBase.RESPONSE_FIND_VALUE)
+        msg = self.make_message(dst_node_id=target_id, nonce=nonce, msg_type=InfraMessageCategory.RESPONSE_FIND_VALUE)
         msg[KeyType.asset_group_id] = asset_group_id
         msg[KeyType.resource_id] = resource_id
         msg[KeyType.resource_type] = resource_type
@@ -230,12 +230,12 @@ class NetworkDomain(DomainBase):
         return self.send_message_to_peer(msg, self.default_payload_type)
 
     def respond_find_node(self, target_id, nonce, resource_id=None):
-        msg = self.make_message(dst_node_id=target_id, nonce=nonce, msg_type=InfraMessageTypeBase.RESPONSE_FIND_USER)
+        msg = self.make_message(dst_node_id=target_id, nonce=nonce, msg_type=InfraMessageCategory.RESPONSE_FIND_USER)
         msg[KeyType.resource_id] = resource_id
         return self.send_message_to_peer(msg, self.default_payload_type)
 
     def send_peerlist(self, query_entry):
-        msg = self.make_message(dst_node_id=ZEROS, nonce=None, msg_type=InfraMessageTypeBase.NOTIFY_PEERLIST)
+        msg = self.make_message(dst_node_id=ZEROS, nonce=None, msg_type=InfraMessageCategory.NOTIFY_PEERLIST)
         msg[KeyType.peer_list] = self.make_peer_list()
         for nd in self.get_neighbor_nodes():
             msg[KeyType.destination_node_id] = nd
@@ -314,7 +314,7 @@ class NetworkDomain(DomainBase):
         """
         user_id = query_entry.data[KeyType.resource_id]
         nonce = query_entry.nonce
-        msg = self.make_message(dst_node_id=ZEROS, nonce=nonce, msg_type=InfraMessageTypeBase.REQUEST_FIND_USER)
+        msg = self.make_message(dst_node_id=ZEROS, nonce=nonce, msg_type=InfraMessageCategory.REQUEST_FIND_USER)
         msg[KeyType.resource_id] = user_id
         for nd in self.get_neighbor_nodes():
             if nd == self.node_id:
