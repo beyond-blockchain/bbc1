@@ -163,9 +163,10 @@ class KeyType:
     destination_node_id = to_4byte(6, 0x50)
 
     domain_id = to_4byte(0, 0x60)
-    asset_group_id = to_4byte(1, 0x60)
-    transaction_id = to_4byte(2, 0x60)
-    asset_id = to_4byte(3, 0x60)
+    transaction_id = to_4byte(1, 0x60)
+    asset_group_id = to_4byte(2, 0x60)
+    asset_group_ids = to_4byte(3, 0x60)
+    asset_id = to_4byte(4, 0x60)
 
     transaction_data = to_4byte(0, 0x70)
     transactions = to_4byte(1, 0x70)

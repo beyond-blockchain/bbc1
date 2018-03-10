@@ -122,6 +122,7 @@ class BBcNetwork:
     def __init__(self, config, core=None, p2p_port=None, use_global=True, external_ip4addr=None, external_ip6addr=None,
                  loglevel="all", logname=None):
         self.core = core
+        self.stats = core.stats
         self.logger = logger.get_logger(key="bbc_network", level=loglevel, logname=logname)
         self.logname = logname
         self.config = config
@@ -210,7 +211,7 @@ class BBcNetwork:
             self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA] = DataHandler(self, config=conf,
                                                                                       workingdir=workingdir,
                                                                                       domain_id=domain_id)
-        self.core.stats.update_stats_increment("network", "num_domains", 1)
+        self.stats.update_stats_increment("network", "num_domains", 1)
         return True
 
     def remove_domain(self, domain_id=ZEROS):
@@ -231,7 +232,7 @@ class BBcNetwork:
         self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].stop_all_timers()
         self.domains[domain_id][InfraMessageCategory.CATEGORY_USER].stop_all_timers()
         del self.domains[domain_id]
-        self.core.stats.update_stats_decrement("network", "num_domains", 1)
+        self.stats.update_stats_decrement("network", "num_domains", 1)
 
     def save_all_static_node_list(self):
         """
@@ -303,7 +304,7 @@ class BBcNetwork:
             self.logger.debug("Send domain_ping to %s:%d" % (query_entry.data[KeyType.node_info].ipv4,
                                                              query_entry.data[KeyType.node_info].port))
         query_entry.update(fire_after=1)
-        self.core.stats.update_stats_increment("network", "domain_ping_send", 1)
+        self.stats.update_stats_increment("network", "domain_ping_send", 1)
         self.send_message_in_network(query_entry.data[KeyType.node_info], PayloadType.Type_msgpack, domain_id, msg)
 
     def receive_domain_ping(self, domain_id, ip4, ipv6, port, msg):
@@ -319,7 +320,7 @@ class BBcNetwork:
         """
         if KeyType.node_id not in msg:
             return
-        self.core.stats.update_stats_increment("network", "domain_ping_receive", 1)
+        self.stats.update_stats_increment("network", "domain_ping_receive", 1)
         node_id = msg[KeyType.node_id]
         ipv4 = msg.get(KeyType.external_ip4addr, None)
         ipv6 = msg.get(KeyType.external_ip6addr, None)
@@ -335,6 +336,7 @@ class BBcNetwork:
             return
 
         self.add_neighbor(domain_id=domain_id, node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port, is_static=is_static)
+        self.stats.update_stats_increment("network", "domain_ping_received", 1)
 
         if msg[KeyType.domain_ping] == 1:
             query_entry = ticker.get_entry(msg[KeyType.nonce])
@@ -372,7 +374,7 @@ class BBcNetwork:
         except:
             pass
 
-    def send_message_in_network(self, nodeinfo, payload_type, domain_id, msg):
+    def send_message_in_network(self, nodeinfo=None, payload_type=PayloadType.Type_msgpack, domain_id=None, msg=None):
         """
         Send message over a domain network
 
@@ -388,14 +390,18 @@ class BBcNetwork:
         data_to_send = message_key_types.make_message(payload_type, msg)
         if len(data_to_send) > TCP_THRESHOLD_SIZE:
             send_data_by_tcp(ipv4=nodeinfo.ipv4, ipv6=nodeinfo.ipv6, port=nodeinfo.port, msg=data_to_send)
+            self.stats.update_stats_increment("network", "send_msg_by_tcp", 1)
+            self.stats.update_stats_increment("network", "sent_data_size", len(data_to_send))
             return
         if nodeinfo.ipv6 is not None and self.socket_udp6 is not None:
             self.socket_udp6.sendto(data_to_send, (nodeinfo.ipv6, nodeinfo.port))
-            self.core.stats.update_stats_increment("network", "packets_sent_by_udp", 1)
+            self.stats.update_stats_increment("network", "send_msg_by_udp6", 1)
+            self.stats.update_stats_increment("network", "sent_data_size", len(data_to_send))
             return
         if nodeinfo.ipv4 is not None and self.socket_udp is not None:
             self.socket_udp.sendto(data_to_send, (nodeinfo.ipv4, nodeinfo.port))
-            self.core.stats.update_stats_increment("network", "message_size_sent_by_udp", len(data_to_send))
+            self.stats.update_stats_increment("network", "send_msg_by_udp4", 1)
+            self.stats.update_stats_increment("network", "sent_data_size", len(data_to_send))
             return
 
     def broadcast_message_in_network(self, domain_id, payload_type=PayloadType.Type_msgpack, msg=None):
@@ -430,6 +436,7 @@ class BBcNetwork:
         is_new = self.domains[domain_id]['neighbor'].add(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port, is_static=is_static)
         if is_new is not None and is_new:
             self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].notify_neighbor_update(node_id, is_new=True)
+        self.stats.update_stats("network", "neighbor_nodes", len(self.domains[domain_id]['neighbor'].nodeinfo_list))
         return is_new
 
     def process_message_base(self, domain_id, ipv4, ipv6, port, msg, payload_type):
@@ -531,7 +538,7 @@ class BBcNetwork:
                     elif sock is self.socket_udp6:
                         data, (ipv6, port) = self.socket_udp6.recvfrom(1500)
                     if data is not None:
-                        self.core.stats.update_stats_increment("network", "packets_received_by_udp", 1)
+                        self.stats.update_stats_increment("network", "packets_received_by_udp", 1)
                         msg_parser.recv(data)
                         msg = msg_parser.parse()
                         #self.logger.debug("Recv_UDP from %s: data=%s" % (addr, msg))
@@ -613,7 +620,7 @@ class BBcNetwork:
                             readfds.remove(sock)
                         else:
                             msg_parsers[sock].recv(buf)
-                            self.core.stats.update_stats_increment("network", "message_size_received_by_tcy", len(buf))
+                            self.stats.update_stats_increment("network", "message_size_received_by_tcy", len(buf))
                             while True:
                                 msg = msg_parsers[sock].parse()
                                 if msg is None:

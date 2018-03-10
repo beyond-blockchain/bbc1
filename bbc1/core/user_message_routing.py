@@ -37,10 +37,12 @@ class UserMessageRouting:
     RESOLVE_USER_LOCATION = to_2byte(0)
     RESPONSE_USER_LOCATION = to_2byte(1)
     RESPONSE_NO_SUCH_USER = to_2byte(2)
-    NOTIFY_USER_LOCATION_FOR_MULTICAST = to_2byte(3)
+    JOIN_MULTICAST_RECEIVER = to_2byte(3)
+    LEAVE_MULTICAST_RECEIVER = to_2byte(4)
 
     def __init__(self, network, domain_id, loglevel="all", logname=None):
         self.network = network
+        self.stats = network.core.stats
         self.domain_id = domain_id
         self.logger = logger.get_logger(key="user_message_routing", level=loglevel, logname=logname)
         self.registered_users = dict()
@@ -69,7 +71,7 @@ class UserMessageRouting:
         self.registered_users.setdefault(user_id, set())
         self.registered_users[user_id].add(socket)
         if is_multicast:
-            self.send_multicast_notification(user_id)
+            self.send_multicast_join(user_id)
 
     def unregister_user(self, user_id, socket=None):
         """
@@ -84,26 +86,30 @@ class UserMessageRouting:
             self.registered_users[user_id].remove(socket)
             if len(self.registered_users[user_id]) == 0:
                 self.registered_users.pop(user_id, None)
+        self.send_multicast_leave(user_id=user_id)
 
-    def add_user_for_forwarding(self, user_id, node_id):
+    def add_user_for_forwarding(self, user_id, node_id, permanent=False):
         """
         Register user to forwarding list
         :param user_id:
         :param node_id:
+        :param permanent: If True, the entry won't expire
         :return:
         """
         self.forwarding_entries.setdefault(user_id, dict())
-        if 'refresh' not in self.forwarding_entries[user_id]:
-            query_entry = query_management.QueryEntry(expire_after=UserMessageRouting.REFRESH_FORWARDING_LIST_INTERVAL,
-                                                      callback_expire=self.remove_user_from_forwarding,
-                                                      data={
-                                                          KeyType.user_id: user_id,
-                                                      }, retry_count=0)
-            self.forwarding_entries[user_id]['refresh'] = query_entry
-        else:
-            self.forwarding_entries[user_id]['refresh'].update(fire_after=UserMessageRouting.REFRESH_FORWARDING_LIST_INTERVAL)
+        if not permanent:
+            if 'refresh' not in self.forwarding_entries[user_id]:
+                query_entry = query_management.QueryEntry(expire_after=UserMessageRouting.REFRESH_FORWARDING_LIST_INTERVAL,
+                                                          callback_expire=self.remove_user_from_forwarding,
+                                                          data={
+                                                              KeyType.user_id: user_id,
+                                                          }, retry_count=0)
+                self.forwarding_entries[user_id]['refresh'] = query_entry
+            else:
+                self.forwarding_entries[user_id]['refresh'].update(fire_after=UserMessageRouting.REFRESH_FORWARDING_LIST_INTERVAL)
         self.forwarding_entries[user_id].setdefault('nodes', set())
         self.forwarding_entries[user_id]['nodes'].add(node_id)
+        self.stats.update_stats("user_message", "registered_users_in_forwarding_list", len(self.forwarding_entries))
 
     def remove_user_from_forwarding(self, query_entry=None, user_id=None, node_id=None):
         """
@@ -121,18 +127,23 @@ class UserMessageRouting:
             return
         self.forwarding_entries[user_id]['nodes'].remove(node_id)
         if len(self.forwarding_entries[user_id]['nodes']) == 0:
+            if 'refresh' in self.forwarding_entries[user_id]:
+                self.forwarding_entries[user_id]['refresh'].deactivate()
             self.forwarding_entries.pop(user_id, None)
+        self.stats.update_stats("user_message", "registered_users_in_forwarding_list", len(self.forwarding_entries))
 
-    def send_message_to_user(self, msg, sock=None):
+    def send_message_to_user(self, msg, sock=None, direct_only=False):
         """
         Forward message to connecting user
         :param msg:
         :param sock:
+        :param direct_only: If true, forward_message_to_another_node is not called.
         :return:
         """
         if sock is not None:
             try:
                 sock.sendall(message_key_types.make_message(PayloadType.Type_msgpack, msg))
+                self.stats.update_stats_increment("user_message", "sent_msg_to_user", 1)
                 return True
             except:
                 return False
@@ -143,15 +154,18 @@ class UserMessageRouting:
         msg[KeyType.infra_msg_type] = InfraMessageCategory.CATEGORY_USER
         socks = self.registered_users.get(msg[KeyType.destination_user_id], None)
         if socks is None:
+            if direct_only:
+                return False
             self.forward_message_to_another_node(msg)
             return True
         count = len(socks)
         for s in socks:
             try:
                 s.sendall(message_key_types.make_message(PayloadType.Type_msgpack, msg))
+                self.stats.update_stats_increment("user_message", "sent_msg_to_user", 1)
             except:
                 count -= 1
-        return count == 0
+        return count > 0
 
     def forward_message_to_another_node(self, msg):
         """
@@ -226,18 +240,35 @@ class UserMessageRouting:
         msg[KeyType.reason] = "Cannot find such user"
         self.send_message_to_user(msg)
 
-    def send_multicast_notification(self, user_id):
+    def send_multicast_join(self, user_id, permanent=False):
         """
-        Broadcast NOTIFY_USER_LOCATION_FOR_MULTICAST
+        Broadcast JOIN_MULTICAST_RECEIVER
         :param user_id:
         :return:
         """
         msg = {
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_USER,
             KeyType.domain_id: self.domain_id,
-            KeyType.infra_command: UserMessageRouting.NOTIFY_USER_LOCATION_FOR_MULTICAST,
-            KeyType.source_user_id: user_id,
+            KeyType.infra_command: UserMessageRouting.JOIN_MULTICAST_RECEIVER,
+            KeyType.user_id: user_id,
+            KeyType.static_entry: permanent,
         }
+        self.stats.update_stats_increment("multicast", "join", 1)
+        self.network.broadcast_message_in_network(domain_id=self.domain_id, msg=msg)
+
+    def send_multicast_leave(self, user_id):
+        """
+        Broadcast LEAVE_MULTICAST_RECEIVER
+        :param user_id:
+        :return:
+        """
+        msg = {
+            KeyType.domain_id: self.domain_id,
+            KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_USER,
+            KeyType.infra_command: UserMessageRouting.LEAVE_MULTICAST_RECEIVER,
+            KeyType.user_id: user_id,
+        }
+        self.stats.update_stats_increment("multicast", "leave", 1)
         self.network.broadcast_message_in_network(domain_id=self.domain_id, msg=msg)
 
     def process_message(self, msg):
@@ -248,6 +279,7 @@ class UserMessageRouting:
         """
         if KeyType.infra_command in msg:
             if msg[KeyType.infra_command] == UserMessageRouting.RESOLVE_USER_LOCATION:
+                self.stats.update_stats_increment("user_message", "RESOLVE_USER_LOCATION", 1)
                 user_id = msg[KeyType.destination_user_id]
                 if user_id not in self.registered_users:
                     return
@@ -261,6 +293,7 @@ class UserMessageRouting:
                                                      domain_id=self.domain_id, msg=msg)
 
             elif msg[KeyType.infra_command] == UserMessageRouting.RESPONSE_USER_LOCATION:
+                self.stats.update_stats_increment("user_message", "RESPONSE_USER_LOCATION", 1)
                 self.add_user_for_forwarding(msg[KeyType.source_user_id], msg[KeyType.source_node_id])
                 if KeyType.nonce in msg:
                     query_entry = ticker.get_entry(msg[KeyType.nonce])
@@ -268,11 +301,19 @@ class UserMessageRouting:
                         query_entry.callback()
 
             elif msg[KeyType.infra_command] == UserMessageRouting.RESPONSE_NO_SUCH_USER:
+                self.stats.update_stats_increment("user_message", "RESPONSE_NO_SUCH_USER", 1)
                 self.remove_user_from_forwarding(user_id=msg[KeyType.user_id], node_id=msg[KeyType.source_node_id])
 
-            elif msg[KeyType.infra_command] == UserMessageRouting.NOTIFY_USER_LOCATION_FOR_MULTICAST:
-                if msg[KeyType.source_node_id] in self.forwarding_entries:
-                    self.add_user_for_forwarding(msg[KeyType.source_user_id], msg[KeyType.source_node_id])
+            elif msg[KeyType.infra_command] == UserMessageRouting.JOIN_MULTICAST_RECEIVER:
+                self.stats.update_stats_increment("user_message", "JOIN_MULTICAST_RECEIVER", 1)
+                self.add_user_for_forwarding(msg[KeyType.user_id], msg[KeyType.source_node_id],
+                                             permanent=msg.get(KeyType.static_entry, False))
+
+            elif msg[KeyType.infra_command] == UserMessageRouting.LEAVE_MULTICAST_RECEIVER:
+                self.stats.update_stats_increment("user_message", "LEAVE_MULTICAST_RECEIVER", 1)
+                if msg[KeyType.user_id] in self.forwarding_entries:
+                    self.remove_user_from_forwarding(user_id=msg[KeyType.user_id],
+                                                     node_id=msg[KeyType.source_node_id])
 
             return
 
@@ -289,9 +330,11 @@ class UserMessageRouting:
                 KeyType.infra_command: UserMessageRouting.RESPONSE_NO_SUCH_USER,
                 KeyType.user_id: dst_user_id,
             }
+            self.stats.update_stats_increment("user_message", "fail_to_find_user", 1)
             self.network.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
                                                  domain_id=self.domain_id, msg=retmsg)
             return
+        self.stats.update_stats_increment("user_message", "send_to_user", 1)
         self.send_message_to_user(msg)
 
 
@@ -326,7 +369,7 @@ class UserMessageRoutingDummy(UserMessageRouting):
     def resolve_failure(self, query_entry):
         pass
 
-    def send_multicast_notification(self, user_id):
+    def send_multicast_join(self, user_id):
         pass
 
     def process_message(self, msg):

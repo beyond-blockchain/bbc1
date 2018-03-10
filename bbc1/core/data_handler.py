@@ -21,6 +21,7 @@ import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core.bbc_types import InfraMessageCategory
+from bbc1.core.bbc_stats import BBcStats
 from bbc1.common import bbclib
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
 from bbc1.common import logger
@@ -48,16 +49,18 @@ class DataHandler:
     RESPONSE_REPLICATION_INSERT = to_2byte(1)
     REQUEST_SEARCH = to_2byte(2)
     RESPONSE_SEARCH = to_2byte(3)
-    REQUEST_INSERTED_NOTIFICATION = to_2byte(4)
-    CANCEL_INSERTED_NOTIFICATION = to_2byte(5)
-    CROSS_REF_NOTIFICATION = to_2byte(6)
-    REQUEST_VERIFY = to_2byte(7)
-    RESPONSE_VERIFY = to_2byte(8)
+    NOTIFY_INSERTED = to_2byte(4)
+    NOTIFY_CROSS_REF = to_2byte(5)
+    REQUEST_VERIFY = to_2byte(6)
+    RESPONSE_VERIFY = to_2byte(7)
 
     def __init__(self, network=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
         if network is not None:
             self.network = network
             self.core = network.core
+            self.stats = network.core.stats
+        else:
+            self.stats = BBcStats()
         self.logger = logger.get_logger(key="data_handler", level=loglevel, logname=logname)
         self.domain_id = domain_id
         self.domain_id_str = bbclib.convert_id_to_string(domain_id)
@@ -127,6 +130,7 @@ class DataHandler:
         :param args:
         :return:
         """
+        self.stats.update_stats_increment("data_handler", "exec_sql", 1)
         try:
             if len(args) > 0:
                 ret = self.db_cur.execute(sql, (*args,))
@@ -134,6 +138,7 @@ class DataHandler:
                 ret = self.db_cur.execute(sql)
         except:
             self.logger.error(traceback.format_exc())
+            self.stats.update_stats_increment("data_handler", "fail_exec_sql", 1)
             return None
         if ret is not None:
             ret = list(ret)
@@ -176,6 +181,7 @@ class DataHandler:
         :param asset_files:
         :return:
         """
+        self.stats.update_stats_increment("data_handler", "insert_transaction", 1)
         if txobj is None:
             txobj = self.core.validate_transaction(txdata, asset_files=asset_files)
             if txobj is None:
@@ -220,6 +226,7 @@ class DataHandler:
                     break
 
         if rollback_flag:
+            self.stats.update_stats_increment("data_handler", "insert_rollback", 1)
             self.exec_sql("DELETE FROM transaction_table WHERE transaction_id = ?", txobj.transaction_id)
             for asset_group_id, asset_id, user_id in rollback_asset:
                 self.exec_sql("DELETE FROM asset_info_table WHERE asset_group_id = ? AND asset_id = ? AND user_id = ?",
@@ -243,7 +250,7 @@ class DataHandler:
         msg = {
             KeyType.domain_id: self.domain_id,
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_DATA,
-            KeyType.command: DataHandler.REQUEST_REPLICATION_INSERT,
+            KeyType.infra_command: DataHandler.REQUEST_REPLICATION_INSERT,
             KeyType.transaction_data: txdata,
         }
         if asset_files is not None:
@@ -350,6 +357,7 @@ class DataHandler:
         :param content:
         :return:
         """
+        self.stats.update_stats_increment("data_handler", "store_in_storage", 1)
         asset_group_id_str = binascii.b2a_hex(asset_group_id).decode('utf-8')
         storage_path = os.path.join(self.storage_root, asset_group_id_str)
         if not os.path.exists(storage_path):
@@ -408,19 +416,22 @@ class DataHandler:
         :param msg:       the message body (already deserialized)
         :return:
         """
-        if KeyType.command not in msg:
+        if KeyType.infra_command not in msg:
             return
 
-        if msg[KeyType.command] == DataHandler.REQUEST_REPLICATION_INSERT:
+        if msg[KeyType.infra_command] == DataHandler.REQUEST_REPLICATION_INSERT:
+            self.stats.update_stats_increment("data_handler", "REQUEST_REPLICATION_INSERT", 1)
             self.insert_transaction(msg[KeyType.transaction_data],
                                     asset_files=msg.get(KeyType.all_asset_files, None), no_replication=True)
 
-        elif msg[KeyType.command] == DataHandler.RESPONSE_REPLICATION_INSERT:
+        elif msg[KeyType.infra_command] == DataHandler.RESPONSE_REPLICATION_INSERT:
+            self.stats.update_stats_increment("data_handler", "RESPONSE_REPLICATION_INSERT", 1)
             pass
 
-        elif msg[KeyType.command] == DataHandler.REQUEST_SEARCH:
+        elif msg[KeyType.infra_command] == DataHandler.REQUEST_SEARCH:
+            self.stats.update_stats_increment("data_handler", "REQUEST_SEARCH", 1)
             ret = self.search_transaction(msg[KeyType.transaction_id])
-            msg[KeyType.command] = DataHandler.RESPONSE_SEARCH
+            msg[KeyType.infra_command] = DataHandler.RESPONSE_SEARCH
             if ret is None or len(ret) == 0:
                 msg[KeyType.result] = False
                 msg[KeyType.reason] = "Not found"
@@ -430,15 +441,19 @@ class DataHandler:
             self.network.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
                                                  domain_id=self.domain_id, msg=msg)
 
-        elif msg[KeyType.command] == DataHandler.RESPONSE_SEARCH:
+        elif msg[KeyType.infra_command] == DataHandler.RESPONSE_SEARCH:
+            self.stats.update_stats_increment("data_handler", "RESPONSE_SEARCH", 1)
             if msg[KeyType.result]:
                 self.insert_transaction(msg[KeyType.transaction_data])
 
-        elif msg[KeyType.command] == DataHandler.REQUEST_INSERTED_NOTIFICATION:
-            self.core.register_to_notification_list(self.domain_id, msg[KeyType.asset_group_id], msg[KeyType.source_user_id])
-
-        elif msg[KeyType.command] == DataHandler.CANCEL_INSERTED_NOTIFICATION:
-            self.core.remove_from_notification_list(self.domain_id, msg[KeyType.asset_group_id], msg[KeyType.source_user_id])
+        elif msg[KeyType.infra_command] == DataHandler.NOTIFY_INSERTED:
+            self.stats.update_stats_increment("data_handler", "NOTIFY_INSERTED", 1)
+            if KeyType.transaction_id not in msg or KeyType.asset_group_ids not in msg:
+                return
+            transaction_id = msg[KeyType.transaction_id]
+            asset_group_ids = msg[KeyType.asset_group_ids]
+            self.core.send_inserted_notification(self.domain_id, asset_group_ids, transaction_id,
+                                                 only_registered_user=True)
 
 
 class DataHandlerDomain0(DataHandler):
@@ -495,7 +510,7 @@ class DataHandlerDomain0(DataHandler):
         if KeyType.command not in msg:
             return
 
-        if msg[KeyType.command] == DataHandler.CROSS_REF_NOTIFICATION:
+        if msg[KeyType.command] == DataHandler.NOTIFY_CROSS_REF:
             if KeyType.domain_id not in msg or KeyType.transaction_id not in msg:
                 return
             domain_id = msg[KeyType.domain_id]

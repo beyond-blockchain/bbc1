@@ -114,7 +114,6 @@ class BBcCoreService:
         self.logger.debug("config = %s" % conf)
         self.test_tx_obj = BBcTransaction()
         self.insert_notification_user_list = dict()
-        self.insert_notification_node_list = dict()
         self.cross_ref_list = []
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port, use_global=use_global,
                                                  external_ip4addr=ip4addr, external_ip6addr=ip6addr,
@@ -500,19 +499,9 @@ class BBcCoreService:
 
         elif cmd == MsgType.REQUEST_INSERT_NOTIFICATION:
             self.register_to_notification_list(domain_id, dat[KeyType.asset_group_id], dat[KeyType.source_user_id])
-            msg = make_message_structure(domain_id, data_handler.DataHandler.REQUEST_INSERTED_NOTIFICATION,
-                                         dat[KeyType.source_user_id], None)
-            msg[KeyType.infra_command] = InfraMessageCategory.CATEGORY_DATA
-            msg[KeyType.asset_group_id] = dat[KeyType.asset_group_id]
-            self.network.broadcast_message_in_network(domain_id=domain_id, msg=msg)
 
         elif cmd == MsgType.CANCEL_INSERT_NOTIFICATION:
             self.remove_from_notification_list(domain_id, dat[KeyType.asset_group_id], dat[KeyType.source_user_id])
-            msg = make_message_structure(domain_id, data_handler.DataHandler.CANCEL_INSERTED_NOTIFICATION,
-                                         dat[KeyType.source_user_id], None)
-            msg[KeyType.infra_command] = InfraMessageCategory.CATEGORY_DATA
-            msg[KeyType.asset_group_id] = dat[KeyType.asset_group_id]
-            self.network.broadcast_message_in_network(domain_id=domain_id, msg=msg)
 
         else:
             self.logger.error("Bad command/response: %s" % cmd)
@@ -529,7 +518,8 @@ class BBcCoreService:
         self.insert_notification_user_list.setdefault(domain_id, dict())
         self.insert_notification_user_list[domain_id].setdefault(asset_group_id, set())
         self.insert_notification_user_list[domain_id][asset_group_id].add(user_id)
-        self.send_request_notification_to_node(domain_id, asset_group_id)
+        umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+        umr.send_multicast_join(asset_group_id, permanent=True)
 
     def remove_from_notification_list(self, domain_id, asset_group_id, user_id):
         """
@@ -539,15 +529,25 @@ class BBcCoreService:
         :param user_id:
         :return:
         """
-        if domain_id in self.insert_notification_user_list:
+        if domain_id not in self.insert_notification_user_list:
+            return
+        if asset_group_id is not None:
             if asset_group_id in self.insert_notification_user_list[domain_id]:
-                self.insert_notification_user_list[domain_id][asset_group_id].remove(user_id)
-                if len(self.insert_notification_user_list[domain_id][asset_group_id]) == 0:
-                    self.insert_notification_user_list[domain_id].pop(asset_group_id, None)
-                    if domain_id in self.insert_notification_node_list:
-                        self.send_cancel_notification_to_node(domain_id, asset_group_id)
-                if len(self.insert_notification_user_list[domain_id]) == 0:
-                    self.insert_notification_user_list.pop(domain_id, None)
+                self.remove_notification_entry(domain_id, asset_group_id, user_id)
+        else:
+            for asset_group_id in list(self.insert_notification_user_list[domain_id]):
+                self.remove_notification_entry(domain_id, asset_group_id, user_id)
+
+    def remove_notification_entry(self, domain_id, asset_group_id, user_id):
+        print("*** remove user:", user_id.hex())
+        self.insert_notification_user_list[domain_id][asset_group_id].remove(user_id)
+        print("*** removed len=", len(self.insert_notification_user_list[domain_id][asset_group_id]))
+        if len(self.insert_notification_user_list[domain_id][asset_group_id]) == 0:
+            self.insert_notification_user_list[domain_id].pop(asset_group_id, None)
+            umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+            umr.send_multicast_leave(asset_group_id)
+        if len(self.insert_notification_user_list[domain_id]) == 0:
+            self.insert_notification_user_list.pop(domain_id, None)
 
     def validate_transaction(self, txdata, asset_files=None):
         """
@@ -659,33 +659,51 @@ class BBcCoreService:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("[%s] Fail to insert a transaction into the ledger" % self.networking.domains[domain_id]['name'])
             return "Failed to insert a transaction into the ledger"
-        if domain_id in self.insert_notification_user_list:
-            self.send_inserted_notification(domain_id, asset_group_ids, txobj.transaction_id)
+
+        self.send_inserted_notification(domain_id, asset_group_ids, txobj.transaction_id)
 
         return {KeyType.transaction_id: txobj.transaction_id}
 
-    def send_inserted_notification(self, domain_id, asset_group_ids, transaction_id):
+    def send_inserted_notification(self, domain_id, asset_group_ids, transaction_id, only_registered_user=False):
         """
-        broadcast INSERTED_NOTIFICATION
+        broadcast NOTIFY_INSERTED
         :param domain_id:
         :param asset_group_ids:
         :param transaction_id:
+        :param only_registered_user:  If True, notification is not sent to other nodes
         :return:
         """
+        umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+        destination_users = set()
+        destination_nodes = set()
+        for asset_group_id in asset_group_ids:
+            if domain_id in self.insert_notification_user_list:
+                if asset_group_id in self.insert_notification_user_list[domain_id]:
+                    for user_id in self.insert_notification_user_list[domain_id][asset_group_id]:
+                        destination_users.add(user_id)
+            if not only_registered_user:
+                if asset_group_id in umr.forwarding_entries:
+                    for node_id in umr.forwarding_entries[asset_group_id]['nodes']:
+                        destination_nodes.add(node_id)
+
+        if len(destination_users) == 0 and len(destination_nodes) == 0:
+            return
         msg = {
             KeyType.domain_id: domain_id,
-            KeyType.infra_command: InfraMessageCategory.CATEGORY_USER,
+            KeyType.infra_command: data_handler.DataHandler.NOTIFY_INSERTED,
             KeyType.command: MsgType.NOTIFY_INSERTED,
             KeyType.transaction_id: transaction_id,
+            KeyType.asset_group_ids: list(asset_group_ids),
         }
-        umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
-        for asset_group_id in asset_group_ids:
-            if asset_group_id in self.insert_notification_user_list[domain_id]:
-                msg[KeyType.asset_group_id] = asset_group_id
-                for dst_user_id in list(self.insert_notification_user_list[domain_id][asset_group_id]):
-                    msg[KeyType.destination_user_id] = dst_user_id
-                    if not umr.send_message_to_user(msg):
-                        self.insert_notification_user_list[domain_id][asset_group_id].remove(dst_user_id)
+        for user_id in destination_users:
+            msg[KeyType.destination_user_id] = user_id
+            if not umr.send_message_to_user(msg=msg, direct_only=True):
+                self.remove_from_notification_list(domain_id, None, user_id)
+
+        msg[KeyType.infra_msg_type] = InfraMessageCategory.CATEGORY_DATA
+        for node_id in destination_nodes:   # TODO: need test (multiple asset_groups are bundled)
+            msg[KeyType.destination_node_id] = node_id
+            self.networking.send_message_in_network(domain_id=domain_id, msg=msg)
 
     def distribute_transaction_to_gather_signatures(self, domain_id, dat):
         """

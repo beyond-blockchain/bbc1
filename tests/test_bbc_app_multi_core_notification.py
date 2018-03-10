@@ -8,6 +8,7 @@ import sys
 sys.path.extend(["../"])
 from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
+from bbc1.core.data_handler import InfraMessageCategory
 from bbc1.common.bbc_error import *
 from bbc1.app import bbc_app
 from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
@@ -26,6 +27,19 @@ asset_group_id = bbclib.get_new_id("asset_group_1")
 transactions = [None for i in range(client_num)]
 cross_ref_list = [[] for i in range(client_num)]
 msg_processor = [None for i in range(client_num)]
+
+
+def check_insert_response(clnum, transaction_id):
+    msg = msg_processor[clnum].synchronize()
+    if msg[KeyType.command] == bbclib.MsgType.RESPONSE_INSERT:
+        assert msg[KeyType.transaction_id] == transaction_id
+        print("[%d] inserted" % clnum)
+    elif msg[KeyType.command] == bbclib.MsgType.NOTIFY_INSERTED:
+        assert KeyType.asset_group_ids in msg
+        print("[%d] notification txid=%s, asset_group=%s" % (
+            clnum, binascii.b2a_hex(msg[KeyType.transaction_id]),
+            [binascii.b2a_hex(a) for a in msg[KeyType.asset_group_ids]]
+        ))
 
 
 class MessageProcessor(bbc_app.Callback):
@@ -60,25 +74,20 @@ class TestBBcAppClient(object):
 
         global msg_processor
         prepare(core_num=core_num, client_num=client_num, loglevel=LOGLEVEL)
-        cni = 0
         for i in range(core_num):
-            if core_num > 1:
-                cni = i
-            start_core_thread(index=i, core_port_increment=cni, p2p_port_increment=i)
+            start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i)
+            time.sleep(0.1)
             domain_setup_utility(i, domain_id)  # system administrator
         time.sleep(1)
         for i in range(client_num):
-            if core_num > 1:
-                cni = i
             msg_processor[i] = MessageProcessor(index=i)
-            make_client(index=i, core_port_increment=cni, callback=msg_processor[i])
+            make_client(index=i, core_port_increment=i, callback=msg_processor[i])
         time.sleep(1)
 
         global cores, clients
         cores, clients = get_core_client()
 
     def test_10_setup_network(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         ret = clients[0]['app'].get_domain_neighborlist(domain_id=domain_id)
         assert ret
@@ -102,8 +111,15 @@ class TestBBcAppClient(object):
             assert ret
         time.sleep(1)
         for cl in clients:
-            assert cl['app'].request_insert_completion_notification(asset_group_id, True)
-        time.sleep(1)
+            assert cl['app'].request_insert_completion_notification(asset_group_id)
+        time.sleep(2)
+
+        for i in range(core_num):
+            fe = cores[i].networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER].forwarding_entries
+            assert asset_group_id in fe
+            print(fe[asset_group_id]['nodes'])
+            num = len(fe[asset_group_id]['nodes'])
+            assert num == core_num - 1
 
     def test_12_make_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -127,35 +143,18 @@ class TestBBcAppClient(object):
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
             cl['app'].insert_transaction(transactions[i])
+            time.sleep(1)
             print("  ----> wait for notification")
             for j in range(client_num):
+                check_insert_response(j, transactions[i].transaction_id)
                 if i == j:
-                    for k in range(2):
-                        retdat = msg_processor[j].synchronize()
-                        assert KeyType.transaction_id in retdat
-                        if retdat[KeyType.command] == bbclib.MsgType.RESPONSE_INSERT:
-                            assert retdat[KeyType.transaction_id] == transactions[i].transaction_id
-                            print("[%d] inserted" % i)
-                        elif retdat[KeyType.command] == bbclib.MsgType.NOTIFY_INSERTED:
-                            assert KeyType.asset_group_id in retdat
-                            print("[%d] notification txid=%s, asset_group=%s" % (
-                                j, binascii.b2a_hex(retdat[KeyType.transaction_id]),
-                                binascii.b2a_hex(retdat[KeyType.asset_group_id])
-                            ))
-                else:
-                    retdat = msg_processor[j].synchronize()
-                    assert retdat[KeyType.command] == bbclib.MsgType.NOTIFY_INSERTED
-                    assert KeyType.transaction_id in retdat
-                    assert KeyType.asset_group_id in retdat
-                    print("[%d] notification txid=%s, asset_group=%s" % (
-                        j, binascii.b2a_hex(retdat[KeyType.transaction_id]),
-                        binascii.b2a_hex(retdat[KeyType.asset_group_id])
-                    ))
+                    check_insert_response(j, transactions[i].transaction_id)
 
     def test_20_cancel_notification(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        for cl in clients:
-            assert cl['app'].request_insert_completion_notification(asset_group_id, False)
+        clients[0]['app'].cancel_insert_completion_notification(asset_group_id)
+        clients[2]['app'].cancel_insert_completion_notification(asset_group_id)
+        time.sleep(1)
 
     def test_21_make_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -179,14 +178,16 @@ class TestBBcAppClient(object):
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
             cl['app'].insert_transaction(transactions[i])
-            dat = msg_processor[i].synchronize()
-            assert KeyType.transaction_id in dat
-            assert dat[KeyType.transaction_id] == transactions[i].transaction_id
+            for j in range(client_num):
+                if i == j:
+                    check_insert_response(j, transactions[i].transaction_id)
+                if j in [1,3,4]:
+                    check_insert_response(j, transactions[i].transaction_id)
 
     def test_22_enable_notification(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for cl in clients:
-            assert cl['app'].request_insert_completion_notification(asset_group_id, True)
+            assert cl['app'].request_insert_completion_notification(asset_group_id)
 
     def test_23_make_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -212,28 +213,9 @@ class TestBBcAppClient(object):
             cl['app'].insert_transaction(transactions[i])
             print("  ----> wait for notification")
             for j in range(client_num):
+                check_insert_response(j, transactions[i].transaction_id)
                 if i == j:
-                    for k in range(2):
-                        retdat = msg_processor[j].synchronize()
-                        assert KeyType.transaction_id in retdat
-                        if retdat[KeyType.command] == bbclib.MsgType.RESPONSE_INSERT:
-                            assert retdat[KeyType.transaction_id] == transactions[i].transaction_id
-                            print("[%d] inserted" % i)
-                        elif retdat[KeyType.command] == bbclib.MsgType.NOTIFY_INSERTED:
-                            assert KeyType.asset_group_id in retdat
-                            print("[%d] notification txid=%s, asset_group=%s" % (
-                                j, binascii.b2a_hex(retdat[KeyType.transaction_id]),
-                                binascii.b2a_hex(retdat[KeyType.asset_group_id])
-                            ))
-                else:
-                    retdat = msg_processor[j].synchronize()
-                    assert retdat[KeyType.command] == bbclib.MsgType.NOTIFY_INSERTED
-                    assert KeyType.transaction_id in retdat
-                    assert KeyType.asset_group_id in retdat
-                    print("[%d] notification txid=%s, asset_group=%s" % (
-                        j, binascii.b2a_hex(retdat[KeyType.transaction_id]),
-                        binascii.b2a_hex(retdat[KeyType.asset_group_id])
-                    ))
+                    check_insert_response(j, transactions[i].transaction_id)
 
     @pytest.mark.unregister
     def test_98_unregister(self):

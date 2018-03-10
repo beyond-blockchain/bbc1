@@ -349,17 +349,23 @@ class BBcAppClient:
         dat = self.make_message_structure(MsgType.UNREGISTER)
         return self.send_msg(dat)
 
-    def request_insert_completion_notification(self, asset_group_id, flag):
+    def request_insert_completion_notification(self, asset_group_id):
         """
         Request notification when a transaction has been inserted (as a copy of transaction)
         :param asset_group_id:
-        :param flag:
         :return:
         """
-        if flag:
-            dat = self.make_message_structure(MsgType.REQUEST_INSERT_NOTIFICATION)
-        else:
-            dat = self.make_message_structure(MsgType.CANCEL_INSERT_NOTIFICATION)
+        dat = self.make_message_structure(MsgType.REQUEST_INSERT_NOTIFICATION)
+        dat[KeyType.asset_group_id] = asset_group_id
+        return self.send_msg(dat)
+
+    def cancel_insert_completion_notification(self, asset_group_id):
+        """
+        Cancel notification when a transaction has been inserted (as a copy of transaction)
+        :param asset_group_id:
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.CANCEL_INSERT_NOTIFICATION)
         dat[KeyType.asset_group_id] = asset_group_id
         return self.send_msg(dat)
 

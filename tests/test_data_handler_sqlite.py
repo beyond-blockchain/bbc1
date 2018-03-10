@@ -87,7 +87,7 @@ class TestDataHandler(object):
         }
         ret = data_handler.insert_transaction(transactions[0].serialize(), transactions[0],
                                               asset_files=asset_files, no_replication=True)
-        assert ret
+        assert asset_group_id1 in ret and asset_group_id2 in ret
 
     def test_04_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -99,7 +99,7 @@ class TestDataHandler(object):
     def test_05_insert_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         ret = data_handler.insert_transaction(transactions[0].serialize(), transactions[0], no_replication=True)
-        assert not ret
+        assert ret is None
 
     def test_06_remove_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -117,7 +117,7 @@ class TestDataHandler(object):
             }
             ret = data_handler.insert_transaction(transactions[i].serialize(), transactions[i],
                                                   asset_files=asset_files, no_replication=True)
-            assert ret
+            assert asset_group_id1 in ret and asset_group_id2 in ret
 
     def test_08_search_transaction_by_user_id(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")

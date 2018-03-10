@@ -86,10 +86,11 @@ class TestBBcAppClient(object):
         prepare(core_num=core_num, client_num=client_num, loglevel=LOGLEVEL)
         for i in range(core_num):
             start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i)
+            time.sleep(0.1)
+            domain_setup_utility(i, domain_id)  # system administrator
         time.sleep(1)
         for i in range(client_num):
             msg_processor[i] = MessageProcessor(index=i)
-            domain_setup_utility(i, domain_id)  # system administrator
             make_client(index=i, core_port_increment=i, callback=msg_processor[i])
         time.sleep(1)
 
@@ -102,7 +103,6 @@ class TestBBcAppClient(object):
             ret = cl['app'].register_to_core()
             assert ret
         time.sleep(1)
-
 
     def test_11_setup_network(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -123,7 +123,7 @@ class TestBBcAppClient(object):
             ret = clients[i]['app'].get_domain_neighborlist(domain_id=domain_id)
             assert ret
             dat = msg_processor[i].synchronize()
-            assert len(dat) == 5
+            assert len(dat) == core_num
 
     def test_12_cross_ref(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")

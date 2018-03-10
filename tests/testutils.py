@@ -4,6 +4,7 @@ import os
 import shutil
 import threading
 import time
+import copy
 
 import sys
 sys.path.extend(["../"])
@@ -15,13 +16,15 @@ from bbc1.core.bbc_config import DEFAULT_CORE_PORT, DEFAULT_P2P_PORT
 
 cores = None
 clients = None
+stats = None
 domain_id = None
 loglv = 'debug'
 
 
 def prepare(core_num=1, client_num=1, loglevel='debug'):
-    global cores, clients, loglv
+    global cores, clients, stats, loglv
     cores = [None for i in range(core_num)]
+    stats = [None for i in range(core_num)]
     clients = [dict() for i in range(client_num)]
     loglv = loglevel
 
@@ -56,7 +59,7 @@ def domain_setup_utility(core_port_increment, dom_id, network_module=None):
     cl.domain_setup(dom_id)
     global domain_id
     domain_id = dom_id
-    wait_check_result_msg_type(cl.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_DOMAIN)
+    wait_check_result_msg_type(cl.callback, bbclib.MsgType.RESPONSE_SETUP_DOMAIN)
     cl.unregister_from_core()
 
 
@@ -86,3 +89,18 @@ def wait_check_result_msg_type(callback, msg_type):
     if dat[KeyType.command] != msg_type:
         print("XXXXXX not expected result: %d <=> %d(received)" % (msg_type, dat[KeyType.command]))
     return dat
+
+
+def get_stats(i):
+    global stats
+    stats[i] = copy.deepcopy(cores[i].stats.get_stats())
+
+
+def get_stat_diffs(i):
+    stats_diff = copy.deepcopy(cores[i].stats.get_stats())
+    for key in stats_diff.keys():
+        for key2 in stats_diff[key].keys():
+            if key in stats[i]:
+                stats_diff[key][key2] -= stats[i][key].get(key2, 0)
+    get_stats(i)
+    return stats_diff

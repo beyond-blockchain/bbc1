@@ -133,8 +133,7 @@ class TestFileProofClient(object):
     def test_01_setup_network(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
 
-        ret = clients[0].get_domain_peerlist(domain_id=domain_id)
-        assert ret
+        clients[0].get_domain_peerlist(domain_id=domain_id)
         dat = clients[0].callback.synchronize()
         print("[0] nodeinfo=",dat[0])
         node_id, ipv4, ipv6, port = dat[0]
@@ -186,16 +185,16 @@ class TestFileProofClient(object):
         if response_data[KeyType.status] < ESUCCESS:
             print("ERROR: ", response_data[KeyType.reason].decode())
             assert False
+        time.sleep(1)
 
     def test_11_verify_file(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         # -- verify by user_1
-        ret = clients[1].search_asset(asset_group_id, asset_id)
-        assert ret
+        clients[1].search_transaction_with_condition(asset_group_id=asset_group_id, asset_id=asset_id)
         response_data = clients[1].callback.synchronize()
         assert response_data[KeyType.status] == ESUCCESS
 
-        txobj = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
+        txobj = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transactions][0])
         digest = txobj.digest()
         ret = txobj.signatures[0].verify(digest)
         assert ret
@@ -244,7 +243,7 @@ class TestFileProofClient(object):
 
     def test_99_quit(self):
         for core in cores:
-            core.networking.save_all_peer_lists()
+            core.networking.save_all_static_node_list()
             core.config.update_config()
 
 
