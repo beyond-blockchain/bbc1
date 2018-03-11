@@ -388,12 +388,6 @@ class BBcCoreService:
                 retmsg[KeyType.merkle_tree] = result
                 umr.send_message_to_user(retmsg)
 
-        elif cmd == MsgType.REQUEST_GET_STATS:
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_STATS,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
-            retmsg[KeyType.stats] = self.stats.get_stats()
-            umr.send_message_to_user(retmsg, sock=socket)
-
         elif cmd == MsgType.REGISTER:
             if not self.param_check([KeyType.domain_id, KeyType.source_user_id], dat):
                 self.logger.debug("REGISTER: bad format")
@@ -408,24 +402,19 @@ class BBcCoreService:
             umr.unregister_user(dat[KeyType.source_user_id], socket)
             return True, None
 
-        elif cmd == MsgType.REQUEST_SETUP_DOMAIN:
-            retmsg = make_message_structure(None, MsgType.RESPONSE_SETUP_DOMAIN,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
-            domain_id = dat.get(KeyType.domain_id, None)
-            if domain_id is None:
-                retmsg[KeyType.result] = False
-            else:
-                config = None
-                if KeyType.bbc_configuration in dat:
-                    try:
-                        config = json.loads(dat[KeyType.bbc_configuration])
-                    except:
-                        config = None
-                self.networking.create_domain(domain_id=domain_id, config=config)
-                retmsg[KeyType.result] = True
-            retmsg[KeyType.domain_id] = domain_id
-            self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER].send_message_to_user(retmsg, sock=socket)
+        elif cmd == MsgType.REQUEST_INSERT_NOTIFICATION:
+            self.register_to_notification_list(domain_id, dat[KeyType.asset_group_id], dat[KeyType.source_user_id])
 
+        elif cmd == MsgType.CANCEL_INSERT_NOTIFICATION:
+            self.remove_from_notification_list(domain_id, dat[KeyType.asset_group_id], dat[KeyType.source_user_id])
+
+        elif cmd == MsgType.REQUEST_GET_STATS:
+            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_STATS,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg[KeyType.stats] = self.stats.get_stats()
+            umr.send_message_to_user(retmsg, sock=socket)
+
+        # --- TODO: REQUEST_GET_PEERLIST will be obsoleted in v0.10
         elif cmd == MsgType.REQUEST_GET_NEIGHBORLIST or cmd == MsgType.REQUEST_GET_PEERLIST:
             domain_id = dat[KeyType.domain_id]
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_NEIGHBORLIST,
@@ -433,19 +422,6 @@ class BBcCoreService:
             if domain_id in self.networking.domains:
                 retmsg[KeyType.domain_id] = domain_id
                 retmsg[KeyType.neighbor_list] = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].make_neighbor_list()
-            umr.send_message_to_user(retmsg, sock=socket)
-
-        elif cmd == MsgType.REQUEST_SET_STATIC_NODE:
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_SET_STATIC_NODE,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
-            retmsg[KeyType.domain_id] = domain_id
-            node_info = dat.get(KeyType.node_info, None)
-            if node_info is None:
-                retmsg[KeyType.result] = False
-            else:
-                self.networking.add_neighbor(domain_id, *node_info, is_static=True)
-                self.config.update_config()
-                retmsg[KeyType.result] = True
             umr.send_message_to_user(retmsg, sock=socket)
 
         elif cmd == MsgType.REQUEST_GET_CONFIG:
@@ -465,6 +441,68 @@ class BBcCoreService:
             retmsg[KeyType.domain_list] = bytes(data)
             umr.send_message_to_user(retmsg, sock=socket)
 
+        elif cmd == MsgType.REQUEST_GET_FORWARDING_LIST:
+            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_FORWARDING_LIST,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            data = bytearray()
+            data.extend(to_2byte(len(umr.forwarding_entries)))
+            for user_id in umr.forwarding_entries:
+                data.extend(user_id)
+                data.extend(to_2byte(len(umr.forwarding_entries[user_id]['nodes'])))
+                for node_id in umr.forwarding_entries[user_id]['nodes']:
+                    data.extend(node_id)
+            retmsg[KeyType.forwarding_list] = bytes(data)
+            umr.send_message_to_user(retmsg, sock=socket)
+
+        elif cmd == MsgType.REQUEST_GET_USERS:
+            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_USERS,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            data = bytearray()
+            data.extend(to_2byte(len(umr.registered_users)))
+            for user_id in umr.registered_users.keys():
+                data.extend(user_id)
+            retmsg[KeyType.user_list] = bytes(data)
+            umr.send_message_to_user(retmsg, sock=socket)
+
+        elif cmd == MsgType.REQUEST_GET_NODEID:
+            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_NODEID,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            data = bytearray()
+            data.extend(self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].my_node_id)
+            retmsg[KeyType.node_id] = bytes(data)
+            umr.send_message_to_user(retmsg, sock=socket)
+
+        elif cmd == MsgType.REQUEST_GET_NOTIFICATION_LIST:
+            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_NOTIFICATION_LIST,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            data = bytearray()
+            data.extend(to_2byte(len(self.insert_notification_user_list[domain_id])))
+            for asset_group_id in self.insert_notification_user_list[domain_id].keys():
+                data.extend(asset_group_id)
+                data.extend(to_2byte(len(self.insert_notification_user_list[domain_id][asset_group_id])))
+                for user_id in self.insert_notification_user_list[domain_id][asset_group_id]:
+                    data.extend(user_id)
+            retmsg[KeyType.notification_list] = bytes(data)
+            umr.send_message_to_user(retmsg, sock=socket)
+
+        elif cmd == MsgType.REQUEST_SETUP_DOMAIN:
+            retmsg = make_message_structure(None, MsgType.RESPONSE_SETUP_DOMAIN,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            domain_id = dat.get(KeyType.domain_id, None)
+            if domain_id is None:
+                retmsg[KeyType.result] = False
+            else:
+                config = None
+                if KeyType.bbc_configuration in dat:
+                    try:
+                        config = json.loads(dat[KeyType.bbc_configuration])
+                    except:
+                        config = None
+                self.networking.create_domain(domain_id=domain_id, config=config)
+                retmsg[KeyType.result] = True
+            retmsg[KeyType.domain_id] = domain_id
+            self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER].send_message_to_user(retmsg, sock=socket)
+
         elif cmd == MsgType.DOMAIN_PING:
             if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.port_number], dat):
                 return False, None
@@ -476,15 +514,18 @@ class BBcCoreService:
             port = dat[KeyType.port_number]
             self.networking.send_domain_ping(domain_id, ipv4, ipv6, port)
 
-        elif cmd == MsgType.REQUEST_PING_TO_ALL:
-            domain_id = dat[KeyType.domain_id]
-            if domain_id in self.networking.domains:
-                self.networking.domains[domain_id].ping_to_all_neighbors()
-
-        elif cmd == MsgType.REQUEST_ALIVE_CHECK:
-            domain_id = dat[KeyType.domain_id]
-            if domain_id in self.networking.domains:
-                self.networking.domains[domain_id].send_peerlist(None)
+        elif cmd == MsgType.REQUEST_SET_STATIC_NODE:
+            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_SET_STATIC_NODE,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg[KeyType.domain_id] = domain_id
+            node_info = dat.get(KeyType.node_info, None)
+            if node_info is None:
+                retmsg[KeyType.result] = False
+            else:
+                self.networking.add_neighbor(domain_id, *node_info, is_static=True)
+                self.config.update_config()
+                retmsg[KeyType.result] = True
+            umr.send_message_to_user(retmsg, sock=socket)
 
         elif cmd == MsgType.REQUEST_MANIP_LEDGER_SUBSYS:
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_MANIP_LEDGER_SUBSYS,
@@ -496,12 +537,6 @@ class BBcCoreService:
                     self.ledger_subsystem.disable()
                 self.ledger_subsystem.set_domain(dat[KeyType.domain_id])
                 umr.send_message_to_user(retmsg, sock=socket)
-
-        elif cmd == MsgType.REQUEST_INSERT_NOTIFICATION:
-            self.register_to_notification_list(domain_id, dat[KeyType.asset_group_id], dat[KeyType.source_user_id])
-
-        elif cmd == MsgType.CANCEL_INSERT_NOTIFICATION:
-            self.remove_from_notification_list(domain_id, dat[KeyType.asset_group_id], dat[KeyType.source_user_id])
 
         else:
             self.logger.error("Bad command/response: %s" % cmd)

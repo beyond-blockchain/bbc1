@@ -38,7 +38,6 @@ DEFAULT_P2P_PORT = 6641
 MAPPING_FILE = ".bbc_id_mappings"
 
 MESSAGE_WITH_NO_RESPONSE = (MsgType.MESSAGE, MsgType.REGISTER, MsgType.UNREGISTER, MsgType.DOMAIN_PING,
-                            MsgType.REQUEST_PING_TO_ALL, MsgType.REQUEST_ALIVE_CHECK,
                             MsgType.REQUEST_INSERT_NOTIFICATION, MsgType.CANCEL_INSERT_NOTIFICATION)
 
 
@@ -120,6 +119,32 @@ def get_list_from_mappings(asset_group_id):
             result.append(name)
         return result
     return None
+
+
+def parse_one_level_list(dat):
+    results = []
+    count = int.from_bytes(dat[:2], 'big')
+    for i in range(count):
+        base = 2 + 32 * i
+        results.append(dat[base:base + 32])
+    return results
+
+
+def parse_two_level_dict(dat):
+    results = dict()
+    count = int.from_bytes(dat[:2], 'big')
+    ptr = 2
+    for i in range(count):
+        first_id = dat[ptr:ptr+32]
+        ptr += 32
+        results[first_id] = list()
+        count2 = int.from_bytes(dat[ptr:ptr+2], 'big')
+        ptr += 2
+        for j in range(count2):
+            second_id = dat[ptr:ptr+32]
+            ptr += 32
+            results[first_id].append(second_id)
+    return results
 
 
 class BBcAppClient:
@@ -218,6 +243,16 @@ class BBcAppClient:
             dat[KeyType.bbc_configuration] = config
         return self.send_msg(dat)
 
+    def get_node_id(self):
+        """
+        Get node_id of the connecting core node
+
+        :param domain_id:
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_GET_NODEID)
+        return self.send_msg(dat)
+
     def get_domain_neighborlist(self, domain_id):
         """
         Get peer list of the domain from the core node (maybe used by a system administrator)
@@ -279,26 +314,6 @@ class BBcAppClient:
         dat[KeyType.static_entry] = True
         return self.send_msg(dat)
 
-    def ping_to_all_neighbors(self, domain_id):
-        """
-        Request bbc_core to send ping to all its neighbors
-        :param domain_id:
-        :return:
-        """
-        dat = self.make_message_structure(MsgType.REQUEST_PING_TO_ALL)
-        dat[KeyType.domain_id] = domain_id
-        return self.send_msg(dat)
-
-    def broadcast_peerlist_to_all_neighbors(self, domain_id):
-        """
-        Request bbc_core to broadcast peerlist to all its neighbors
-        :param domain_id:
-        :return:
-        """
-        dat = self.make_message_structure(MsgType.REQUEST_ALIVE_CHECK)
-        dat[KeyType.domain_id] = domain_id
-        return self.send_msg(dat)
-
     def get_bbc_config(self):
         """
         Get config file of bbc_core (maybe used by a system administrator)
@@ -315,6 +330,33 @@ class BBcAppClient:
         :return:
         """
         dat = self.make_message_structure(MsgType.REQUEST_GET_DOMAINLIST)
+        return self.send_msg(dat)
+
+    def get_user_list(self):
+        """
+        Get user_ids in the domain that are connecting to the core node
+
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_GET_USERS)
+        return self.send_msg(dat)
+
+    def get_forwarding_list(self):
+        """
+        Get forwarding_list of the domain in the core node
+
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_GET_FORWARDING_LIST)
+        return self.send_msg(dat)
+
+    def get_notification_list(self):
+        """
+        Get notification_list of the core node
+
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_GET_NOTIFICATION_LIST)
         return self.send_msg(dat)
 
     def manipulate_ledger_subsystem(self, enable=False, domain_id=None):
@@ -644,22 +686,30 @@ class Callback:
             self.proc_resp_register_hash(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS:
             self.proc_resp_verify_hash(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_SETUP_DOMAIN:
-            self.proc_resp_domain_setup(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_GET_STATS:
+            self.proc_resp_get_stats(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GET_PEERLIST: # TODO: will be obsoleted in v0.10
             self.proc_resp_get_neighborlist(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GET_NEIGHBORLIST:
             self.proc_resp_get_neighborlist(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GET_DOMAINLIST:
             self.proc_resp_get_domainlist(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_SET_STATIC_NODE:
-            self.proc_resp_set_peer(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_GET_USERS:
+            self.proc_resp_get_userlist(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_GET_FORWARDING_LIST:
+            self.proc_resp_get_forwardinglist(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_GET_NOTIFICATION_LIST:
+            self.proc_resp_get_notificationlist(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_GET_NODEID:
+            self.proc_resp_get_node_id(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GET_CONFIG:
             self.proc_resp_get_config(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_MANIP_LEDGER_SUBSYS:
             self.proc_resp_ledger_subsystem(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_GET_STATS:
-            self.proc_resp_get_stats(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_SETUP_DOMAIN:
+            self.proc_resp_domain_setup(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_SET_STATIC_NODE:
+            self.proc_resp_set_neighbor(dat)
         else:
             self.logger.warn("No method to process for command=%d" % dat[KeyType.command])
 
@@ -734,6 +784,9 @@ class Callback:
     def proc_user_message(self, dat):
         self.queue.put(dat)
 
+    def proc_resp_ledger_subsystem(self, dat):
+        self.queue.put(dat)
+
     def proc_resp_register_hash(self, dat):
         self.queue.put(dat)
 
@@ -741,6 +794,12 @@ class Callback:
         self.queue.put(dat)
 
     def proc_resp_domain_setup(self, dat):
+        self.queue.put(dat)
+
+    def proc_resp_set_neighbor(self, dat):
+        self.queue.put(dat)
+
+    def proc_resp_get_config(self, dat):
         self.queue.put(dat)
 
     def proc_resp_get_neighborlist(self, dat):
@@ -776,23 +835,37 @@ class Callback:
         if KeyType.domain_list not in dat:
             self.queue.put(None)
             return
-        domainlist = dat[KeyType.domain_list]
-        results = []
-        count = int.from_bytes(domainlist[:2], 'big')
-        for i in range(count):
-            base = 2 + 32*i
-            domain_id = domainlist[base:base+32]
-            results.append(domain_id)
-        self.queue.put(results)
+        self.queue.put(parse_one_level_list(dat[KeyType.domain_list]))
 
-    def proc_resp_set_peer(self, dat):
-        self.queue.put(dat)
+    def proc_resp_get_userlist(self, dat):
+        """
+        Return list of user_ids
+        :param dat:
+        :return:
+        """
+        if KeyType.user_list not in dat:
+            self.queue.put(None)
+            return
+        self.queue.put(parse_one_level_list(dat[KeyType.user_list]))
 
-    def proc_resp_get_config(self, dat):
-        self.queue.put(dat)
+    def proc_resp_get_forwardinglist(self, dat):
+        if KeyType.forwarding_list not in dat:
+            self.queue.put(None)
+            return
+        self.queue.put(parse_two_level_dict(dat[KeyType.forwarding_list]))
 
-    def proc_resp_ledger_subsystem(self, dat):
-        self.queue.put(dat)
+    def proc_resp_get_notificationlist(self, dat):
+        if KeyType.notification_list not in dat:
+            self.queue.put(None)
+            return
+        self.queue.put(parse_two_level_dict(dat[KeyType.notification_list]))
+
+    def proc_resp_get_node_id(self, dat):
+        if KeyType.node_id not in dat:
+            self.queue.put(None)
+            return
+        self.queue.put(dat[KeyType.node_id])
 
     def proc_resp_get_stats(self, dat):
         self.queue.put(dat)
+
