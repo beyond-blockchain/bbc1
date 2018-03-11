@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import time
+import traceback
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
@@ -26,6 +26,10 @@ from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.core import query_management
 
 ticker = query_management.get_ticker()
+
+
+def direct_send_to_user(sock, msg):
+    sock.sendall(message_key_types.make_message(PayloadType.Type_msgpack, msg))
 
 
 class UserMessageRouting:
@@ -132,22 +136,13 @@ class UserMessageRouting:
             self.forwarding_entries.pop(user_id, None)
         self.stats.update_stats("user_message", "registered_users_in_forwarding_list", len(self.forwarding_entries))
 
-    def send_message_to_user(self, msg, sock=None, direct_only=False):
+    def send_message_to_user(self, msg, direct_only=False):
         """
         Forward message to connecting user
         :param msg:
-        :param sock:
         :param direct_only: If true, forward_message_to_another_node is not called.
         :return:
         """
-        if sock is not None:
-            try:
-                sock.sendall(message_key_types.make_message(PayloadType.Type_msgpack, msg))
-                self.stats.update_stats_increment("user_message", "sent_msg_to_user", 1)
-                return True
-            except:
-                return False
-
         if KeyType.destination_user_id not in msg:
             return True
 
@@ -161,7 +156,7 @@ class UserMessageRouting:
         count = len(socks)
         for s in socks:
             try:
-                s.sendall(message_key_types.make_message(PayloadType.Type_msgpack, msg))
+                direct_send_to_user(s, msg)
                 self.stats.update_stats_increment("user_message", "sent_msg_to_user", 1)
             except:
                 count -= 1

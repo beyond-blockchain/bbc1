@@ -50,9 +50,6 @@ class DataHandler:
     REQUEST_SEARCH = to_2byte(2)
     RESPONSE_SEARCH = to_2byte(3)
     NOTIFY_INSERTED = to_2byte(4)
-    NOTIFY_CROSS_REF = to_2byte(5)
-    REQUEST_VERIFY = to_2byte(6)
-    RESPONSE_VERIFY = to_2byte(7)
 
     def __init__(self, network=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
         if network is not None:
@@ -457,18 +454,8 @@ class DataHandler:
 
 
 class DataHandlerDomain0(DataHandler):
-    INITIAL_ACCEPT_LIMIT = 10
-
     def __init__(self, network=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
-        if network is not None:
-            self.network = network
-            self.core = network.core
-        self.logger = logger.get_logger(key="data_handler", level=loglevel, logname=logname)
-        self.domain_id = domain_id
-        self.domain_id_str = bbclib.convert_id_to_string(domain_id)
-        self.config = config
-        self.working_dir = workingdir
-        self.cross_ref_accept_limit = dict()
+        pass
 
     def close_db(self):
         pass
@@ -507,22 +494,7 @@ class DataHandlerDomain0(DataHandler):
         pass
 
     def process_message(self, msg):
-        if KeyType.command not in msg:
-            return
-
-        if msg[KeyType.command] == DataHandler.NOTIFY_CROSS_REF:
-            if KeyType.domain_id not in msg or KeyType.transaction_id not in msg:
-                return
-            domain_id = msg[KeyType.domain_id]
-            if domain_id not in self.cross_ref_accept_limit:
-                self.cross_ref_accept_limit[domain_id] = DataHandlerDomain0.INITIAL_ACCEPT_LIMIT
-            if self.cross_ref_accept_limit[domain_id] > 0:
-                self.core.add_cross_ref_into_list(domain_id, msg[KeyType.transaction_id])
-                self.cross_ref_accept_limit[domain_id] -= 1
-
-        if msg[KeyType.command] == DataHandler.REQUEST_VERIFY:
-            domain_id = msg[KeyType.domain_id]
-            transaction_id = msg[KeyType.transaction_id]
+        pass
 
 
 class DbAdaptor:

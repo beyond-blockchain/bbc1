@@ -33,3 +33,4 @@ class InfraMessageCategory:
     CATEGORY_TOPOLOGY = to_2byte(1)
     CATEGORY_USER = to_2byte(2)
     CATEGORY_DATA = to_2byte(3)
+    CATEGORY_DOMAIN0 = to_2byte(4)

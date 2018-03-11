@@ -36,6 +36,7 @@ from bbc1.core.bbc_types import ResourceType, InfraMessageCategory
 from bbc1.core.topology_manager import TopologyManagerBase
 from bbc1.core.user_message_routing import UserMessageRouting
 from bbc1.core.data_handler import DataHandler, DataHandlerDomain0
+from bbc1.core.domain0_manager import Domain0Manager
 from bbc1.core import query_management
 from bbc1.common import bbclib, message_key_types
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
@@ -119,14 +120,15 @@ class BBcNetwork:
     """
     NOTIFY_LEAVE = to_2byte(0)
 
-    def __init__(self, config, core=None, p2p_port=None, use_global=True, external_ip4addr=None, external_ip6addr=None,
+    def __init__(self, config, core=None, p2p_port=None, external_ip4addr=None, external_ip6addr=None,
                  loglevel="all", logname=None):
         self.core = core
         self.stats = core.stats
         self.logger = logger.get_logger(key="bbc_network", level=loglevel, logname=logname)
         self.logname = logname
+        self.loglevel = loglevel
         self.config = config
-        self.use_global = use_global
+        self.domain0manager = None
         conf = self.config.get_config()
         self.domains = dict()
         self.ip_address, self.ip6_address = check_my_IPaddresses()
@@ -202,15 +204,26 @@ class BBcNetwork:
                                                            sock=self.get_my_socket_info())
         self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY] = TopologyManagerBase(network=self,
                                                                                               domain_id=domain_id,
-                                                                                              node_id=node_id)
-        self.domains[domain_id][InfraMessageCategory.CATEGORY_USER] = UserMessageRouting(self, domain_id)
+                                                                                              node_id=node_id,
+                                                                                              logname=self.logname,
+                                                                                              loglevel=self.loglevel)
+        self.domains[domain_id][InfraMessageCategory.CATEGORY_USER] = UserMessageRouting(self, domain_id,
+                                                                                         logname=self.logname,
+                                                                                         loglevel=self.loglevel)
+
         workingdir = self.config.get_config()['workingdir']
         if domain_id == ZEROS:
-            self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA] = DataHandlerDomain0(self, domain_id=domain_id)
+            self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA] = DataHandlerDomain0(self,
+                                                                                             domain_id=domain_id,
+                                                                                             logname=self.logname,
+                                                                                             loglevel=self.loglevel)
+            self.domain0manager = Domain0Manager(self, node_id=node_id, logname=self.logname, loglevel=self.loglevel)
         else:
             self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA] = DataHandler(self, config=conf,
                                                                                       workingdir=workingdir,
-                                                                                      domain_id=domain_id)
+                                                                                      domain_id=domain_id,
+                                                                                      logname=self.logname,
+                                                                                      loglevel=self.loglevel)
         self.stats.update_stats_increment("network", "num_domains", 1)
         return True
 
@@ -222,7 +235,7 @@ class BBcNetwork:
         :return:
         """
         if domain_id not in self.domains:
-            return
+            return False
         msg = {
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_NETWORK,
             KeyType.domain_id: domain_id,
@@ -231,8 +244,13 @@ class BBcNetwork:
         self.broadcast_message_in_network(domain_id=domain_id, msg=msg)
         self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].stop_all_timers()
         self.domains[domain_id][InfraMessageCategory.CATEGORY_USER].stop_all_timers()
+        if domain_id == ZEROS:
+            self.domain0manager.stop_all_timers()
+        else:
+            self.domain0manager.remove_domain(domain_id)
         del self.domains[domain_id]
         self.stats.update_stats_decrement("network", "num_domains", 1)
+        return True
 
     def save_all_static_node_list(self):
         """
@@ -464,6 +482,9 @@ class BBcNetwork:
         elif msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_TOPOLOGY:
             self.add_neighbor(domain_id, msg[KeyType.source_node_id], ipv4, ipv6, port)
             self.domains[domain_id][msg[KeyType.infra_msg_type]].process_message(ipv4, ipv6, port, msg)
+        elif msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_DOMAIN0:
+            self.add_neighbor(domain_id, msg[KeyType.source_node_id], ipv4, ipv6, port)
+            self.domain0manager.process_message(msg)
 
     def process_message(self, domain_id, ipv4, ipv6, port, msg):
         """

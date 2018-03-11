@@ -243,6 +243,14 @@ class BBcAppClient:
             dat[KeyType.bbc_configuration] = config
         return self.send_msg(dat)
 
+    def domain_close(self):
+        """
+        Close domain leading to remove_domain in the core
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_CLOSE_DOMAIN)
+        return self.send_msg(dat)
+
     def get_node_id(self):
         """
         Get node_id of the connecting core node
@@ -710,6 +718,8 @@ class Callback:
             self.proc_resp_domain_setup(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SET_STATIC_NODE:
             self.proc_resp_set_neighbor(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_CLOSE_DOMAIN:
+            self.proc_resp_domain_close(dat)
         else:
             self.logger.warn("No method to process for command=%d" % dat[KeyType.command])
 
@@ -794,6 +804,9 @@ class Callback:
         self.queue.put(dat)
 
     def proc_resp_domain_setup(self, dat):
+        self.queue.put(dat)
+
+    def proc_resp_domain_close(self, dat):
         self.queue.put(dat)
 
     def proc_resp_set_neighbor(self, dat):

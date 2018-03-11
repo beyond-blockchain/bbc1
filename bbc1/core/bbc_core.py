@@ -100,7 +100,7 @@ def check_transaction_if_having_asset_file(txdata, asid):
 
 
 class BBcCoreService:
-    def __init__(self, p2p_port=None, core_port=None, use_global=False, ip4addr=None, ip6addr=None,
+    def __init__(self, p2p_port=None, core_port=None, use_domain0=False, ip4addr=None, ip6addr=None,
                  workingdir=".bbc1", configfile=None, use_ledger_subsystem=False,
                  loglevel="all", logname="-", server_start=True):
         self.logger = logger.get_logger(key="core", level=loglevel, logname=logname)
@@ -115,7 +115,7 @@ class BBcCoreService:
         self.test_tx_obj = BBcTransaction()
         self.insert_notification_user_list = dict()
         self.cross_ref_list = []
-        self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port, use_global=use_global,
+        self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port,
                                                  external_ip4addr=ip4addr, external_ip6addr=ip6addr,
                                                  loglevel=loglevel, logname=logname)
         self.ledger_subsystem = None
@@ -126,6 +126,8 @@ class BBcCoreService:
 
         for domain_id_str in conf['domains'].keys():
             domain_id = bbclib.convert_idstring_to_bytes(domain_id_str)
+            if not use_domain0 and domain_id == bbclib.domain_global_0:
+                continue
             c = self.config.get_domain_config(domain_id)
             self.networking.create_domain(domain_id=domain_id, config=c)
             for nd, info in c['static_nodes'].items():
@@ -232,8 +234,9 @@ class BBcCoreService:
         if not self.param_check([KeyType.command, KeyType.source_user_id], dat):
             self.logger.debug("message has bad format")
             return False, None
-        if KeyType.domain_id in dat:
-            domain_id = dat[KeyType.domain_id]
+        domain_id = dat.get(KeyType.domain_id, None)
+        umr = None
+        if domain_id is not None:
             if domain_id in self.networking.domains:
                 umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
             else:
@@ -399,7 +402,8 @@ class BBcCoreService:
             return False, (domain_id, user_id)
 
         elif cmd == MsgType.UNREGISTER:
-            umr.unregister_user(dat[KeyType.source_user_id], socket)
+            if umr is not None:
+                umr.unregister_user(dat[KeyType.source_user_id], socket)
             return True, None
 
         elif cmd == MsgType.REQUEST_INSERT_NOTIFICATION:
@@ -412,7 +416,7 @@ class BBcCoreService:
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_STATS,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.stats] = self.stats.get_stats()
-            umr.send_message_to_user(retmsg, sock=socket)
+            user_message_routing.direct_send_to_user(socket, retmsg)
 
         # --- TODO: REQUEST_GET_PEERLIST will be obsoleted in v0.10
         elif cmd == MsgType.REQUEST_GET_NEIGHBORLIST or cmd == MsgType.REQUEST_GET_PEERLIST:
@@ -422,14 +426,14 @@ class BBcCoreService:
             if domain_id in self.networking.domains:
                 retmsg[KeyType.domain_id] = domain_id
                 retmsg[KeyType.neighbor_list] = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].make_neighbor_list()
-            umr.send_message_to_user(retmsg, sock=socket)
+            user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_CONFIG:
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_CONFIG,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             jsondat = self.config.get_json_config()
             retmsg[KeyType.bbc_configuration] = jsondat
-            umr.send_message_to_user(retmsg, sock=socket)
+            user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_DOMAINLIST:
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_DOMAINLIST,
@@ -439,7 +443,7 @@ class BBcCoreService:
             for domain_id in self.networking.domains:
                 data.extend(domain_id)
             retmsg[KeyType.domain_list] = bytes(data)
-            umr.send_message_to_user(retmsg, sock=socket)
+            user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_FORWARDING_LIST:
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_FORWARDING_LIST,
@@ -452,7 +456,7 @@ class BBcCoreService:
                 for node_id in umr.forwarding_entries[user_id]['nodes']:
                     data.extend(node_id)
             retmsg[KeyType.forwarding_list] = bytes(data)
-            umr.send_message_to_user(retmsg, sock=socket)
+            user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_USERS:
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_USERS,
@@ -462,7 +466,7 @@ class BBcCoreService:
             for user_id in umr.registered_users.keys():
                 data.extend(user_id)
             retmsg[KeyType.user_list] = bytes(data)
-            umr.send_message_to_user(retmsg, sock=socket)
+            user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_NODEID:
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_NODEID,
@@ -470,7 +474,7 @@ class BBcCoreService:
             data = bytearray()
             data.extend(self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].my_node_id)
             retmsg[KeyType.node_id] = bytes(data)
-            umr.send_message_to_user(retmsg, sock=socket)
+            user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_NOTIFICATION_LIST:
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_NOTIFICATION_LIST,
@@ -483,12 +487,11 @@ class BBcCoreService:
                 for user_id in self.insert_notification_user_list[domain_id][asset_group_id]:
                     data.extend(user_id)
             retmsg[KeyType.notification_list] = bytes(data)
-            umr.send_message_to_user(retmsg, sock=socket)
+            user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_SETUP_DOMAIN:
             retmsg = make_message_structure(None, MsgType.RESPONSE_SETUP_DOMAIN,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
-            domain_id = dat.get(KeyType.domain_id, None)
             if domain_id is None:
                 retmsg[KeyType.result] = False
             else:
@@ -500,8 +503,14 @@ class BBcCoreService:
                         config = None
                 self.networking.create_domain(domain_id=domain_id, config=config)
                 retmsg[KeyType.result] = True
-            retmsg[KeyType.domain_id] = domain_id
-            self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER].send_message_to_user(retmsg, sock=socket)
+                retmsg[KeyType.domain_id] = domain_id
+            user_message_routing.direct_send_to_user(socket, retmsg)
+
+        elif cmd == MsgType.REQUEST_CLOSE_DOMAIN:
+            retmsg = make_message_structure(None, MsgType.RESPONSE_CLOSE_DOMAIN,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg[KeyType.result] = self.networking.remove_domain(domain_id)
+            user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.DOMAIN_PING:
             if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.port_number], dat):
@@ -510,7 +519,6 @@ class BBcCoreService:
             ipv6 = dat.get(KeyType.ipv6_address, None)
             if ipv4 is None and ipv6 is None:
                 return False, None
-            domain_id = dat[KeyType.domain_id]
             port = dat[KeyType.port_number]
             self.networking.send_domain_ping(domain_id, ipv4, ipv6, port)
 
@@ -525,7 +533,7 @@ class BBcCoreService:
                 self.networking.add_neighbor(domain_id, *node_info, is_static=True)
                 self.config.update_config()
                 retmsg[KeyType.result] = True
-            umr.send_message_to_user(retmsg, sock=socket)
+            user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_MANIP_LEDGER_SUBSYS:
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_MANIP_LEDGER_SUBSYS,
@@ -536,7 +544,7 @@ class BBcCoreService:
                 else:
                     self.ledger_subsystem.disable()
                 self.ledger_subsystem.set_domain(dat[KeyType.domain_id])
-                umr.send_message_to_user(retmsg, sock=socket)
+                user_message_routing.direct_send_to_user(socket, retmsg)
 
         else:
             self.logger.error("Bad command/response: %s" % cmd)
@@ -574,9 +582,7 @@ class BBcCoreService:
                 self.remove_notification_entry(domain_id, asset_group_id, user_id)
 
     def remove_notification_entry(self, domain_id, asset_group_id, user_id):
-        print("*** remove user:", user_id.hex())
         self.insert_notification_user_list[domain_id][asset_group_id].remove(user_id)
-        print("*** removed len=", len(self.insert_notification_user_list[domain_id][asset_group_id]))
         if len(self.insert_notification_user_list[domain_id][asset_group_id]) == 0:
             self.insert_notification_user_list[domain_id].pop(asset_group_id, None)
             umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
@@ -876,7 +882,7 @@ if __name__ == '__main__':
         core_port=argresult.coreport,
         workingdir=argresult.workingdir,
         configfile=argresult.config,
-        use_global=argresult.globaldomain,
+        use_domain0=argresult.domain0,
         use_ledger_subsystem=argresult.ledgersubsystem,
         ip4addr=argresult.ip4addr,
         ip6addr=argresult.ip6addr,

@@ -46,6 +46,7 @@ class TopologyManagerBase:
 
     def __init__(self, network=None, config=None, domain_id=None, node_id=None, loglevel="all", logname=None):
         self.network = network
+        self.stats = network.core.stats
         self.neighbors = network.domains[domain_id]['neighbor']
         self.config = config
         self.domain_id = domain_id
@@ -191,6 +192,7 @@ class TopologyManagerBase:
         if KeyType.destination_node_id not in msg or KeyType.command not in msg:
             return
         if msg[KeyType.command] == TopologyManagerBase.NOTIFY_NEIGHBOR_LIST:
+            self.stats.update_stats_increment("topology_manager", "NOTIFY_NEIGHBOR_LIST", 1)
             self.update_refresh_timer_entry(new_entry=False)
             diff_flag = self.update_neighbor_list(msg[KeyType.neighbor_list])
             if diff_flag:
