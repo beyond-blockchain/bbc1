@@ -59,13 +59,16 @@ class Ticker:
                     entry = self.schedule.pop(0)
                 if entry.nonce in self.queries:
                     entry.fire()
+            print("%s" % [e.expire_at for e in self.schedule_final])
             while len(self.schedule_final) > 0 and self.schedule_final[0].expire_at <= time.time():
+                #print("%s" % [e.expire_at for e in self.schedule_final])
                 with self.lock:
                     entry = self.schedule_final.pop(0)
                 if entry.nonce in self.queries:
                     entry.fire()
                     del self.queries[entry.nonce]
             time.sleep(self.tick_interval)
+            print(".")
 
     def add_entry(self, entry):
         nonce = random.randint(0, 0xFFFFFFFF)  # 4-byte
@@ -76,6 +79,8 @@ class Ticker:
         with self.lock:
             self.schedule_final.append(entry)
             self.schedule_final.sort(key=lambda ent: ent.expire_at)
+            print(" --> add:", entry.expire_at)
+            print("%s" % [e.expire_at for e in self.schedule_final])
         return nonce
 
     def get_entry(self, nonce):
@@ -154,6 +159,7 @@ class QueryEntry:
         :return:
         """
         self.expire_at = time.time() + expire_after
+        print(" -> update_expiration_time:", self.expire_at)
         if ticker is not None:
             ticker.refresh_timer()
 

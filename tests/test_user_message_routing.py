@@ -227,7 +227,7 @@ class TestBBcNetwork(object):
     def test_14_unregister_user19(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         assert len(user_routings[9].registered_users) == 2
-        user_routings[9].unregister_user(user_id=users[19])
+        user_routings[9].unregister_user(user_id=users[19], socket=client_socks[19])
         assert len(user_routings[9].registered_users) == 1
 
     def test_15_send_message_to_user19(self):
@@ -254,8 +254,8 @@ class TestBBcNetwork(object):
     def test_17_reset_all_connections(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(core_nodes):
-            user_routings[i].unregister_user(user_id=users[i*2])
-            user_routings[i].unregister_user(user_id=users[i*2+1])
+            user_routings[i].unregister_user(user_id=users[i*2], socket=client_socks[i*2])
+            user_routings[i].unregister_user(user_id=users[i*2+1], socket=client_socks[i*2+1])
         for i in range(core_nodes):
             assert len(user_routings[i].registered_users) == 0
 

@@ -35,17 +35,17 @@ def to_2byte(val, offset=0):
     return (val+offset).to_bytes(2, 'big')   # network byte order
 
 
-def make_message(payload_type, msg, payload_version=0, name=None):
+def make_message(payload_type, msg, payload_version=0, key_name=None):
     if payload_type == PayloadType.Type_msgpack:
         dat = msgpack.packb(msg)
     elif payload_type == PayloadType.Type_binary:
         dat = make_TLV_formatted_message(msg)
-    elif payload_type == PayloadType.TYPE_encrypted_msgpack:
-        if name not in encryptors or encryptors[name] is None:
+    elif payload_type == PayloadType.Type_encrypted_msgpack:
+        if key_name not in encryptors or encryptors[key_name] is None:
             return None
         dat = bytearray()
-        dat.extend(encryptors[name][1])  # add hint to the counter entity
-        dat += encryptors[name][0].update(msgpack.packb(msg))
+        dat.extend(encryptors[key_name][1])  # add hint to the counter entity
+        dat += encryptors[key_name][0].update(msgpack.packb(msg))
     else:
         return None
     msg = bytearray()
@@ -59,7 +59,7 @@ def deserialize_data(payload_type, dat):
         return msgpack.unpackb(dat)
     elif payload_type == PayloadType.Type_binary:
         return make_dictionary_from_TLV_format(dat)
-    elif payload_type == PayloadType.TYPE_encrypted_msgpack:
+    elif payload_type == PayloadType.Type_encrypted_msgpack:
         name = bytes(dat[:4])
         try:
             msg = decryptors[name].update(bytes(dat[4:]))
@@ -96,14 +96,14 @@ def get_ECDH_parameters():
     global encryptors, decryptors
     private_key = ec.generate_private_key(ec.SECP384R1(), default_backend())
     serialized_pubkey = private_key.public_key().public_numbers().encode_point()
-    name = None
-    while name is None:
-        name = os.urandom(4)
-        if name in encryptors:
-            name = None
-    encryptors[name] = None
-    decryptors[name] = None
-    return private_key, serialized_pubkey, name
+    key_name = None
+    while key_name is None:
+        key_name = os.urandom(4)
+        if key_name in encryptors:
+            key_name = None
+    encryptors[key_name] = None
+    decryptors[key_name] = None
+    return private_key, serialized_pubkey, key_name
 
 
 def derive_shared_key(private_key, serialized_pubkey, shared_info):
@@ -115,23 +115,24 @@ def derive_shared_key(private_key, serialized_pubkey, shared_info):
     return derived_key
 
 
-def set_cipher(shared_key, nonce, name, hint):
+def set_cipher(shared_key, nonce, key_name, hint):
     global encryptors, decryptors
     cipher = Cipher(algorithms.AES(bytes(shared_key)), modes.CTR(nonce), backend=default_backend())
-    encryptors[name] = [cipher.encryptor(), hint]
-    decryptors[name] = cipher.decryptor()
+    encryptors[key_name] = [cipher.encryptor(), hint]
+    decryptors[key_name] = cipher.decryptor()
 
 
-def unset_cipher(name):
-    if name in encryptors:
-        del encryptors[name]
-        del decryptors[name]
+def unset_cipher(key_name):
+    if key_name in encryptors:
+        del encryptors[key_name]
+        del decryptors[key_name]
 
 
 class PayloadType:
     Type_binary = 0
-    Type_msgpack = 1
-    TYPE_encrypted_msgpack = 2
+    Type_any = 1
+    Type_msgpack = 2
+    Type_encrypted_msgpack = 3
 
 
 class Message:
@@ -193,6 +194,7 @@ class KeyType:
     hint = to_4byte(17)
     ecdh = to_4byte(18)     # peer_public_key value for ECDH
     random = to_4byte(19)
+    retry_tiemr = to_4byte(20)
 
     network_module = to_4byte(0, 0x30)
     storage_type = to_4byte(1, 0x30)

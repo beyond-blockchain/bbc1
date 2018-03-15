@@ -32,7 +32,7 @@ def direct_send_to_user(sock, msg, name=None):
     if name is None:
         sock.sendall(message_key_types.make_message(PayloadType.Type_msgpack, msg))
     else:
-        sock.sendall(message_key_types.make_message(PayloadType.TYPE_encrypted_msgpack, msg, name=name))
+        sock.sendall(message_key_types.make_message(PayloadType.Type_encrypted_msgpack, msg, name=name))
 
 
 class UserMessageRouting:
@@ -97,11 +97,14 @@ class UserMessageRouting:
         :param socket:
         :return:
         """
+        if user_id not in self.registered_users:
+            return
         self.registered_users[user_id].remove(socket)
         if len(self.registered_users[user_id]) == 0:
             self.registered_users.pop(user_id, None)
-        message_key_types.unset_cipher(self.aes_name_list[socket])
-        del self.aes_name_list[socket]
+        if socket in self.aes_name_list:
+            message_key_types.unset_cipher(self.aes_name_list[socket])
+            del self.aes_name_list[socket]
         self.send_multicast_leave(user_id=user_id)
 
     def add_user_for_forwarding(self, user_id, node_id, permanent=False):

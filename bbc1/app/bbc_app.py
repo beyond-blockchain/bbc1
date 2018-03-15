@@ -158,7 +158,7 @@ class BBcAppClient:
         self.domain_id = None
         self.query_id = (0).to_bytes(2, 'little')
         self.privatekey_for_ecdh = None
-        self.aes_name = None
+        self.aes_key_name = None
         self.is_secure_connection = False
         self.start_receiver_loop()
 
@@ -223,7 +223,7 @@ class BBcAppClient:
             return None
         try:
             if self.is_secure_connection:
-                msg = message_key_types.make_message(PayloadType.TYPE_encrypted_msgpack, dat, name=self.aes_name)
+                msg = message_key_types.make_message(PayloadType.Type_encrypted_msgpack, dat, name=self.aes_key_name)
             else:
                 msg = message_key_types.make_message(PayloadType.Type_msgpack, dat)
             self.connection.sendall(msg)
@@ -241,10 +241,9 @@ class BBcAppClient:
             self.logger.error("Need to set domain first!")
             return None
         dat = self.make_message_structure(MsgType.REQUEST_ECDH_KEY_EXCHANGE)
-        self.privatekey_for_ecdh, dat[KeyType.ecdh], self.aes_name = message_key_types.get_ECDH_parameters()
-        print("$$$$$")
+        self.privatekey_for_ecdh, dat[KeyType.ecdh], self.aes_key_name = message_key_types.get_ECDH_parameters()
         dat[KeyType.nonce] = os.urandom(16)
-        dat[KeyType.hint] = self.aes_name
+        dat[KeyType.hint] = self.aes_key_name
         dat[KeyType.random] = os.urandom(8)
         return self.send_msg(dat)
 
@@ -421,12 +420,12 @@ class BBcAppClient:
         """
         dat = self.make_message_structure(MsgType.UNREGISTER)
         self.send_msg(dat)
-        if self.aes_name is not None:
-            message_key_types.unset_cipher(self.aes_name)
+        if self.aes_key_name is not None:
+            message_key_types.unset_cipher(self.aes_key_name)
             self.privatekey_for_ecdh = None
-            self.aes_name = None
+            self.aes_key_name = None
             self.is_secure_connection = False
-        return None
+        return True
 
     def request_insert_completion_notification(self, asset_group_id):
         """
@@ -920,6 +919,6 @@ class Callback:
     def proc_resp_ecdh_key_exchange(self, dat):
         shared_key = message_key_types.derive_shared_key(self.client.privatekey_for_ecdh,
                                                          dat[KeyType.ecdh], dat[KeyType.random])
-        message_key_types.set_cipher(shared_key, dat[KeyType.nonce], self.client.aes_name, dat[KeyType.hint])
+        message_key_types.set_cipher(shared_key, dat[KeyType.nonce], self.client.aes_key_name, dat[KeyType.hint])
         self.client.is_secure_connection = False
         self.queue.put(True)

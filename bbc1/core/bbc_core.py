@@ -516,7 +516,7 @@ class BBcCoreService:
         elif cmd == MsgType.REQUEST_ECDH_KEY_EXCHANGE:
             retmsg = make_message_structure(None, MsgType.RESPONSE_ECDH_KEY_EXCHANGE,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
-            privatekey_for_ecdh, peer_pub_key_to_send, my_name = message_key_types.get_ECDH_parameters()
+            privatekey_for_ecdh, peer_pub_key_to_send, my_keyname = message_key_types.get_ECDH_parameters()
             if privatekey_for_ecdh is None:
                 return False, None
             nonce = dat[KeyType.nonce]
@@ -525,9 +525,9 @@ class BBcCoreService:
             retmsg[KeyType.ecdh] = peer_pub_key_to_send
             retmsg[KeyType.nonce] = nonce
             retmsg[KeyType.random] = rand
-            retmsg[KeyType.hint] = my_name
+            retmsg[KeyType.hint] = my_keyname
             user_message_routing.direct_send_to_user(socket, retmsg)
-            message_key_types.set_cipher(shared_key, nonce, my_name, dat[KeyType.hint])
+            message_key_types.set_cipher(shared_key, nonce, my_keyname, dat[KeyType.hint])
             umr.set_aes_name(socket, my_name)
 
         elif cmd == MsgType.DOMAIN_PING:

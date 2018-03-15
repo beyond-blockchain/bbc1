@@ -82,8 +82,8 @@ class TestBBcAppClient(object):
 
         for i in range(1, client_num):
             clients[i]['app'].send_domain_ping(domain_id, ipv4, ipv6, port)
-        print("*** wait 5 seconds ***")
-        time.sleep(5)
+        print("*** wait 15 seconds ***")
+        time.sleep(15)
 
         for i in range(core_num):
             print(cores[i].networking.domains[domain_id]['neighbor'].show_list())

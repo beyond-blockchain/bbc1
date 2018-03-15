@@ -32,6 +32,7 @@ import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core import bbc_core
 from bbc1.core.bbc_config import DEFAULT_P2P_PORT
+from bbc1.core.key_exchange_manager import KeyExchangeManager
 from bbc1.core.bbc_types import ResourceType, InfraMessageCategory
 from bbc1.core.topology_manager import TopologyManagerBase
 from bbc1.core.user_message_routing import UserMessageRouting
@@ -119,6 +120,9 @@ class BBcNetwork:
     Socket and thread management for infrastructure layers
     """
     NOTIFY_LEAVE = to_2byte(0)
+    REQUEST_KEY_EXCHANGE = to_2byte(1)
+    RESPONSE_KEY_EXCHANGE = to_2byte(2)
+    CONFIRM_KEY_EXCHANGE = to_2byte(3)
 
     def __init__(self, config, core=None, p2p_port=None, external_ip4addr=None, external_ip6addr=None,
                  loglevel="all", logname=None):
@@ -176,6 +180,25 @@ class BBcNetwork:
         return socket.inet_pton(socket.AF_INET, ipv4), socket.inet_pton(socket.AF_INET6, ipv6), port, \
                int(time.time()).to_bytes(8, 'big')
 
+    def send_key_exchange_message(self, domain_id, node_id, command, pubkey, nonce, random_val, key_name):
+        if command == "request":
+            command = BBcNetwork.REQUEST_KEY_EXCHANGE
+        elif command == "response":
+            command = BBcNetwork.RESPONSE_KEY_EXCHANGE
+        else:
+            command = BBcNetwork.CONFIRM_KEY_EXCHANGE
+        msg = {
+            KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_NETWORK,
+            KeyType.destination_node_id: node_id,
+            KeyType.domain_id: domain_id,
+            KeyType.command: command,
+            KeyType.ecdh: pubkey,
+            KeyType.nonce: nonce,
+            KeyType.random: random_val,
+            KeyType.hint: key_name,
+        }
+        return self.send_message_in_network(None, PayloadType.Type_msgpack, domain_id, msg)
+
     def create_domain(self, domain_id=ZEROS, config=None):
         """
         Create domain and register user in the domain
@@ -200,7 +223,7 @@ class BBcNetwork:
         self.domains[domain_id] = dict()
         self.domains[domain_id]['node_id'] = node_id
         self.domains[domain_id]['name'] = node_id.hex()[:4]
-        self.domains[domain_id]['neighbor'] = NeighborInfo(domain_id=domain_id, node_id=node_id,
+        self.domains[domain_id]['neighbor'] = NeighborInfo(network=self, domain_id=domain_id, node_id=node_id,
                                                            sock=self.get_my_socket_info())
         self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY] = TopologyManagerBase(network=self,
                                                                                               domain_id=domain_id,
@@ -247,7 +270,8 @@ class BBcNetwork:
         if domain_id == ZEROS:
             self.domain0manager.stop_all_timers()
         else:
-            self.domain0manager.remove_domain(domain_id)
+            if self.domain0manager is not None:
+                self.domain0manager.remove_domain(domain_id)
         del self.domains[domain_id]
         self.stats.update_stats_decrement("network", "num_domains", 1)
         return True
@@ -392,7 +416,7 @@ class BBcNetwork:
         except:
             pass
 
-    def send_message_in_network(self, nodeinfo=None, payload_type=PayloadType.Type_msgpack, domain_id=None, msg=None):
+    def send_message_in_network(self, nodeinfo=None, payload_type=PayloadType.Type_any, domain_id=None, msg=None):
         """
         Send message over a domain network
 
@@ -403,26 +427,48 @@ class BBcNetwork:
         :return:
         """
         if nodeinfo is None:
+            if domain_id not in self.domains:
+                return False
+            if msg[KeyType.destination_node_id] not in self.domains[domain_id]['neighbor'].nodeinfo_list:
+                return False
             nodeinfo = self.domains[domain_id]['neighbor'].nodeinfo_list[msg[KeyType.destination_node_id]]
         msg[KeyType.source_node_id] = self.domains[domain_id]['neighbor'].my_node_id
-        data_to_send = message_key_types.make_message(payload_type, msg)
+
+        if payload_type == PayloadType.Type_any:
+            if nodeinfo.key_manager is not None and nodeinfo.key_manager.key_name is not None and \
+                    nodeinfo.key_manager.key_name in message_key_types.encryptors:
+                payload_type = PayloadType.Type_encrypted_msgpack
+            else:
+                payload_type = PayloadType.Type_msgpack
+
+        if payload_type in [PayloadType.Type_msgpack, PayloadType.Type_binary]:
+            data_to_send = message_key_types.make_message(payload_type, msg)
+        elif payload_type == PayloadType.Type_encrypted_msgpack:
+            payload_type = PayloadType.Type_encrypted_msgpack
+            data_to_send = message_key_types.make_message(payload_type, msg, key_name=nodeinfo.key_manager.key_name)
+            if data_to_send is None:
+                self.logger.error("Fail to encrypt message")
+                return False
+        else:
+            return False
+
         if len(data_to_send) > TCP_THRESHOLD_SIZE:
             send_data_by_tcp(ipv4=nodeinfo.ipv4, ipv6=nodeinfo.ipv6, port=nodeinfo.port, msg=data_to_send)
             self.stats.update_stats_increment("network", "send_msg_by_tcp", 1)
             self.stats.update_stats_increment("network", "sent_data_size", len(data_to_send))
-            return
+            return True
         if nodeinfo.ipv6 is not None and self.socket_udp6 is not None:
             self.socket_udp6.sendto(data_to_send, (nodeinfo.ipv6, nodeinfo.port))
             self.stats.update_stats_increment("network", "send_msg_by_udp6", 1)
             self.stats.update_stats_increment("network", "sent_data_size", len(data_to_send))
-            return
+            return True
         if nodeinfo.ipv4 is not None and self.socket_udp is not None:
             self.socket_udp.sendto(data_to_send, (nodeinfo.ipv4, nodeinfo.port))
             self.stats.update_stats_increment("network", "send_msg_by_udp4", 1)
             self.stats.update_stats_increment("network", "sent_data_size", len(data_to_send))
-            return
+            return True
 
-    def broadcast_message_in_network(self, domain_id, payload_type=PayloadType.Type_msgpack, msg=None):
+    def broadcast_message_in_network(self, domain_id, payload_type=PayloadType.Type_any, msg=None):
         """
         send message to all neighbor nodes
         :param domain_id:
@@ -434,6 +480,7 @@ class BBcNetwork:
             return
         for node_id, nodeinfo in self.domains[domain_id]['neighbor'].nodeinfo_list.items():
             msg[KeyType.destination_node_id] = node_id
+            #print("broadcast:", node_id.hex(), node_id)
             self.send_message_in_network(nodeinfo, payload_type, domain_id, msg)
 
     def add_neighbor(self, domain_id, node_id, ipv4=None, ipv6=None, port=None, is_static=False):
@@ -453,8 +500,9 @@ class BBcNetwork:
 
         is_new = self.domains[domain_id]['neighbor'].add(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port, is_static=is_static)
         if is_new is not None and is_new:
+            nodelist = self.domains[domain_id]['neighbor'].nodeinfo_list
             self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].notify_neighbor_update(node_id, is_new=True)
-        self.stats.update_stats("network", "neighbor_nodes", len(self.domains[domain_id]['neighbor'].nodeinfo_list))
+            self.stats.update_stats("network", "neighbor_nodes", len(nodelist))
         return is_new
 
     def process_message_base(self, domain_id, ipv4, ipv6, port, msg, payload_type):
@@ -498,6 +546,28 @@ class BBcNetwork:
         """
         if KeyType.domain_ping in msg and port is not None:
             self.receive_domain_ping(domain_id, ipv4, ipv6, port, msg)
+
+        elif msg[KeyType.command] == BBcNetwork.REQUEST_KEY_EXCHANGE:
+            if KeyType.ecdh in msg and KeyType.hint in msg and KeyType.nonce in msg and KeyType.random in msg:
+                source_node_id = msg[KeyType.source_node_id]
+                if source_node_id not in self.domains[domain_id]['neighbor'].nodeinfo_list:
+                    self.add_neighbor(domain_id, source_node_id, ipv4, ipv6, port)
+                nodeinfo = self.domains[domain_id]['neighbor'].nodeinfo_list[source_node_id]
+                if nodeinfo.key_manager is None:
+                    nodeinfo.key_manager = KeyExchangeManager(self, domain_id, source_node_id)
+                nodeinfo.key_manager.receive_exchange_request(msg[KeyType.ecdh], msg[KeyType.nonce],
+                                                              msg[KeyType.random], msg[KeyType.hint])
+
+        elif msg[KeyType.command] == BBcNetwork.RESPONSE_KEY_EXCHANGE:
+            if KeyType.ecdh in msg and KeyType.hint in msg and KeyType.nonce in msg and KeyType.random in msg:
+                source_node_id = msg[KeyType.source_node_id]
+                nodeinfo = self.domains[domain_id]['neighbor'].nodeinfo_list[source_node_id]
+                nodeinfo.key_manager.receive_exchange_response(msg[KeyType.ecdh], msg[KeyType.random], msg[KeyType.hint])
+
+        elif msg[KeyType.command] == BBcNetwork.CONFIRM_KEY_EXCHANGE:
+            source_node_id = msg[KeyType.source_node_id]
+            nodeinfo = self.domains[domain_id]['neighbor'].nodeinfo_list[source_node_id]
+            nodeinfo.key_manager.receive_confirmation()
 
         elif msg[KeyType.command] == BBcNetwork.NOTIFY_LEAVE:
             if KeyType.source_node_id in msg:
@@ -563,12 +633,11 @@ class BBcNetwork:
                         msg_parser.recv(data)
                         msg = msg_parser.parse()
                         #self.logger.debug("Recv_UDP from %s: data=%s" % (addr, msg))
-                        if msg_parser.payload_type == PayloadType.Type_msgpack:
-                            if KeyType.domain_id not in msg:
-                                continue
-                            if msg[KeyType.domain_id] in self.domains:
-                                self.process_message_base(msg[KeyType.domain_id], ipv4, ipv6, port,
-                                                          msg, msg_parser.payload_type)
+                        if KeyType.domain_id not in msg:
+                            continue
+                        if msg[KeyType.domain_id] in self.domains:
+                            self.process_message_base(msg[KeyType.domain_id], ipv4, ipv6, port,
+                                                      msg, msg_parser.payload_type)
         finally:
             for sock in readfds:
                 sock.close()
@@ -647,9 +716,8 @@ class BBcNetwork:
                                 if msg is None:
                                     break
                                 #self.logger.debug("Recv_TCP at %s: data=%s" % (sock.getsockname(), msg))
-                                if msg_parsers[sock].payload_type == PayloadType.Type_msgpack:
-                                    if KeyType.destination_node_id not in msg or KeyType.domain_id not in msg:
-                                        continue
+                                if KeyType.destination_node_id not in msg or KeyType.domain_id not in msg:
+                                    continue
                                 self.process_message_base(msg[KeyType.domain_id], None, None, None,
                                                           msg, msg_parsers[sock].payload_type)
 
@@ -666,7 +734,8 @@ class NeighborInfo:
     """
     PURGE_INTERVAL_SEC = 300
 
-    def __init__(self, domain_id=None, node_id=None, sock=None):
+    def __init__(self, network=None, domain_id=None, node_id=None, sock=None):
+        self.networking = network
         self.domain_id = domain_id
         self.my_node_id = node_id
         self.my_socket_info = sock
@@ -684,12 +753,18 @@ class NeighborInfo:
     def add(self, node_id, ipv4=None, ipv6=None, port=None, is_static=False):
         if node_id not in self.nodeinfo_list:
             self.nodeinfo_list[node_id] = NodeInfo(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port, is_static=is_static)
+            self.nodeinfo_list[node_id].key_manager = KeyExchangeManager(self.networking, self.domain_id, node_id)
+            rand_time = random.uniform(1, KeyExchangeManager.KEY_EXCHANGE_INVOKE_MAX_BACKOFF)
+            self.nodeinfo_list[node_id].key_manager.set_invoke_timer(rand_time)
             return True
         else:
             change_flag = self.nodeinfo_list[node_id].update(ipv4=ipv4, ipv6=ipv6, port=port)
             return change_flag
 
     def remove(self, node_id):
+        if self.nodeinfo_list[node_id].key_manager is not None:
+            self.nodeinfo_list[node_id].key_manager.remove_all_timers()
+            self.nodeinfo_list[node_id].key_manager.unset_cipher()
         self.nodeinfo_list.pop(node_id, None)
 
     def show_list(self):
@@ -707,6 +782,11 @@ class NodeInfo:
     """
     node information entry (socket info)
     """
+    SECURITY_STATE_NONE = 0
+    SECURITY_STATE_REQUESTING = 1
+    SECURITY_STATE_CONFIRMING = 2
+    SECURITY_STATE_ESTABLISHED = 3
+
     def __init__(self, node_id=None, ipv4=None, ipv6=None, port=None, is_static=False):
         self.node_id = node_id
         if ipv4 is None or len(ipv4) == 0:
@@ -728,6 +808,7 @@ class NodeInfo:
         self.created_at = self.updated_at = time.time()
         self.is_alive = True
         self.disconnect_at = 0
+        self.key_manager = None
 
     def __lt__(self, other):
         if self.is_alive and other.is_alive:
@@ -749,9 +830,10 @@ class NodeInfo:
         ipv6 = self.ipv6
         if ipv6 is None:
             ipv6 = "::"
-        output = "[node_id=%s, ipv4=%s, ipv6=%s, port=%d, alive=%s, static=%s, time=%d]" %\
-                 (binascii.b2a_hex(self.node_id), ipv4, ipv6, self.port,
-                  self.is_alive, self.is_static, self.updated_at)
+        security_state = (self.key_manager is not None and self.key_manager.state == KeyExchangeManager.STATE_ESTABLISHED)
+        output = "[node_id=%s, ipv4=%s, ipv6=%s, port=%d, alive=%s, static=%s, encryption=%s, time=%d]" %\
+                 (binascii.b2a_hex(self.node_id), ipv4, ipv6, self.port, self.is_alive, self.is_static,
+                  security_state, self.updated_at)
         return output
 
     def touch(self):
