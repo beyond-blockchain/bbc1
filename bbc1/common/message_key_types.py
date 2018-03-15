@@ -14,8 +14,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import os
 import msgpack
 import struct
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+encryptors = dict()
+decryptors = dict()
 
 
 def to_4byte(val, offset=0):
@@ -26,11 +35,17 @@ def to_2byte(val, offset=0):
     return (val+offset).to_bytes(2, 'big')   # network byte order
 
 
-def make_message(payload_type, msg, payload_version=0):
+def make_message(payload_type, msg, payload_version=0, name=None):
     if payload_type == PayloadType.Type_msgpack:
         dat = msgpack.packb(msg)
     elif payload_type == PayloadType.Type_binary:
         dat = make_TLV_formatted_message(msg)
+    elif payload_type == PayloadType.TYPE_encrypted_msgpack:
+        if name not in encryptors or encryptors[name] is None:
+            return None
+        dat = bytearray()
+        dat.extend(encryptors[name][1])  # add hint to the counter entity
+        dat += encryptors[name][0].update(msgpack.packb(msg))
     else:
         return None
     msg = bytearray()
@@ -44,6 +59,14 @@ def deserialize_data(payload_type, dat):
         return msgpack.unpackb(dat)
     elif payload_type == PayloadType.Type_binary:
         return make_dictionary_from_TLV_format(dat)
+    elif payload_type == PayloadType.TYPE_encrypted_msgpack:
+        name = bytes(dat[:4])
+        try:
+            msg = decryptors[name].update(bytes(dat[4:]))
+        except:
+            import traceback
+            traceback.print_exc()
+        return msgpack.unpackb(msg)
     return None
 
 
@@ -61,14 +84,54 @@ def make_TLV_formatted_message(msg):
 def make_dictionary_from_TLV_format(dat):
     msg = dict()
     ptr = 0
-    while ptr < len(dat):
+    while ptr < len(dat)-1:
         T, L = struct.unpack("II")
-    return
+        ptr += 8
+        msg[T] = dat[ptr:ptr+L]
+        ptr += L
+    return msg
+
+
+def get_ECDH_parameters():
+    global encryptors, decryptors
+    private_key = ec.generate_private_key(ec.SECP384R1(), default_backend())
+    serialized_pubkey = private_key.public_key().public_numbers().encode_point()
+    name = None
+    while name is None:
+        name = os.urandom(4)
+        if name in encryptors:
+            name = None
+    encryptors[name] = None
+    decryptors[name] = None
+    return private_key, serialized_pubkey, name
+
+
+def derive_shared_key(private_key, serialized_pubkey, shared_info):
+    deserialized_public_numbers = ec.EllipticCurvePublicNumbers.from_encoded_point(ec.SECP384R1(), serialized_pubkey)
+    deserialized_pubkey = deserialized_public_numbers.public_key(default_backend())
+    shared_key = private_key.exchange(ec.ECDH(), deserialized_pubkey)
+    derived_key = HKDF(algorithm=hashes.SHA256(), length=32, salt=None,
+                       info=shared_info, backend=default_backend()).derive(shared_key)
+    return derived_key
+
+
+def set_cipher(shared_key, nonce, name, hint):
+    global encryptors, decryptors
+    cipher = Cipher(algorithms.AES(bytes(shared_key)), modes.CTR(nonce), backend=default_backend())
+    encryptors[name] = [cipher.encryptor(), hint]
+    decryptors[name] = cipher.decryptor()
+
+
+def unset_cipher(name):
+    if name in encryptors:
+        del encryptors[name]
+        del decryptors[name]
 
 
 class PayloadType:
     Type_binary = 0
     Type_msgpack = 1
+    TYPE_encrypted_msgpack = 2
 
 
 class Message:
@@ -128,17 +191,14 @@ class KeyType:
     count = to_4byte(15)
     stats = to_4byte(16)
     hint = to_4byte(17)
-
-    ledger_subsys_manip = to_4byte(0, 0x20)     # enable/disable ledger_subsystem
-    ledger_subsys_register = to_4byte(1, 0x20)
-    ledger_subsys_verify = to_4byte(2, 0x20)
-    merkle_tree = to_4byte(3, 0x20)
+    ecdh = to_4byte(18)     # peer_public_key value for ECDH
+    random = to_4byte(19)
 
     network_module = to_4byte(0, 0x30)
     storage_type = to_4byte(1, 0x30)
     storage_path = to_4byte(2, 0x30)
     node_info = to_4byte(3, 0x30)
-    peer_list = to_4byte(4, 0x30)   # TOFDO: will obsoleted in v0.10
+    peer_list = to_4byte(4, 0x30)   # TODO: will obsoleted in v0.10
     domain_list = to_4byte(5, 0x30)
     forwarding_list = to_4byte(6, 0x30)
     user_list = to_4byte(7, 0x30)
@@ -178,4 +238,10 @@ class KeyType:
     all_asset_files = to_4byte(4, 0x80)
     signature = to_4byte(5, 0x80)
     cross_refs = to_4byte(6, 0x80)
+
+    ledger_subsys_manip = to_4byte(0, 0xA0)     # enable/disable ledger_subsystem
+    ledger_subsys_register = to_4byte(1, 0xA0)
+    ledger_subsys_verify = to_4byte(2, 0xA0)
+    merkle_tree = to_4byte(3, 0xA0)
+
 

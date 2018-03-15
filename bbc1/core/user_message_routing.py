@@ -28,8 +28,11 @@ from bbc1.core import query_management
 ticker = query_management.get_ticker()
 
 
-def direct_send_to_user(sock, msg):
-    sock.sendall(message_key_types.make_message(PayloadType.Type_msgpack, msg))
+def direct_send_to_user(sock, msg, name=None):
+    if name is None:
+        sock.sendall(message_key_types.make_message(PayloadType.Type_msgpack, msg))
+    else:
+        sock.sendall(message_key_types.make_message(PayloadType.TYPE_encrypted_msgpack, msg, name=name))
 
 
 class UserMessageRouting:
@@ -49,6 +52,7 @@ class UserMessageRouting:
         self.stats = network.core.stats
         self.domain_id = domain_id
         self.logger = logger.get_logger(key="user_message_routing", level=loglevel, logname=logname)
+        self.aes_name_list = dict()
         self.registered_users = dict()
         self.forwarding_entries = dict()
         self.on_going_timers = set()
@@ -64,6 +68,15 @@ class UserMessageRouting:
         for q in self.on_going_timers:
             ticker.get_entry(q).deactivate()
 
+    def set_aes_name(self, socket, name):
+        """
+        Set name for specifying AES key for message encryption
+        :param socket:
+        :param name:
+        :return:
+        """
+        self.aes_name_list[socket] = name
+
     def register_user(self, user_id, socket, is_multicast=False):
         """
         Register user to forward message
@@ -77,19 +90,18 @@ class UserMessageRouting:
         if is_multicast:
             self.send_multicast_join(user_id)
 
-    def unregister_user(self, user_id, socket=None):
+    def unregister_user(self, user_id, socket):
         """
-        Unregister user from the list
+        Unregister user from the list and delete AES key if exists
         :param user_id:
         :param socket:
         :return:
         """
-        if socket is None:
+        self.registered_users[user_id].remove(socket)
+        if len(self.registered_users[user_id]) == 0:
             self.registered_users.pop(user_id, None)
-        else:
-            self.registered_users[user_id].remove(socket)
-            if len(self.registered_users[user_id]) == 0:
-                self.registered_users.pop(user_id, None)
+        message_key_types.unset_cipher(self.aes_name_list[socket])
+        del self.aes_name_list[socket]
         self.send_multicast_leave(user_id=user_id)
 
     def add_user_for_forwarding(self, user_id, node_id, permanent=False):
@@ -156,7 +168,10 @@ class UserMessageRouting:
         count = len(socks)
         for s in socks:
             try:
-                direct_send_to_user(s, msg)
+                if s in self.aes_name_list:
+                    direct_send_to_user(s, msg, name=self.aes_name_list[s])
+                else:
+                    direct_send_to_user(s, msg)
                 self.stats.update_stats_increment("user_message", "sent_msg_to_user", 1)
             except:
                 count -= 1

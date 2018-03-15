@@ -192,7 +192,8 @@ class BBcCoreService:
             traceback.print_exc()
         self.logger.debug("closing socket")
         if user_info is not None:
-            self.networking.domains[user_info[0]][InfraMessageCategory.CATEGORY_USER].unregister_user(user_info[1])
+            self.networking.domains[user_info[0]][InfraMessageCategory.CATEGORY_USER].unregister_user(user_info[1],
+                                                                                                      socket)
         try:
             socket.shutdown(py_socket.SHUT_RDWR)
             socket.close()
@@ -511,6 +512,23 @@ class BBcCoreService:
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.result] = self.networking.remove_domain(domain_id)
             user_message_routing.direct_send_to_user(socket, retmsg)
+
+        elif cmd == MsgType.REQUEST_ECDH_KEY_EXCHANGE:
+            retmsg = make_message_structure(None, MsgType.RESPONSE_ECDH_KEY_EXCHANGE,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            privatekey_for_ecdh, peer_pub_key_to_send, my_name = message_key_types.get_ECDH_parameters()
+            if privatekey_for_ecdh is None:
+                return False, None
+            nonce = dat[KeyType.nonce]
+            rand = dat[KeyType.random]
+            shared_key = message_key_types.derive_shared_key(privatekey_for_ecdh, dat[KeyType.ecdh], rand)
+            retmsg[KeyType.ecdh] = peer_pub_key_to_send
+            retmsg[KeyType.nonce] = nonce
+            retmsg[KeyType.random] = rand
+            retmsg[KeyType.hint] = my_name
+            user_message_routing.direct_send_to_user(socket, retmsg)
+            message_key_types.set_cipher(shared_key, nonce, my_name, dat[KeyType.hint])
+            umr.set_aes_name(socket, my_name)
 
         elif cmd == MsgType.DOMAIN_PING:
             if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.port_number], dat):

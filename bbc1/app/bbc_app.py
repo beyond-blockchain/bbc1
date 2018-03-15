@@ -152,10 +152,14 @@ class BBcAppClient:
         self.logger = logger.get_logger(key="bbc_app", level=loglevel, logname=logname)
         self.connection = socket.create_connection((host, port))
         self.callback = Callback(log=self.logger)
+        self.set_client = self
         self.use_query_id_based_message_wait = False
         self.user_id = None
         self.domain_id = None
         self.query_id = (0).to_bytes(2, 'little')
+        self.privatekey_for_ecdh = None
+        self.aes_name = None
+        self.is_secure_connection = False
         self.start_receiver_loop()
 
     def set_callback(self, callback_obj):
@@ -218,12 +222,31 @@ class BBcAppClient:
             self.logger.warn("Message must include domain_id and source_id")
             return None
         try:
-            msg = message_key_types.make_message(PayloadType.Type_msgpack, dat)
+            if self.is_secure_connection:
+                msg = message_key_types.make_message(PayloadType.TYPE_encrypted_msgpack, dat, name=self.aes_name)
+            else:
+                msg = message_key_types.make_message(PayloadType.Type_msgpack, dat)
             self.connection.sendall(msg)
         except Exception as e:
-            self.logger.error(e)
+            self.logger.error(traceback.format_exc())
             return None
         return self.query_id
+
+    def exchange_key(self):
+        """
+        Perform ECDH (key exchange algorithm)
+        :return:
+        """
+        if self.domain_id is None:
+            self.logger.error("Need to set domain first!")
+            return None
+        dat = self.make_message_structure(MsgType.REQUEST_ECDH_KEY_EXCHANGE)
+        self.privatekey_for_ecdh, dat[KeyType.ecdh], self.aes_name = message_key_types.get_ECDH_parameters()
+        print("$$$$$")
+        dat[KeyType.nonce] = os.urandom(16)
+        dat[KeyType.hint] = self.aes_name
+        dat[KeyType.random] = os.urandom(8)
+        return self.send_msg(dat)
 
     def domain_setup(self, domain_id, config=None,
                      module_name=None, storage_type=StorageType.FILESYSTEM, storage_path=None):
@@ -397,7 +420,13 @@ class BBcAppClient:
         :return:
         """
         dat = self.make_message_structure(MsgType.UNREGISTER)
-        return self.send_msg(dat)
+        self.send_msg(dat)
+        if self.aes_name is not None:
+            message_key_types.unset_cipher(self.aes_name)
+            self.privatekey_for_ecdh = None
+            self.aes_name = None
+            self.is_secure_connection = False
+        return None
 
     def request_insert_completion_notification(self, asset_group_id):
         """
@@ -647,11 +676,15 @@ class Callback:
     """
     def __init__(self, log=None):
         self.logger = log
+        self.client = None
         self.queue = queue.Queue()
         self.query_queue = dict()
 
     def set_logger(self, log):
         self.logger = log
+
+    def set_client(self, client):
+        self.client = client
 
     def create_queue(self, query_id):
         self.query_queue.setdefault(query_id, queue.Queue())
@@ -720,6 +753,8 @@ class Callback:
             self.proc_resp_set_neighbor(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_CLOSE_DOMAIN:
             self.proc_resp_domain_close(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_ECDH_KEY_EXCHANGE:
+            self.proc_resp_ecdh_key_exchange(dat)
         else:
             self.logger.warn("No method to process for command=%d" % dat[KeyType.command])
 
@@ -882,3 +917,9 @@ class Callback:
     def proc_resp_get_stats(self, dat):
         self.queue.put(dat)
 
+    def proc_resp_ecdh_key_exchange(self, dat):
+        shared_key = message_key_types.derive_shared_key(self.client.privatekey_for_ecdh,
+                                                         dat[KeyType.ecdh], dat[KeyType.random])
+        message_key_types.set_cipher(shared_key, dat[KeyType.nonce], self.client.aes_name, dat[KeyType.hint])
+        self.client.is_secure_connection = False
+        self.queue.put(True)
