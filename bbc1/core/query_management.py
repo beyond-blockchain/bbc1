@@ -45,7 +45,6 @@ class Ticker:
         """
         self.tick_interval = tick_interval
         self.schedule = []
-        self.schedule_final = []
         self.queries = dict()
         self.lock = threading.Lock()
         th = threading.Thread(target=self.tick_loop)
@@ -54,21 +53,23 @@ class Ticker:
 
     def tick_loop(self):
         while True:
+            need_reorder = False
+            #print("%s" % [e.expire_at for e in self.schedule])
             while len(self.schedule) > 0 and self.schedule[0].fire_at <= time.time():
                 with self.lock:
                     entry = self.schedule.pop(0)
                 if entry.nonce in self.queries:
-                    entry.fire()
-            print("%s" % [e.expire_at for e in self.schedule_final])
-            while len(self.schedule_final) > 0 and self.schedule_final[0].expire_at <= time.time():
-                #print("%s" % [e.expire_at for e in self.schedule_final])
+                    ret = entry.fire()
+                    if ret:
+                        del self.queries[entry.nonce]
+                    else:
+                        self.schedule.append(entry)
+                        need_reorder = True
+            if need_reorder:
                 with self.lock:
-                    entry = self.schedule_final.pop(0)
-                if entry.nonce in self.queries:
-                    entry.fire()
-                    del self.queries[entry.nonce]
+                    self.schedule.sort()
             time.sleep(self.tick_interval)
-            print(".")
+            #print(".")
 
     def add_entry(self, entry):
         nonce = random.randint(0, 0xFFFFFFFF)  # 4-byte
@@ -77,10 +78,10 @@ class Ticker:
         self.queries[nonce] = entry
         entry.nonce = nonce
         with self.lock:
-            self.schedule_final.append(entry)
-            self.schedule_final.sort(key=lambda ent: ent.expire_at)
-            print(" --> add:", entry.expire_at)
-            print("%s" % [e.expire_at for e in self.schedule_final])
+            self.schedule.append(entry)
+            self.schedule.sort(key=lambda ent: ent.fire_at)
+            #print(" --> add:", entry.expire_at)
+            #print("%s" % [e.expire_at for e in self.schedule])
         return nonce
 
     def get_entry(self, nonce):
@@ -125,13 +126,12 @@ class QueryEntry:
         self.retry_count = retry_count
         self.callback_expire = callback_expire
         self.data = copy.deepcopy(data)
-        self.fire_at = interval
+        self.fire_at = self.expire_at
         self.callback_success = callback
         self.callback_failure = callback_error
-        self.nonce = ticker.add_entry(self)
         self.entry_exists_in_ticker_scheduler = False
-        if interval > 0:
-            self.update()
+        self.update(init=True)
+        self.nonce = ticker.add_entry(self)
 
     def __lt__(self, other):
         return self.fire_at < other.fire_at
@@ -160,20 +160,35 @@ class QueryEntry:
         """
         self.expire_at = time.time() + expire_after
         print(" -> update_expiration_time:", self.expire_at)
-        if ticker is not None:
-            ticker.refresh_timer()
+        if self.fire_at > self.expire_at:
+            self.fire_at = self.expire_at
+            if ticker is not None:
+                ticker.refresh_timer()
+
+    def set_next_fire_at(self, now):
+        if now + self.fire_interval < self.expire_at:
+            self.fire_at = now + self.fire_interval
+        else:
+            self.fire_at = self.expire_at
 
     def fire(self):
         """
         Fire the entry
 
-        :return:
+        :return: True if expire
         """
         if time.time() < self.expire_at and self.retry_count != 0:
             self.entry_exists_in_ticker_scheduler = False
             if self.active and self.callback_failure is not None:
                 self.callback_failure(self)
             self.retry_count -= 1
+            if self.retry_count == 0 or self.fire_at + self.fire_interval > self.expire_at:
+                self.fire_at = self.expire_at
+            else:
+                if self.fire_interval > 0:
+                    self.fire_at += self.fire_interval
+                else:
+                    self.fire_at = self.expire_at
             return False
         else:
             if self.active and self.callback_expire is not None:
@@ -190,25 +205,34 @@ class QueryEntry:
         self.deactivate()
         self.callback_expire(self)
 
-    def update(self, fire_after=None, callback=None, callback_error=None):
+    def update(self, fire_after=None, expire_after=None, callback=None, callback_error=None, init=False):
         """
         Update the entry information
 
         :param fire_after:
+        :param expire_after:
         :param callback:
         :param callback_error:
+        :param init:
         :return:
         """
-        if fire_after is None:
-            self.fire_at = time.time() + self.fire_interval
-        else:
-            self.fire_at = time.time() + fire_after
+        now = time.time()
+        if expire_after is not None:
+            self.expire_at = now + expire_after
+            if self.fire_at > self.expire_at:
+                self.fire_at = self.expire_at
+        if fire_after is not None:
+            if now + fire_after < self.expire_at:
+                self.fire_at = now + fire_after
+            else:
+                self.fire_at = self.expire_at
         if callback is not None:
             self.callback_success = callback
         if callback_error is not None:
             self.callback_failure = callback_error
         self.active = True
-        ticker.update_timer(self.nonce, not self.entry_exists_in_ticker_scheduler)
+        if not init:
+            ticker.update_timer(self.nonce, not self.entry_exists_in_ticker_scheduler)
         self.entry_exists_in_ticker_scheduler = True
 
     def callback(self):
@@ -232,7 +256,6 @@ class QueryEntry:
             return self.fire()
         if self.callback_failure is not None:
             self.callback_failure(self)
-        #self.deactivate()
 
 
 def exec_func_after(func, after):
