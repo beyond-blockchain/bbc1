@@ -159,7 +159,7 @@ class QueryEntry:
         :return:
         """
         self.expire_at = time.time() + expire_after
-        print(" -> update_expiration_time:", self.expire_at)
+        #print(" -> update_expiration_time:", self.expire_at)
         if self.fire_at > self.expire_at:
             self.fire_at = self.expire_at
             if ticker is not None:

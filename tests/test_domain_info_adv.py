@@ -36,6 +36,14 @@ def show_domain_list(domain_list):
             print("   node_id:", nd.hex())
 
 
+def sleep_tick(wait_for):
+    print("-- sleep %d sec" % wait_for)
+    end_time = time.time() + wait_for
+    while time.time() < end_time:
+        print("(%d) .. waiting" % int(time.time()))
+        time.sleep(1)
+
+
 class TestBBcAppClient(object):
 
     def test_00_setup(self):
@@ -59,10 +67,9 @@ class TestBBcAppClient(object):
                 base_core_index = i * core_per_domain + j
                 print(" base_core_index:", base_core_index)
                 print("  client_index:", base_core_index*client_per_core, base_core_index*client_per_core+1)
-                make_client(index=base_core_index*client_per_core,
-                            core_port_increment=base_core_index, domain_id=domain_ids[i])
-                make_client(index=base_core_index*client_per_core+1,
-                            core_port_increment=base_core_index, domain_id=domain_ids[i])
+                for k in range(client_per_core):
+                    make_client(index=base_core_index*client_per_core+k,
+                                core_port_increment=base_core_index, domain_id=domain_ids[i])
         time.sleep(1)
 
         global cores, clients
@@ -115,37 +122,49 @@ class TestBBcAppClient(object):
         print("-- sleep 10 sec")
         time.sleep(10)
         for i in range(core_num):
-            dm = cores[i].networking.domain0manager.domain_list
             print("****** [%d] %s ******" % (i, cores[i].networking.domain0manager.my_node_id.hex()))
+            dm = cores[i].networking.domain0manager.domain_list
             show_domain_list(dm)
         print("-- sleep 10 sec")
         time.sleep(10)
         for i in range(core_num):
-            dm = cores[i].networking.domain0manager.domain_list
             print("****** [%d] %s ******" % (i, cores[i].networking.domain0manager.my_node_id.hex()))
+            dm = cores[i].networking.domain0manager.domain_list
             show_domain_list(dm)
-            assert len(dm) == 3
+            assert len(dm) == 2
             for d in dm:
-                if core_domains[i] == d:
-                    assert len(dm[d]) == 4
-                else:
-                    assert len(dm[d]) == 5
+                assert len(dm[d]) == 5
         print("-- sleep 5 sec")
         time.sleep(5)
         for i in range(core_num):
             nd = cores[i].networking.domain0manager.node_domain_list
-            assert len(nd) == 14
+            assert len(nd) == 10
 
     def test_14_remove_domain(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         clients[0]['app'].domain_close()
         dat = msg_processor[0].synchronize()
         assert dat[KeyType.result]
-        time.sleep(15)
+        sleep_tick(15)
 
-        for i in range(1, core_num):
+        for i in range(1, 4):
             nd = cores[i].networking.domain0manager.node_domain_list
-            assert len(nd) == 13
+            print("node[%d]: len(node_domain_list)=%d" % (i, len(nd)))
+            assert len(nd) == 10
+        for i in range(5, core_num):
+            nd = cores[i].networking.domain0manager.node_domain_list
+            print("node[%d]: len(node_domain_list)=%d" % (i, len(nd)))
+            assert len(nd) == 9
+
+        print("****** [%d] %s ******" % (0, cores[0].networking.domain0manager.my_node_id.hex()))
+        dm = cores[0].networking.domain0manager.domain_list
+        show_domain_list(dm)
+        assert len(dm) == 3
+        for i in range(1, core_num):
+            print("****** [%d] %s ******" % (i, cores[i].networking.domain0manager.my_node_id.hex()))
+            dm = cores[i].networking.domain0manager.domain_list
+            show_domain_list(dm)
+            assert len(dm) == 2
 
     def test_15_remove_domain_in_all_nodes(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -153,30 +172,39 @@ class TestBBcAppClient(object):
             clients[i*2]['app'].domain_close()
             dat = msg_processor[i*2].synchronize()
             assert dat[KeyType.result]
-        time.sleep(15)
+        sleep_tick(2)
 
+        for i in range(core_num):
+            print("****** [%d] %s ******" % (i, cores[i].networking.domain0manager.my_node_id.hex()))
+            dm = cores[i].networking.domain0manager.domain_list
+            show_domain_list(dm)
+
+        sleep_tick(15)
         for i in range(core_num):
             nd = cores[i].networking.domain0manager.node_domain_list
             assert len(nd) == 0
+        for i in range(core_num):
+            print("****** [%d] %s ******" % (i, cores[i].networking.domain0manager.my_node_id.hex()))
+            dm = cores[i].networking.domain0manager.domain_list
+            show_domain_list(dm)
 
     """
-    def test_15_wait(self):
+    def test_16_wait(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         print("-- sleep 10 sec")
         time.sleep(10)
         for i in range(core_num):
-            dm = cores[i].networking.domain0manager.domain_list
             print("****** [%d] %s ******" % (i, cores[i].networking.domain0manager.my_node_id.hex()))
+            dm = cores[i].networking.domain0manager.domain_list
             show_domain_list(dm)
         print("-- sleep 10 sec")
         time.sleep(10)
         for i in range(core_num):
-            dm = cores[i].networking.domain0manager.domain_list
             print("****** [%d] %s ******" % (i, cores[i].networking.domain0manager.my_node_id.hex()))
+            dm = cores[i].networking.domain0manager.domain_list
             show_domain_list(dm)
-            assert len(dm) == 3
-            print("len=", len(dm[core_domains[0]]))
-
+            for d in core_domains:
+                assert len(dm[d]) == 0
 
     def test_98_unregister(self):
         for cl in clients:

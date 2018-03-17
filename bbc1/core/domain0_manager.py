@@ -51,8 +51,9 @@ class Domain0Manager:
         self.stats = network.core.stats
         self.my_node_id = node_id
         self.logger = logger.get_logger(key="domain0", level=loglevel, logname=logname)
-        self.domain_list = dict()
-        self.node_domain_list = dict()
+        self.domains_belong_to = set()
+        self.domain_list = dict()        # {domain_id: set(node_id,,,)}
+        self.node_domain_list = dict()   # {node_id: {domain_id: expiration_time}}
         self.remove_lock = threading.Lock()
         self.cross_ref_accept_limit = dict()
         self.advertise_timer_entry = None
@@ -66,18 +67,40 @@ class Domain0Manager:
         if self.advertise_timer_entry is not None:
             self.advertise_timer_entry.deactivate()
 
-    def remove_domain(self, domain_id):
+    def register_node(self, domain_id, node_id):
+        self.domain_list.setdefault(domain_id, set()).add(node_id)
+        self.node_domain_list.setdefault(node_id, dict())[domain_id] = int(time.time())
+
+    def remove_node(self, domain_id, node_id):
         """
-        Remove all entries regarding specified domain_id
+        Remove node from the lists
         :param domain_id:
+        :param node_id:
         :return:
         """
+        #print("*** remove_node at %s:" % self.my_node_id.hex(), node_id.hex(), "in domain", domain_id.hex())
+        #print(" ==> before: len(node_domain_list)=%d" % len(self.node_domain_list.keys()))
         self.remove_lock.acquire()
-        self.domain_list.pop(domain_id, None)
-        for node_id in self.node_domain_list.keys():
+        if domain_id in self.domain_list:
+            if node_id in self.domain_list[domain_id]:
+                self.domain_list[domain_id].remove(node_id)
+                if len(self.domain_list[domain_id]) == 0:
+                    self.domain_list.pop(domain_id, None)
+
+        if node_id in self.node_domain_list:
             if domain_id in self.node_domain_list[node_id]:
-                self.node_domain_list[node_id].remove(domain_id)
+                self.node_domain_list[node_id].pop(domain_id, None)
+                if len(self.node_domain_list[node_id]) == 0:
+                    self.node_domain_list.pop(node_id, None)
         self.remove_lock.release()
+        #print(" ==> after: len(node_domain_list)=%d" % len(self.node_domain_list.keys()))
+
+    def update_domain_belong_to(self):
+        """
+        Update the list domain_belong_to
+        :return:
+        """
+        self.domains_belong_to = set(self.network.domains.keys())
 
     def update_advertise_timer_entry(self):
         rand_interval = random.randint(int(Domain0Manager.DOMAIN_INFO_ADVERTISE_INTERVAL * 5 / 6),
@@ -91,16 +114,14 @@ class Domain0Manager:
         Check expiration of the node_domain_list
         :return:
         """
-        #print("eliminate_obsoleted_entries:", len(self.node_domain_list.keys()))
-        self.remove_lock.acquire()
+        #print("eliminate_obsoleted_entries at %s: len(node_domain_list)=%d" % (self.my_node_id.hex(),
+        #                                                                       len(self.node_domain_list.keys())))
         for node_id in list(self.node_domain_list.keys()):
-            prev_time = self.node_domain_list[node_id][0]
-            if int(time.time()) - prev_time > Domain0Manager.DOMAIN_INFO_LIFETIME:
-                for domain_id in self.node_domain_list[node_id][1]:
-                    if domain_id in self.domain_list and node_id in self.domain_list[domain_id]:
-                        self.domain_list[domain_id].remove(node_id)
-                self.node_domain_list.pop(node_id, None)
-        self.remove_lock.release()
+            for domain_id in list(self.node_domain_list[node_id].keys()):
+                prev_time = self.node_domain_list[node_id][domain_id]
+                if int(time.time()) - prev_time > Domain0Manager.DOMAIN_INFO_LIFETIME:
+                    #print(" --> expire node_id=%s in domain %s" % (node_id.hex(), domain_id.hex()))
+                    self.remove_node(domain_id, node_id)
 
     def advertise_domain_info(self, query_entry):
         """
@@ -130,17 +151,19 @@ class Domain0Manager:
         :return: True/False:  True if the received nodeinfo and that the node has is different
         """
         src_node_id = msg[KeyType.source_node_id]
-        new_domains = set(msg[KeyType.domain_list])
+        new_domains = set(filter(lambda d: d not in self.domains_belong_to, msg[KeyType.domain_list]))
+        #print("newdomain:", [dm.hex() for dm in new_domains])
 
         if src_node_id in self.node_domain_list:
             self.remove_lock.acquire()
-            deleted = self.node_domain_list[src_node_id][1] - new_domains
-            for dm in deleted:
-                self.domain_list.pop(dm, None)
+            deleted = set(self.node_domain_list[src_node_id].keys()) - new_domains
             self.remove_lock.release()
-        self.node_domain_list[src_node_id] = (int(time.time()), new_domains)
+            #print("deleted:", [dm.hex() for dm in deleted])
+            for dm in deleted:
+                self.remove_node(dm, src_node_id)
         for dm in new_domains:
-            self.domain_list.setdefault(dm, set()).add(src_node_id)
+            #print("NEW:", dm.hex())
+            self.register_node(dm, src_node_id)
 
     def process_message(self, msg):
         """
@@ -153,6 +176,7 @@ class Domain0Manager:
 
         if msg[KeyType.command] == Domain0Manager.ADV_DOMAIN_LIST:
             if KeyType.domain_list in msg:
+                #print("RECV domain_list at %s from %s" % (self.my_node_id.hex(), msg[KeyType.source_node_id].hex()))
                 self.stats.update_stats_increment("domain0", "ADV_DOMAIN_LIST", 1)
                 self.update_domain_list(msg)
 

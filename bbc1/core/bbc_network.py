@@ -247,6 +247,8 @@ class BBcNetwork:
                                                                                       domain_id=domain_id,
                                                                                       logname=self.logname,
                                                                                       loglevel=self.loglevel)
+        if self.domain0manager is not None:
+            self.domain0manager.update_domain_belong_to()
         self.stats.update_stats_increment("network", "num_domains", 1)
         return True
 
@@ -265,14 +267,14 @@ class BBcNetwork:
             KeyType.command: BBcNetwork.NOTIFY_LEAVE,
         }
         self.broadcast_message_in_network(domain_id=domain_id, msg=msg)
+
         self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].stop_all_timers()
         self.domains[domain_id][InfraMessageCategory.CATEGORY_USER].stop_all_timers()
         if domain_id == ZEROS:
             self.domain0manager.stop_all_timers()
-        else:
-            if self.domain0manager is not None:
-                self.domain0manager.remove_domain(domain_id)
         del self.domains[domain_id]
+        if self.domain0manager is not None:
+            self.domain0manager.update_domain_belong_to()
         self.stats.update_stats_decrement("network", "num_domains", 1)
         return True
 
