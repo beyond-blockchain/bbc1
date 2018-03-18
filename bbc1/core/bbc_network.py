@@ -160,7 +160,7 @@ class BBcNetwork:
             self.logger.error("** Fail to setup TCP server **")
             return
 
-    def get_my_socket_info(self):
+    def get_my_socket_info(self, node_id):
         """
         Return waiting port and my IP address
 
@@ -176,9 +176,8 @@ class BBcNetwork:
             ipv6 = self.external_ip6addr
         if ipv6 is None or len(ipv6) == 0:
             ipv6 = "::"
-        port = socket.htons(self.port).to_bytes(2, 'big')
-        return socket.inet_pton(socket.AF_INET, ipv4), socket.inet_pton(socket.AF_INET6, ipv6), port, \
-               int(time.time()).to_bytes(8, 'big')
+        domain0 = True if self.domain0manager is not None else False
+        return NodeInfo(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=self.port, domain0=domain0)
 
     def send_key_exchange_message(self, domain_id, node_id, command, pubkey, nonce, random_val, key_name):
         if command == "request":
@@ -224,7 +223,7 @@ class BBcNetwork:
         self.domains[domain_id]['node_id'] = node_id
         self.domains[domain_id]['name'] = node_id.hex()[:4]
         self.domains[domain_id]['neighbor'] = NeighborInfo(network=self, domain_id=domain_id, node_id=node_id,
-                                                           sock=self.get_my_socket_info())
+                                                           my_info=self.get_my_socket_info(node_id))
         self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY] = TopologyManagerBase(network=self,
                                                                                               domain_id=domain_id,
                                                                                               node_id=node_id,
@@ -249,6 +248,10 @@ class BBcNetwork:
                                                                                       loglevel=self.loglevel)
         if self.domain0manager is not None:
             self.domain0manager.update_domain_belong_to()
+            for dm in self.domains.keys():
+                if dm != ZEROS:
+                    self.domains[dm]['neighbor'].my_info.update(domain0=True)
+            self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].update_refresh_timer_entry(1)
         self.stats.update_stats_increment("network", "num_domains", 1)
         return True
 
@@ -272,6 +275,10 @@ class BBcNetwork:
         self.domains[domain_id][InfraMessageCategory.CATEGORY_USER].stop_all_timers()
         if domain_id == ZEROS:
             self.domain0manager.stop_all_timers()
+            for dm in self.domains.keys():
+                if dm != ZEROS:
+                    self.domains[dm]['neighbor'].my_info.update(domain0=False)
+                    self.domains[dm][InfraMessageCategory.CATEGORY_TOPOLOGY].update_refresh_timer_entry(1)
         del self.domains[domain_id]
         if self.domain0manager is not None:
             self.domain0manager.update_domain_belong_to()
@@ -736,11 +743,11 @@ class NeighborInfo:
     """
     PURGE_INTERVAL_SEC = 300
 
-    def __init__(self, network=None, domain_id=None, node_id=None, sock=None):
+    def __init__(self, network=None, domain_id=None, node_id=None, my_info=None):
         self.networking = network
         self.domain_id = domain_id
         self.my_node_id = node_id
-        self.my_socket_info = sock
+        self.my_info = my_info
         self.nodeinfo_list = dict()
         self.purge_timer = query_management.QueryEntry(expire_after=NeighborInfo.PURGE_INTERVAL_SEC,
                                                        callback_expire=self.purge, retry_count=3)
@@ -752,15 +759,16 @@ class NeighborInfo:
         self.purge_timer = query_management.QueryEntry(expire_after=NeighborInfo.PURGE_INTERVAL_SEC,
                                                        callback_expire=self.purge, retry_count=3)
 
-    def add(self, node_id, ipv4=None, ipv6=None, port=None, is_static=False):
+    def add(self, node_id, ipv4=None, ipv6=None, port=None, is_static=False, domain0=False):
         if node_id not in self.nodeinfo_list:
-            self.nodeinfo_list[node_id] = NodeInfo(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port, is_static=is_static)
+            self.nodeinfo_list[node_id] = NodeInfo(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port,
+                                                   is_static=is_static, domain0=domain0)
             self.nodeinfo_list[node_id].key_manager = KeyExchangeManager(self.networking, self.domain_id, node_id)
             rand_time = random.uniform(1, KeyExchangeManager.KEY_EXCHANGE_INVOKE_MAX_BACKOFF)
             self.nodeinfo_list[node_id].key_manager.set_invoke_timer(rand_time)
             return True
         else:
-            change_flag = self.nodeinfo_list[node_id].update(ipv4=ipv4, ipv6=ipv6, port=port)
+            change_flag = self.nodeinfo_list[node_id].update(ipv4=ipv4, ipv6=ipv6, port=port, domain0=domain0)
             return change_flag
 
     def remove(self, node_id):
@@ -789,7 +797,7 @@ class NodeInfo:
     SECURITY_STATE_CONFIRMING = 2
     SECURITY_STATE_ESTABLISHED = 3
 
-    def __init__(self, node_id=None, ipv4=None, ipv6=None, port=None, is_static=False):
+    def __init__(self, node_id=None, ipv4=None, ipv6=None, port=None, is_static=False, domain0=False):
         self.node_id = node_id
         if ipv4 is None or len(ipv4) == 0:
             self.ipv4 = None
@@ -807,6 +815,7 @@ class NodeInfo:
                 self.ipv6 = ipv6
         self.port = port
         self.is_static = is_static
+        self.is_domain0_node = domain0
         self.created_at = self.updated_at = time.time()
         self.is_alive = True
         self.disconnect_at = 0
@@ -833,9 +842,9 @@ class NodeInfo:
         if ipv6 is None:
             ipv6 = "::"
         security_state = (self.key_manager is not None and self.key_manager.state == KeyExchangeManager.STATE_ESTABLISHED)
-        output = "[node_id=%s, ipv4=%s, ipv6=%s, port=%d, alive=%s, static=%s, encryption=%s, time=%d]" %\
+        output = "[node_id=%s, ipv4=%s, ipv6=%s, port=%d, alive=%s, static=%s, encryption=%s, domain0=%s, time=%d]" %\
                  (binascii.b2a_hex(self.node_id), ipv4, ipv6, self.port, self.is_alive, self.is_static,
-                  security_state, self.updated_at)
+                  security_state, self.is_domain0_node, self.updated_at)
         return output
 
     def touch(self):
@@ -846,7 +855,7 @@ class NodeInfo:
         self.disconnect_at = time.time()
         self.is_alive = False
 
-    def update(self, ipv4=None, ipv6=None, port=None):
+    def update(self, ipv4=None, ipv6=None, port=None, domain0=None):
         change_flag = None
         if ipv4 is not None and self.ipv4 != ipv4:
             if isinstance(ipv4, bytes):
@@ -865,6 +874,9 @@ class NodeInfo:
         if port is not None and self.port != port:
             self.port = port
             change_flag = True
+        if domain0 is not None and self.is_domain0_node != domain0:
+            self.is_domain0_node = domain0
+            change_flag = True
         self.updated_at = time.time()
         self.is_alive = True
         return change_flag
@@ -878,5 +890,6 @@ class NodeInfo:
             ipv6 = socket.inet_pton(socket.AF_INET6, self.ipv6)
         else:
             ipv6 = socket.inet_pton(socket.AF_INET6, "::")
+        domain0 = int(1).to_bytes(1, 'little') if self.is_domain0_node else int(0).to_bytes(1, 'little')
         return self.node_id, ipv4, ipv6, socket.htons(self.port).to_bytes(2, 'big'), \
-               int(self.updated_at).to_bytes(8, 'big')
+               domain0, int(self.updated_at).to_bytes(8, 'big')

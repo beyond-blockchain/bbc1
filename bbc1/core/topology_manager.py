@@ -100,9 +100,12 @@ class TopologyManagerBase:
         else:
             self.advertise_wait_entry.update_expiration_time(rand_time)
 
-    def update_refresh_timer_entry(self, new_entry=True):
-        rand_interval = random.randint(int(TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL * 2 / 3),
-                                       int(TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL * 4 / 3))
+    def update_refresh_timer_entry(self, new_entry=True, force_refresh_time=None):
+        if force_refresh_time is None:
+            rand_interval = random.randint(int(TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL * 2 / 3),
+                                           int(TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL * 4 / 3))
+        else:
+            rand_interval = force_refresh_time
         self.logger.debug("update_refresh_timer_entry: %d" % rand_interval)
         if new_entry:
             self.neighbor_refresh_timer_entry = query_management.QueryEntry(
@@ -137,8 +140,7 @@ class TopologyManagerBase:
         nodeinfo = bytearray()
 
         # the node itself
-        nodeinfo.extend(self.my_node_id)
-        for item in self.neighbors.my_socket_info:
+        for item in self.neighbors.my_info.get_nodeinfo():
             nodeinfo.extend(item)
         count = 1
 
@@ -163,15 +165,16 @@ class TopologyManagerBase:
         count_unchanged = 0
         count = int.from_bytes(binary_data[:4], 'big')
         for i in range(count):
-            base = 4 + i * (32 + 4 + 16 + 2 + 8)
+            base = 4 + i * (32 + 4 + 16 + 2 + 1 + 8)
             node_id = binary_data[base:base + 32]
             if node_id == self.my_node_id:
                 continue
             ipv4 = socket.inet_ntop(socket.AF_INET, binary_data[base + 32:base + 36])
             ipv6 = socket.inet_ntop(socket.AF_INET6, binary_data[base + 36:base + 52])
             port = socket.ntohs(int.from_bytes(binary_data[base + 52:base + 54], 'big'))
-            updated_at = int.from_bytes(binary_data[base + 54:base + 62], 'big')
-            if not self.neighbors.add(node_id, ipv4, ipv6, port):
+            domain0 = True if binary_data[base + 54] == 0x01 else False
+            updated_at = int.from_bytes(binary_data[base + 55:base + 63], 'big')
+            if not self.neighbors.add(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port, domain0=domain0):
                 count_unchanged += 1
         self.logger.debug("[%s] update_neighbor_list: orig=%d, unchanged=%d, recv=%d, need_advertise=%s" %
               (self.my_node_id.hex()[:4], count_originally, count_unchanged, count, count_originally != count_unchanged))

@@ -117,6 +117,11 @@ class TestBBcAppClient(object):
         print(cores[1].networking.domains[bbclib.domain_global_0]['neighbor'].show_list())
         print(cores[14].networking.domains[bbclib.domain_global_0]['neighbor'].show_list())
 
+        print("-- wait 5 seconds --")
+        time.sleep(5)
+        for i in range(domain_num):
+            print(cores[i*core_per_domain].networking.domains[domain_ids[i]]['neighbor'].show_list())
+
     def test_13_wait(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         print("-- sleep 10 sec")
