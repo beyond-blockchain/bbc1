@@ -636,6 +636,7 @@ class BBcCoreService:
         if asset_files is None:
             return txobj
 
+        # -- if asset_files is given, check them.
         for idx, evt in enumerate(txobj.events):
             if evt.asset is None:
                 continue
@@ -655,37 +656,6 @@ class BBcCoreService:
                     self.logger.error("Bad asset_id for event[%d]" % idx)
                     return None
         return txobj
-
-    def validate_asset_file(self, txobj, asid, asset_file):
-        """
-        Validate asset in storage by verifying SHA256 digest
-
-        :param txobj:
-        :param asset_file:
-        :return:
-        """
-        for idx, evt in enumerate(txobj.events):
-            if evt.asset is None:
-                continue
-            if asid == evt.asset.asset_id:
-                if evt.asset.asset_file_digest == hashlib.sha256(asset_file).digest():
-                    return True
-                else:
-                    self.stats.update_stats_increment("asset", "invalid", 1)
-                    self.logger.error("Bad asset_id for event[%d]" % idx)
-                    return False
-        for idx, rtn in enumerate(txobj.relations):
-            if rtn.asset is None:
-                continue
-            if asid == rtn.asset.asset_id:
-                if rtn.asset.asset_file_digest == hashlib.sha256(asset_file).digest():
-                    return True
-                else:
-                    self.stats.update_stats_increment("asset", "invalid", 1)
-                    self.logger.error("Bad asset_id for event[%d]" % idx)
-                    return False
-        self.stats.update_stats_increment("asset", "invalid", 1)
-        return False
 
     def insert_transaction(self, domain_id, txdata, asset_files):
         """

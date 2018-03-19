@@ -17,6 +17,7 @@ limitations under the License.
 
 import traceback
 import binascii
+import hashlib
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
@@ -45,6 +46,9 @@ class DataHandler:
     """
     Handle message for data
     """
+    REPLICATION_ALL = 0
+    REPLICATION_P2P = 1
+    REPLICATION_EXT = 2
     REQUEST_REPLICATION_INSERT = to_2byte(0)
     RESPONSE_REPLICATION_INSERT = to_2byte(1)
     REQUEST_SEARCH = to_2byte(2)
@@ -67,9 +71,8 @@ class DataHandler:
         if not os.path.exists(self.storage_root):
             os.makedirs(self.storage_root, exist_ok=True)
         self.use_external_storage = self.storage_setup()
-        self.send_copy_to_all_neighbors = None
-        self.db_adaptor = None
-        self.db_cur = None
+        self.replication_strategy = DataHandler.REPLICATION_ALL
+        self.db_adaptors = list()
         self.dbs = list()
         self.db_setup()
 
@@ -79,29 +82,32 @@ class DataHandler:
         :return:
         """
         dbconf = self.config['db']
-        if dbconf['send_copy_to'] == 'all':
-            self.send_copy_to_all_neighbors = "all"
-        elif dbconf['send_copy_to'] == 'custom':
-            self.send_copy_to_all_neighbors = "custom"
+        if dbconf['replication_strategy'] == 'all':
+            self.replication_strategy = DataHandler.REPLICATION_ALL
+        elif dbconf['replication_strategy'] == 'p2p':
+            self.replication_strategy = DataHandler.REPLICATION_P2P
+        else:
+            self.replication_strategy = DataHandler.REPLICATION_EXT
         db_type = dbconf.get("db_type", "sqlite")
+        db_name = dbconf.get("db_name", "bbc1_db.sqlite")
         if db_type == "sqlite":
-            db_name = dbconf.get("db_name", "bbc1_db.sqlite")
-            self.db_adaptor = SqliteAdaptor(self, db_name=os.path.join(self.storage_root, db_name))
+            self.db_adaptors.append(SqliteAdaptor(self, db_name=os.path.join(self.storage_root, db_name)))
         elif db_type == "mysql":
-            servers = list()
-            for c in dbconf['servers']:
-                db_addr = dbconf.get("db_addr", "127.0.0.1")
-                db_port = dbconf.get("db_port", 3306)
-                db_user = dbconf.get("db_user", "user")
-                db_pass = dbconf.get("db_pass", "password")
-                servers.append((db_addr, db_port, db_user, db_pass))
-            self.db_adaptor = MysqlAdaptor(self, servers=servers)
-        if self.db_adaptor is None:
-            return
-        self.db_adaptor.open_db()
-        self.db_adaptor.create_table('transaction_table', transaction_tbl_definition, primary_key=0, indices=[0])
-        self.db_adaptor.create_table('asset_info_table', asset_info_definition, primary_key=0, indices=[0, 1, 2, 3])
-        self.db_adaptor.create_table('topology_table', topology_info_definition, primary_key=0, indices=[0, 1])
+            count = 0
+            for c in dbconf['db_servers']:
+                db_addr = c.get("db_addr", "127.0.0.1")
+                db_port = c.get("db_port", 3306)
+                db_user = c.get("db_user", "user")
+                db_pass = c.get("db_pass", "password")
+                self.db_adaptors.append(MysqlAdaptor(self, db_name=db_name, db_num=count,
+                                                     server_info=(db_addr, db_port, db_user, db_pass)))
+                count += 1
+
+        for db in self.db_adaptors:
+            db.open_db()
+            db.create_table('transaction_table', transaction_tbl_definition, primary_key=0, indices=[0])
+            db.create_table('asset_info_table', asset_info_definition, primary_key=0, indices=[0, 1, 2, 3, 4])
+            db.create_table('topology_table', topology_info_definition, primary_key=0, indices=[0, 1, 2])
 
     def storage_setup(self):
         if self.config['storage']['type'] == "external":
@@ -117,24 +123,59 @@ class DataHandler:
         """
         (internal use) close DB
         """
-        self.db_cur.close()
-        self.db_adaptor.db.close()
+        for d in self.db_adaptors:
+            d.db_cur.close()
+            d.db.close()
 
-    def exec_sql(self, sql, *args):
+    def exec_sql(self, db_num=0, sql=None, args=()):
         """
         Execute sql sentence
+        :param db_num:
         :param sql:
         :param args:
         :return:
         """
         self.stats.update_stats_increment("data_handler", "exec_sql", 1)
+        #print("sql=", sql)
+        #if len(args) > 0:
+        #    print("args=", args)
         try:
+            db_num = 0 if db_num >= len(self.db_adaptors) else db_num
             if len(args) > 0:
-                ret = self.db_cur.execute(sql, (*args,))
+                ret = self.db_adaptors[db_num].db_cur.execute(sql, args)
             else:
-                ret = self.db_cur.execute(sql)
+                ret = self.db_adaptors[db_num].db_cur.execute(sql)
+            self.db_adaptors[db_num].db.commit()
         except:
             self.logger.error(traceback.format_exc())
+            traceback.print_exc()
+            self.stats.update_stats_increment("data_handler", "fail_exec_sql", 1)
+            return None
+        if ret is None:
+            return []
+        else:
+            return list(ret)
+
+    def exec_sql_fetchall(self, db_num=0, sql=None, args=()):
+        """
+        Execute sql sentence
+        :param db_num:
+        :param sql:
+        :param args:
+        :return:
+        """
+        self.stats.update_stats_increment("data_handler", "exec_sql", 1)
+        #print("sql=", sql)
+        try:
+            db_num = 0 if db_num >= len(self.db_adaptors) else db_num
+            if len(args) > 0:
+                self.db_adaptors[db_num].db_cur.execute(sql, args)
+            else:
+                self.db_adaptors[db_num].db_cur.execute(sql)
+            ret = self.db_adaptors[db_num].db_cur.fetchall()
+        except:
+            self.logger.error(traceback.format_exc())
+            traceback.print_exc()
             self.stats.update_stats_increment("data_handler", "fail_exec_sql", 1)
             return None
         if ret is not None:
@@ -149,11 +190,15 @@ class DataHandler:
         """
         info = list()
         for idx, evt in enumerate(txobj.events):
-            if evt.asset is not None:
-                info.append((evt.asset_group_id, evt.asset.asset_id, evt.asset.user_id, evt.asset.asset_file_size>0))
+            ast = evt.asset
+            if ast is not None:
+                info.append((evt.asset_group_id, ast.asset_id, ast.user_id, ast.asset_file_size>0,
+                             ast.asset_file_digest))
         for idx, rtn in enumerate(txobj.relations):
+            ast = rtn.asset
             if rtn.asset is not None:
-                info.append((rtn.asset_group_id, rtn.asset.asset_id, rtn.asset.user_id, rtn.asset.asset_file_size>0))
+                info.append((rtn.asset_group_id, ast.asset_id, ast.user_id, ast.asset_file_size>0,
+                             ast.asset_file_digest))
         return info
 
     def get_topology_info(self, txobj):
@@ -184,56 +229,40 @@ class DataHandler:
             if txobj is None:
                 return None
 
-        ret = self.exec_sql("INSERT INTO transaction_table VALUES (?, ?)", txobj.transaction_id, txdata)
-        if ret is None:
-            return None
+        inserted_count = 0
+        for i in range(len(self.db_adaptors)):
+            ret = self.exec_sql(db_num=i,
+                                sql="INSERT INTO transaction_table VALUES (%s,%s)" % (self.db_adaptors[0].placeholder,
+                                                                                      self.db_adaptors[0].placeholder),
+                                args=(txobj.transaction_id, txdata))
+            if ret is None:
+                continue
+            inserted_count += 1
 
-        if not no_replication:
-            self.send_replication_to_other_cores(txdata, asset_files)
+            for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
+                self.exec_sql(db_num=i,
+                              sql="INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id) "
+                                "VALUES (%s, %s, %s, %s)" % (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
+                                                             self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
+                                args=(txobj.transaction_id, asset_group_id, asset_id, user_id))
+            for tx_to, tx_from in self.get_topology_info(txobj):
+                self.exec_sql(db_num=i,
+                              sql="INSERT INTO topology_table(tx_to, tx_from) VALUES (%s, %s)" %
+                                (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
+                              args=(tx_to, tx_from))
+
+        if inserted_count == 0:
+            return None
 
         asset_group_ids = set()
-        rollback_asset = list()
-        rollback_asset_file = list()
-        rollback_flag = False
-        for asset_group_id, asset_id, user_id, fileflag in self.get_asset_info(txobj):
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
             asset_group_ids.add(asset_group_id)
-            ret = self.exec_sql("INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id) "
-                                "VALUES (?, ?, ?, ?)",
-                                txobj.transaction_id, asset_group_id, asset_id, user_id)
-            if ret is not None:
-                rollback_asset.append((asset_group_id, asset_id, user_id))
-            else:
-                rollback_flag = True
-                break
             if not self.use_external_storage and asset_files is not None and asset_id in asset_files:
-                if self.store_in_storage(asset_group_id, asset_id, asset_files[asset_id]):
-                    rollback_asset_file.append((asset_group_id, asset_id))
-                else:
-                    rollback_flag = True
-                    break
+                self.store_in_storage(asset_group_id, asset_id, asset_files[asset_id])
 
-        rollback_topology = list()
-        if not rollback_flag:
-            for tx_to, tx_from in self.get_topology_info(txobj):
-                ret = self.exec_sql("INSERT INTO topology_table(tx_to, tx_from) VALUES (?, ?)", tx_to, tx_from)
-                if ret is not None:
-                    rollback_topology.append((tx_to, tx_from))
-                else:
-                    rollback_flag = True
-                    break
+        if not no_replication and self.replication_strategy != DataHandler.REPLICATION_EXT:
+            self.send_replication_to_other_cores(txdata, asset_files)
 
-        if rollback_flag:
-            self.stats.update_stats_increment("data_handler", "insert_rollback", 1)
-            self.exec_sql("DELETE FROM transaction_table WHERE transaction_id = ?", txobj.transaction_id)
-            for asset_group_id, asset_id, user_id in rollback_asset:
-                self.exec_sql("DELETE FROM asset_info_table WHERE asset_group_id = ? AND asset_id = ? AND user_id = ?",
-                              asset_group_id, asset_id, user_id)
-            for tx_to, tx_from in rollback_topology:
-                self.exec_sql("DELETE FROM topology_table WHERE tx_to = ? AND tx_from = ?", tx_to, tx_from)
-            if not self.use_external_storage:
-                for asset_group_id, asset_id in rollback_asset_file:
-                    self.remove_in_storage(asset_group_id, asset_id)
-            return None
         return asset_group_ids
 
     def send_replication_to_other_cores(self, txdata, asset_files=None):
@@ -242,8 +271,6 @@ class DataHandler:
         :param txdata:
         :return:
         """
-        if self.send_copy_to_all_neighbors is None:
-            return
         msg = {
             KeyType.domain_id: self.domain_id,
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_DATA,
@@ -252,10 +279,10 @@ class DataHandler:
         }
         if asset_files is not None:
             msg[KeyType.all_asset_files] = asset_files
-        if self.send_copy_to_all_neighbors == "all":
+        if self.replication_strategy == DataHandler.REPLICATION_ALL:
             self.network.broadcast_message_in_network(domain_id=self.domain_id,
                                                       payload_type=PayloadType.Type_msgpack, msg=msg)
-        elif self.send_copy_to_all_neighbors == "custom":
+        elif self.replication_strategy == DataHandler.REPLICATION_P2P:
             pass  # TODO: implement (destinations determined by TopologyManager)
 
     def remove(self, transaction_id):
@@ -266,17 +293,29 @@ class DataHandler:
         """
         if transaction_id is None:
             return
-        txdata = self.exec_sql("SELECT * FROM transaction_table WHERE transaction_id = ?", transaction_id)
+        txdata = self.exec_sql_fetchall(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
+                                            self.db_adaptors[0].placeholder, args=(transaction_id,))
         txobj = bbclib.BBcTransaction(deserialize=txdata[0][1])
 
-        self.exec_sql("DELETE FROM transaction_table WHERE transaction_id = ?", transaction_id)
-        for asset_group_id, asset_id, user_id, fileflag in self.get_asset_info(txobj):
-            self.exec_sql("DELETE FROM asset_info_table WHERE asset_group_id = ? AND asset_id = ? AND user_id = ?",
-                          asset_group_id, asset_id, user_id)
-            if fileflag:
-                self.remove_in_storage(asset_group_id, asset_id)
-        for tx_to, tx_from in self.get_topology_info(txobj):
-            self.exec_sql("DELETE FROM topology_table WHERE tx_to = ? AND tx_from = ?", tx_to, tx_from)
+        for i in range(len(self.db_adaptors)):
+            self.exec_sql(
+                db_num=i,
+                sql="DELETE FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
+                args=(transaction_id,))
+            for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
+                self.exec_sql(
+                    db_num=i,
+                    sql="DELETE FROM asset_info_table WHERE asset_group_id = %s AND asset_id = %s AND user_id = %s" %
+                        (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
+                    args=(asset_group_id, asset_id, user_id))
+                if fileflag:
+                    self.remove_in_storage(asset_group_id, asset_id)
+            for tx_to, tx_from in self.get_topology_info(txobj):
+                self.exec_sql(
+                    db_num=i,
+                    sql="DELETE FROM topology_table WHERE tx_to = %s AND tx_from = %s" %
+                        (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
+                    args=(tx_to, tx_from))
 
     def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None, count=1):
         """
@@ -289,18 +328,19 @@ class DataHandler:
         :return:
         """
         if transaction_id is not None:
-            txinfo = self.exec_sql("SELECT * FROM transaction_table WHERE transaction_id = ?", transaction_id)
+            txinfo = self.exec_sql_fetchall(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
+                                                self.db_adaptors[0].placeholder, args=(transaction_id,))
             if len(txinfo) == 0:
                 return None, None
         else:
             sql = "SELECT * from asset_info_table WHERE "
             conditions = list()
             if asset_group_id is not None:
-                conditions.append("asset_group_id = ? ")
+                conditions.append("asset_group_id = %s " % self.db_adaptors[0].placeholder)
             if asset_id is not None:
-                conditions.append("asset_id = ? ")
+                conditions.append("asset_id = %s " % self.db_adaptors[0].placeholder)
             if user_id is not None:
-                conditions.append("user_id = ? ")
+                conditions.append("user_id = %s " % self.db_adaptors[0].placeholder)
             sql += "AND ".join(conditions) + "ORDER BY id DESC"
             if count > 0:
                 if count > 20:
@@ -308,16 +348,19 @@ class DataHandler:
                 sql += " limit %d" % count
             sql += ";"
             args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id)))
-            ret = self.exec_sql(sql, *args)
+            ret = self.exec_sql_fetchall(sql=sql, args=args)
             txinfo = list()
             for record in ret:
-                tx = self.exec_sql("SELECT * FROM transaction_table WHERE transaction_id = ?", record[1])
+                tx = self.exec_sql_fetchall(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
+                                                self.db_adaptors[0].placeholder, args=(record[1],))
                 if tx is not None and len(tx) == 1:
                     txinfo.append(tx[0])
 
         result_txobj = list()
         txid_list = dict()
         result_asset_files = dict()
+        compromised_tx = list()
+        compromised_asset_files = list()
         for txid, txdata in txinfo:
             if txid in txid_list:
                 continue
@@ -326,12 +369,20 @@ class DataHandler:
             txobj.deserialize(txdata)
             for sig in txobj.signatures:
                 if not sig.verify(txid):
-                    return None  # TODO: データが改ざんされていた場合の対応（別のところから取ってくる?）
+                    compromised_tx.append(txid)
             result_txobj.append(txobj)
-            for asset_group_id, asset_id, user_id, fileflag in self.get_asset_info(txobj):
+            for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
                 if fileflag:
-                    result_asset_files[asset_id] = self.get_in_storage(asset_group_id, asset_id)
-        return result_txobj, result_asset_files
+                    assetfile = self.get_in_storage(asset_group_id, asset_id)
+                    if hashlib.sha256(assetfile).digest() == filedigest:
+                        result_asset_files[asset_id] = assetfile
+                    else:
+                        compromised_asset_files.append(asset_id)
+        if len(compromised_tx) == 0 and len(compromised_asset_files) == 0:
+            return result_txobj, result_asset_files
+        # TODO: implement finding correct transaction data and asset file
+        print(len(compromised_tx), len(compromised_asset_files))
+        return None, None
 
     def search_transaction_topology(self, transaction_id, reverse_link=False):
         """
@@ -342,9 +393,12 @@ class DataHandler:
         if transaction_id is None:
             return None
         if reverse_link:
-            return self.exec_sql("SELECT * FROM topology_table WHERE tx_from = ?", transaction_id)
+            return self.exec_sql_fetchall(sql="SELECT * FROM topology_table WHERE tx_from = %s" %
+                                              self.db_adaptors[0].placeholder, args=(transaction_id,))
+
         else:
-            return self.exec_sql("SELECT * FROM topology_table WHERE tx_to = ?", transaction_id)
+            return self.exec_sql_fetchall(sql="SELECT * FROM topology_table WHERE tx_to = %s" %
+                                              self.db_adaptors[0].placeholder, args=(transaction_id,))
 
     def store_in_storage(self, asset_group_id, asset_id, content):
         """
@@ -498,11 +552,13 @@ class DataHandlerDomain0(DataHandler):
 
 
 class DbAdaptor:
-    def __init__(self, handler=None, db_name=None, servers=None, loglevel="all", logname=None):
+    def __init__(self, handler=None, db_name=None, db_num=0, loglevel="all", logname=None):
         self.handler = handler
         self.db = None
+        self.db_cur = None
         self.db_name = db_name
-        self.servers = servers
+        self.db_num = db_num
+        self.placeholder = ""
         self.logger = logger.get_logger(key="db_adaptor", level=loglevel, logname=logname)
 
     def open_db(self):
@@ -511,18 +567,19 @@ class DbAdaptor:
     def create_table(self, tbl, tbl_definition, primary_key=0, indices=[]):
         pass
 
-    def get_sql_table_existence_check(self, tblname):
+    def check_table_existence(self, tblname):
         pass
 
 
 class SqliteAdaptor(DbAdaptor):
-    def __init__(self, handler=None, db_name=None, servers=None, loglevel="all", logname=None):
-        super(SqliteAdaptor, self).__init__(handler, db_name, servers, loglevel, logname)
+    def __init__(self, handler=None, db_name=None, loglevel="all", logname=None):
+        super(SqliteAdaptor, self).__init__(handler=handler, db_name=db_name, loglevel=loglevel, logname=logname)
+        self.placeholder = "?"
 
     def open_db(self):
         import sqlite3
         self.db = sqlite3.connect(self.db_name, isolation_level=None)
-        self.handler.db_cur = self.db.cursor()
+        self.db_cur = self.db.cursor()
 
     def create_table(self, tbl, tbl_definition, primary_key=0, indices=[]):
         if len(self.check_table_existence(tbl)) > 0:
@@ -532,23 +589,59 @@ class SqliteAdaptor(DbAdaptor):
         sql += ", ".join(["%s %s" % (d[0],d[1]) for d in tbl_definition])
         sql += ", PRIMARY KEY ("+tbl_definition[primary_key][0]+")"
         sql += ");"
-        self.handler.exec_sql(sql)
+        self.handler.exec_sql(sql=sql)
         for idx in indices:
-            self.handler.exec_sql("CREATE INDEX %s_idx_%d ON %s (%s);" % (tbl, idx, tbl, tbl_definition[idx][0]))
+            self.handler.exec_sql(sql="CREATE INDEX %s_idx_%d ON %s (%s);" % (tbl, idx, tbl, tbl_definition[idx][0]))
 
     def check_table_existence(self, tblname):
-        return self.handler.exec_sql("SELECT * FROM sqlite_master WHERE type='table' AND name=?", tblname)
+        return self.handler.exec_sql_fetchall(sql="SELECT * FROM sqlite_master WHERE type='table' AND name=?", args=(tblname,))
 
 
 class MysqlAdaptor(DbAdaptor):
-    def __init__(self, handler=None, db_name=None, servers=None, loglevel="all", logname=None):
-        super(MysqlAdaptor, self).__init__(handler, db_name, servers, loglevel, logname)
+    def __init__(self, handler=None, db_name=None, db_num=None, server_info=None, loglevel="all", logname=None):
+        super(MysqlAdaptor, self).__init__(handler, db_name, db_num, loglevel, logname)
+        self.placeholder = "%s"
+        self.db_addr = server_info[0]
+        self.db_port = server_info[1]
+        self.db_user = server_info[2]
+        self.db_pass = server_info[3]
 
     def open_db(self):
-        pass
+        import mysql.connector
+        self.db = mysql.connector.connect(
+            host=self.db_addr,
+            port=self.db_port,
+            db=self.db_name,
+            user=self.db_user,
+            password=self.db_pass,
+            charset='utf8'
+        )
+        self.db_cur = self.db.cursor(buffered=True)
 
     def create_table(self, tbl, tbl_definition, primary_key=0, indices=[]):
-        pass
+        if len(self.check_table_existence(tbl)) == 1:
+            return
+        sql = "CREATE TABLE %s " % tbl
+        sql += "("
+        defs = list()
+        for d in tbl_definition:
+            if d[0] == "id":
+                defs.append("%s %s AUTO_INCREMENT NOT NULL" % (d[0], d[1]))
+            else:
+                defs.append("%s %s" % (d[0], d[1]))
+        sql += ",".join(defs)
+        if tbl_definition[primary_key][1] in ["BLOB", "TEXT"]:
+            sql += ", PRIMARY KEY (%s(32))" % tbl_definition[primary_key][0]
+        else:
+            sql += ", PRIMARY KEY (%s)" % tbl_definition[primary_key][0]
+        sql += ") CHARSET=utf8;"
+        self.handler.exec_sql(db_num=self.db_num, sql=sql)
+        for idx in indices:
+            if tbl_definition[idx][1] in ["BLOB", "TEXT"]:
+                self.handler.exec_sql(db_num=self.db_num, sql="ALTER TABLE %s ADD INDEX (%s(32));" % (tbl, tbl_definition[idx][0]))
+            else:
+                self.handler.exec_sql(db_num=self.db_num, sql="ALTER TABLE %s ADD INDEX (%s);" % (tbl, tbl_definition[idx][0]))
 
-    def get_sql_table_existence_check(self, tblname):
-        pass
+    def check_table_existence(self, tblname):
+        sql = "show tables from %s like '%s';" % (self.db_name, tblname)
+        return self.handler.exec_sql_fetchall(db_num=self.db_num, sql=sql)

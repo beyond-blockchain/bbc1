@@ -27,9 +27,11 @@ config = {
                 "type": "internal",
             },
             "db": {
-                "db_type": "sqlite",
-                "db_name": "testdb",
-                'replication_strategy': "all",
+                "db_type": "mysql",
+                "db_name": "bbctest",
+                'replication_strategy': "external",
+                "db_servers": [{"db_addr": "127.0.0.1", "db_port": 3306, "db_user": "root", "db_pass": "password"},
+                               {"db_addr": "127.0.0.1", "db_port": 3307, "db_user": "root", "db_pass": "password"}]
             },
         }
     }
@@ -43,7 +45,6 @@ class TestDataHandler(object):
         global data_handler
         conf = config["domains"][bbclib.convert_id_to_string(domain_id)]
         data_handler = DataHandler(config=conf, workingdir="testdir", domain_id=domain_id)
-
         global transactions
         for i in range(10):
             txobj = bbclib.BBcTransaction()
@@ -96,7 +97,7 @@ class TestDataHandler(object):
         assert len(ret_asset_files) == 1
         print(ret_txobj)
 
-    def test_05_insert_transaction_failures(self):
+    def test_05_insert_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         ret = data_handler.insert_transaction(transactions[0].serialize(), transactions[0], no_replication=True)
         assert ret is None

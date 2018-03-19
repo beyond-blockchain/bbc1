@@ -120,9 +120,11 @@ class BBcConfig:
                     "type": "internal",  # or "external"
                 },
                 'db': {
-                    "send_copy_to": "all",  # or None/custom
-                    "db_type": "sqlite", # or "mysql"
+                    "db_type": "sqlite",            # or "mysql"
                     "db_name": "bbc_ledger.sqlite",
+                    "replication_strategy": "all",  # or "p2p"/"external" (valid only in db_type=mysql)
+                    "db_servers": [{"db_addr": "127.0.0.1", "db_port": 3306, "db_user": "user", "db_pass": "pass"}]
+                    # valid only in the case of db_type=mysql
                 },
                 'static_nodes': {
                     # id : [ipv4, ipv6, port]

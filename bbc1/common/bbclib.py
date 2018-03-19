@@ -1028,6 +1028,8 @@ class BBcAsset:
             ptr, self.asset_file_size = get_n_byte_int(ptr, 4, data)
             if self.asset_file_size > 0:
                 ptr, self.asset_file_digest = get_bigint(ptr, data)
+            else:
+                self.asset_file_digest = None
             ptr, self.asset_body_size = get_n_byte_int(ptr, 2, data)
             if self.asset_body_size > 0:
                 ptr, self.asset_body = get_n_bytes(ptr, self.asset_body_size, data)
