@@ -6,7 +6,7 @@ sys.path.extend(["../"])
 import bbc1.common.message_key_types as message_key_types
 import bbc1.common.bbc_error as bbc_error
 
-from bbc1.common.bbclib import ServiceMessageType as MsgType
+from bbc1.common.bbclib import MsgType
 # dummy start.
 #class MsgType:
 #    MESSAGE = 34

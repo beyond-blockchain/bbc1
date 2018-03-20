@@ -39,29 +39,9 @@ current_config = {
     'client': {
         'port': DEFAULT_CORE_PORT,
     },
-    'ledger': {
-        'type': "sqlite3",
-        'transaction_db': "bbc_transaction.sqlite3",
-        'auxiliary_db': "bbc_aux.sqlite3",
-        'merkle_db': "bbc_merkle.sqlite3",
-    },
-    'storage': {
-        #'path': "path/to/somewhere",
-        #'path': "/path/to/somewhere",
-    },
     'network': {
         'p2p_port': DEFAULT_P2P_PORT,
         'max_connections': 100,
-        'modules': {
-            'simple_cluster': {
-                'test': 1,
-            },
-            'p2p_kademlia': {
-                'concurrent_lookup_num': 3,
-                'redundancy': 3,
-                'k_value': 10,
-            },
-        },
     },
     'domains': {
         '0000000000000000000000000000000000000000000000000000000000000000': {
@@ -69,12 +49,14 @@ current_config = {
             'static_nodes': {
                 # id : [ipv4, ipv6, port]
             },
-            'peer_list': {
-                # id : [ipv4, ipv6, port]
+            'use_ledger_subsystem': False,  # if this items does not exist or False, ledger_subsystem will not be used
+            'ledger_subsystem': {
+                'subsystem': 'ethereum',
+                'max_transactions': 4096,
+                'max_seconds': 60 * 60,
             },
         },
     },
-    'use_ledger_subsystem': False,
     'ethereum': {
         'chain_id': DEFAULT_ETHEREUM_CHAIN_ID,
         'port': DEFAULT_ETHEREUM_GETH_PORT,
@@ -83,11 +65,6 @@ current_config = {
         'passphrase': '',
         'contract': 'BBcAnchor',
         'contract_address': '',
-    },
-    'ledger_subsystem': {
-        'subsystem': 'ethereum',
-        'max_transactions': 4096,
-        'max_seconds': 60 * 60,
     },
 }
 
@@ -136,11 +113,17 @@ class BBcConfig:
         domain_id_str = bbclib.convert_id_to_string(domain_id)
         if create_if_new and domain_id_str not in self.config['domains']:
             self.config['domains'][domain_id_str] = {
-                'module': 'simple_cluster',
-                'static_nodes': {
-                    # id : [ipv4, ipv6, port]
+                'storage': {
+                    "type": "internal",  # or "external"
                 },
-                'peer_list': {
+                'db': {
+                    "db_type": "sqlite",            # or "mysql"
+                    "db_name": "bbc_ledger.sqlite",
+                    "replication_strategy": "all",  # or "p2p"/"external" (valid only in db_type=mysql)
+                    "db_servers": [{"db_addr": "127.0.0.1", "db_port": 3306, "db_user": "user", "db_pass": "pass"}]
+                    # valid only in the case of db_type=mysql
+                },
+                'static_nodes': {
                     # id : [ipv4, ipv6, port]
                 },
             }

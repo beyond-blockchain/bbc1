@@ -72,7 +72,7 @@ def output_template_config():
 
 def get_config(client):
     client.get_bbc_config()
-    dat = wait_check_result_msg_type(client.callback, bbclib.ServiceMessageType.RESPONSE_GET_CONFIG)
+    dat = wait_check_result_msg_type(client.callback, bbclib.MsgType.RESPONSE_GET_CONFIG)
     return dat[KeyType.bbc_configuration].decode()
 
 
@@ -81,13 +81,13 @@ def send_config(client, config_obj):
         domain_id = bbclib.convert_idstring_to_bytes(domain_id_str)
 
         client.domain_setup(domain_id, conf['module'])
-        dat = wait_check_result_msg_type(client.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_DOMAIN)
+        dat = wait_check_result_msg_type(client.callback, bbclib.MsgType.RESPONSE_SETUP_DOMAIN)
         assert dat[KeyType.status] == ESUCCESS
 
         for nd, info in conf['static_nodes'].items():
             node_id, ipv4, ipv6, port = nd, info[0], info[1], info[2]
             client.set_domain_static_node(domain_id, bbclib.convert_idstring_to_bytes(node_id), ipv4, ipv6, port)
-            dat = wait_check_result_msg_type(client.callback, bbclib.ServiceMessageType.RESPONSE_SET_STATIC_NODE)
+            dat = wait_check_result_msg_type(client.callback, bbclib.MsgType.RESPONSE_SET_STATIC_NODE)
             assert dat[KeyType.status] == ESUCCESS
 
         for asset_group_id_str, info in conf['asset_group_ids'].items():
@@ -96,7 +96,7 @@ def send_config(client, config_obj):
                                         storage_type=info['storage_type'], storage_path=info['storage_path'],
                                         advertise_in_domain0=info['advertise_in_domain0']
                                         )
-            dat = wait_check_result_msg_type(client.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_ASSET_GROUP)
+            dat = wait_check_result_msg_type(client.callback, bbclib.MsgType.RESPONSE_SETUP_ASSET_GROUP)
             assert dat[KeyType.status] == ESUCCESS
 
 

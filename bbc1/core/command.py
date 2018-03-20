@@ -25,7 +25,7 @@ DEFAULT_SERV_ADDR = '127.0.0.1'
 
 def parser():
     usage = 'python {} [--coreport <number>] [--p2pport <number>] [--workingdir <dir>] ' \
-            '[--config <filename>] [--globaldomain] [--ledgersubsystem] ' \
+            '[--config <filename>] [--domain0] [--ledgersubsystem] ' \
             '[--ip4addr <IP addr>] [--ip6addr <IPv6 addr>] ' \
             '[--log <filename>] [--verbose_level <string>] [--daemon] [--kill] [--help]'.format(__file__)
     argparser = ArgumentParser(usage=usage)
@@ -37,9 +37,9 @@ def parser():
                            help='working directory name')
     argparser.add_argument('-c', '--config', type=str, default=None,
                            help='config file name')
-    argparser.add_argument('--globaldomain',
+    argparser.add_argument('--domain0',
                            action='store_true',
-                           help='connect with domain_global_0')
+                           help='connect to domain_global_0')
     argparser.add_argument('--ledgersubsystem',
                            action='store_true',
                            help='use ledger_subsystem')

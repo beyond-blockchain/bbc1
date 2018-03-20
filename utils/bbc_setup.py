@@ -96,7 +96,7 @@ if __name__ == '__main__':
         sys.exit(0)
 
     bbcclient.domain_setup(domain_id, "simple_cluster")
-    dat = wait_check_result_msg_type(bbcclient.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_DOMAIN)
+    dat = wait_check_result_msg_type(bbcclient.callback, bbclib.MsgType.RESPONSE_SETUP_DOMAIN)
     assert dat[KeyType.status] == ESUCCESS
 
     sys.exit(0)
