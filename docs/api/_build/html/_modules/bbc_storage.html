@@ -99,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../bbc_network.html">bbc_network module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbc_storage.html">bbc_storage module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbclib.html">bbclib module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_types.html">bbc_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ledger_subsystem.html">ledger_subsystem module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../message_key_types.html">message_key_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../p2p_domain0.html">p2p_domain0 module</a></li>
@@ -193,7 +194,6 @@
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;../../&quot;</span><span class="p">])</span>
 <span class="kn">from</span> <span class="nn">bbc1.common</span> <span class="k">import</span> <span class="n">logger</span>
 <span class="kn">from</span> <span class="nn">bbc1.common.bbclib</span> <span class="k">import</span> <span class="n">StorageType</span>
-<span class="kn">from</span> <span class="nn">bbc1.common</span> <span class="k">import</span> <span class="n">bbclib</span>
 
 
 <div class="viewcode-block" id="BBcStorage"><a class="viewcode-back" href="../bbc_storage.html#bbc_storage.BBcStorage">[docs]</a><span class="k">class</span> <span class="nc">BBcStorage</span><span class="p">:</span>
@@ -216,54 +216,52 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-<div class="viewcode-block" id="BBcStorage.set_storage_path"><a class="viewcode-back" href="../bbc_storage.html#bbc_storage.BBcStorage.set_storage_path">[docs]</a>    <span class="k">def</span> <span class="nf">set_storage_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">from_config</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                         <span class="n">storage_type</span><span class="o">=</span><span class="n">StorageType</span><span class="o">.</span><span class="n">FILESYSTEM</span><span class="p">,</span> <span class="n">storage_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcStorage.set_storage_path"><a class="viewcode-back" href="../bbc_storage.html#bbc_storage.BBcStorage.set_storage_path">[docs]</a>    <span class="k">def</span> <span class="nf">set_storage_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">storage_type</span><span class="o">=</span><span class="n">StorageType</span><span class="o">.</span><span class="n">FILESYSTEM</span><span class="p">,</span> <span class="n">storage_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set storage path for the domain</span>
 
 <span class="sd">        :param domain_id:</span>
-<span class="sd">        :param asset_group_id</span>
-<span class="sd">        :param from_config:  If True, read setting from config and ignore storage_type and storage_path param</span>
 <span class="sd">        :param storage_type: filesystem/HTTP-PUT/HTTP-POST/NONE</span>
 <span class="sd">        :param storage_path:    directory path or URL</span>
 <span class="sd">        :return: True if make dir is successful</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">from_config</span><span class="p">:</span>
-            <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_asset_group_config</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">)</span>
-            <span class="n">storage_type</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;storage_type&#39;</span><span class="p">]</span>
-            <span class="n">storage_path</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;storage_path&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">storage_type</span> <span class="o">==</span> <span class="n">StorageType</span><span class="o">.</span><span class="n">NONE</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="n">domain_id_str</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">domain_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
-        <span class="n">asset_group_id_str</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">storage_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">storage_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_root</span> <span class="o">+</span> <span class="n">domain_id_str</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">asset_group_id_str</span> <span class="o">+</span> <span class="s2">&quot;/storage/&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">storage_path</span><span class="p">):</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">storage_path</span><span class="p">,</span> <span class="mo">0o777</span><span class="p">)</span>
+            <span class="n">storage_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_root</span> <span class="o">+</span> <span class="n">domain_id_str</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">storage_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">storage_path</span><span class="p">,</span> <span class="mo">0o777</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">storage_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">storage_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span></div>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span>
-        <span class="k">if</span> <span class="n">storage_type</span> <span class="o">==</span> <span class="n">StorageType</span><span class="o">.</span><span class="n">FILESYSTEM</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">storage_path</span>
-            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="n">asset_group_id</span><span class="p">],</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
-        <span class="c1"># TODO: need to implement other types</span>
-
-<div class="viewcode-block" id="BBcStorage.get_storage_type"><a class="viewcode-back" href="../bbc_storage.html#bbc_storage.BBcStorage.get_storage_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_storage_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcStorage.get_storage_type"><a class="viewcode-back" href="../bbc_storage.html#bbc_storage.BBcStorage.get_storage_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_storage_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get storage type for the domain</span>
 
 <span class="sd">        :param domain_id:</span>
-<span class="sd">        :param asset_group_id:</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]</span>
         <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="BBcStorage.create_new_directory"><a class="viewcode-back" href="../bbc_storage.html#bbc_storage.BBcStorage.create_new_directory">[docs]</a>    <span class="k">def</span> <span class="nf">create_new_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new directory for new asset_group_id</span>
+<span class="sd">        :param domain_id: domain to put in</span>
+<span class="sd">        :param asset_group_id:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">domain_id_str</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">domain_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">asset_group_id_str</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">storage_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_root</span> <span class="o">+</span> <span class="n">domain_id_str</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">asset_group_id_str</span> <span class="o">+</span> <span class="s2">&quot;/storage/&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">storage_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">storage_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">storage_path</span></div>
 
 <div class="viewcode-block" id="BBcStorage.store_locally"><a class="viewcode-back" href="../bbc_storage.html#bbc_storage.BBcStorage.store_locally">[docs]</a>    <span class="k">def</span> <span class="nf">store_locally</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asid</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -275,9 +273,9 @@
 <span class="sd">        :param content:</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span> <span class="ow">or</span> <span class="n">asset_group_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">==</span> <span class="n">StorageType</span><span class="o">.</span><span class="n">FILESYSTEM</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">==</span> <span class="n">StorageType</span><span class="o">.</span><span class="n">FILESYSTEM</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_in_filesystem</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asid</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Not supported yet.&quot;</span><span class="p">)</span>
@@ -293,6 +291,8 @@
 <span class="sd">        :param content:</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">asset_group_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_new_directory</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="n">asset_group_id</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asid</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -310,9 +310,9 @@
 <span class="sd">        :param asid:   file name</span>
 <span class="sd">        :return:       the file content (None if not found)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span> <span class="ow">or</span> <span class="n">asset_group_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">==</span> <span class="n">StorageType</span><span class="o">.</span><span class="n">FILESYSTEM</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">==</span> <span class="n">StorageType</span><span class="o">.</span><span class="n">FILESYSTEM</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_in_filesystem</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asid</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Not supported yet.&quot;</span><span class="p">)</span>
@@ -327,6 +327,8 @@
 <span class="sd">        :param asid:   file name</span>
 <span class="sd">        :return:       the file content (None if not found)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">asset_group_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="n">asset_group_id</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asid</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
@@ -346,7 +348,9 @@
 <span class="sd">        :param asid:   file name</span>
 <span class="sd">        :return:       True if succeeded</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span> <span class="ow">or</span> <span class="n">asset_group_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_type</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">asset_group_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="c1"># TODO: do we need this method? If so, removing remote resources is also needed</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="n">asset_group_id</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asid</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>

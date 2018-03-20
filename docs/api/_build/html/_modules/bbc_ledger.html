@@ -99,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../bbc_network.html">bbc_network module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbc_storage.html">bbc_storage module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbclib.html">bbclib module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_types.html">bbc_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ledger_subsystem.html">ledger_subsystem module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../message_key_types.html">message_key_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../p2p_domain0.html">p2p_domain0 module</a></li>
@@ -173,30 +174,26 @@
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">binascii</span>
 
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;../../&quot;</span><span class="p">])</span>
 <span class="kn">from</span> <span class="nn">bbc1.common</span> <span class="k">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">bbc1.core.bbc_types</span> <span class="k">import</span> <span class="n">ResourceType</span>
 
-<span class="kn">import</span> <span class="nn">binascii</span>
 
-<span class="n">transaction_db_definition</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">[</span><span class="s2">&quot;transaction_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;asset_group_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;transaction_data&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+<span class="n">transaction_tbl_definition</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;transaction_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;transaction_data&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
 <span class="p">]</span>
 
-<span class="n">auxiliary_db_definition</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;resource_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;asset_group_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s2">&quot;resource_type&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+<span class="n">asset_info_definition</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;transaction_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;asset_group_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;asset_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
 <span class="p">]</span>
 
-
-<div class="viewcode-block" id="ResourceType"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.ResourceType">[docs]</a><span class="k">class</span> <span class="nc">ResourceType</span><span class="p">:</span>
-    <span class="n">Transaction_data</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">Asset_ID</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">Asset_file</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">Edge_incoming</span> <span class="o">=</span> <span class="mi">3</span>
-    <span class="n">Edge_outgoing</span> <span class="o">=</span> <span class="mi">4</span>
-    <span class="n">Owner_asset</span> <span class="o">=</span> <span class="mi">5</span></div>
+<span class="n">topology_info_definition</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;transaction_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;resource_type&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;resource_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">]</span>
+<span class="p">]</span>
 
 
 <div class="viewcode-block" id="BBcLedger"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger">[docs]</a><span class="k">class</span> <span class="nc">BBcLedger</span><span class="p">:</span>
@@ -247,9 +244,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db_cur</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">create_table_in_db</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s1">&#39;transaction_db&#39;</span><span class="p">,</span> <span class="s1">&#39;transaction_table&#39;</span><span class="p">,</span>
-                                <span class="n">transaction_db_definition</span><span class="p">,</span> <span class="n">primary_keys</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">create_table_in_db</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span> <span class="s1">&#39;auxiliary_table&#39;</span><span class="p">,</span>
-                                <span class="n">auxiliary_db_definition</span><span class="p">,</span> <span class="n">primary_keys</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span></div>
+                                <span class="n">transaction_tbl_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_table_in_db</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span> <span class="s1">&#39;asset_info_table&#39;</span><span class="p">,</span>
+                                <span class="n">asset_info_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_table_in_db</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">,</span> <span class="s1">&#39;topology_table&#39;</span><span class="p">,</span>
+                                <span class="n">topology_info_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="BBcLedger.open_db"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.open_db">[docs]</a>    <span class="k">def</span> <span class="nf">open_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">dbname</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -277,7 +276,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">db_cur</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="n">dbname</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="n">dbname</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="BBcLedger.create_table_in_db"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.create_table_in_db">[docs]</a>    <span class="k">def</span> <span class="nf">create_table_in_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">,</span> <span class="n">primary_keys</span><span class="o">=</span><span class="p">[],</span> <span class="n">indices</span><span class="o">=</span><span class="p">[]):</span>
+<div class="viewcode-block" id="BBcLedger.create_table_in_db"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.create_table_in_db">[docs]</a>    <span class="k">def</span> <span class="nf">create_table_in_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[]):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        (internal use) Create a new table in a DB</span>
 
@@ -296,15 +295,12 @@
         <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;CREATE TABLE </span><span class="si">%s</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="n">tbl</span>
         <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;(&quot;</span>
         <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">tbl_definition</span><span class="p">])</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">primary_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;, PRIMARY KEY (&quot;</span>
-            <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tbl_definition</span><span class="p">[</span><span class="n">p</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">primary_keys</span><span class="p">)</span>
-            <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;)&quot;</span>
+        <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;, PRIMARY KEY (&quot;</span><span class="o">+</span><span class="n">tbl_definition</span><span class="p">[</span><span class="n">primary_key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;)&quot;</span>
         <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;);&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="n">sql</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="s2">&quot;CREATE INDEX transaction_table_idx_</span><span class="si">%d</span><span class="s2"> ON </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">);&quot;</span> <span class="o">%</span>
-                          <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="s2">&quot;CREATE INDEX </span><span class="si">%s</span><span class="s2">_idx_</span><span class="si">%d</span><span class="s2"> ON </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">);&quot;</span> <span class="o">%</span>
+                          <span class="p">(</span><span class="n">tbl</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span></div>
 
 <div class="viewcode-block" id="BBcLedger.exec_sql_fetchone"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.exec_sql_fetchone">[docs]</a>    <span class="k">def</span> <span class="nf">exec_sql_fetchone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">dbname</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="o">*</span><span class="n">dat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -363,84 +359,106 @@
                                      <span class="s2">&quot;select * from sqlite_master where type=&#39;table&#39; and name=?&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
-<div class="viewcode-block" id="BBcLedger.find_locally"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.find_locally">[docs]</a>    <span class="k">def</span> <span class="nf">find_locally</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcLedger.find_transaction_locally"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.find_transaction_locally">[docs]</a>    <span class="k">def</span> <span class="nf">find_transaction_locally</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Find data by ID</span>
-
+<span class="sd">        Find transaction data</span>
 <span class="sd">        :param domain_id:</span>
-<span class="sd">        :param asset_group_id</span>
-<span class="sd">        :param resource_id:   Transaction_ID or Asset_ID</span>
-<span class="sd">        :param resource_type: ResourceType value</span>
-<span class="sd">        :return:              data, data_type</span>
+<span class="sd">        :param transaction_id:</span>
+<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">resource_type</span> <span class="o">==</span> <span class="n">ResourceType</span><span class="o">.</span><span class="n">Transaction_data</span><span class="p">:</span>
-            <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;transaction_db&quot;</span><span class="p">,</span>
-                                         <span class="s2">&quot;select * from transaction_table where transaction_id = ? AND asset_group_id = ?&quot;</span><span class="p">,</span>
-                                         <span class="n">resource_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span>
-                                         <span class="s2">&quot;select * from auxiliary_table where resource_id = ? AND &quot;</span>
-                                         <span class="s2">&quot;asset_group_id = ? AND resource_type = ?&quot;</span><span class="p">,</span>
-                                         <span class="n">resource_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;transaction_db&quot;</span><span class="p">,</span>
+                                     <span class="s2">&quot;select * from transaction_table where transaction_id = ?&quot;</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="BBcLedger.insert_locally"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.insert_locally">[docs]</a>    <span class="k">def</span> <span class="nf">insert_locally</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">require_uniqueness</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcLedger.find_by_sql_in_local_auxiliary_db"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.find_by_sql_in_local_auxiliary_db">[docs]</a>    <span class="k">def</span> <span class="nf">find_by_sql_in_local_auxiliary_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="o">*</span><span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        find entries by SQL</span>
+<span class="sd">        :param domain_id:</span>
+<span class="sd">        :param sql:</span>
+<span class="sd">        :param *dat:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="o">*</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcLedger.insert_transaction_locally"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.insert_transaction_locally">[docs]</a>    <span class="k">def</span> <span class="nf">insert_transaction_locally</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Insert data in the local ledger</span>
 
 <span class="sd">        :param domain_id:</span>
-<span class="sd">        :param asset_group_id:</span>
-<span class="sd">        :param resource_id:     Transaction_ID, Asset_ID, or Owner_ID</span>
-<span class="sd">        :param resource_type:   ResourceType value</span>
-<span class="sd">        :param data:            Transaction Data (serialized), Transacrtion_ID, or Node_ID</span>
+<span class="sd">        :param transaction_id:  Transaction_ID</span>
+<span class="sd">        :param data:            Transaction Data (serialized)</span>
 <span class="sd">        :param require_uniqueness: Ignore uniqueness if True</span>
 <span class="sd">        :return: True/False</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">resource_type</span> <span class="o">==</span> <span class="n">ResourceType</span><span class="o">.</span><span class="n">Transaction_data</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;transaction_db&quot;</span><span class="p">,</span>
-                                      <span class="s2">&quot;select * from transaction_table where transaction_id = ? AND asset_group_id = ?&quot;</span><span class="p">,</span>
-                                      <span class="n">resource_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">False</span>
-            <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;insert into transaction_table values (?, ?, ?)&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;transaction_db&quot;</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">require_uniqueness</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span>
-                                                             <span class="s2">&quot;select * from auxiliary_table where resource_id = ? AND &quot;</span>
-                                                             <span class="s2">&quot;asset_group_id = ? AND resource_type = ?&quot;</span><span class="p">,</span>
-                                                             <span class="n">resource_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Found duplicate transaction ID&quot;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="kc">False</span>
-            <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;insert into auxiliary_table(resource_id, asset_group_id, resource_type, data) values (?, ?, ?, ?)&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;transaction_db&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;select * from transaction_table where transaction_id = ?&quot;</span><span class="p">,</span>
+                                  <span class="n">transaction_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;transaction_db&quot;</span><span class="p">,</span> <span class="s2">&quot;insert into transaction_table values (?, ?)&quot;</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="BBcLedger.remove"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcLedger.insert_asset_info_locally"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.insert_asset_info_locally">[docs]</a>    <span class="k">def</span> <span class="nf">insert_asset_info_locally</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Remove data</span>
+<span class="sd">        Insert data in the local ledger</span>
 
 <span class="sd">        :param domain_id:</span>
+<span class="sd">        :param transaction_id:</span>
 <span class="sd">        :param asset_group_id:</span>
-<span class="sd">        :param resource_id:     Transaction_ID, Asset_ID, or Owner_ID</span>
+<span class="sd">        :param asset_id:</span>
+<span class="sd">        :param user_id:</span>
+<span class="sd">        :return: True/False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;select * from asset_info_table where transaction_id = ? AND asset_group_id = ? AND asset_id = ? AND user_id = ?&quot;</span><span class="p">,</span>
+                                  <span class="n">transaction_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span> <span class="s2">&quot;insert into asset_info_table (transaction_id, asset_group_id, &quot;</span>
+                                                 <span class="s2">&quot;asset_id, user_id) values (?, ?, ?, ?)&quot;</span><span class="p">,</span>
+                      <span class="n">transaction_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcLedger.insert_topology_info_locally"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.insert_topology_info_locally">[docs]</a>    <span class="k">def</span> <span class="nf">insert_topology_info_locally</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Insert topology data for transactions</span>
+<span class="sd">        :param domain_id:</span>
+<span class="sd">        :param transaction_id:</span>
+<span class="sd">        :param resource_type:</span>
+<span class="sd">        :param resource_id:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;select * from topology_table where transaction_id = ? AND resource_type = ? AND resource_id = ?&quot;</span><span class="p">,</span>
+                                  <span class="n">transaction_id</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span> <span class="s2">&quot;insert into topology_table (transaction_id, resource_type, &quot;</span>
+                                                 <span class="s2">&quot;resource_id) values (?, ?, ?)&quot;</span><span class="p">,</span>
+                      <span class="n">transaction_id</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcLedger.remove"><a class="viewcode-back" href="../bbc_ledger.html#bbc_ledger.BBcLedger.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove all data with the specified transaction_id</span>
+
+<span class="sd">        :param domain_id:</span>
+<span class="sd">        :param transaction_id:  Transaction_ID</span>
 <span class="sd">        :return: True/False</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;transaction_db&quot;</span><span class="p">,</span>
-                                  <span class="s2">&quot;select * from transaction_table where transaction_id = ? AND asset_group_id = ?&quot;</span><span class="p">,</span>
-                                  <span class="n">resource_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                  <span class="s2">&quot;select * from transaction_table where transaction_id = ?&quot;</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;transaction_db&quot;</span><span class="p">,</span>
-                          <span class="s2">&quot;delete from transaction_table where asset_group_id = ? and transaction_id = ?&quot;</span><span class="p">,</span>
-                          <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">)</span>
+                          <span class="s2">&quot;delete from transaction_table where transaction_id = ?&quot;</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span>
-                                  <span class="s2">&quot;select * from auxiliary_table where resource_id = ? AND asset_group_id = ?&quot;</span><span class="p">,</span>
-                                  <span class="n">resource_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                  <span class="s2">&quot;select * from asset_info_table where transaction_id = ?&quot;</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span>
-                          <span class="s2">&quot;delete from auxiliary_table where asset_group_id = ? and resource_id = ?&quot;</span><span class="p">,</span>
-                          <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">)</span>
+                          <span class="s2">&quot;delete from asset_info_table where transaction_id = ?&quot;</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql_fetchone</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;select * from topology_table where transaction_id = ?&quot;</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;delete from topology_table where transaction_id = ?&quot;</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="s2">&quot;auxiliary_db&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;delete from topology_table where resource_id = ?&quot;</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span></div></div>
 </pre></div>
 

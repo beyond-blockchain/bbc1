@@ -173,13 +173,13 @@
   <div class="section" id="module-bbc_network">
 <span id="bbc-network-module"></span><h1>bbc_network module<a class="headerlink" href="#module-bbc_network" title="Permalink to this headline">¶</a></h1>
 <p>Copyright (c) 2017 beyond-blockchain.org.</p>
-<p>Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;);
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at</p>
 <blockquote>
 <div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
 <p>Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an &#8220;AS IS&#8221; BASIS,
+distributed under the License is distributed on an “AS IS” BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.</p>
@@ -189,17 +189,17 @@ limitations under the License.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#bbc_network.BBcNetwork" title="bbc_network.BBcNetwork"><code class="xref py py-obj docutils literal"><span class="pre">BBcNetwork</span></code></a>(config[,&nbsp;core,&nbsp;p2p_port,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#bbc_network.BBcNetwork" title="bbc_network.BBcNetwork"><code class="xref py py-obj docutils literal"><span class="pre">BBcNetwork</span></code></a>(config[,&nbsp;core,&nbsp;p2p_port,&nbsp;…])</td>
 <td>Socket and thread management for infrastructure layers</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#bbc_network.DomainBase" title="bbc_network.DomainBase"><code class="xref py py-obj docutils literal"><span class="pre">DomainBase</span></code></a>([network,&nbsp;config,&nbsp;domain_id,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#bbc_network.DomainBase" title="bbc_network.DomainBase"><code class="xref py py-obj docutils literal"><span class="pre">DomainBase</span></code></a>([network,&nbsp;config,&nbsp;domain_id,&nbsp;…])</td>
 <td>Base class of a domain</td>
 </tr>
 </tbody>
 </table>
 <dl class="class">
 <dt id="bbc_network.BBcNetwork">
-<em class="property">class </em><code class="descclassname">bbc_network.</code><code class="descname">BBcNetwork</code><span class="sig-paren">(</span><em>config</em>, <em>core=None</em>, <em>p2p_port=None</em>, <em>use_global=True</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bbc_network.</code><code class="descname">BBcNetwork</code><span class="sig-paren">(</span><em>config</em>, <em>core=None</em>, <em>p2p_port=None</em>, <em>use_global=True</em>, <em>external_ip4addr=None</em>, <em>external_ip6addr=None</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Socket and thread management for infrastructure layers</p>
 <dl class="method">
@@ -211,11 +211,11 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>node_id</strong> &#8211; </li>
-<li><strong>ipv4</strong> &#8211; </li>
-<li><strong>ipv6</strong> &#8211; </li>
-<li><strong>port</strong> &#8211; </li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>node_id</strong> – </li>
+<li><strong>ipv4</strong> – </li>
+<li><strong>ipv6</strong> – </li>
+<li><strong>port</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -229,12 +229,12 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc_network.BBcNetwork.callback_route_failure">
 <code class="descname">callback_route_failure</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.callback_route_failure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.callback_route_failure" title="Permalink to this definition">¶</a></dt>
-<dd><p>(internal use) Called after several &#8220;route_message&#8221; trial</p>
+<dd><p>(internal use) Called after several “route_message” trial</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> – </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -251,9 +251,9 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>network_module</strong> &#8211; string of module script file</li>
-<li><strong>get_new_node_id</strong> &#8211; If True, the node_id is newly created again</li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>network_module</strong> – string of module script file</li>
+<li><strong>get_new_node_id</strong> – If True, the node_id is newly created again</li>
 </ul>
 </td>
 </tr>
@@ -266,15 +266,15 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc_network.BBcNetwork.disseminate_cross_ref">
-<code class="descname">disseminate_cross_ref</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.disseminate_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.disseminate_cross_ref" title="Permalink to this definition">¶</a></dt>
+<code class="descname">disseminate_cross_ref</code><span class="sig-paren">(</span><em>domain_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.disseminate_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.disseminate_cross_ref" title="Permalink to this definition">¶</a></dt>
 <dd><p>disseminate transaction_id in the network (domain_global_0)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transaction_id</strong> &#8211; </li>
-<li><strong>asset_group_id</strong> &#8211; </li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>transaction_id</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -286,6 +286,11 @@ limitations under the License.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="bbc_network.BBcNetwork.domain_ping">
+<code class="descname">domain_ping</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.domain_ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.domain_ping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="bbc_network.BBcNetwork.forward_message">
 <code class="descname">forward_message</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.forward_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.forward_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>(internal use) forward message</p>
@@ -293,7 +298,7 @@ limitations under the License.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> – </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -310,10 +315,10 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>nonce</strong> &#8211; </li>
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>resource_id</strong> &#8211; </li>
-<li><strong>resource_type</strong> &#8211; </li>
+<li><strong>nonce</strong> – </li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>resource_id</strong> – </li>
+<li><strong>resource_type</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -340,18 +345,18 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc_network.BBcNetwork.put">
-<code class="descname">put</code><span class="sig-paren">(</span><em>domain_id=None</em>, <em>asset_group_id=None</em>, <em>resource_id=None</em>, <em>resource_type=0</em>, <em>resource=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.put" title="Permalink to this definition">¶</a></dt>
+<code class="descname">put</code><span class="sig-paren">(</span><em>domain_id=None</em>, <em>resource_id=None</em>, <em>resource_type=0</em>, <em>resource=None</em>, <em>asset_group_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>Put data in the DHT</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>asset_group_id</strong> &#8211; </li>
-<li><strong>resource_id</strong> &#8211; </li>
-<li><strong>resource_type</strong> &#8211; </li>
-<li><strong>resource</strong> &#8211; </li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>resource_id</strong> – </li>
+<li><strong>resource_type</strong> – </li>
+<li><strong>resource</strong> – </li>
+<li><strong>asset_group_id</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -363,11 +368,6 @@ limitations under the License.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bbc_network.BBcNetwork.raw_ping">
-<code class="descname">raw_ping</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.raw_ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.raw_ping" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="bbc_network.BBcNetwork.receive_domain_ping">
 <code class="descname">receive_domain_ping</code><span class="sig-paren">(</span><em>ip4</em>, <em>from_addr</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.receive_domain_ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.receive_domain_ping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process received domain_ping. If KeyType.domain_ping value is 1, the sender of the ping is registered as static</p>
@@ -376,10 +376,10 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ip4</strong> &#8211; True (from IPv4) / False (from IPv6)</li>
-<li><strong>from_addr</strong> &#8211; sender address and port (None if TCP)</li>
-<li><strong>msg</strong> &#8211; the message body (already deserialized)</li>
-<li><strong>payload_type</strong> &#8211; PayloadType value of msg</li>
+<li><strong>ip4</strong> – True (from IPv4) / False (from IPv6)</li>
+<li><strong>from_addr</strong> – sender address and port (None if TCP)</li>
+<li><strong>msg</strong> – the message body (already deserialized)</li>
+<li><strong>payload_type</strong> – PayloadType value of msg</li>
 </ul>
 </td>
 </tr>
@@ -392,16 +392,15 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc_network.BBcNetwork.register_user_id">
-<code class="descname">register_user_id</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.register_user_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.register_user_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">register_user_id</code><span class="sig-paren">(</span><em>domain_id</em>, <em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.register_user_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.register_user_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register user_id connecting directly to this node in the domain</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>asset_group_id</strong> &#8211; </li>
-<li><strong>user_id</strong> &#8211; </li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>user_id</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -420,7 +419,7 @@ limitations under the License.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> – </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -430,20 +429,15 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc_network.BBcNetwork.remove_user_id">
-<code class="descname">remove_user_id</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.remove_user_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.remove_user_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove_user_id</code><span class="sig-paren">(</span><em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.remove_user_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.remove_user_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove user_id from the domain</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>asset_group_id</strong> &#8211; </li>
-<li><strong>user_id</strong> &#8211; </li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>user_id</strong> – </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
 </tbody>
 </table>
@@ -451,19 +445,18 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc_network.BBcNetwork.route_message">
-<code class="descname">route_message</code><span class="sig-paren">(</span><em>domain_id=b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'</em>, <em>asset_group_id=None</em>, <em>dst_user_id=None</em>, <em>src_user_id=None</em>, <em>msg_to_send=None</em>, <em>payload_type=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.route_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.route_message" title="Permalink to this definition">¶</a></dt>
+<code class="descname">route_message</code><span class="sig-paren">(</span><em>domain_id=b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'</em>, <em>dst_user_id=None</em>, <em>src_user_id=None</em>, <em>msg_to_send=None</em>, <em>payload_type=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.route_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.route_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the destination host and send it</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>asset_group_id</strong> &#8211; </li>
-<li><strong>src_user_id</strong> &#8211; source user</li>
-<li><strong>dst_user_id</strong> &#8211; destination user</li>
-<li><strong>msg_to_send</strong> &#8211; content to send</li>
-<li><strong>payload_type</strong> &#8211; PayloadType value</li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>src_user_id</strong> – source user</li>
+<li><strong>dst_user_id</strong> – destination user</li>
+<li><strong>msg_to_send</strong> – content to send</li>
+<li><strong>payload_type</strong> – PayloadType value</li>
 </ul>
 </td>
 </tr>
@@ -489,17 +482,18 @@ limitations under the License.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bbc_network.BBcNetwork.send_message_in_network">
-<code class="descname">send_message_in_network</code><span class="sig-paren">(</span><em>nodeinfo</em>, <em>payload_type</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.send_message_in_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.send_message_in_network" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send message over a domain network</p>
+<dt id="bbc_network.BBcNetwork.send_domain_ping">
+<code class="descname">send_domain_ping</code><span class="sig-paren">(</span><em>domain_id</em>, <em>ipv4</em>, <em>ipv6</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.send_domain_ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.send_domain_ping" title="Permalink to this definition">¶</a></dt>
+<dd><p>(internal use) Send raw message to the specified node</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>nodeinfo</strong> &#8211; NodeInfo object</li>
-<li><strong>payload_type</strong> &#8211; PayloadType value</li>
-<li><strong>msg</strong> &#8211; data body</li>
+<li><strong>domain_id</strong> – </li>
+<li><strong>ipv4</strong> – </li>
+<li><strong>ipv6</strong> – </li>
+<li><strong>port</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -511,18 +505,17 @@ limitations under the License.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bbc_network.BBcNetwork.send_raw_message">
-<code class="descname">send_raw_message</code><span class="sig-paren">(</span><em>domain_id</em>, <em>ipv4</em>, <em>ipv6</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.send_raw_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.send_raw_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>(internal use) Send raw message to the specified node</p>
+<dt id="bbc_network.BBcNetwork.send_message_in_network">
+<code class="descname">send_message_in_network</code><span class="sig-paren">(</span><em>nodeinfo</em>, <em>payload_type</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#BBcNetwork.send_message_in_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.BBcNetwork.send_message_in_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send message over a domain network</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> &#8211; </li>
-<li><strong>ipv4</strong> &#8211; </li>
-<li><strong>ipv6</strong> &#8211; </li>
-<li><strong>port</strong> &#8211; </li>
+<li><strong>nodeinfo</strong> – NodeInfo object</li>
+<li><strong>payload_type</strong> – PayloadType value</li>
+<li><strong>msg</strong> – data body</li>
 </ul>
 </td>
 </tr>
@@ -605,9 +598,9 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>node_id</strong> &#8211; </li>
-<li><strong>ip4</strong> &#8211; True (IPv4)/False (IPv6)</li>
-<li><strong>addr_info</strong> &#8211; tuple of (address, port)</li>
+<li><strong>node_id</strong> – </li>
+<li><strong>ip4</strong> – True (IPv4)/False (IPv6)</li>
+<li><strong>addr_info</strong> – tuple of (address, port)</li>
 </ul>
 </td>
 </tr>
@@ -620,17 +613,17 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc_network.DomainBase.add_peer_node_ip46">
-<code class="descname">add_peer_node_ip46</code><span class="sig-paren">(</span><em>node_id</em>, <em>ipv4</em>, <em>ipv6</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.add_peer_node_ip46"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.add_peer_node_ip46" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_peer_node_ip46</code><span class="sig-paren">(</span><em>node_id</em>, <em>ipv4</em>, <em>ipv6</em>, <em>port</em>, <em>need_ping=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.add_peer_node_ip46"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.add_peer_node_ip46" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add as a peer node (with ipv4 and ipv6 address)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>node_id</strong> &#8211; </li>
-<li><strong>ipv4</strong> &#8211; </li>
-<li><strong>ipv6</strong> &#8211; </li>
-<li><strong>port</strong> &#8211; </li>
+<li><strong>node_id</strong> – </li>
+<li><strong>ipv4</strong> – </li>
+<li><strong>ipv6</strong> – </li>
+<li><strong>port</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -689,27 +682,6 @@ limitations under the License.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="bbc_network.DomainBase.is_registered_user">
-<code class="descname">is_registered_user</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.is_registered_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.is_registered_user" title="Permalink to this definition">¶</a></dt>
-<dd><p>(internal use) check if the user_id is registered in the asset_group</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>asset_group_id</strong> &#8211; </li>
-<li><strong>user_id</strong> &#8211; </li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="bbc_network.DomainBase.leave_domain">
 <code class="descname">leave_domain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.leave_domain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.leave_domain" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -723,9 +695,9 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dst_node_id</strong> &#8211; </li>
-<li><strong>nonce</strong> &#8211; </li>
-<li><strong>msg_type</strong> &#8211; </li>
+<li><strong>dst_node_id</strong> – </li>
+<li><strong>nonce</strong> – </li>
+<li><strong>msg_type</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -751,9 +723,11 @@ limitations under the License.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bbc_network.DomainBase.ping_response_check">
-<code class="descname">ping_response_check</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.ping_response_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.ping_response_check" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="bbc_network.DomainBase.ping_to_all_neighbors">
+<code class="descname">ping_to_all_neighbors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.ping_to_all_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.ping_to_all_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd><p>send ping to all neighbors
+:return:</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc_network.DomainBase.ping_with_retry">
@@ -764,9 +738,9 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>query_entry</strong> &#8211; </li>
-<li><strong>node_id</strong> &#8211; target node_id (need for first trial)</li>
-<li><strong>retry_count</strong> &#8211; </li>
+<li><strong>query_entry</strong> – </li>
+<li><strong>node_id</strong> – target node_id (need for first trial)</li>
+<li><strong>retry_count</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -800,9 +774,9 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ip4</strong> &#8211; True (from IPv4) / False (from IPv6)</li>
-<li><strong>from_addr</strong> &#8211; sender address and port (None if TCP)</li>
-<li><strong>msg</strong> &#8211; the message body (already deserialized)</li>
+<li><strong>ip4</strong> – True (from IPv4) / False (from IPv6)</li>
+<li><strong>from_addr</strong> – sender address and port (None if TCP)</li>
+<li><strong>msg</strong> – the message body (already deserialized)</li>
 </ul>
 </td>
 </tr>
@@ -822,10 +796,10 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ip4</strong> &#8211; True (from IPv4) / False (from IPv6)</li>
-<li><strong>from_addr</strong> &#8211; sender address and port (None if TCP)</li>
-<li><strong>msg</strong> &#8211; the message body (already deserialized)</li>
-<li><strong>payload_type</strong> &#8211; PayloadType value of msg</li>
+<li><strong>ip4</strong> – True (from IPv4) / False (from IPv6)</li>
+<li><strong>from_addr</strong> – sender address and port (None if TCP)</li>
+<li><strong>msg</strong> – the message body (already deserialized)</li>
+<li><strong>payload_type</strong> – PayloadType value of msg</li>
 </ul>
 </td>
 </tr>
@@ -838,7 +812,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc_network.DomainBase.put_resource">
-<code class="descname">put_resource</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>resource_id</em>, <em>resource_type</em>, <em>resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.put_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.put_resource" title="Permalink to this definition">¶</a></dt>
+<code class="descname">put_resource</code><span class="sig-paren">(</span><em>resource_id</em>, <em>resource_type</em>, <em>resource</em>, <em>asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.put_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.put_resource" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -854,7 +828,7 @@ limitations under the License.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> – </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -864,23 +838,26 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc_network.DomainBase.register_user_id">
-<code class="descname">register_user_id</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.register_user_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.register_user_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">register_user_id</code><span class="sig-paren">(</span><em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.register_user_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.register_user_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register user_id that connect directly to this core node in the list</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>asset_group_id</strong> &#8211; </li>
-<li><strong>user_id</strong> &#8211; </li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>user_id</strong> – </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc_network.DomainBase.remove_peer_because_no_response">
+<code class="descname">remove_peer_because_no_response</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.remove_peer_because_no_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.remove_peer_because_no_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the peer that does not respond
+:param query_entry:
+:return:</p>
 </dd></dl>
 
 <dl class="method">
@@ -891,7 +868,7 @@ limitations under the License.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>id</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>id</strong> – </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -902,12 +879,12 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc_network.DomainBase.renew_peerlist">
 <code class="descname">renew_peerlist</code><span class="sig-paren">(</span><em>peerlist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.renew_peerlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.renew_peerlist" title="Permalink to this definition">¶</a></dt>
-<dd><p>(internal use) send peer_list to renew those of others</p>
+<dd><p>(internal use) renew peer_list</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>peerlist</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>peerlist</strong> – </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -934,8 +911,8 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>msg</strong> &#8211; </li>
-<li><strong>payload_type</strong> &#8211; PayloadType value</li>
+<li><strong>msg</strong> – </li>
+<li><strong>payload_type</strong> – PayloadType value</li>
 </ul>
 </td>
 </tr>
@@ -963,7 +940,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc_network.DomainBase.send_store">
-<code class="descname">send_store</code><span class="sig-paren">(</span><em>target_id</em>, <em>nonce</em>, <em>asset_group_id</em>, <em>resource_id</em>, <em>resource</em>, <em>resource_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.send_store"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.send_store" title="Permalink to this definition">¶</a></dt>
+<code class="descname">send_store</code><span class="sig-paren">(</span><em>target_id</em>, <em>nonce</em>, <em>resource_id</em>, <em>resource</em>, <em>resource_type</em>, <em>asset_group_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.send_store"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.send_store" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -974,7 +951,7 @@ limitations under the License.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>interval</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>interval</strong> – </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -998,110 +975,27 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc_network.DomainBase.unregister_user_id">
-<code class="descname">unregister_user_id</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.unregister_user_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.unregister_user_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">unregister_user_id</code><span class="sig-paren">(</span><em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.unregister_user_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.unregister_user_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>(internal use) remove user_id from the list</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>asset_group_id</strong> &#8211; </li>
-<li><strong>user_id</strong> &#8211; </li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>user_id</strong> – </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="bbc_network.DomainBase.update_refresh_timer_random">
+<code class="descname">update_refresh_timer_random</code><span class="sig-paren">(</span><em>update_time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#DomainBase.update_refresh_timer_random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.DomainBase.update_refresh_timer_random" title="Permalink to this definition">¶</a></dt>
+<dd><p>update refresh timer with random time (0.5*update_timer - 1.5*update_time)
+:param update_time:
+:return:</p>
 </dd></dl>
-
-<dl class="class">
-<dt id="bbc_network.InfraMessageTypeBase">
-<em class="property">class </em><code class="descclassname">bbc_network.</code><code class="descname">InfraMessageTypeBase</code><a class="reference internal" href="_modules/bbc_network.html#InfraMessageTypeBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.InfraMessageTypeBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.ADVERTISE_ASSET_GROUP">
-<code class="descname">ADVERTISE_ASSET_GROUP</code><em class="property"> = b'\x00\x11'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.ADVERTISE_ASSET_GROUP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.DOMAIN_PING">
-<code class="descname">DOMAIN_PING</code><em class="property"> = b'\x00\x00'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.DOMAIN_PING" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.MESSAGE_TO_USER">
-<code class="descname">MESSAGE_TO_USER</code><em class="property"> = b'\x00G'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.MESSAGE_TO_USER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.NOTIFY_CROSS_REF">
-<code class="descname">NOTIFY_CROSS_REF</code><em class="property"> = b'\x00\x10'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.NOTIFY_CROSS_REF" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.NOTIFY_LEAVE">
-<code class="descname">NOTIFY_LEAVE</code><em class="property"> = b'\x00\x01'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.NOTIFY_LEAVE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.NOTIFY_PEERLIST">
-<code class="descname">NOTIFY_PEERLIST</code><em class="property"> = b'\x00\x02'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.NOTIFY_PEERLIST" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.REQUEST_FIND_USER">
-<code class="descname">REQUEST_FIND_USER</code><em class="property"> = b'\x00C'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.REQUEST_FIND_USER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.REQUEST_FIND_VALUE">
-<code class="descname">REQUEST_FIND_VALUE</code><em class="property"> = b'\x00E'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.REQUEST_FIND_VALUE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.REQUEST_PING">
-<code class="descname">REQUEST_PING</code><em class="property"> = b'\x00\x04'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.REQUEST_PING" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.REQUEST_STORE">
-<code class="descname">REQUEST_STORE</code><em class="property"> = b'\x00&#64;'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.REQUEST_STORE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.RESPONSE_FIND_USER">
-<code class="descname">RESPONSE_FIND_USER</code><em class="property"> = b'\x00D'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.RESPONSE_FIND_USER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.RESPONSE_FIND_VALUE">
-<code class="descname">RESPONSE_FIND_VALUE</code><em class="property"> = b'\x00F'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.RESPONSE_FIND_VALUE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.RESPONSE_PING">
-<code class="descname">RESPONSE_PING</code><em class="property"> = b'\x00\x05'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.RESPONSE_PING" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.RESPONSE_STORE">
-<code class="descname">RESPONSE_STORE</code><em class="property"> = b'\x00A'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.RESPONSE_STORE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.RESPONSE_STORE_COPY">
-<code class="descname">RESPONSE_STORE_COPY</code><em class="property"> = b'\x00B'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.RESPONSE_STORE_COPY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bbc_network.InfraMessageTypeBase.START_TO_REFRESH">
-<code class="descname">START_TO_REFRESH</code><em class="property"> = b'\x00\x03'</em><a class="headerlink" href="#bbc_network.InfraMessageTypeBase.START_TO_REFRESH" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
@@ -1111,8 +1005,13 @@ limitations under the License.</p>
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="bbc_network.convert_to_string">
+<code class="descclassname">bbc_network.</code><code class="descname">convert_to_string</code><span class="sig-paren">(</span><em>array</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#convert_to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.convert_to_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="bbc_network.send_data_by_tcp">
-<code class="descclassname">bbc_network.</code><code class="descname">send_data_by_tcp</code><span class="sig-paren">(</span><em>ipv4=''</em>, <em>ipv6=''</em>, <em>port=6641</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#send_data_by_tcp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.send_data_by_tcp" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">bbc_network.</code><code class="descname">send_data_by_tcp</code><span class="sig-paren">(</span><em>ipv4=None</em>, <em>ipv6=None</em>, <em>port=6641</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc_network.html#send_data_by_tcp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc_network.send_data_by_tcp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

@@ -8,7 +8,7 @@ import sys
 sys.path.extend(["../"])
 from bbc1.common import bbclib
 from bbc1.app import bbc_app
-from testutils import prepare, get_core_client, start_core_thread, make_client, get_random_data, domain_and_asset_group_setup
+from testutils import prepare, get_core_client, start_core_thread, make_client, get_random_data, domain_setup_utility
 
 import random
 
@@ -41,7 +41,7 @@ def make_transaction(client_idx):
     print(">>> domain=%s, txid=%s, num_cross_ref=%d" % (binascii.b2a_hex(domain_ids[client_idx%domain_num][:4]),
                                                         binascii.b2a_hex(transaction.transaction_id[:4]),
                                                         len(transaction.cross_refs)))
-    ret = cl['app'].insert_transaction(asset_group_ids[client_idx%domain_num], transaction)
+    ret = cl['app'].insert_transaction(transaction)
     assert ret
     msg_processor[client_idx].synchronize()
 
@@ -54,11 +54,10 @@ class TestBBcAppClient(object):
         prepare(core_num=core_num, client_num=client_num, loglevel=LOGLEVEL)
         for i in range(core_num):
             start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i, use_global=True)
-            domain_and_asset_group_setup(i, domain_ids[i % domain_num], asset_group_ids[i % domain_num],
-                                         advertise_in_domain0=True)  # system administrator
+            domain_setup_utility(i, domain_ids[i % domain_num])
         time.sleep(1)
         for i in range(client_num):
-            make_client(index=i, core_port_increment=i % core_num, asset_group_id=asset_group_ids[i % domain_num])
+            make_client(index=i, core_port_increment=i % core_num)
         time.sleep(1)
         # client: i*3 = domain[0], i*3+1 = domain[1], i*3+2 = domain[2]
 
@@ -100,15 +99,22 @@ class TestBBcAppClient(object):
             assert ret
             ret = msg_processor[i].synchronize()
             print("[%d] set_peer result is %s" %(i, ret))
-
+            clients[i]['app'].ping_to_all_neighbors(bbclib.domain_global_0)
         time.sleep(3)
+
+        cores[0].networking.domains[bbclib.domain_global_0].alive_check()
+        print("** wait 16 sec to finish alive_check")
+        time.sleep(16)
+        assert len(cores[1].networking.domains[bbclib.domain_global_0].id_ip_mapping) == core_num-1
+
         for i in range(core_num):
             cores[i].networking.domains[bbclib.domain_global_0].print_peerlist()
 
     def test_12_register(self):
         print("-----", sys._getframe().f_code.co_name, "-----")
-        for cl in clients:
-            ret = cl['app'].register_to_core()
+        for i in range(client_num):
+            clients[i]['app'].set_domain_id(domain_ids[i%domain_num])
+            ret = clients[i]['app'].register_to_core()
             assert ret
         time.sleep(1)
 

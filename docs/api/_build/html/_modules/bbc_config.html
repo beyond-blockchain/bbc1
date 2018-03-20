@@ -99,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../bbc_network.html">bbc_network module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbc_storage.html">bbc_storage module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bbclib.html">bbclib module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bbc_types.html">bbc_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ledger_subsystem.html">ledger_subsystem module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../message_key_types.html">message_key_types module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../p2p_domain0.html">p2p_domain0 module</a></li>
@@ -209,20 +210,19 @@
 <span class="n">current_config</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;workingdir&#39;</span><span class="p">:</span> <span class="n">DEFAULT_WORKING_DIR</span><span class="p">,</span>
     <span class="s1">&#39;client&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;ipv6&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="n">DEFAULT_CORE_PORT</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s1">&#39;ledger&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s2">&quot;sqlite3&quot;</span><span class="p">,</span>
         <span class="s1">&#39;transaction_db&#39;</span><span class="p">:</span> <span class="s2">&quot;bbc_transaction.sqlite3&quot;</span><span class="p">,</span>
         <span class="s1">&#39;auxiliary_db&#39;</span><span class="p">:</span> <span class="s2">&quot;bbc_aux.sqlite3&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;merkle_db&#39;</span><span class="p">:</span> <span class="s2">&quot;bbc_merkle.sqlite3&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s1">&#39;storage&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="c1">#&#39;path&#39;: &quot;path/to/somewhere&quot;,</span>
         <span class="c1">#&#39;path&#39;: &quot;/path/to/somewhere&quot;,</span>
     <span class="p">},</span>
     <span class="s1">&#39;network&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;ipv6&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s1">&#39;p2p_port&#39;</span><span class="p">:</span> <span class="n">DEFAULT_P2P_PORT</span><span class="p">,</span>
         <span class="s1">&#39;max_connections&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
         <span class="s1">&#39;modules&#39;</span><span class="p">:</span> <span class="p">{</span>
@@ -238,7 +238,6 @@
     <span class="p">},</span>
     <span class="s1">&#39;domains&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s1">&#39;0000000000000000000000000000000000000000000000000000000000000000&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;special_domain&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
             <span class="s1">&#39;module&#39;</span><span class="p">:</span> <span class="s1">&#39;p2p_domain0&#39;</span><span class="p">,</span>
             <span class="s1">&#39;static_nodes&#39;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="c1"># id : [ipv4, ipv6, port]</span>
@@ -248,6 +247,7 @@
             <span class="p">},</span>
         <span class="p">},</span>
     <span class="p">},</span>
+    <span class="s1">&#39;use_ledger_subsystem&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
     <span class="s1">&#39;ethereum&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s1">&#39;chain_id&#39;</span><span class="p">:</span> <span class="n">DEFAULT_ETHEREUM_CHAIN_ID</span><span class="p">,</span>
         <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="n">DEFAULT_ETHEREUM_GETH_PORT</span><span class="p">,</span>
@@ -292,8 +292,11 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span></div>
+            <span class="kn">import</span> <span class="nn">traceback</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="BBcConfig.get_json_config"><a class="viewcode-back" href="../bbc_config.html#bbc_config.BBcConfig.get_json_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_json_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_config</span><span class="p">()</span>
@@ -313,26 +316,10 @@
                 <span class="s1">&#39;peer_list&#39;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="c1"># id : [ipv4, ipv6, port]</span>
                 <span class="p">},</span>
-                <span class="s1">&#39;asset_group_ids&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="c1"># id: { config }</span>
-                <span class="p">}</span>
             <span class="p">}</span>
         <span class="k">if</span> <span class="n">domain_id_str</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">][</span><span class="n">domain_id_str</span><span class="p">]</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
-
-<div class="viewcode-block" id="BBcConfig.get_asset_group_config"><a class="viewcode-back" href="../bbc_config.html#bbc_config.BBcConfig.get_asset_group_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_asset_group_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">create_if_new</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">dc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_domain_config</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">create_if_new</span><span class="o">=</span><span class="n">create_if_new</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">dc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        <span class="n">asset_group_str</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">convert_id_to_string</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">asset_group_str</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dc</span><span class="p">[</span><span class="s1">&#39;asset_group_ids&#39;</span><span class="p">]:</span>
-            <span class="n">dc</span><span class="p">[</span><span class="s1">&#39;asset_group_ids&#39;</span><span class="p">][</span><span class="n">asset_group_str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;storage_type&#39;</span><span class="p">:</span> <span class="n">StorageType</span><span class="o">.</span><span class="n">FILESYSTEM</span><span class="p">,</span>
-                <span class="s1">&#39;storage_path&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="s1">&#39;advertise_in_domain0&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="p">}</span>
-        <span class="k">return</span> <span class="n">dc</span><span class="p">[</span><span class="s1">&#39;asset_group_ids&#39;</span><span class="p">][</span><span class="n">asset_group_str</span><span class="p">]</span></div></div>
+        <span class="k">return</span> <span class="kc">None</span></div></div>
 </pre></div>
 
            </div>

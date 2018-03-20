@@ -173,13 +173,13 @@
   <div class="section" id="module-simple_cluster">
 <span id="simple-cluster-module"></span><h1>simple_cluster module<a class="headerlink" href="#module-simple_cluster" title="Permalink to this headline">¶</a></h1>
 <p>Copyright (c) 2017 beyond-blockchain.org.</p>
-<p>Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;);
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at</p>
 <blockquote>
 <div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
 <p>Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an &#8220;AS IS&#8221; BASIS,
+distributed under the License is distributed on an “AS IS” BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.</p>
@@ -189,7 +189,7 @@ limitations under the License.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#simple_cluster.NetworkDomain" title="simple_cluster.NetworkDomain"><code class="xref py py-obj docutils literal"><span class="pre">NetworkDomain</span></code></a>([network,&nbsp;config,&nbsp;domain_id,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#simple_cluster.NetworkDomain" title="simple_cluster.NetworkDomain"><code class="xref py py-obj docutils literal"><span class="pre">NetworkDomain</span></code></a>([network,&nbsp;config,&nbsp;domain_id,&nbsp;…])</td>
 <td>Compose a simple core node cluster</td>
 </tr>
 </tbody>
@@ -200,22 +200,6 @@ limitations under the License.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">bbc1.core.bbc_network.DomainBase</span></code></p>
 <p>Compose a simple core node cluster</p>
 <dl class="method">
-<dt id="simple_cluster.NetworkDomain.add_advertise_list">
-<code class="descname">add_advertise_list</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_cluster.html#NetworkDomain.add_advertise_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_cluster.NetworkDomain.add_advertise_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>The peer node information will be advertised because ping is successful</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> &#8211; </td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="simple_cluster.NetworkDomain.add_peer_node">
 <code class="descname">add_peer_node</code><span class="sig-paren">(</span><em>node_id</em>, <em>ip4</em>, <em>addr_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_cluster.html#NetworkDomain.add_peer_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_cluster.NetworkDomain.add_peer_node" title="Permalink to this definition">¶</a></dt>
 <dd><p>(internal use) add node as a peer node</p>
@@ -224,9 +208,9 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>node_id</strong> &#8211; </li>
-<li><strong>ip4</strong> &#8211; </li>
-<li><strong>addr_info</strong> &#8211; </li>
+<li><strong>node_id</strong> – </li>
+<li><strong>ip4</strong> – </li>
+<li><strong>addr_info</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -246,22 +230,6 @@ limitations under the License.</p>
 <dt id="simple_cluster.NetworkDomain.alive_check">
 <code class="descname">alive_check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_cluster.html#NetworkDomain.alive_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_cluster.NetworkDomain.alive_check" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="method">
-<dt id="simple_cluster.NetworkDomain.broadcast_peerlist">
-<code class="descname">broadcast_peerlist</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_cluster.html#NetworkDomain.broadcast_peerlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_cluster.NetworkDomain.broadcast_peerlist" title="Permalink to this definition">¶</a></dt>
-<dd><p>Broadcast the peer_list to the neighbors</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> &#8211; </td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
 
 <dl class="method">
 <dt id="simple_cluster.NetworkDomain.domain_manager_loop">
@@ -334,9 +302,9 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ip4</strong> &#8211; True (from IPv4) / False (from IPv6)</li>
-<li><strong>from_addr</strong> &#8211; sender address and port (None if TCP)</li>
-<li><strong>msg</strong> &#8211; the message body (already deserialized)</li>
+<li><strong>ip4</strong> – True (from IPv4) / False (from IPv6)</li>
+<li><strong>from_addr</strong> – sender address and port (None if TCP)</li>
+<li><strong>msg</strong> – the message body (already deserialized)</li>
 </ul>
 </td>
 </tr>
@@ -363,7 +331,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="simple_cluster.NetworkDomain.put_resource">
-<code class="descname">put_resource</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>resource_id</em>, <em>resource_type</em>, <em>resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_cluster.html#NetworkDomain.put_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_cluster.NetworkDomain.put_resource" title="Permalink to this definition">¶</a></dt>
+<code class="descname">put_resource</code><span class="sig-paren">(</span><em>resource_id</em>, <em>resource_type</em>, <em>resource</em>, <em>asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_cluster.html#NetworkDomain.put_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_cluster.NetworkDomain.put_resource" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -375,8 +343,8 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>msg</strong> &#8211; </li>
-<li><strong>count</strong> &#8211; number of nodes to send</li>
+<li><strong>msg</strong> – </li>
+<li><strong>count</strong> – number of nodes to send</li>
 </ul>
 </td>
 </tr>
@@ -400,7 +368,7 @@ limitations under the License.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> – </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -410,7 +378,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="simple_cluster.NetworkDomain.respond_find_node">
-<code class="descname">respond_find_node</code><span class="sig-paren">(</span><em>target_id</em>, <em>nonce</em>, <em>asset_group_id=None</em>, <em>resource_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_cluster.html#NetworkDomain.respond_find_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_cluster.NetworkDomain.respond_find_node" title="Permalink to this definition">¶</a></dt>
+<code class="descname">respond_find_node</code><span class="sig-paren">(</span><em>target_id</em>, <em>nonce</em>, <em>resource_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_cluster.html#NetworkDomain.respond_find_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_cluster.NetworkDomain.respond_find_node" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -420,7 +388,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="simple_cluster.NetworkDomain.send_find_value">
-<code class="descname">send_find_value</code><span class="sig-paren">(</span><em>target_id</em>, <em>nonce</em>, <em>asset_group_id</em>, <em>resource_id</em>, <em>resource_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_cluster.html#NetworkDomain.send_find_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_cluster.NetworkDomain.send_find_value" title="Permalink to this definition">¶</a></dt>
+<code class="descname">send_find_value</code><span class="sig-paren">(</span><em>target_id</em>, <em>nonce</em>, <em>resource_id</em>, <em>resource_type</em>, <em>extra_info={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_cluster.html#NetworkDomain.send_find_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_cluster.NetworkDomain.send_find_value" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -431,7 +399,7 @@ limitations under the License.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query_entry</strong> – </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -441,7 +409,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="simple_cluster.NetworkDomain.send_peerlist">
-<code class="descname">send_peerlist</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_cluster.html#NetworkDomain.send_peerlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_cluster.NetworkDomain.send_peerlist" title="Permalink to this definition">¶</a></dt>
+<code class="descname">send_peerlist</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_cluster.html#NetworkDomain.send_peerlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_cluster.NetworkDomain.send_peerlist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

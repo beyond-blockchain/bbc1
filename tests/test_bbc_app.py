@@ -10,7 +10,7 @@ from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
 from bbc1.common.bbc_error import *
 from bbc1.app import bbc_app
-from testutils import prepare, get_core_client, start_core_thread, make_client, domain_and_asset_group_setup, wait_check_result_msg_type
+from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility, wait_check_result_msg_type
 
 LOGLEVEL = 'debug'
 LOGLEVEL = 'info'
@@ -63,9 +63,9 @@ class TestBBcAppClient(object):
         prepare(core_num=core_num, client_num=client_num, loglevel=LOGLEVEL)
         for i in range(core_num):
             start_core_thread(index=i)
-            domain_and_asset_group_setup(i, domain_id, asset_group_id)  # system administrator
+            domain_setup_utility(i, domain_id)  # system administrator
             msg_processor[i] = MessageProcessor(index=i)
-            make_client(index=i, core_port_increment=0, callback=msg_processor[i], asset_group_id=asset_group_id)
+            make_client(index=i, core_port_increment=0, callback=msg_processor[i])
         time.sleep(1)
 
         global cores, clients
@@ -104,7 +104,7 @@ class TestBBcAppClient(object):
         transactions[0].dump()
         transactions[0].digest()
         print("register transaction=", binascii.b2a_hex(transactions[0].transaction_id))
-        ret = clients[0]['app'].insert_transaction(asset_group_id, transactions[0])
+        ret = clients[0]['app'].insert_transaction(transactions[0])
         assert ret
         dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_INSERT)
         assert dat[KeyType.status] == ESUCCESS
@@ -143,14 +143,14 @@ class TestBBcAppClient(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         transactions[0].digest()
         print("find txid=", binascii.b2a_hex(transactions[0].transaction_id))
-        ret = clients[0]['app'].search_transaction(asset_group_id, transactions[0].transaction_id)
+        ret = clients[0]['app'].search_transaction(transactions[0].transaction_id)
         assert ret
         dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION)
         assert dat[KeyType.status] == ESUCCESS
 
     def test_16_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = clients[0]['app'].search_transaction(asset_group_id, b'4898g9fh')
+        ret = clients[0]['app'].search_transaction(b'4898g9fh')
         assert ret
         print("* should be NG *")
         dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION)

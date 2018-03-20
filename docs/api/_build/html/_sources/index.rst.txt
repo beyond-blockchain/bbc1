@@ -18,6 +18,7 @@ Welcome to BBc-1's documentation!
    bbc_network
    bbc_storage
    bbclib
+   bbc_types
    ledger_subsystem
    message_key_types
    p2p_domain0

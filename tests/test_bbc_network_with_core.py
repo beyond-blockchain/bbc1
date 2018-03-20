@@ -10,7 +10,7 @@ import sys
 sys.path.extend(["../"])
 from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
-from bbc1.core.bbc_ledger import ResourceType
+from bbc1.core.bbc_types import ResourceType
 from bbc1.core import query_management
 from testutils import prepare, start_core_thread, get_core_client
 
@@ -75,8 +75,9 @@ class TestBBcNetworkWithCore(object):
         simple_cluster.FORWARD_CACHE_SIZE = 5
         for i in range(core_nodes):
             cores[i].networking.create_domain(network_module="simple_cluster", domain_id=domain_id)
+            cores[i].ledger_manager.add_domain(domain_id)
             nodes[i] = cores[i].networking.domains[domain_id].node_id
-            cores[i].networking.register_user_id(domain_id, asset_group_id, users[i])
+            cores[i].networking.register_user_id(domain_id, users[i])
             cores[i].send_message = dummy_send_message
             cores[i].storage_manager.set_storage_path(domain_id, asset_group_id)
 
@@ -122,9 +123,9 @@ class TestBBcNetworkWithCore(object):
             cores[i].networking.domains[domain_id].print_peerlist()
 
         cores[0].networking.domains[domain_id].alive_check()
-        print("** wait 5 sec to finish alive_check")
-        time.sleep(5)
-        assert len(cores[1].networking.domains[domain_id].id_ip_mapping) == 10-1
+        print("** wait 16 sec to finish alive_check")
+        time.sleep(16)
+        assert len(cores[1].networking.domains[domain_id].id_ip_mapping) == core_nodes-1
 
         query_entry = query_management.QueryEntry(expire_after=2,
                                                   callback_expire=get_test_func_failure,
@@ -157,8 +158,8 @@ class TestBBcNetworkWithCore(object):
         for i in range(core_nodes):
             msg = {KeyType.domain_id: domain_id, KeyType.destination_user_id: users[0],
                    b'data': "AAAAAA from %d" % i}
-            cores[i].networking.route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                              dst_user_id=users[0], msg_to_send=msg)
+            cores[i].networking.route_message(domain_id=domain_id, dst_user_id=users[0],
+                                              src_user_id=users[i], msg_to_send=msg)
         print("wait queue: 10")
         total = wait_results(10)
         assert total == 10
@@ -168,8 +169,8 @@ class TestBBcNetworkWithCore(object):
         for i in range(core_nodes):
             msg = {KeyType.domain_id: domain_id, KeyType.destination_user_id: users[0],
                    b'data': "BBBBBB from %d" % i}
-            cores[i].networking.route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                              dst_user_id=users[0], msg_to_send=msg)
+            cores[i].networking.route_message(domain_id=domain_id, dst_user_id=users[0],
+                                              src_user_id=users[i], msg_to_send=msg)
         print("wait queue: 10")
         total = wait_results(10)
         assert total == 10
@@ -178,8 +179,8 @@ class TestBBcNetworkWithCore(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         dummy_user_id = bbclib.get_new_id("dummy_user_id")
         msg = {KeyType.command:3, KeyType.query_id:4, b'aaaaa': 1, b'bbbb': "CCCCCC from 1"}
-        cores[1].networking.route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                          dst_user_id=dummy_user_id, msg_to_send=msg)
+        cores[1].networking.route_message(domain_id=domain_id, dst_user_id=dummy_user_id,
+                                          src_user_id=users[1], msg_to_send=msg)
         total = wait_results(1)
         assert total == 0
 
@@ -187,8 +188,8 @@ class TestBBcNetworkWithCore(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(core_nodes):
             msg = {b'aaaaa': 1, b'bbbb': "DDDDDD from %d" % i}
-            cores[1].networking.route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                              dst_user_id=users[0], msg_to_send=msg)
+            cores[1].networking.route_message(domain_id=domain_id, dst_user_id=users[0],
+                                              src_user_id=users[1], msg_to_send=msg)
         print("wait queue: 10")
         total = wait_results(10)
         assert total == 10
@@ -197,8 +198,8 @@ class TestBBcNetworkWithCore(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(core_nodes):
             msg = {b'aaaaa': 1, b'bbbb': "EEEEEEE from %d" % i}
-            cores[1].networking.route_message(domain_id=domain_id, asset_group_id=asset_group_id,
-                                              dst_user_id=users[0], msg_to_send=msg)
+            cores[1].networking.route_message(domain_id=domain_id, dst_user_id=users[0],
+                                              src_user_id=users[1], msg_to_send=msg)
         print("wait queue: 10")
         total = wait_results(10)
         assert total == 10
@@ -212,11 +213,10 @@ class TestBBcNetworkWithCore(object):
         sig = transaction.sign(keypair=keypair)
         transaction.add_signature(user_id=users[0], signature=sig)
         transaction.digest()
-        ret = cores[3].ledger_manager.insert_locally(domain_id, asset_group_id, transaction.transaction_id,
-                                                     ResourceType.Transaction_data, transaction.serialize())
+        ret = cores[3].ledger_manager.insert_transaction_locally(domain_id, transaction.transaction_id,
+                                                                 transaction.serialize())
         time.sleep(2)
-        ret = cores[3].ledger_manager.find_locally(domain_id, asset_group_id,
-                                                   transaction.transaction_id, ResourceType.Transaction_data)
+        ret = cores[3].ledger_manager.find_transaction_locally(domain_id, transaction.transaction_id)
         assert ret is not None
 
     def test_12_get(self):
