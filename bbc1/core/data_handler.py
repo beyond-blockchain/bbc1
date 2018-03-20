@@ -41,6 +41,19 @@ topology_info_definition = [
     ["id", "INTEGER"], ["tx_to", "BLOB"], ["tx_from", "BLOB"]
 ]
 
+#--- for anchoring ethereum/bitcoin blockchain ---
+merkle_branch_db_definition = [
+    ["digest", "BLOB"], ["left", "BLOB"], ["right", "BLOB"],
+]
+
+merkle_leaf_db_definition = [
+    ["digest", "BLOB"], ["left", "BLOB"], ["right", "BLOB"], ["prev", "BLOB"],
+]
+
+merkle_root_db_definition = [
+    ["root", "BLOB"], ["spec", "BLOB"],
+]
+
 
 class DataHandler:
     """
@@ -108,6 +121,9 @@ class DataHandler:
             db.create_table('transaction_table', transaction_tbl_definition, primary_key=0, indices=[0])
             db.create_table('asset_info_table', asset_info_definition, primary_key=0, indices=[0, 1, 2, 3, 4])
             db.create_table('topology_table', topology_info_definition, primary_key=0, indices=[0, 1, 2])
+            db.create_table('merkle_branch_table', merkle_branch_db_definition, primary_key=0, indices=[1, 2])
+            db.create_table('merkle_leaf_table', merkle_leaf_db_definition, primary_key=0, indices=[1, 2])
+            db.create_table('merkle_root_table', merkle_root_db_definition, primary_key=0, indices=[0])
 
     def storage_setup(self):
         if self.config['storage']['type'] == "external":

@@ -39,9 +39,6 @@ current_config = {
     'client': {
         'port': DEFAULT_CORE_PORT,
     },
-    #'ledger': {
-    #'merkle_db': "bbc_merkle.sqlite3",
-    #},
     'network': {
         'p2p_port': DEFAULT_P2P_PORT,
         'max_connections': 100,
@@ -52,9 +49,14 @@ current_config = {
             'static_nodes': {
                 # id : [ipv4, ipv6, port]
             },
+            'use_ledger_subsystem': False,  # if this items does not exist or False, ledger_subsystem will not be used
+            'ledger_subsystem': {
+                'subsystem': 'ethereum',
+                'max_transactions': 4096,
+                'max_seconds': 60 * 60,
+            },
         },
     },
-    'use_ledger_subsystem': False,
     'ethereum': {
         'chain_id': DEFAULT_ETHEREUM_CHAIN_ID,
         'port': DEFAULT_ETHEREUM_GETH_PORT,
@@ -63,11 +65,6 @@ current_config = {
         'passphrase': '',
         'contract': 'BBcAnchor',
         'contract_address': '',
-    },
-    'ledger_subsystem': {
-        'subsystem': 'ethereum',
-        'max_transactions': 4096,
-        'max_seconds': 60 * 60,
     },
 }
 

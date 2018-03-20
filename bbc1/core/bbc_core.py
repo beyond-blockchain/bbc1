@@ -118,12 +118,7 @@ class BBcCoreService:
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port,
                                                  external_ip4addr=ip4addr, external_ip6addr=ip6addr,
                                                  loglevel=loglevel, logname=logname)
-        self.ledger_subsystem = None
-        if conf['use_ledger_subsystem'] or use_ledger_subsystem:
-            from bbc1.core import ledger_subsystem
-            self.ledger_subsystem = ledger_subsystem.LedgerSubsystem(self.config, core=self,
-                                                                     loglevel=loglevel, logname=logname)
-
+        self.ledger_subsystems = dict()
         for domain_id_str in conf['domains'].keys():
             domain_id = bbclib.convert_idstring_to_bytes(domain_id_str)
             if not use_domain0 and domain_id == bbclib.domain_global_0:
@@ -133,6 +128,12 @@ class BBcCoreService:
             for nd, info in c['static_nodes'].items():
                 node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
                 self.networking.add_neighbor(domain_id, node_id, ipv4, ipv6, port, is_static=True)
+            if ('use_ledger_subsystem' in conf and conf['use_ledger_subsystem']) or use_ledger_subsystem:
+                from bbc1.core import ledger_subsystem
+                self.ledger_subsystems[domain_id] = ledger_subsystem.LedgerSubsystem(self.config,
+                                                                                     networking=self.networking,
+                                                                                     domain_id=domain_id,
+                                                                                     loglevel=loglevel, logname=logname)
         gevent.signal(signal.SIGINT, self.quit_program)
         if server_start:
             self.start_server(core_port)
