@@ -42,27 +42,6 @@ def get_random_data(length=16):
 
 
 class DummyCore:
-    class DB:
-        def add_domain(self, domain_id):
-            pass
-
-        def insert_transaction_locally(self, domain_id, resource_id, resource_type, data):
-            print("insert_locally: domain_id=%s, resource_id=%s" % (binascii.b2a_hex(domain_id[:4]),
-                                                                    binascii.b2a_hex(resource_id[:4])))
-            result_queue.put(1)
-
-        def find_transaction_locally(self, domain_id, resource_id):
-            if resource_id == sample_resource_id:
-                print("find_locally: FOUND %s" % binascii.b2a_hex(resource_id[:4]))
-                return b'sample_resource'
-            else:
-                print("find_locally: NOTFOUND!!!!!!!")
-                return None
-
-    class Storage:
-        def set_storage_path(self, domain_id, storage_type, storage_path):
-            pass
-
     class UserMessageRouting:
         def add_domain(self, domain_id):
             pass
@@ -71,8 +50,6 @@ class DummyCore:
             pass
 
     def __init__(self):
-        self.ledger_manager = DummyCore.DB()
-        self.storage_manager = DummyCore.Storage()
         self.user_message_routing = DummyCore.UserMessageRouting()
         self.stats = bbc_stats.BBcStats()
 
