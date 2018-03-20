@@ -1,9 +1,9 @@
 Sample applications
 ===
-Two types of sample applications are available here.
+Three types of sample applications are available here.
 
 # File proof
-This app allowa a user to do the following:
+This app allows a user to do the following:
 * store a file in bbc_core
 * update a file in bbc_core
 * get a file from bbc_core
@@ -23,3 +23,14 @@ The app consists of four scripts, which allow a user to do the following:
     * Check double spending of land by third-party (like a legal affairs bureau).
 - escrow.py
     * Escrow land and coin to a third-party program (this script) to execute an atomic exchange between land and coin automatically.
+
+
+# Payment with a digital currency
+This app allows a user to do the following:
+* define and change users
+* define and switch among currencies
+* create currency tokens for a user
+* delete currency tokens
+* transfer currency tokens from the user to another user
+* show proof of existence of tokens
+* show status (balances, etc.) of currencies
