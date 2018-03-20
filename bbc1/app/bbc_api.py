@@ -23,13 +23,15 @@ sys.path.extend(["../"])
 from common import bbclib
 from common.message_key_types import KeyType
 from app import bbc_app
+from bbc1.common.bbc_error import *
 
 app = Flask(__name__)
 
-def setup_bbc_client(user_id, asset_group_id):
+#TODO:TMP set domain id and user id to bbc app
+def setup_bbc_client(user_id, domain_id=bbclib.get_new_id("coindomain", include_timestamp=False)):
     bbc_app_client = bbc_app.BBcAppClient(port=bbc_app.DEFAULT_CORE_PORT, loglevel="all")
     bbc_app_client.set_user_id(user_id)
-    bbc_app_client.set_asset_group_id(asset_group_id)
+    bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_callback(bbc_app.Callback())
     ret = bbc_app_client.register_to_core()
     assert ret
@@ -60,38 +62,40 @@ def check_json_rpc_format(req):
 def rpc_proccess(req):
     if req["method"] == "bbc1_Hello":
         result = "Access bbc1 over HTTP!"
-    elif req["method"] == "bbc1_GetTransaction":
+    elif req["method"] == "bbc1_gettransaction":
         asset_group_id = binascii.unhexlify(req["params"]["asset_group_id"])
         txid = binascii.unhexlify(req["params"]["tx_id"])
         source_id = binascii.unhexlify(req["params"]["user_id"])
         query_id = req["id"]
-        bbcapp = setup_bbc_client(source_id, asset_group_id)
+        bbcapp = setup_bbc_client(source_id)
         bbcapp.search_transaction(asset_group_id, txid)
         response_data = bbcapp.callback.synchronize()
         tx = bbclib.BBcTransaction()
         tx.deserialize(response_data[KeyType.transaction_data])
         tx.dump()
         result = tx_to_dict(tx)
+    #TODO: nonce in bbclib.BBcEvent and timestamp in bbclib.Transaction are fied
     elif req["method"] == "bbc1_GetTransactionDigest":
-        result = "Insert Transaction over HTTP!"
         tx = dict_to_tx(req["params"])
         digest = tx.digest()
-        tx.dump()
         result = bina2str(digest)
+    elif req["method"] == "bbc1_InsertTransaction":
+        result = "Insert Transaction over HTTP!"
+        tx = dict_to_tx(req["params"])
+        source_id = str2bina(req["params"]["Event"][0]["mandatory_approvers"][0])
+        asset_group_id = binascii.unhexlify(req["params"]["Event"][0]["asset_group_id"])
+        bbcapp = setup_bbc_client(source_id)
+        bbcapp.insert_transaction(tx)
+        response_data = bbcapp.callback.synchronize()
+        if response_data[KeyType.status] < ESUCCESS:
+            reslut = response_data[KeyType.reason].decode()
+        else:
+            result = bina2str(response_data[KeyType.transaction_id])
     else:
         result = {"code": -32601,"message":"Method '"+req["method"]+"' not found"}
         return False, result
     return True, result
-    '''
-        tx = tx.serialize()
-        result = self.insert_transaction(asset_group_id, tx, None)
-        if not isinstance(result, dict):
-            result = {"code": 1, "message":result}
-            return False, result
-        result = list(result.values())
-        txid = binascii.hexlify(result[0])
-        result = {"transaction_id": txid.decode("utf-8")}
-    '''
+
 def str2bina(str):
     str = str.encode("utf-8")
     return binascii.unhexlify(str)
