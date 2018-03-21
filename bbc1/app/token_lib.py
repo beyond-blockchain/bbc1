@@ -32,6 +32,11 @@ from bbc1.core.bbc_config import DEFAULT_CORE_PORT
 NAME_OF_DB = 'token_db'
 
 
+token_tx_id_table_definition = [
+    ["tx_id", "BLOB"],
+    ["tx", "BLOB"],
+]
+
 token_utxo_table_definition = [
     ["mint_id", "BLOB"],
     ["user_id", "BLOB"],
@@ -39,15 +44,22 @@ token_utxo_table_definition = [
     ["event_idx", "INTEGER"],
     ["asset_body", "BLOB"],
     ["is_single", "INTEGER"],
+    ["state", "INTEGER"],
+    ["last_modified", "INTEGER"]
 ]
 
+IDX_MINT_ID       = 0
+IDX_USER_ID       = 1
+IDX_TX_ID         = 2
+IDX_EVENT_IDX     = 3
+IDX_ASSET_BODY    = 4
+IDX_IS_SINGLE     = 5
+IDX_STATE         = 6
+IDX_LAST_MODIFIED = 7
 
-IDX_MINT_ID    = 0
-IDX_USER_ID    = 1
-IDX_TX_ID      = 2
-IDX_EVENT_IDX  = 3
-IDX_ASSET_BODY = 4
-IDX_IS_SINGLE  = 5
+ST_FREE     = 0
+ST_RESERVED = 1
+ST_TAKEN    = 2
 
 
 class Fraction(fractions.Fraction):
@@ -599,12 +611,17 @@ class Store:
         self.domain_id = domain_id
         self.mint_id = mint_id
         self.app = app
+        self.db_online = True
         self.db = app_support_lib.Database()
         self.db.setup_db(domain_id, NAME_OF_DB)
         self.db.create_table_in_db(domain_id, NAME_OF_DB,
                 'token_utxo_table',
                 token_utxo_table_definition,
                 indices=[0, 1, 2])
+        self.db.create_table_in_db(domain_id, NAME_OF_DB,
+                'token_tx_id_table',
+                token_tx_id_table_definition,
+                primary_key=0, indices=[1])
         self.store_ids = (
             self.get_store_id(Store.SEED_CONDITION),
             self.get_store_id(Store.SEED_CURRENCY_SPEC)
@@ -612,10 +629,15 @@ class Store:
 
 
     def delete_utxo(self, tx_id, idx):
+        if self.db_online is False:
+            return None
         return self.db.exec_sql(
             self.domain_id,
             NAME_OF_DB,
-            'delete from token_utxo_table where tx_id=? and event_idx=?',
+            ('update token_utxo_table set state=?, last_modified=? where '
+             'tx_id=? and event_idx=?'),
+            ST_TAKEN,
+            int(time.time()),
             tx_id,
             idx
         )
@@ -697,14 +719,87 @@ class Store:
         return tx
 
 
+    def insert(self, tx, user_id, idPublickeyMap):
+        if idPublickeyMap.verify_signers(tx, self.mint_id, user_id) == False:
+            raise RuntimeError('signers not verified')
+
+        self.push_tx(tx.transaction_id, tx)
+        ret = self.app.insert_transaction(tx)
+        assert ret
+        res = self.app.callback.synchronize()
+        if res[KeyType.status] < ESUCCESS:
+            raise RuntimeError(res[KeyType.reason].decode())
+
+
+    def inserted(self, tx_id):
+        tx = self.take_tx(tx_id)
+        if tx is None:
+            return
+
+        # FIXME: check validity
+        for i, event in enumerate(tx.events):
+            if event.asset_group_id == self.mint_id and \
+              event.asset.user_id not in self.store_ids:
+                _, body = BaseAssetBody.from_serialized_data(0,
+                        event.asset.asset_body)
+                self.write_utxo(event.asset.user_id,
+                        tx.transaction_id, i, event.asset.asset_body, True)
+
+        for ref in tx.references:
+            if ref.asset_group_id == self.mint_id:
+                self.delete_utxo(ref.transaction_id, ref.event_index_in_ref)
+
+
+    def push_tx(self, tx_id, tx):
+        if self.db_online is False:
+            return
+        self.db.exec_sql(
+            self.domain_id,
+            NAME_OF_DB,
+            'insert into token_tx_id_table values (?, ?)',
+            tx_id,
+            tx.serialize()
+        )
+
+
     def read_utxo_list(self, user_id):
         return self.db.exec_sql(
             self.domain_id,
             NAME_OF_DB,
-            'select * from token_utxo_table where mint_id=? and user_id=?',
+            ('select * from token_utxo_table where '
+             'mint_id=? and user_id=? and state=?'),
             self.mint_id,
-            user_id
+            user_id,
+            ST_FREE
         )
+
+
+    def reserve_utxo(self, tx_id, idx):
+        if self.db_online is False:
+            return None
+        return self.db.exec_sql(
+            self.domain_id,
+            NAME_OF_DB,
+            ('update token_utxo_table set state=?, last_modified=? where '
+             'tx_id=? and event_idx=?'),
+            ST_RESERVED,
+            int(time.time()),
+            tx_id,
+            idx
+        )
+
+
+    def reserve_referred_utxos(self, tx):
+        for ref in tx.references:
+            if ref.asset_group_id == self.mint_id:
+                self.reserve_utxo(ref.transaction_id, ref.event_index_in_ref)
+
+
+    '''
+    mainly for testing purposes.
+    '''
+    def set_db_online(self, is_online=True):
+        self.db_online = is_online
 
 
     def set_condition(self, condition, update=False, keypair=None,
@@ -755,49 +850,53 @@ class Store:
                 private_key=keypair.private_key,
                 public_key=keypair.public_key)
         transaction.add_signature(user_id=user_id, signature=sig)
+        return sig
 
 
     def sign_and_insert(self, transaction, user_id, keypair, idPublickeyMap):
         self.sign(transaction, user_id, keypair)
         transaction.digest()
-
-        if idPublickeyMap.verify_signers(transaction, self.mint_id,
-                user_id) == False:
-            raise RuntimeError('signers not verified')
-
-        ret = self.app.insert_transaction(transaction)
-        assert ret
-        res = self.app.callback.synchronize()
-        if res[KeyType.status] < ESUCCESS:
-            raise RuntimeError(res[KeyType.reason].decode())
-
-        for i, event in enumerate(transaction.events):
-            if event.asset_group_id == self.mint_id and \
-              event.asset.user_id not in self.store_ids:
-                _, body = BaseAssetBody.from_serialized_data(0,
-                        event.asset.asset_body)
-                self.write_utxo(event.asset.user_id,
-                        transaction.transaction_id, i, event.asset.asset_body,
-                        True)
-
-        for ref in transaction.references:
-            if ref.asset_group_id == self.mint_id:
-                self.delete_utxo(ref.transaction_id, ref.event_index_in_ref)
-
+        self.insert(transaction, user_id, idPublickeyMap)
         return transaction
 
 
-    def write_utxo(self, user_id, tx_id, idx, asset_body, is_single):
+    def take_tx(self, tx_id):
+        if self.db_online is False:
+            return None
+        rows = self.db.exec_sql(
+            self.domain_id,
+            NAME_OF_DB,
+            'select tx from token_tx_id_table where tx_id=?',
+            tx_id
+        )
+        if len(rows) <= 0:
+            return None
+        tx = bbclib.BBcTransaction()
+        tx.deserialize(rows[0][0])
         self.db.exec_sql(
             self.domain_id,
             NAME_OF_DB,
-            'insert into token_utxo_table values (?, ?, ?, ?, ?, ?)',
+            'delete from token_tx_id_table where tx_id=?',
+            tx_id
+        )
+        return tx
+
+
+    def write_utxo(self, user_id, tx_id, idx, asset_body, is_single):
+        if self.db_online is False:
+            return
+        self.db.exec_sql(
+            self.domain_id,
+            NAME_OF_DB,
+            'insert into token_utxo_table values (?, ?, ?, ?, ?, ?, ?, ?)',
             self.mint_id,
             user_id,
             tx_id,
             idx,
             asset_body,
-            is_single
+            is_single,
+            ST_FREE,
+            int(time.time())
         )
 
 
@@ -810,7 +909,7 @@ class BBcMint:
     def __init__(self, domain_id, mint_id, user_id, idPublickeyMap,
                     port=DEFAULT_CORE_PORT, logname="-", loglevel="none"):
         self.logger = logger.get_logger(key="token_lib", level=loglevel,
-                logname=logname)
+                logname=logname) # FIXME: use logger
         self.condition = 0
         self.domain_id = domain_id
         self.mint_id = mint_id
@@ -820,20 +919,18 @@ class BBcMint:
                 loglevel=loglevel)
         self.app.set_user_id(user_id)
         self.app.set_domain_id(domain_id)
-        self.app.set_callback(bbc_app.Callback())
+        self.app.set_callback(MintCallback(logger, self))
         ret = self.app.register_to_core()
         assert ret
 
         self.store = Store(self.domain_id, self.mint_id, self.app)
+        self.app.request_insert_completion_notification(self.mint_id, True)
 
 
     def get_balance_of(self, user_id, eval_time=None):
         if eval_time is None:
             eval_time = int(time.time())
         return self.store.get_balance_of(user_id, eval_time)
-
-
-#    def get_balance_proof(self, user_id):
 
 
     def get_condition(self):
@@ -846,11 +943,10 @@ class BBcMint:
         return self.currency_spec
 
 
-    def get_total_supply(self, time=int(time.time())):
-        return
-
-#    def get_total_supply_proof(self):
-
+    def get_total_supply(self, eval_time=None):
+        if eval_time is None:
+            eval_time = int(time.time())
+        return # FIXME: implement this
 
 
     def issue(self, to_user_id, amount, time_of_origin=None, keypair=None):
@@ -900,6 +996,10 @@ class BBcMint:
         self.currency_spec = currency_spec
         return self.store.set_currency_spec(currency_spec, update, keypair,
                 self.idPublickeyMap)
+
+
+    def set_keypair(self, keypair):
+        self.app.callback.set_keypair(keypair)
 
 
     def sign_and_insert(self, transaction, user_id, keypair):
@@ -986,13 +1086,56 @@ class BBcMint:
         if keypair_from is None:
             return tx
 
-        self.store.sign(tx, from_user_id, keypair_from)
-
         if keypair_mint is None:
-            return tx
+            self.app.gather_signatures(tx, destinations=[self.mint_id])
+            res = self.app.callback.synchronize()
+            if res[KeyType.status] < ESUCCESS:
+                raise RuntimeError(res[KeyType.reason].decode())
+            result = res[KeyType.result]
+            tx.add_signature(self.mint_id, signature=result[2])
+            return self.store.sign_and_insert(tx, from_user_id, keypair_from,
+                    self.idPublickeyMap)
+
+        self.store.sign(tx, from_user_id, keypair_from)
 
         return self.store.sign_and_insert(tx, self.mint_id, keypair_mint,
                 self.idPublickeyMap)
+
+
+class MintCallback(bbc_app.Callback):
+
+    def __init__(self, logger, mint):
+        super().__init__(logger)
+        self.mint = mint
+        self.keypair = None
+
+
+    def proc_cmd_sign_request(self, dat):
+        source_user_id = dat[KeyType.source_user_id]
+
+        if self.keypair is None:
+            self.mint.app.sendback_denial_of_sign(source_user_id,
+                    'keypair is unset')
+
+        tx = bbclib.BBcTransaction()
+        tx.deserialize(dat[KeyType.transaction_data])
+
+        # FIXME: check validity
+
+        sig = self.mint.store.sign(tx, self.mint.user_id, self.keypair)
+        tx.digest()
+
+        self.mint.store.reserve_referred_utxos(tx)
+        self.mint.store.push_tx(tx.transaction_id, tx)
+        self.mint.app.sendback_signature(source_user_id, -1, sig)
+
+
+    def proc_notify_inserted(self, dat):
+        self.mint.store.inserted(dat[KeyType.transaction_id])
+
+
+    def set_keypair(self, keypair):
+        self.keypair = keypair
 
 
 # end of token_lib.py

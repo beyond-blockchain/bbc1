@@ -277,6 +277,12 @@ def test_effective_value():
     assert body.get_effective_value(10000) == 100
 
 
+# FIXME: test_next_update_time
+
+
+# FIXME: test_expected_loss_or_gain
+
+
 def test_currency_spec():
 
     rate = token_lib.Fraction(-1, 10)
@@ -959,6 +965,51 @@ def test_mint_depreciation():
 
     assert mint.get_balance_of(user_a_id) == 79998
     assert mint.get_balance_of(user_b_id) == 20000
+
+
+def test_mint_sign_requested():
+
+    currency_spec = token_lib.CurrencySpec({
+        'name': "BBc Point",
+        'symbol': "BBP",
+    })
+
+    mint = token_lib.BBcMint(domain_id, mint_id, mint_id, idPubkeyMap)
+    mint.set_condition(0, keypair=keypairs[0])
+    mint.set_currency_spec(currency_spec, keypair=keypairs[0])
+
+    assert mint.get_condition() == 0
+    assert mint.get_currency_spec() == currency_spec
+
+    (user_a_id, keypairs_a) = idPubkeyMap.create_user_id(num_pubkeys=1)
+    (user_b_id, keypairs_b) = idPubkeyMap.create_user_id(num_pubkeys=1)
+
+    mint_a = token_lib.BBcMint(domain_id, mint_id, user_a_id, idPubkeyMap)
+    mint_a.store.set_db_online(False)
+
+    mint.set_keypair(keypairs[0])
+
+    mint.issue(user_a_id, 1000, keypair=keypairs[0])
+
+    assert mint.get_balance_of(user_a_id) == 1000
+    assert mint.get_balance_of(user_b_id) == 0
+
+    mint_a.transfer(user_a_id, user_b_id, 100,
+                    keypair_from=keypairs_a[0])
+
+    assert mint.get_balance_of(user_a_id) == 900
+    assert mint.get_balance_of(user_b_id) == 100
+
+    mint.issue(user_a_id, 10, keypair=keypairs[0])
+
+    assert mint.get_balance_of(user_a_id) == 910
+    assert mint.get_balance_of(user_b_id) == 100
+
+    mint_a.transfer(user_a_id, user_b_id, 100,
+                    keypair_from=keypairs_a[0])
+
+    assert mint.get_balance_of(user_a_id) == 810
+    assert mint.get_balance_of(user_b_id) == 200
 
 
 # end of tests/test_token_lib.py
