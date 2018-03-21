@@ -70,24 +70,76 @@ def deserialize_data(payload_type, dat):
     return None
 
 
+def make_binary(dat):
+    ret = bytearray()
+    if isinstance(dat, list):
+        ret.extend(int(3).to_bytes(4, "big"))  # data type = list
+        total_len = 0
+        array_dat = bytearray()
+        for item in dat:
+            d = make_binary(item)
+            total_len += len(d)
+            array_dat.extend(d)
+        ret.extend(int(total_len).to_bytes(4, "big"))
+        ret.extend(array_dat)
+    elif isinstance(dat, bool):
+        ret.extend(int(2).to_bytes(4, "big"))  # data type = bool
+        ret.extend(int(1).to_bytes(4, "big"))
+        val = int(1).to_bytes(1, "little") if dat else int(0).to_bytes(1, "little")
+        ret.extend(val)
+    elif isinstance(dat, int):
+        ret.extend(int(1).to_bytes(4, "big"))  # data type = int
+        ret.extend(int(8).to_bytes(4, "big"))
+        ret.extend(int(dat).to_bytes(8, "big"))
+    else:
+        ret.extend(int(0).to_bytes(4, "big"))  # data type = bytes
+        ret.extend(len(dat).to_bytes(4, 'big'))
+        if isinstance(dat, str):
+            ret.extend(dat.encode())
+        else:
+            ret.extend(dat)
+    return ret
+
+
 def make_TLV_formatted_message(msg):
     dat = bytearray()
-    for k, v in msg.itmes():
+    for k, v in msg.items():
         dat.extend(k)
-        length = len(v).to_bytes(4, 'little')
-        dat.extend(length)
-        if isinstance(v, list):
-            dat.extend(make_TLV_formatted_message(v))
+        dat.extend(make_binary(v))
     return bytes(dat)
+
+
+def convert_from_binary(data_type, dat):
+    if data_type == 0:
+        return dat
+    elif data_type == 1:
+        return int.from_bytes(dat, "big")
+    elif data_type == 2:
+        val = int.from_bytes(dat, "little")
+        if val == 1:
+            return True
+        else:
+            return False
+    else:
+        ret = list()
+        l = 0
+        while l < len(dat):
+            DT, L = struct.unpack(">II", dat[l:l+8])
+            l += 8
+            ret.append(convert_from_binary(DT, dat[l:l+L]))
+            l += L
+        return ret
 
 
 def make_dictionary_from_TLV_format(dat):
     msg = dict()
     ptr = 0
     while ptr < len(dat)-1:
-        T, L = struct.unpack("II")
+        T = dat[ptr:ptr+4]
+        ptr += 4
+        DT, L = struct.unpack(">II", dat[ptr:ptr+8])
         ptr += 8
-        msg[T] = dat[ptr:ptr+L]
+        msg[T] = convert_from_binary(DT, dat[ptr:ptr+L])
         ptr += L
     return msg
 
@@ -195,6 +247,9 @@ class KeyType:
     ecdh = to_4byte(18)     # peer_public_key value for ECDH
     random = to_4byte(19)
     retry_tiemr = to_4byte(20)
+    message_seq = to_4byte(21)
+    domain_signature = to_4byte(22)
+    domain_admin_info = to_4byte(23)
 
     network_module = to_4byte(0, 0x30)
     storage_type = to_4byte(1, 0x30)

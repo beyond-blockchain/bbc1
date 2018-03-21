@@ -24,16 +24,15 @@ import select
 import threading
 import random
 import binascii
-import struct
+import hashlib
 import time
 
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
-from bbc1.core import bbc_core
 from bbc1.core.bbc_config import DEFAULT_P2P_PORT
 from bbc1.core.key_exchange_manager import KeyExchangeManager
-from bbc1.core.bbc_types import ResourceType, InfraMessageCategory
+from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.core.topology_manager import TopologyManagerBase
 from bbc1.core.user_message_routing import UserMessageRouting
 from bbc1.core.data_handler import DataHandler, DataHandlerDomain0
@@ -179,6 +178,16 @@ class BBcNetwork:
         domain0 = True if self.domain0manager is not None else False
         return NodeInfo(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=self.port, domain0=domain0)
 
+    def include_admin_info_into_message_if_needed(self, domain_id, msg, admin_info):
+        admin_info[KeyType.message_seq] = self.domains[domain_id]["neighbor"].admin_sequence_number + 1
+        self.domains[domain_id]["neighbor"].admin_sequence_number += 1
+        if "keypair" in self.domains[domain_id] and self.domains[domain_id]["keypair"] is not None:
+            msg[KeyType.domain_admin_info] = message_key_types.make_TLV_formatted_message(admin_info)
+            digest = hashlib.sha256(msg[KeyType.domain_admin_info]).digest()
+            msg[KeyType.domain_signature] = self.domains[domain_id]["keypair"]['keys'][0].sign(digest)
+        else:
+            msg.update(admin_info)
+
     def send_key_exchange_message(self, domain_id, node_id, command, pubkey, nonce, random_val, key_name):
         if command == "request":
             command = BBcNetwork.REQUEST_KEY_EXCHANGE
@@ -188,14 +197,18 @@ class BBcNetwork:
             command = BBcNetwork.CONFIRM_KEY_EXCHANGE
         msg = {
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_NETWORK,
-            KeyType.destination_node_id: node_id,
             KeyType.domain_id: domain_id,
+            KeyType.destination_node_id: node_id,
+        }
+        admin_info = {
+            KeyType.destination_node_id: node_id,  # To defend from replay attack
             KeyType.command: command,
             KeyType.ecdh: pubkey,
             KeyType.nonce: nonce,
             KeyType.random: random_val,
             KeyType.hint: key_name,
         }
+        self.include_admin_info_into_message_if_needed(domain_id, msg, admin_info)
         return self.send_message_in_network(None, PayloadType.Type_msgpack, domain_id, msg)
 
     def create_domain(self, domain_id=ZEROS, config=None):
@@ -232,6 +245,7 @@ class BBcNetwork:
         self.domains[domain_id][InfraMessageCategory.CATEGORY_USER] = UserMessageRouting(self, domain_id,
                                                                                          logname=self.logname,
                                                                                          loglevel=self.loglevel)
+        self.get_domain_keypair(domain_id)
 
         workingdir = self.config.get_config()['workingdir']
         if domain_id == ZEROS:
@@ -264,15 +278,23 @@ class BBcNetwork:
         """
         if domain_id not in self.domains:
             return False
+        self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].stop_all_timers()
+        self.domains[domain_id][InfraMessageCategory.CATEGORY_USER].stop_all_timers()
+        for nd in self.domains[domain_id]["neighbor"].nodeinfo_list.values():
+            nd.key_manager.stop_all_timers()
+
         msg = {
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_NETWORK,
             KeyType.domain_id: domain_id,
             KeyType.command: BBcNetwork.NOTIFY_LEAVE,
         }
+        admin_info = {
+            KeyType.source_node_id: self.domains[domain_id]["neighbor"].my_node_id,
+            KeyType.nonce: bbclib.get_random_value(32)   # just for randomization
+        }
+        self.include_admin_info_into_message_if_needed(domain_id, msg, admin_info)
         self.broadcast_message_in_network(domain_id=domain_id, msg=msg)
 
-        self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].stop_all_timers()
-        self.domains[domain_id][InfraMessageCategory.CATEGORY_USER].stop_all_timers()
         if domain_id == ZEROS:
             self.domain0manager.stop_all_timers()
             for dm in self.domains.keys():
@@ -302,6 +324,46 @@ class BBcNetwork:
                     conf['static_node'][nid] = info
         self.config.update_config()
         self.logger.info("Done...")
+
+    def get_domain_keypair(self, domain_id):
+        """
+        (internal use) Get domain_keys (private key and public key)
+        :param domain_id:
+        :return:
+        """
+        keyconfig = self.config.get_config().get('domain_auth_key', None)
+        if keyconfig is None:
+            self.domains[domain_id]['keypair'] = None
+            return
+        if 'use' not in keyconfig or not keyconfig['use']:
+            return
+        if 'directory' not in keyconfig or not os.path.exists(keyconfig['directory']):
+            self.domains[domain_id]['keypair'] = None
+            return
+        domain_id_str = domain_id.hex()
+        keypair = bbclib.KeyPair()
+        try:
+            with open(os.path.join(keyconfig['directory'], domain_id_str+".pem"), "r") as f:
+                keypair.mk_keyobj_from_private_key_pem(f.read())
+        except:
+            self.domains[domain_id]['keypair'] = None
+            return
+        self.domains[domain_id].setdefault('keypair', dict())
+        self.domains[domain_id]['keypair'].setdefault('keys', list())
+        self.domains[domain_id]['keypair']['keys'].insert(0, keypair)
+        timer = self.domains[domain_id]['keypair'].setdefault('timer', None)
+        if timer is None or not timer.active:
+            self.domains[domain_id]['keypair']['timer'] = query_management.QueryEntry(
+                expire_after=keyconfig['obsolete_timeout'],
+                data={KeyType.domain_id: domain_id}, callback_expire=self.delete_obsoleted_domain_keys)
+        else:
+            timer.update_expiration_time(keyconfig['obsolete_timeout'])
+        self.domains[domain_id]['keypair']['keys'].insert(0, keypair)
+
+    def delete_obsoleted_domain_keys(self, query_entry):
+        domain_id = query_entry.data[KeyType.domain_id]
+        if self.domains[domain_id]['keypair'] is not None and len(self.domains[domain_id]['keypair']['keys']) > 1:
+            del self.domains[domain_id]['keypair']['keys'][1:]
 
     def send_domain_ping(self, domain_id, ipv4, ipv6, port, is_static=False):
         """
@@ -335,19 +397,21 @@ class BBcNetwork:
         msg = {
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_NETWORK,
             KeyType.domain_id: domain_id,
+        }
+        admin_info = {
             KeyType.node_id: query_entry.data[KeyType.node_id],
             KeyType.domain_ping: 0,
             KeyType.nonce: query_entry.nonce,
             KeyType.static_entry: query_entry.data[KeyType.node_info].is_static,
         }
         if self.external_ip4addr is not None:
-            msg[KeyType.external_ip4addr] = self.external_ip4addr
+            admin_info[KeyType.external_ip4addr] = self.external_ip4addr
         else:
-            msg[KeyType.external_ip4addr] = self.ip_address
+            admin_info[KeyType.external_ip4addr] = self.ip_address
         if self.external_ip6addr is not None:
-            msg[KeyType.external_ip6addr] = self.external_ip6addr
+            admin_info[KeyType.external_ip6addr] = self.external_ip6addr
         else:
-            msg[KeyType.external_ip6addr] = self.ip6_address
+            admin_info[KeyType.external_ip6addr] = self.ip6_address
         if query_entry.data[KeyType.node_info].ipv6 is not None:
             self.logger.debug("Send domain_ping to %s:%d" % (query_entry.data[KeyType.node_info].ipv6,
                                                              query_entry.data[KeyType.node_info].port))
@@ -356,6 +420,8 @@ class BBcNetwork:
                                                              query_entry.data[KeyType.node_info].port))
         query_entry.update(fire_after=1)
         self.stats.update_stats_increment("network", "domain_ping_send", 1)
+
+        self.include_admin_info_into_message_if_needed(domain_id, msg, admin_info)
         self.send_message_in_network(query_entry.data[KeyType.node_info], PayloadType.Type_msgpack, domain_id, msg)
 
     def receive_domain_ping(self, domain_id, ip4, ipv6, port, msg):
@@ -393,22 +459,26 @@ class BBcNetwork:
             query_entry = ticker.get_entry(msg[KeyType.nonce])
             query_entry.deactivate()
         else:
+            nonce = msg[KeyType.nonce]
             msg = {
                 KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_NETWORK,
                 KeyType.domain_id: domain_id,
+            }
+            admin_info = {
                 KeyType.node_id: self.domains[domain_id]['neighbor'].my_node_id,
                 KeyType.domain_ping: 1,
-                KeyType.nonce: msg[KeyType.nonce],
+                KeyType.nonce: nonce,
                 KeyType.static_entry: is_static,
             }
             if self.external_ip4addr is not None:
-                msg[KeyType.external_ip4addr] = self.external_ip4addr
+                admin_info[KeyType.external_ip4addr] = self.external_ip4addr
             else:
-                msg[KeyType.external_ip4addr] = self.ip_address
+                admin_info[KeyType.external_ip4addr] = self.ip_address
             if self.external_ip6addr is not None:
-                msg[KeyType.external_ip6addr] = self.external_ip6addr
+                admin_info[KeyType.external_ip6addr] = self.external_ip6addr
             else:
-                msg[KeyType.external_ip6addr] = self.ip6_address
+                admin_info[KeyType.external_ip6addr] = self.ip6_address
+            self.include_admin_info_into_message_if_needed(domain_id, msg, admin_info)
             nodeinfo = NodeInfo(ipv4=ipv4, ipv6=ipv6, port=port)
             self.send_message_in_network(nodeinfo, PayloadType.Type_msgpack, domain_id, msg)
 
@@ -514,6 +584,25 @@ class BBcNetwork:
             self.stats.update_stats("network", "neighbor_nodes", len(nodelist))
         return is_new
 
+    def check_admin_signature(self, domain_id, msg):
+        if domain_id not in self.domains:
+            return False
+        if "keypair" not in self.domains[domain_id] or self.domains[domain_id]["keypair"] is None:
+            return True
+        if KeyType.domain_signature not in msg or KeyType.domain_admin_info not in msg:
+            return False
+        digest = hashlib.sha256(msg[KeyType.domain_admin_info]).digest()
+        flag = False
+        for key in self.domains[domain_id]["keypair"]['keys']:
+            if key.verify(digest, msg[KeyType.domain_signature]):
+                flag = True
+                break
+        if not flag:
+            return False
+        admin_info = message_key_types.make_dictionary_from_TLV_format(msg[KeyType.domain_admin_info])
+        msg.update(admin_info)
+        return True
+
     def process_message_base(self, domain_id, ipv4, ipv6, port, msg, payload_type):
         """
         (internal use) process received message (common process for any kind of network module)
@@ -553,12 +642,22 @@ class BBcNetwork:
         :param msg:       the message body (already deserialized)
         :return:
         """
+        if not self.check_admin_signature(domain_id, msg):
+            self.logger.error("Illegal access to domain %s" % domain_id.hex())
+            return
+
+        source_node_id = msg[KeyType.source_node_id]
+        if source_node_id in self.domains[domain_id]["neighbor"].nodeinfo_list:
+            admin_msg_seq = msg[KeyType.message_seq]
+            if self.domains[domain_id]["neighbor"].nodeinfo_list[source_node_id].admin_sequence_number >= admin_msg_seq:
+                return
+            self.domains[domain_id]["neighbor"].nodeinfo_list[source_node_id].admin_sequence_number = admin_msg_seq
+
         if KeyType.domain_ping in msg and port is not None:
             self.receive_domain_ping(domain_id, ipv4, ipv6, port, msg)
 
         elif msg[KeyType.command] == BBcNetwork.REQUEST_KEY_EXCHANGE:
             if KeyType.ecdh in msg and KeyType.hint in msg and KeyType.nonce in msg and KeyType.random in msg:
-                source_node_id = msg[KeyType.source_node_id]
                 if source_node_id not in self.domains[domain_id]['neighbor'].nodeinfo_list:
                     self.add_neighbor(domain_id, source_node_id, ipv4, ipv6, port)
                 nodeinfo = self.domains[domain_id]['neighbor'].nodeinfo_list[source_node_id]
@@ -569,21 +668,18 @@ class BBcNetwork:
 
         elif msg[KeyType.command] == BBcNetwork.RESPONSE_KEY_EXCHANGE:
             if KeyType.ecdh in msg and KeyType.hint in msg and KeyType.nonce in msg and KeyType.random in msg:
-                source_node_id = msg[KeyType.source_node_id]
                 nodeinfo = self.domains[domain_id]['neighbor'].nodeinfo_list[source_node_id]
                 nodeinfo.key_manager.receive_exchange_response(msg[KeyType.ecdh], msg[KeyType.random], msg[KeyType.hint])
 
         elif msg[KeyType.command] == BBcNetwork.CONFIRM_KEY_EXCHANGE:
-            source_node_id = msg[KeyType.source_node_id]
             nodeinfo = self.domains[domain_id]['neighbor'].nodeinfo_list[source_node_id]
             nodeinfo.key_manager.receive_confirmation()
 
         elif msg[KeyType.command] == BBcNetwork.NOTIFY_LEAVE:
             if KeyType.source_node_id in msg:
-                node_id = msg[KeyType.source_node_id]
-                self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].notify_neighbor_update(node_id,
+                self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].notify_neighbor_update(source_node_id,
                                                                                                        is_new=False)
-                self.domains[domain_id]['neighbor'].remove(node_id)
+                self.domains[domain_id]['neighbor'].remove(source_node_id)
 
     def setup_udp_socket(self):
         """
@@ -748,6 +844,7 @@ class NeighborInfo:
         self.domain_id = domain_id
         self.my_node_id = node_id
         self.my_info = my_info
+        self.admin_sequence_number = 0
         self.nodeinfo_list = dict()
         self.purge_timer = query_management.QueryEntry(expire_after=NeighborInfo.PURGE_INTERVAL_SEC,
                                                        callback_expire=self.purge, retry_count=3)
@@ -773,7 +870,7 @@ class NeighborInfo:
 
     def remove(self, node_id):
         if self.nodeinfo_list[node_id].key_manager is not None:
-            self.nodeinfo_list[node_id].key_manager.remove_all_timers()
+            self.nodeinfo_list[node_id].key_manager.stop_all_timers()
             self.nodeinfo_list[node_id].key_manager.unset_cipher()
         self.nodeinfo_list.pop(node_id, None)
 
@@ -814,6 +911,7 @@ class NodeInfo:
             else:
                 self.ipv6 = ipv6
         self.port = port
+        self.admin_sequence_number = 0
         self.is_static = is_static
         self.is_domain0_node = domain0
         self.created_at = self.updated_at = time.time()
@@ -842,9 +940,10 @@ class NodeInfo:
         if ipv6 is None:
             ipv6 = "::"
         security_state = (self.key_manager is not None and self.key_manager.state == KeyExchangeManager.STATE_ESTABLISHED)
-        output = "[node_id=%s, ipv4=%s, ipv6=%s, port=%d, alive=%s, static=%s, encryption=%s, domain0=%s, time=%d]" %\
-                 (binascii.b2a_hex(self.node_id), ipv4, ipv6, self.port, self.is_alive, self.is_static,
-                  security_state, self.is_domain0_node, self.updated_at)
+        output = "[node_id=%s, ipv4=%s, ipv6=%s, port=%d, seq=%d, " \
+                 "alive=%s, static=%s, encryption=%s, domain0=%s, time=%d]" %\
+                 (binascii.b2a_hex(self.node_id), ipv4, ipv6, self.port, self.admin_sequence_number,
+                  self.is_alive, self.is_static, security_state, self.is_domain0_node, self.updated_at)
         return output
 
     def touch(self):
@@ -855,7 +954,7 @@ class NodeInfo:
         self.disconnect_at = time.time()
         self.is_alive = False
 
-    def update(self, ipv4=None, ipv6=None, port=None, domain0=None):
+    def update(self, ipv4=None, ipv6=None, port=None, seq=None, domain0=None):
         change_flag = None
         if ipv4 is not None and self.ipv4 != ipv4:
             if isinstance(ipv4, bytes):
@@ -874,12 +973,17 @@ class NodeInfo:
         if port is not None and self.port != port:
             self.port = port
             change_flag = True
+        if seq is not None and self.admin_sequence_number < seq:
+            self.admin_sequence_number = seq
         if domain0 is not None and self.is_domain0_node != domain0:
             self.is_domain0_node = domain0
             change_flag = True
         self.updated_at = time.time()
         self.is_alive = True
         return change_flag
+
+    def seq_increment(self):
+        self.admin_sequence_number += 1
 
     def get_nodeinfo(self):
         if self.ipv4 is not None:

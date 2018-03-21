@@ -22,7 +22,6 @@ script:
   #- pytest test_bbc_ethereum.py
   - pytest test_bbc_network.py
   - pytest test_bbc_network_encryption.py
-  - pytest test_bbc_network_with_core.py
   - pytest test_data_handler_sqlite.py
   - pytest test_key_exchange_manager.py
   - pytest test_bbclib.py

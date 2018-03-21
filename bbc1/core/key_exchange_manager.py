@@ -71,7 +71,7 @@ class KeyExchangeManager:
         else:
             message_key_types.unset_cipher(key_name)
 
-    def remove_all_timers(self):
+    def stop_all_timers(self):
         if self.timer_entry is not None and self.timer_entry.active:
             self.timer_entry.deactivate()
 

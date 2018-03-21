@@ -43,6 +43,11 @@ current_config = {
         'p2p_port': DEFAULT_P2P_PORT,
         'max_connections': 100,
     },
+    'domain_auth_key': {
+        'use': False,
+        'directory': DEFAULT_WORKING_DIR,
+        'obsolete_timeout': 300,
+    },
     'domains': {
         '0000000000000000000000000000000000000000000000000000000000000000': {
             'module': 'p2p_domain0',
@@ -73,10 +78,11 @@ class BBcConfig:
     def __init__(self, directory=None, file=None):
         self.config = copy.deepcopy(current_config)
         self.config_file = DEFAULT_CONFIG_FILE
-        self.working_dir = self.config['workingdir']
         if directory is not None:
             self.working_dir = directory
             self.config['workingdir'] = self.working_dir
+        else:
+            self.working_dir = self.config['workingdir']
         if file is not None:
             self.config_file = file
 

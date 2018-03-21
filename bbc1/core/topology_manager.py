@@ -125,8 +125,11 @@ class TopologyManagerBase:
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_TOPOLOGY,
             KeyType.domain_id: self.domain_id,
             KeyType.command: TopologyManagerBase.NOTIFY_NEIGHBOR_LIST,
+        }
+        admin_info = {
             KeyType.neighbor_list: self.make_neighbor_list(),
         }
+        self.network.include_admin_info_into_message_if_needed(self.domain_id, msg, admin_info)
         self.network.broadcast_message_in_network(domain_id=self.domain_id,
                                                   payload_type=PayloadType.Type_msgpack, msg=msg)
         if "is_refresh" in query_entry.data:
@@ -194,6 +197,11 @@ class TopologyManagerBase:
         """
         if KeyType.destination_node_id not in msg or KeyType.command not in msg:
             return
+        if "keypair" in self.network.domains[self.domain_id] and self.network.domains[self.domain_id]["keypair"] is not None:
+            if not self.network.check_admin_signature(self.domain_id, msg):
+                self.logger.error("Illegal access to domain %s" % self.domain_id.hex())
+                return
+
         if msg[KeyType.command] == TopologyManagerBase.NOTIFY_NEIGHBOR_LIST:
             self.stats.update_stats_increment("topology_manager", "NOTIFY_NEIGHBOR_LIST", 1)
             self.update_refresh_timer_entry(new_entry=False)
