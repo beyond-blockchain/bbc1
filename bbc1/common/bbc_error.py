@@ -18,6 +18,7 @@ limitations under the License.
 ESUCCESS        = 0
 EINVALID_COMMAND = -1
 ENODESTINATION  = -2
+EUNAUTHORIZED_COMMAND = -3
 
 ENOASSET        = -11
 EBADASSETDIGEST = -12

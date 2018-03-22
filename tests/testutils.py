@@ -33,21 +33,23 @@ def get_core_client():
     return cores, clients
 
 
-def start_core_thread(index, core_port_increment=0, p2p_port_increment=0, use_domain0=False, remove_dir=True):
+def start_core_thread(index, core_port_increment=0, p2p_port_increment=0,
+                      use_nodekey=False, use_domain0=False, remove_dir=True):
     core_port = DEFAULT_CORE_PORT + core_port_increment
     p2p_port = DEFAULT_P2P_PORT + p2p_port_increment
-    th = threading.Thread(target=start_core, args=(index, core_port, p2p_port, use_domain0, remove_dir,))
+    th = threading.Thread(target=start_core, args=(index, core_port, p2p_port, use_nodekey, use_domain0, remove_dir,))
     th.setDaemon(True)
     th.start()
     time.sleep(0.1)
 
 
-def start_core(index, core_port, p2p_port, use_domain0=False, remove_dir=True):
+def start_core(index, core_port, p2p_port, use_nodekey=False, use_domain0=False, remove_dir=True):
     print("** [%d] start: port=%i" % (index, core_port))
     if remove_dir and os.path.exists(".bbc1-%i/" % core_port):
         shutil.rmtree(".bbc1-%i/" % core_port)
     cores[index] = bbc_core.BBcCoreService(p2p_port=p2p_port, core_port=core_port,
                                            workingdir=".bbc1-%i/" % core_port,
+                                           use_nodekey=use_nodekey,
                                            use_domain0=use_domain0,
                                            server_start=False,
                                            loglevel=loglv)

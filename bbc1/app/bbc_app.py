@@ -22,6 +22,7 @@ import json
 import traceback
 import queue
 import binascii
+import hashlib
 import os
 
 import sys
@@ -153,6 +154,8 @@ class BBcAppClient:
         self.connection = socket.create_connection((host, port))
         self.callback = Callback(log=self.logger)
         self.set_client = self
+        self.domain_keypair = None
+        self.default_node_keypair = None
         self.use_query_id_based_message_wait = False
         self.user_id = None
         self.domain_id = None
@@ -190,6 +193,44 @@ class BBcAppClient:
         """
         self.user_id = identifier
 
+    def set_node_key(self, pem_file=None):
+        """
+        Set node_key to this client
+        :param pem_file:
+        :return:
+        """
+        if pem_file is None:
+            self.default_node_keypair = None
+        try:
+            self.default_node_keypair = bbclib.KeyPair()
+            with open(pem_file, "r") as f:
+                self.default_node_keypair.mk_keyobj_from_private_key_pem(f.read())
+        except:
+            return
+
+    def set_domain_key(self, pem_file=None):
+        """
+        Set domain_auth_key to this client
+        :param pem_file:
+        :return:
+        """
+        if pem_file is None:
+            self.domain_keypair = None
+        try:
+            self.domain_keypair = bbclib.KeyPair()
+            with open(pem_file, "r") as f:
+                self.domain_keypair.mk_keyobj_from_private_key_pem(f.read())
+        except:
+            return
+
+    def include_admin_info(self, dat, admin_info, keypair):
+        if keypair is not None:
+            dat[KeyType.domain_admin_info] = message_key_types.make_TLV_formatted_message(admin_info)
+            digest = hashlib.sha256(dat[KeyType.domain_admin_info]).digest()
+            dat[KeyType.domain_signature] = keypair.sign(digest)
+        else:
+            dat.update(admin_info)
+
     def make_message_structure(self, cmd):
         """
         (internal use) make a base message structure for sending to the core node
@@ -220,15 +261,17 @@ class BBcAppClient:
         """
         if KeyType.domain_id not in dat or KeyType.source_user_id not in dat:
             self.logger.warn("Message must include domain_id and source_id")
+            print(">>>>>1")
             return None
         try:
             if self.is_secure_connection:
-                msg = message_key_types.make_message(PayloadType.Type_encrypted_msgpack, dat, name=self.aes_key_name)
+                msg = message_key_types.make_message(PayloadType.Type_encrypted_msgpack, dat, key_name=self.aes_key_name)
             else:
                 msg = message_key_types.make_message(PayloadType.Type_msgpack, dat)
             self.connection.sendall(msg)
         except Exception as e:
             self.logger.error(traceback.format_exc())
+            print(">>>>>2",traceback.format_exc())
             return None
         return self.query_id
 
@@ -247,22 +290,22 @@ class BBcAppClient:
         dat[KeyType.random] = os.urandom(8)
         return self.send_msg(dat)
 
-    def domain_setup(self, domain_id, config=None,
-                     module_name=None, storage_type=StorageType.FILESYSTEM, storage_path=None):
+    def domain_setup(self, domain_id, config=None):
         """
         Set up domain with the specified network module and storage (maybe used by a system administrator)
 
         :param domain_id:
         :param config:       in json format
-        :param module_name:  TODO: will be obsoleted in v0.10
-        :param storage_type: TODO: will be obsoleted in v0.10
-        :param storage_path: TODO: will be obsoleted in v0.10
         :return:
         """
         dat = self.make_message_structure(MsgType.REQUEST_SETUP_DOMAIN)
-        dat[KeyType.domain_id] = domain_id
+        admin_info = {
+            KeyType.domain_id: domain_id,
+            KeyType.random: bbclib.get_random_value(32)
+        }
         if config is not None:
-            dat[KeyType.bbc_configuration] = config
+            admin_info[KeyType.bbc_configuration] = config
+        self.include_admin_info(dat, admin_info, self.default_node_keypair)
         return self.send_msg(dat)
 
     def domain_close(self):
@@ -271,6 +314,10 @@ class BBcAppClient:
         :return:
         """
         dat = self.make_message_structure(MsgType.REQUEST_CLOSE_DOMAIN)
+        admin_info = {
+            KeyType.random: bbclib.get_random_value(32)
+        }
+        self.include_admin_info(dat, admin_info, self.domain_keypair)
         return self.send_msg(dat)
 
     def get_node_id(self):
@@ -292,6 +339,10 @@ class BBcAppClient:
         """
         dat = self.make_message_structure(MsgType.REQUEST_GET_NEIGHBORLIST)
         dat[KeyType.domain_id] = domain_id
+        admin_info = {
+            KeyType.random: bbclib.get_random_value(32)
+        }
+        self.include_admin_info(dat, admin_info, self.domain_keypair)
         return self.send_msg(dat)
 
     def get_domain_peerlist(self, domain_id):
@@ -319,7 +370,10 @@ class BBcAppClient:
         """
         dat = self.make_message_structure(MsgType.REQUEST_SET_STATIC_NODE)
         dat[KeyType.domain_id] = domain_id
-        dat[KeyType.node_info] = [node_id, ipv4, ipv6, port]
+        admin_info = {
+            KeyType.node_info: [node_id, ipv4, ipv6, port]
+        }
+        self.include_admin_info(dat, admin_info, self.domain_keypair)
         return self.send_msg(dat)
 
     def send_domain_ping(self, domain_id, ipv4=None, ipv6=None, port=DEFAULT_P2P_PORT):
@@ -336,12 +390,14 @@ class BBcAppClient:
             return
         dat = self.make_message_structure(MsgType.DOMAIN_PING)
         dat[KeyType.domain_id] = domain_id
+        admin_info = dict()
         if ipv4 is not None and ipv4 != "0.0.0.0":
-            dat[KeyType.ipv4_address] = ipv4
+            admin_info[KeyType.ipv4_address] = ipv4
         if ipv6 is not None and ipv6 != "::":
-            dat[KeyType.ipv6_address] = ipv6
-        dat[KeyType.port_number] = port
-        dat[KeyType.static_entry] = True
+            admin_info[KeyType.ipv6_address] = ipv6
+        admin_info[KeyType.port_number] = port
+        admin_info[KeyType.static_entry] = True
+        self.include_admin_info(dat, admin_info, self.domain_keypair)
         return self.send_msg(dat)
 
     def get_bbc_config(self):
@@ -351,6 +407,10 @@ class BBcAppClient:
         :return:
         """
         dat = self.make_message_structure(MsgType.REQUEST_GET_CONFIG)
+        admin_info = {
+            KeyType.random: bbclib.get_random_value(32)
+        }
+        self.include_admin_info(dat, admin_info, self.default_node_keypair)
         return self.send_msg(dat)
 
     def get_domain_list(self):
@@ -360,6 +420,10 @@ class BBcAppClient:
         :return:
         """
         dat = self.make_message_structure(MsgType.REQUEST_GET_DOMAINLIST)
+        admin_info = {
+            KeyType.random: bbclib.get_random_value(32)
+        }
+        self.include_admin_info(dat, admin_info, self.default_node_keypair)
         return self.send_msg(dat)
 
     def get_user_list(self):
@@ -369,6 +433,10 @@ class BBcAppClient:
         :return:
         """
         dat = self.make_message_structure(MsgType.REQUEST_GET_USERS)
+        admin_info = {
+            KeyType.random: bbclib.get_random_value(32)
+        }
+        self.include_admin_info(dat, admin_info, self.domain_keypair)
         return self.send_msg(dat)
 
     def get_forwarding_list(self):
@@ -378,6 +446,10 @@ class BBcAppClient:
         :return:
         """
         dat = self.make_message_structure(MsgType.REQUEST_GET_FORWARDING_LIST)
+        admin_info = {
+            KeyType.random: bbclib.get_random_value(32)
+        }
+        self.include_admin_info(dat, admin_info, self.domain_keypair)
         return self.send_msg(dat)
 
     def get_notification_list(self):
@@ -387,6 +459,10 @@ class BBcAppClient:
         :return:
         """
         dat = self.make_message_structure(MsgType.REQUEST_GET_NOTIFICATION_LIST)
+        admin_info = {
+            KeyType.random: bbclib.get_random_value(32)
+        }
+        self.include_admin_info(dat, admin_info, self.domain_keypair)
         return self.send_msg(dat)
 
     def manipulate_ledger_subsystem(self, enable=False, domain_id=None):
@@ -398,8 +474,12 @@ class BBcAppClient:
         :return:
         """
         dat = self.make_message_structure(MsgType.REQUEST_MANIP_LEDGER_SUBSYS)
-        dat[KeyType.ledger_subsys_manip] = enable
         dat[KeyType.domain_id] = domain_id
+        admin_info = {
+            KeyType.ledger_subsys_manip: enable,
+            KeyType.random: bbclib.get_random_value(32)
+        }
+        self.include_admin_info(dat, admin_info, self.domain_keypair)
         return self.send_msg(dat)
 
     def register_to_core(self):
@@ -631,6 +711,10 @@ class BBcAppClient:
         :return:
         """
         dat = self.make_message_structure(MsgType.REQUEST_GET_STATS)
+        admin_info = {
+            KeyType.random: bbclib.get_random_value(32)
+        }
+        self.include_admin_info(dat, admin_info, self.default_node_keypair)
         return self.send_msg(dat)
 
     def send_message(self, msg, dst_user_id):
@@ -703,11 +787,11 @@ class Callback:
         if dat[KeyType.command] == MsgType.RESPONSE_SEARCH_TRANSACTION:
             self.proc_resp_search_transaction(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_WITH_CONDITIONS:
-            self.proc_resp_search_with_cndition(dat)
+            self.proc_resp_search_with_condition(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_ASSET:  # TODO: will be obsoleted in v0.10
-            self.proc_resp_search_with_cndition(dat)
+            self.proc_resp_search_with_condition(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_USERID: # TODO: will be obsoleted in v0.10
-            self.proc_resp_search_with_cndition(dat)
+            self.proc_resp_search_with_condition(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GATHER_SIGNATURE:
             self.proc_resp_gather_signature(dat)
         elif dat[KeyType.command] == MsgType.REQUEST_SIGNATURE:
@@ -810,7 +894,7 @@ class Callback:
     def proc_notify_inserted(self, dat):
         self.queue.put(dat)
 
-    def proc_resp_search_with_cndition(self, dat):
+    def proc_resp_search_with_condition(self, dat):
         self.queue.put(dat)
 
     def proc_resp_search_transaction(self, dat):
