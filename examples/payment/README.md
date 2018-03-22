@@ -1,12 +1,11 @@
 Payment
 ==========
 This app allows a user to do the following:
-* define and change users
+* define and switch among users
 * define and switch among currencies
 * create currency tokens for a user
 * delete currency tokens
 * transfer currency tokens from the user to another user
-* show proof of existence of tokens
 * show status (balances, etc.) of currencies
 
 # How to use
@@ -15,11 +14,10 @@ This app allows a user to do the following:
     cd ../../bbc1/core
     python bbc_core.py
     ```
-2. Create a super user (issuer), a domain and an asset group.
+2. Create a domain.
     ```
     python payment.py setup
     ```
-   User name "super" is reserved for the super user.
 3. User commands
     * Define a user
         ```
@@ -34,14 +32,15 @@ This app allows a user to do the following:
         python payment.py user [username]
         ```
     * Replace the key-pair for a user
-      ```
-      python payment.py new-keypair [username]
-      ```
+        ```
+        python payment.py new-keypair [username]
+        ```
 4. Currency commands
     * Define a currency
         ```
-        python payment.py def-currency [name]
+        python payment.py def-currency [name] [symbol] [file]
         ```
+      where file contains a definition in JSON.
     * Show currencies
         ```
         python payment.py currency
@@ -50,15 +49,17 @@ This app allows a user to do the following:
         ```
         python payment.py currency [name]
         ```
+    * Issue currency tokens to a user
+        ```
+        python payment.py issue [amount] [username]
+        ```
     * Transfer the currency tokens to a user
         ```
         python payment.py transfer [amount] [username]
         ```
-      If this is performed by the super user, currency tokens are created.
-      If this is performed against the super user, the tokens are returned
-      and destroyed.
+      
 5. Status commands
-    * Show the currency status
+    * Show the currency status (not implemented yet)
         ```
         python payment.py status
         ```
@@ -66,8 +67,3 @@ This app allows a user to do the following:
         ```
         python payment.py status [username]
         ```
-    * Show the proof of possession for a user
-        ```
-        python payment.py proof [username]
-        ```
-

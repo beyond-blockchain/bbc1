@@ -27,10 +27,9 @@ The app consists of four scripts, which allow a user to do the following:
 
 # Payment with a digital currency
 This app allows a user to do the following:
-* define and change users
+* define and switch among users
 * define and switch among currencies
 * create currency tokens for a user
 * delete currency tokens
 * transfer currency tokens from the user to another user
-* show proof of existence of tokens
 * show status (balances, etc.) of currencies

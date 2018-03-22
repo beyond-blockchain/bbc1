@@ -217,6 +217,24 @@ def read_dic(file_name):
     return dic
 
 
+def replace_keypair(name, dic, file_name):
+    for name0, user in dic.items():
+        if name0 == name:
+            keypair_old = user.keypair
+            keypair = bbclib.KeyPair()
+            idPubkeyMap = id_lib.BBcIdPublickeyMap(domain_id)
+            idPubkeyMap.update(user.user_id,
+                    public_keys_to_replace=[keypair.public_key],
+                    keypair=keypair_old)
+            user.keypair = keypair
+            break
+
+    write_dic(file_name, dic)
+    print("public key for %s is renewed:" % (name))
+    print("old:", binascii.b2a_hex(keypair_old.public_key).decode())
+    print("new:", binascii.b2a_hex(keypair.public_key).decode())
+
+
 def select_user(name, dic, file_name):
     clear_selected(dic)
     for name0, user in dic.items():
@@ -314,7 +332,8 @@ if __name__ == '__main__':
                 dic_currencies=dic_currencies, dic_users=dic_users)
 
     elif parsed_args.command_type == "new-keypair":
-        sys.exit(0)
+        replace_keypair(name=parsed_args.user_name, dic=dic_users,
+                file_name=F_JSON_USERS)
 
     elif parsed_args.command_type == "setup":
         setup()
