@@ -52,7 +52,7 @@ def setup_bbc_client():
     bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
     bbc_app_client.set_user_id(user_id)
     bbc_app_client.set_domain_id(domain_id)
-    bbc_app_client.set_asset_group_id(asset_group_id)
+    #bbc_app_client.set_asset_group_id(asset_group_id)
     bbc_app_client.set_callback(bbc_app.Callback())
     ret = bbc_app_client.register_to_core()
     assert ret

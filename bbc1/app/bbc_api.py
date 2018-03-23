@@ -62,13 +62,13 @@ def check_json_rpc_format(req):
 def rpc_proccess(req):
     if req["method"] == "bbc1_Hello":
         result = "Access bbc1 over HTTP!"
-    elif req["method"] == "bbc1_gettransaction":
+    elif req["method"] == "bbc1_GetTransaction":
         asset_group_id = binascii.unhexlify(req["params"]["asset_group_id"])
         txid = binascii.unhexlify(req["params"]["tx_id"])
         source_id = binascii.unhexlify(req["params"]["user_id"])
         query_id = req["id"]
         bbcapp = setup_bbc_client(source_id)
-        bbcapp.search_transaction(asset_group_id, txid)
+        bbcapp.search_transaction(txid)
         response_data = bbcapp.callback.synchronize()
         tx = bbclib.BBcTransaction()
         tx.deserialize(response_data[KeyType.transaction_data])
