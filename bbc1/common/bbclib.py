@@ -679,6 +679,115 @@ class BBcTransaction:
         else:
             print("  None")
 
+    def jsondump(self):
+        import binascii
+        jsontx = {}
+        if self.transaction_id is not None:
+            jsontx["transaction_id"] = binascii.b2a_hex(self.transaction_id)
+        else:
+            jsontx["transaction_id"] = None
+        jsontx["version:"] = self.version
+        jsontx["timestamp:"] = self.timestamp
+        jsontx["Event"] = []
+        if len(self.events) > 0:
+            for i, evt in enumerate(self.events):
+                event = {}
+                event["asset_group_id"] =  binascii.b2a_hex(evt.asset_group_id)
+                event["reference_indices"] = evt.reference_indices
+                event["mandatory_approvers"] = []
+                if len(evt.mandatory_approvers) > 0:
+                    for user in evt.mandatory_approvers:
+                        event["mandatory_approvers"].append(binascii.b2a_hex(user))
+                event["option_approvers"] = []
+                if len(evt.option_approvers) > 0:
+                    for user in evt.option_approvers:
+                        event["option_approvers"].append(binascii.b2a_hex(user))
+                event["option_approver_num_numerator"] = evt.option_approver_num_numerator
+                event["option_approver_num_denominator"] = evt.option_approver_num_denominator
+                event["Asset"] = {}
+                event["Asset"]["asset_id"] = binascii.b2a_hex(evt.asset.asset_id)
+                if evt.asset.user_id is not None:
+                    event["Asset"]["user_id"] = binascii.b2a_hex(evt.asset.user_id)
+                else:
+                    event["Asset"]["user_id"] = None
+                event["Asset"]["nonce"] = binascii.b2a_hex(evt.asset.nonce)
+                event["Asset"]["file_size"] = evt.asset.asset_file_size
+                if evt.asset.asset_file_digest is not None:
+                    event["Asset"]["file_digest"] = binascii.b2a_hex(evt.asset.asset_file_digest)
+                event["Asset"]["body_size"] = evt.asset.asset_body_size
+                event["Asset"]["body"] = evt.asset.asset_body
+                jsontx["Event"].append(event)
+        jsontx["Reference"] = []
+        if len(self.references) > 0:
+            for i, refe in enumerate(self.references):
+                reference = {}
+                if refe.asset_group_id is not None and refe.transaction_id is not None:
+                    reference["asset_group_id"] = binascii.b2a_hex(refe.asset_group_id)
+                    reference["transaction_id"] = binascii.b2a_hex(refe.transaction_id)
+                    reference["event_index_in_ref"] = refe.event_index_in_ref
+                    reference["sig_index"] = refe.sig_indices
+                jsontx["Reference"].append(reference)
+        jsontx["Relation"] = []
+        if len(self.relations) > 0:
+            for i, rtn in enumerate(self.relations):
+                relation = {}
+                relation["asset_group_id"] = binascii.b2a_hex(rtn.asset_group_id)
+                relation["Pointers"] = []
+                if len(rtn.pointers) > 0:
+                    for pt in rtn.pointers:
+                        pointer = {}
+                        if pt.transaction_id is not None:
+                            pointer["transaction_id"] = binascii.b2a_hex(pt.transaction_id)
+                        else:
+                            pointer["transaction_id"] = None
+                        if pt.asset_id is not None:
+                            pointer["asset_id"] = binascii.b2a_hex(pt.asset_id)
+                        else:
+                            pointer["asset_id"] = None
+                    relation["Pointers"].append(pointer)
+                relation["Asset"] = {}
+                if rtn.asset is not None:
+                    relation["Asset"]["asset_id"] = binascii.b2a_hex(rtn.asset.asset_id)
+                    if rtn.asset.user_id is not None:
+                        relation["Asset"]["user_id"] = binascii.b2a_hex(rtn.asset.user_id)
+                    else:
+                        relation["Asset"]["user_id"] = None
+                    relation["Asset"]["nonce"] = binascii.b2a_hex(rtn.asset.nonce)
+                    relation["Asset"]["file_size"] = rtn.asset.asset_file_size
+                    if rtn.asset.asset_file_digest is not None:
+                        relation["Asset"]["file_digest"] = binascii.b2a_hex(rtn.asset.asset_file_digest)
+                    relation["Asset"]["body_size"] = rtn.asset.asset_body_size
+                    relation["Asset"]["body"] = rtn.asset.asset_body
+                jsontx["Relation"].append(relation)
+        jsontx["Witness"] = []
+        if self.witness is not None:
+            for i in range(len(self.witness.sig_indices)):
+                witt = {}
+                if self.witness.user_ids[i] is not None:
+                    witt["user_id"] = binascii.b2a_hex(self.witness.user_ids[i])
+                    witt["sig_index"] = self.witness.sig_indices[i]
+                jsontx["Witness"].append(witt)
+        jsontx["Cross_Ref"] = []
+        if len(self.cross_refs) > 0:
+            for i, cross in enumerate(self.cross_refs):
+                xref = {}
+                if cross is not None:
+                    xref["domain_id"] = binascii.b2a_hex(cross.domain_id)
+                    xref["transaction_id"] = binascii.b2a_hex(cross.transaction_id)
+                jsontx["Cross_Ref"].append(xref)
+        jsontx["Signature"] = []
+        if len(self.signatures) > 0:
+            for i, sig in enumerate(self.signatures):
+                signature = {}
+                if sig is None:
+                    signature = "*RESERVED*"
+                    continue
+                signature["type"] = sig.type
+                signature["signature"] = binascii.b2a_hex(sig.signature)
+                signature["pubkey"] = binascii.b2a_hex(sig.pubkey)
+                jsontx["Signature"].append(signature)
+
+        return jsontx
 
 class BBcEvent:
     def __init__(self, asset_group_id=None):
