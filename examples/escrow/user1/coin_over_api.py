@@ -46,6 +46,20 @@ def store_proc(data, approver_id, txid=None):
     transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
     transaction.events[0].add(mandatory_approver=approver_id, asset_group_id=asset_group_id)
     transaction.events[0].asset.add(user_id=user_id, asset_body=data)
+    if txid:
+        obj = {"jsonrpc": "2.0",
+               "method": "bbc1_GetTransaction",
+               "params":{
+                    "asset_group_id": bbclib.bin2str_base64(asset_group_id),
+                    "tx_id": txid,
+                    "user_id": bbclib.bin2str_base64(user_id),
+                   },
+               "id": 114514
+              }
+        response = json_post(obj)
+        prevtx = response["result"]
+        prevtx = bbclib.BBcTransaction(jsonload=prevtx)
+        bbclib.add_reference_to_transaction(asset_group_id, transaction, prevtx, 0)
 
     # get transaction digest
     jsontx = transaction.jsondump()
@@ -65,7 +79,6 @@ def store_proc(data, approver_id, txid=None):
         "pubkey": bbclib.bin2str_base64(key_pair.public_key)
         }
     jsontx["Signature"].append(sig)
-    print(jsontx)
     # Insert Transaction
     obj = {"jsonrpc": "2.0",
            "method": "bbc1_InsertTransaction",
@@ -90,12 +103,17 @@ def json_post(obj):
 
 def get_coindata(asid):
     obj = {"jsonrpc": "2.0",
-           "method": "bbc1_GetTransaction",
-           "params":jsontx,
+           "method": "bbc1_GetTransactionfromAsset",
+           "params":{
+               "asset_group_id": bbclib.bin2str_base64(asset_group_id),
+               "as_id": asid,
+               "user_id": bbclib.bin2str_base64(user_id),
+               },
            "id": 114514
           }
     response = json_post(obj)
-    return retdata
+    tx = response["result"]
+    return tx
 
 def create_keypair():
     keypair = bbclib.KeyPair()
@@ -107,33 +125,24 @@ def create_keypair():
     print("created private_key and public_key : %s, %s" % (PRIVATE_KEY, PUBLIC_KEY))
 
 def registration(price):
-    data = {"owner":binascii.b2a_hex(user_id).decode("UTF-8"),"price":price,"date":datetime.now().strftime('%s')}
+    data = {"owner":bbclib.bin2str_base64(user_id),"price":price,"date":datetime.now().strftime('%s')}
     jsondata = json.dumps(data)
     store_proc(data=jsondata, approver_id=user_id ,txid=None)
     print("Coin is generated!: %s" % jsondata)
 
-def chown(new_owner,asid):
-    asset = json.loads(get_coindata(asid).decode("UTF-8"))
-    if asset["owner"] != binascii.b2a_hex(user_id).decode("UTF-8"):
+def chown(new_owner, asid):
+    prevtx = json.loads(get_coindata(asid))
+    asset = json.loads(prevtx["Event"][0]["Asset"]["body"])
+    if asset["owner"] != bbclib.bin2str_base64(user_id):
         print("Owner of this coin is not you")
         return 0
     asset["owner"] = new_owner
     asset["date"] = datetime.now().strftime('%s')
     data = json.dumps(asset)
 
-    bbc_app_client = setup_bbc_client()
-    ret = bbc_app_client.search_asset(asset_group_id, binascii.unhexlify(asid))
-    assert ret
-    response_data = bbc_app_client.callback.synchronize()
-    if response_data[KeyType.status] < ESUCCESS:
-        print("ERROR: ", response_data[KeyType.reason].decode())
-        sys.exit(0)
-    get_transaction = bbclib.BBcTransaction()
-    get_transaction.deserialize(response_data[KeyType.transaction_data])
-    transaction_id = get_transaction.transaction_id
-    transaction_info = store_proc(data, approver_id=binascii.unhexlify(new_owner),txid=transaction_id)
-    bbc_app_client.send_message(transaction_info, asset_group_id, binascii.unhexlify(new_owner))
-    print("Transfer is done.....")
+    coin = json.loads(get_coindata(asid))
+    transaction_id = coin["transaction_id"]
+    transaction_info = store_proc(data, approver_id=binascii.a2b_base64(new_owner), txid=transaction_id)
 
 if __name__ == '__main__':
     if(not os.path.exists(PRIVATE_KEY) and not os.path.exists(PUBLIC_KEY)):
@@ -161,24 +170,24 @@ if __name__ == '__main__':
             address = input('>> ')
             registration(address)
         elif command == "get":
-            print("This method is not implimented over API")
-            '''
             print("Type AsID of coin")
             asid = input('>> ')
-            get_coindata(asid)
-            '''
+            tx = json.loads(get_coindata(asid))
+            print("TXID: %s" % tx["transaction_id"])
+            print("ASID: %s" % tx["Event"][0]["Asset"]["asset_id"])
+            print(tx["Event"][0]["Asset"]["body"])
         elif command == "send":
-            print("This method is not implimented over API")
-            '''
             print("Type AsID of coin")
             asid = input('>> ')
-            asset = json.loads(get_coindata(asid).decode("UTF-8"))
-            assert asset
+            tx = json.loads(get_coindata(asid))
+            print("TXID: %s" % tx["transaction_id"])
+            print("ASID: %s" % tx["Event"][0]["Asset"]["asset_id"])
+            print(tx["Event"][0]["Asset"]["body"])
             print("You want send coin(%s)"% asid)
             print("Type new owner ID")
             new_owner = input('>> ')
-            chown(new_owner,asid)
-            '''
+            chown(new_owner, asid)
+            print("Transfer is done.....")
         elif command == "exit":
             print("bye")
             sys.exit(0)

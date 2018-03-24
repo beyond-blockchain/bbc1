@@ -80,14 +80,10 @@ def rpc_proccess(req):
         source_id = binascii.a2b_base64(req["params"]["user_id"])
         query_id = req["id"]
         bbcapp = setup_bbc_client(source_id)
-        bbcapp.search_asset(asse_group_id, asid)
+        bbcapp.search_asset(asset_group_id, asid)
         response_data = bbcapp.callback.synchronize()
-        print(response_data)
-        tx = bbclib.BBcTransaction()
-        tx.deserialize(response_data[KeyType.transaction_data])
-        tx.dump()
+        tx = bbclib.BBcTransaction(deserialize=response_data[KeyType.transactions][0])
         result = tx.jsondump()
-
     elif req["method"] == "bbc1_GetTransactionDigest":
         tx = bbclib.BBcTransaction(jsonload=req["params"])
         digest = tx.digest()
