@@ -826,7 +826,7 @@ class BBcTransaction:
                     evt.asset.user_id = None
                 evt.asset.nonce = binascii.a2b_base64(event["Asset"]["nonce"])
                 evt.asset.asset_file_size = event["Asset"]["file_size"]
-                if event["Asset"]["file_digest"] is not None:
+                if "file_digest" in event["Asset"].keys():
                     evt.asset.asset_file_digest = binascii.a2b_base64(event["Asset"]["file_digest"])
                 evt.asset.asset_body_size = event["Asset"]["body_size"]
                 evt.asset.asset_body = event["Asset"]["body"].encode("utf-8")
