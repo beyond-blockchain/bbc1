@@ -63,9 +63,9 @@ def rpc_proccess(req):
     if req["method"] == "bbc1_Hello":
         result = "Access bbc1 over HTTP!"
     elif req["method"] == "bbc1_GetTransaction":
-        asset_group_id = binascii.unhexlify(req["params"]["asset_group_id"])
-        txid = binascii.unhexlify(req["params"]["tx_id"])
-        source_id = binascii.unhexlify(req["params"]["user_id"])
+        asset_group_id = binascii.a2b_base64(req["params"]["asset_group_id"].encode("utf-8"))
+        txid = binascii.a2b_base64(req["params"]["tx_id"].encode("utf-8"))
+        source_id = binascii.a2b_base64(req["params"]["user_id"].encode("utf-8"))
         query_id = req["id"]
         bbcapp = setup_bbc_client(source_id)
         bbcapp.search_transaction(txid)
@@ -74,23 +74,39 @@ def rpc_proccess(req):
         tx.deserialize(response_data[KeyType.transaction_data])
         tx.dump()
         result = tx.jsondump()
+    elif req["method"] == "bbc1_GetTransactionfromAsset":
+        asset_group_id = binascii.a2b_base64(req["params"]["asset_group_id"])
+        asid = binascii.a2b_base64(req["params"]["as_id"])
+        source_id = binascii.a2b_base64(req["params"]["user_id"])
+        query_id = req["id"]
+        bbcapp = setup_bbc_client(source_id)
+        bbcapp.search_asset(asse_group_id, asid)
+        response_data = bbcapp.callback.synchronize()
+        print(response_data)
+        tx = bbclib.BBcTransaction()
+        tx.deserialize(response_data[KeyType.transaction_data])
+        tx.dump()
+        result = tx.jsondump()
+
     elif req["method"] == "bbc1_GetTransactionDigest":
         tx = bbclib.BBcTransaction(jsonload=req["params"])
         digest = tx.digest()
-        result["digest"] = bina2str(digest)
+        result = {}
+        result["digest"] = bbclib.bin2str_base64(digest)
         result["tx"] = tx.jsondump()
     elif req["method"] == "bbc1_InsertTransaction":
         result = "Insert Transaction over HTTP!"
         tx = bbclib.BBcTransaction(jsonload=req["params"])
-        source_id = str2bina(req["params"]["Event"][0]["mandatory_approvers"][0])
-        asset_group_id = binascii.unhexlify(req["params"]["Event"][0]["asset_group_id"])
+        tx.dump()
+        source_id = tx.events[0].mandatory_approvers[0]
+        asset_group_id = tx.events[0].asset_group_id
         bbcapp = setup_bbc_client(source_id)
         bbcapp.insert_transaction(tx)
         response_data = bbcapp.callback.synchronize()
         if response_data[KeyType.status] < ESUCCESS:
             reslut = response_data[KeyType.reason].decode()
         else:
-            result = bina2str(response_data[KeyType.transaction_id])
+            result = bbclib.bin2str_base64(response_data[KeyType.transaction_id])
     else:
         result = {"code": -32601,"message":"Method '"+req["method"]+"' not found"}
         return False, result

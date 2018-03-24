@@ -40,80 +40,6 @@ user_id = None
 key_pair = None
 bbc_app_client = None
 
-def bina2str(bina):
-    return binascii.b2a_hex(bina).decode("utf-8")
-
-def str2bina(str):
-    str = str.encode("utf-8")
-    return binascii.a2b_hex(str)
-
-
-def tx_to_dict(tx):
-    txdict = {}
-    if tx.transaction_id is not None:
-        txdict["transaction_id"] = bina2str(tx.transaction_id)
-    else:
-        txdict["transaction_id"] = None
-    txdict["version"] = tx.version
-    txdict["timestamp"] = tx.timestamp
-    txdict["Event"] = []
-    if len(tx.events) > 0:
-        for i, evt in enumerate(tx.events):
-            event = {}
-            event["asset_group_id"] = bina2str(evt.asset_group_id)
-            event["reference_indices"] = evt.reference_indices
-            event["mandatory_approvers"] = []
-            if len(evt.mandatory_approvers) > 0:
-                for user in evt.mandatory_approvers:
-                    event["mandatory_approvers"].append(bina2str(user))
-            event["option_approvers"] = []
-            if len(evt.option_approvers) > 0:
-                for user in evt.option_approvers:
-                    event["option_approvers"] = bina2str(user)
-            event["option_approver_num_numerator"] = evt.option_approver_num_numerator
-            event["option_approver_num_denominator"] = evt.option_approver_num_denominator
-            event["Asset"] = {}
-            event["Asset"]["asset_id"] = bina2str(evt.asset.asset_id)
-            if evt.asset.user_id is not None:
-                event["Asset"]["user_id"] = bina2str(evt.asset.user_id)
-            else:
-                event["Asset"]["user_id"] = None
-            event["Asset"]["nonce"] = bina2str(evt.asset.nonce)
-            event["Asset"]["file_size"] = evt.asset.asset_file_size
-            if evt.asset.asset_file_digest is not None:
-                event["Asset"]["file_digest"] = bina2str(evt.asset.asset_file_digest)
-            event["Asset"]["body_size"] = evt.asset.asset_body_size
-            event["Asset"]["body"] = bina2str(evt.asset.asset_body)
-            txdict["Event"].append(event)
-    txdict["Reference"] = []
-    if len(tx.references) > 0:
-        for i, refe in enumerate(tx.references):
-            ref = {}
-            ref["asset_group_id"] = bina2str(refe.asset_group_id)
-            ref["transaction_id"] = bina2str(refe.transaction_id)
-            ref["event_index_in_ref"] = refe.event_index_in_ref
-            ref["sig_index"] = refe.sig_indices
-            txdict["Reference"].append(ref)
-    txdict["Cross_Ref"] = {}
-    if len(tx.cross_refs) > 0:
-        for i, cross in enumerate(tx.cross_refs):
-            crossref = {}
-            crossref["asset_group_id"] = bina2str(cross.asset_group_id)
-            crossref["transaction_id"] = bina2str(cross.transaction_id)
-            txdict["Cross_ref"].append(crossref)
-    txdict["Signature"] = []
-    if len(tx.signatures) > 0:
-        for i, sig in enumerate(tx.signatures):
-            sign = {}
-            if sig is None:
-                sign = "*RESERVED*"
-                continue
-            sign["type"] = sig.type
-            sign["signature"] = bina2str(sig.signature)
-            sign["pubkey"] = bina2str(sig.pubkey)
-            txdict["Signature"].append(sign)
-    return txdict
-
 def store_proc(data, approver_id, txid=None):
     # make transaction object
     # TODO: adapt ref tx
@@ -131,23 +57,24 @@ def store_proc(data, approver_id, txid=None):
     response = json_post(obj)
 
     # add sign to transaction json
-    sig = bina2str(key_pair.sign(str2bina(response["result"]["digest"])))
-    jsontx = json.load(response["result"]["tx"])
+    sig = bbclib.bin2str_base64(key_pair.sign(binascii.a2b_base64(response["result"]["digest"].encode("utf-8"))))
+    jsontx = json.loads(response["result"]["tx"])
     sig = {
         "type":1,
         "signature": sig,
-        "pubkey": bina2str(key_pair.public_key)
+        "pubkey": bbclib.bin2str_base64(key_pair.public_key)
         }
     jsontx["Signature"].append(sig)
-
+    print(jsontx)
     # Insert Transaction
     obj = {"jsonrpc": "2.0",
            "method": "bbc1_InsertTransaction",
-           "params":jsontx,
+           "params":json.dumps(jsontx),
            "id": 114514
           }
     response = json_post(obj)
     print("TXID: %s" % response["result"])
+    print("ASID: %s" % jsontx["Event"][0]["Asset"]["asset_id"])
     return True
 
 def json_post(obj):
@@ -155,7 +82,6 @@ def json_post(obj):
     method = "POST"
     headers = {"Content-Type" : "application/json"}
     json_data = json.dumps(obj).encode("utf-8")
-
     request = urllib.request.Request(url, data=json_data, method=method, headers=headers)
     with urllib.request.urlopen(request) as response:
         response_body = response.read().decode("utf-8")
@@ -163,23 +89,13 @@ def json_post(obj):
     return response
 
 def get_coindata(asid):
-    bbc_app_client = setup_bbc_client()
-    asid = binascii.unhexlify(asid)
-    ret = bbc_app_client.search_asset(asset_group_id, asid)
-    assert ret
-    response_data = bbc_app_client.callback.synchronize()
-    if response_data[KeyType.status] < ESUCCESS:
-        print("ERROR: ", response_data[KeyType.reason].decode())
-        sys.exit(0)
-    get_transaction = bbclib.BBcTransaction()
-    get_transaction.deserialize(response_data[KeyType.transaction_data])
-
-    retdata = get_transaction.events[0].asset.asset_body
-    refdata = get_transaction.references
-    print("get: %s" % retdata)
-    print("ref: %s" % refdata)
+    obj = {"jsonrpc": "2.0",
+           "method": "bbc1_GetTransaction",
+           "params":jsontx,
+           "id": 114514
+          }
+    response = json_post(obj)
     return retdata
-    print("This method is not implimented over API")
 
 def create_keypair():
     keypair = bbclib.KeyPair()
@@ -230,7 +146,7 @@ if __name__ == '__main__':
     key_pair = bbclib.KeyPair(privkey=private_key, pubkey=public_key)
     user_id = bbclib.get_new_id(str(binascii.b2a_hex(key_pair.public_key)), include_timestamp=False)
     print("welcome to sample coin manage!")
-    print("Your id: %s" % binascii.b2a_hex(user_id))
+    print("Your id: %s" % bbclib.bin2str_base64(user_id))
     print("Type command(help to see command list)")
     while(True):
         command = input('>> ')
