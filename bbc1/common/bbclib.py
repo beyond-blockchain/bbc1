@@ -351,7 +351,7 @@ class BBcSignature:
 class BBcTransaction:
     def __init__(self, version=0, deserialize=None, jsonload=None):
         self.version = version
-        self.timestamp = 0#int(time.time())
+        self.timestamp = int(time.time())
         self.events = []
         self.references = []
         self.relations = []
@@ -1165,7 +1165,7 @@ class BBcAsset:
     def __init__(self):
         self.asset_id = None
         self.user_id = None
-        self.nonce = b"0000"#get_random_value()
+        self.nonce = get_random_value()
         self.asset_file_size = 0
         self.asset_file = None
         self.asset_file_digest = None
