@@ -120,27 +120,9 @@ def store_proc(data, approver_id, txid=None):
     transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
     transaction.events[0].add(mandatory_approver=approver_id, asset_group_id=asset_group_id)
     transaction.events[0].asset.add(user_id=user_id, asset_body=data)
-    '''
-    if txid:
-        bbc_app_client.search_transaction(asset_group_id, txid)
-        response_data = bbc_app_client.callback.synchronize()
-        if response_data[KeyType.status] < ESUCCESS:
-            print("ERROR: ", response_data[KeyType.reason].decode())
-            sys.exit(0)
-        prev_tx = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
-        reference = bbclib.add_reference_to_transaction(asset_group_id, transaction, prev_tx, 0)
-        sig = transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
-                                     private_key=key_pair.private_key,
-                                     public_key=key_pair.public_key)
-        transaction.references[0].add_signature(user_id=user_id, signature=sig)
-    else:
-        sig = transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
-                                     keypair=key_pair)
-        transaction.add_signature(signature=sig)
-    '''
 
     # get transaction digest
-    jsontx = tx_to_dict(transaction)
+    jsontx = transaction.jsondump()
     obj = {"jsonrpc": "2.0",
            "method": "bbc1_GetTransactionDigest",
            "params":jsontx,
@@ -149,7 +131,8 @@ def store_proc(data, approver_id, txid=None):
     response = json_post(obj)
 
     # add sign to transaction json
-    sig = bina2str(key_pair.sign(str2bina(response["result"])))
+    sig = bina2str(key_pair.sign(str2bina(response["result"]["digest"])))
+    jsontx = json.load(response["result"]["tx"])
     sig = {
         "type":1,
         "signature": sig,
