@@ -833,9 +833,9 @@ class BBcTransaction:
                 self.add(event=evt)
         if len(jsontx["Reference"]) > 0:
             for i, reference in enumerate(jsontx["Reference"]):
-                refe = BBcReference()
+                refe = BBcReference(None, None)
                 if reference["asset_group_id"] is not None and reference["transaction_id"] is not None:
-                    refe.asset_group_id = binascii.a2b_base64(refe.asset_group_id)
+                    refe.asset_group_id = binascii.a2b_base64(reference["asset_group_id"])
                     refe.transaction_id = binascii.a2b_base64(reference["transaction_id"])
                     refe.event_index_in_ref = reference["event_index_in_ref"]
                     refe.sig_indices = reference["sig_index"]
