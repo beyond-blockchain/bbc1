@@ -194,6 +194,10 @@ def get_bigint(ptr, dat):
     size = int.from_bytes(dat[ptr:ptr+2], 'little')
     return ptr+2+size, dat[ptr+2:ptr+2+size]
 
+def bin2str_base64(dat):
+    import binascii
+    return binascii.b2a_base64(dat, newline=False).decode("utf-8")
+
 
 class KeyType:
     ECDSA_SECP256k1 = 1
@@ -345,7 +349,7 @@ class BBcSignature:
 
 
 class BBcTransaction:
-    def __init__(self, version=0):
+    def __init__(self, version=0, deserialize=None, jsonload=None):
         self.version = version
         self.timestamp = 0#int(time.time())
         self.events = []
@@ -357,6 +361,11 @@ class BBcTransaction:
         self.userid_sigidx_mapping = dict()
         self.transaction_id = None
         self.transaction_base_digest = None
+        self.transaction_data = None
+        if deserialize is not None:
+            self.deserialize(deserialize)
+        if jsonload is not None:
+            self.jsonload(jsonload)
 
     def add(self, event=None, reference=None, relation=None, witness=None, cross_ref=None):
         if event is not None:
@@ -515,6 +524,7 @@ class BBcTransaction:
                 sig.deserialize(sigdata)
                 self.signatures.append(sig)
             self.digest()
+            self.transaction_data = data
         except Exception as e:
             print("Transaction data deserialize: %s" % e)
             print(traceback.format_exc())
@@ -675,6 +685,211 @@ class BBcTransaction:
         else:
             print("  None")
 
+    def jsondump(self):
+        import binascii
+        jsontx = {}
+        if self.transaction_id is not None:
+            jsontx["transaction_id"] = bin2str_base64(self.transaction_id)
+        else:
+            jsontx["transaction_id"] = None
+        jsontx["version"] = self.version
+        jsontx["timestamp"] = self.timestamp
+        jsontx["Event"] = []
+        if len(self.events) > 0:
+            for i, evt in enumerate(self.events):
+                event = {}
+                event["asset_group_id"] =  bin2str_base64(evt.asset_group_id)
+                event["reference_indices"] = evt.reference_indices
+                event["mandatory_approvers"] = []
+                if len(evt.mandatory_approvers) > 0:
+                    for user in evt.mandatory_approvers:
+                        event["mandatory_approvers"].append(bin2str_base64(user))
+                event["option_approvers"] = []
+                if len(evt.option_approvers) > 0:
+                    for user in evt.option_approvers:
+                        event["option_approvers"].append(bin2str_base64(user))
+                event["option_approver_num_numerator"] = evt.option_approver_num_numerator
+                event["option_approver_num_denominator"] = evt.option_approver_num_denominator
+                event["Asset"] = {}
+                event["Asset"]["asset_id"] = bin2str_base64(evt.asset.asset_id)
+                if evt.asset.user_id is not None:
+                    event["Asset"]["user_id"] = bin2str_base64(evt.asset.user_id)
+                else:
+                    event["Asset"]["user_id"] = None
+                event["Asset"]["nonce"] = bin2str_base64(evt.asset.nonce)
+                event["Asset"]["file_size"] = evt.asset.asset_file_size
+                if evt.asset.asset_file_digest is not None:
+                    event["Asset"]["file_digest"] = bin2str_base64(evt.asset.asset_file_digest)
+                event["Asset"]["body_size"] = evt.asset.asset_body_size
+                event["Asset"]["body"] = evt.asset.asset_body.decode("utf-8")
+                jsontx["Event"].append(event)
+        jsontx["Reference"] = []
+        if len(self.references) > 0:
+            for i, refe in enumerate(self.references):
+                reference = {}
+                if refe.asset_group_id is not None and refe.transaction_id is not None:
+                    reference["asset_group_id"] = bin2str_base64(refe.asset_group_id)
+                    reference["transaction_id"] = bin2str_base64(refe.transaction_id)
+                    reference["event_index_in_ref"] = refe.event_index_in_ref
+                    reference["sig_index"] = refe.sig_indices
+                jsontx["Reference"].append(reference)
+        jsontx["Relation"] = []
+        if len(self.relations) > 0:
+            for i, rtn in enumerate(self.relations):
+                relation = {}
+                relation["asset_group_id"] = bin2str_base64(rtn.asset_group_id)
+                relation["Pointers"] = []
+                if len(rtn.pointers) > 0:
+                    for pt in rtn.pointers:
+                        pointer = {}
+                        if pt.transaction_id is not None:
+                            pointer["transaction_id"] = bin2str_base64(pt.transaction_id)
+                        else:
+                            pointer["transaction_id"] = None
+                        if pt.asset_id is not None:
+                            pointer["asset_id"] = bin2str_base64(pt.asset_id)
+                        else:
+                            pointer["asset_id"] = None
+                    relation["Pointers"].append(pointer)
+                relation["Asset"] = {}
+                if rtn.asset is not None:
+                    relation["Asset"]["asset_id"] = bin2str_base64(rtn.asset.asset_id)
+                    if rtn.asset.user_id is not None:
+                        relation["Asset"]["user_id"] = bin2str_base64(rtn.asset.user_id)
+                    else:
+                        relation["Asset"]["user_id"] = None
+                    relation["Asset"]["nonce"] = bin2str_base64(rtn.asset.nonce)
+                    relation["Asset"]["file_size"] = rtn.asset.asset_file_size
+                    if rtn.asset.asset_file_digest is not None:
+                        relation["Asset"]["file_digest"] = bin2str_base64(rtn.asset.asset_file_digest)
+                    relation["Asset"]["body_size"] = rtn.asset.asset_body_size
+                    relation["Asset"]["body"] = rtn.asset.asset_body.decode("utf-8")
+                jsontx["Relation"].append(relation)
+        jsontx["Witness"] = []
+        if self.witness is not None:
+            for i in range(len(self.witness.sig_indices)):
+                witt = {}
+                if self.witness.user_ids[i] is not None:
+                    witt["user_id"] = bin2str_base64(self.witness.user_ids[i])
+                    witt["sig_index"] = self.witness.sig_indices[i]
+                jsontx["Witness"].append(witt)
+        jsontx["Cross_Ref"] = []
+        if len(self.cross_refs) > 0:
+            for i, cross in enumerate(self.cross_refs):
+                xref = {}
+                if cross is not None:
+                    xref["domain_id"] = bin2str_base64(cross.domain_id)
+                    xref["transaction_id"] = bin2str_base64(cross.transaction_id)
+                jsontx["Cross_Ref"].append(xref)
+        jsontx["Signature"] = []
+        if len(self.signatures) > 0:
+            for i, sig in enumerate(self.signatures):
+                signature = {}
+                if sig is None:
+                    signature = "*RESERVED*"
+                    continue
+                signature["type"] = sig.type
+                signature["signature"] = bin2str_base64(sig.signature)
+                signature["pubkey"] = bin2str_base64(sig.pubkey)
+                jsontx["Signature"].append(signature)
+        import json
+        return json.dumps(jsontx)
+
+    def jsonload(self, jsontx):
+        import json
+        jsontx = json.loads(jsontx)
+        import binascii
+        if jsontx["transaction_id"] is not None:
+            self.transaction_id = binascii.a2b_base64(jsontx["transaction_id"])
+        else:
+            self.transaction_id = None
+        self.version = jsontx["version"]
+        self.timestamp = jsontx["timestamp"]
+        if len(jsontx["Event"]) > 0:
+            for i, event in enumerate(jsontx["Event"]):
+                evt = BBcEvent()
+                evt.asset_group_id =  binascii.a2b_base64(event["asset_group_id"])
+                evt.reference_indices = event["reference_indices"]
+                if len(event["mandatory_approvers"]) > 0:
+                    for user in event["mandatory_approvers"]:
+                        evt.mandatory_approvers.append(binascii.a2b_base64(user))
+                if len(event["option_approvers"]) > 0:
+                    for user in event["option_approvers"]:
+                        evt.option_approvers.append(binascii.a2b_base64(user))
+                evt.option_approver_num_numerator = event["option_approver_num_numerator"]
+                evt.option_approver_num_denominator = event["option_approver_num_denominator"]
+                evt.asset = BBcAsset()
+                evt.asset.asset_id = binascii.a2b_base64(event["Asset"]["asset_id"])
+                if event["Asset"]["user_id"] is not None:
+                    evt.asset.user_id = binascii.a2b_base64(event["Asset"]["user_id"])
+                else:
+                    evt.asset.user_id = None
+                evt.asset.nonce = binascii.a2b_base64(event["Asset"]["nonce"])
+                evt.asset.asset_file_size = event["Asset"]["file_size"]
+                if event["Asset"]["file_digest"] is not None:
+                    evt.asset.asset_file_digest = binascii.a2b_base64(event["Asset"]["file_digest"])
+                evt.asset.asset_body_size = event["Asset"]["body_size"]
+                evt.asset.asset_body = event["Asset"]["body"].encode("utf-8")
+                self.add(event=evt)
+        if len(jsontx["Reference"]) > 0:
+            for i, reference in enumerate(jsontx["Reference"]):
+                refe = BBcReference()
+                if reference["asset_group_id"] is not None and reference["transaction_id"] is not None:
+                    refe.asset_group_id = binascii.a2b_base64(refe.asset_group_id)
+                    refe.transaction_id = binascii.a2b_base64(reference["transaction_id"])
+                    refe.event_index_in_ref = reference["event_index_in_ref"]
+                    refe.sig_indices = reference["sig_index"]
+                self.add(reference=refe)
+        if len(jsontx["Relation"]) > 0:
+            for i, relation in enumerate(jsontx["Relation"]):
+                rtn = BBcRelation()
+                rtn.asset_group_id = binascii.a2b_base64(relation["asset_group_id"])
+                if len(relation["Pointers"]) > 0:
+                    for pointer in relation["Pointers"]:
+                        pt = BBcPointer()
+                        if pointer["transaction_id"] is not None:
+                            pt.transaction_id = binascii.a2b_base64(pointer["transaction_id"])
+                        else:
+                            pt.transaction_id = None
+                        if pointer["asset_id"] is not None:
+                            pt.asset_id = binascii.a2b_base64(pointer["asset_id"])
+                        else:
+                            pt.asset_id = None
+                    rtn.pointers.append(pt)
+                rtn.asset = BBcAsset()
+                if relation["Asset"] is not None:
+                    rtn.asset.asset_id = binascii.a2b_base64(relation["Asset"]["asset_id"])
+                    if relation["Asset"]["user_id"] is not None:
+                        rtn.asset.user_id = binascii.a2b_base64(relation["Asset"]["user_id"])
+                    else:
+                        rtn.asset.user_id = None
+                    rtn.asset.nonce = binascii.a2b_base64(relation["Asset"]["nonce"])
+                    rtn.asset.asset_file_size = relation["Asset"]["file_size"]
+                    if "file_digest" in relation["Asset"].keys():
+                        rtn.asset.asset_file_digest = binascii.a2b_base64(relation["Asset"]["file_digest"])
+                    rtn.asset.asset_body_size = relation["Asset"]["body_size"]
+                    rtn.asset.asset_body = relation["Asset"]["body"].encode("utf-8")
+                self.add(relation=rtn)
+        if jsontx["Witness"] is not None:
+            witness = BBcWitness()
+            for witt in jsontx["Witness"]:
+                if witt["user_id"] is not None:
+                    witness.user_ids.append(binascii.a2b_base64(witt["user_id"]))
+                    witness.sig_indices.append(witt["sig_index"])
+            self.add(witness=witness)
+        if len(jsontx["Cross_Ref"]) > 0:
+            for i, xref in enumerate(jsontx["Cross_Ref"]):
+                cross = BBcCrossRef(domain_id=binascii.a2b_base64(xref["domain_id"]), transaction_id=binascii.a2b_base64(xref["transaction_id"]))
+                self.add(cross_ref=cross)
+        if len(jsontx["Signature"]) > 0:
+            for i, signature in enumerate(self.signatures):
+                sig = BBcSignature()
+                if signture is not "*RESERVED*":
+                    sig.type = signature["type"]
+                    sig.signature = binascii.a2b_base64(signature["signature"])
+                    sig.pubkey = binascii.a2b_base64(signature["pubkey"])
+                self.signatures.append(sig)
+        return True
 
 class BBcEvent:
     def __init__(self, asset_group_id=None):
@@ -1024,6 +1239,8 @@ class BBcAsset:
             ptr, self.asset_file_size = get_n_byte_int(ptr, 4, data)
             if self.asset_file_size > 0:
                 ptr, self.asset_file_digest = get_bigint(ptr, data)
+            else:
+                self.asset_file_digest = None
             ptr, self.asset_body_size = get_n_byte_int(ptr, 2, data)
             if self.asset_body_size > 0:
                 ptr, self.asset_body = get_n_bytes(ptr, self.asset_body_size, data)
@@ -1053,11 +1270,11 @@ class BBcCrossRef:
         return True
 
 
-class ServiceMessageType:
+class MsgType:
     REQUEST_SETUP_DOMAIN = 0
     RESPONSE_SETUP_DOMAIN = 1
-    REQUEST_GET_PEERLIST = 2
-    RESPONSE_GET_PEERLIST = 3
+    REQUEST_GET_PEERLIST = 2        # TODO: will obsolete in v0.10
+    RESPONSE_GET_PEERLIST = 3       # TODO: will obsolete in v0.10
     REQUEST_SET_STATIC_NODE = 4
     RESPONSE_SET_STATIC_NODE = 5
     REQUEST_GET_CONFIG = 8
@@ -1071,29 +1288,43 @@ class ServiceMessageType:
     CANCEL_INSERT_NOTIFICATION = 16
     REQUEST_GET_STATS = 17
     RESPONSE_GET_STATS = 18
-    REQUEST_PING_TO_ALL = 19
-    REQUEST_ALIVE_CHECK = 20
+    REQUEST_GET_NEIGHBORLIST = 21
+    RESPONSE_GET_NEIGHBORLIST = 22
+    REQUEST_GET_USERS = 23
+    RESPONSE_GET_USERS = 24
+    REQUEST_GET_FORWARDING_LIST = 25
+    RESPONSE_GET_FORWARDING_LIST = 26
+    REQUEST_GET_NODEID = 27
+    RESPONSE_GET_NODEID = 28
+    REQUEST_GET_NOTIFICATION_LIST = 29
+    RESPONSE_GET_NOTIFICATION_LIST = 30
+    REQUEST_CLOSE_DOMAIN = 31
+    RESPONSE_CLOSE_DOMAIN = 32
+    REQUEST_ECDH_KEY_EXCHANGE = 33
+    RESPONSE_ECDH_KEY_EXCHANGE = 34
 
-    REGISTER = 32
-    UNREGISTER = 33
-    MESSAGE = 34
+    REGISTER = 64
+    UNREGISTER = 65
+    MESSAGE = 66
 
-    REQUEST_GATHER_SIGNATURE = 35
-    RESPONSE_GATHER_SIGNATURE = 36
-    REQUEST_SIGNATURE = 37
-    RESPONSE_SIGNATURE = 38
-    REQUEST_INSERT = 39
-    RESPONSE_INSERT = 40
-    NOTIFY_INSERTED = 41
+    REQUEST_GATHER_SIGNATURE = 67
+    RESPONSE_GATHER_SIGNATURE = 68
+    REQUEST_SIGNATURE = 69
+    RESPONSE_SIGNATURE = 70
+    REQUEST_INSERT = 71
+    RESPONSE_INSERT = 72
+    NOTIFY_INSERTED = 73
 
-    REQUEST_SEARCH_ASSET = 66
-    RESPONSE_SEARCH_ASSET = 67
-    REQUEST_SEARCH_TRANSACTION = 68
-    RESPONSE_SEARCH_TRANSACTION = 69
-    REQUEST_SEARCH_USERID = 70
-    RESPONSE_SEARCH_USERID = 71
-    REQUEST_CROSS_REF = 72
-    RESPONSE_CROSS_REF = 73
+    REQUEST_SEARCH_ASSET = 80
+    RESPONSE_SEARCH_ASSET = 81
+    REQUEST_SEARCH_TRANSACTION = 82
+    RESPONSE_SEARCH_TRANSACTION = 83
+    REQUEST_SEARCH_USERID = 84
+    RESPONSE_SEARCH_USERID = 85
+    REQUEST_SEARCH_WITH_CONDITIONS = 86
+    RESPONSE_SEARCH_WITH_CONDITIONS = 87
+    REQUEST_CROSS_REF = 88
+    RESPONSE_CROSS_REF = 89
 
     REQUEST_REGISTER_HASH_IN_SUBSYS = 128
     RESPONSE_REGISTER_HASH_IN_SUBSYS = 129
@@ -1101,108 +1332,7 @@ class ServiceMessageType:
     RESPONSE_VERIFY_HASH_IN_SUBSYS = 131
 
 
-def is_less_than(val_a, val_b):
-    """
-    return True if val_a is less than val_b (evaluate as integer)
-    :param val_a:
-    :param val_b:
-    :return:
-    """
-    size = len(val_a)
-    if size != len(val_b):
-        return False
-    for i in reversed(range(size)):
-        if val_a[i] < val_b[i]:
-            return True
-        elif val_a[i] > val_b[i]:
-            return False
-    return False
-
-
-class NodeInfo:
-    """
-    node information entry (socket info)
-    """
-    def __init__(self, node_id=domain_global_0, ipv4=None, ipv6=None, port=None):
-        self.node_id = node_id
-        if ipv4 is None or len(ipv4) == 0:
-            self.ipv4 = None
-        else:
-            if isinstance(ipv4, bytes):
-                self.ipv4 = ipv4.decode()
-            else:
-                self.ipv4 = ipv4
-        if ipv6 is None or len(ipv6) == 0:
-            self.ipv6 = None
-        else:
-            if isinstance(ipv6, bytes):
-                self.ipv6 = ipv6.decode()
-            else:
-                self.ipv6 = ipv6
-        self.port = port
-        self.created_at = self.updated_at = time.time()
-        self.is_alive = False
-        self.disconnect_at = 0
-
-    def __lt__(self, other):
-        if self.is_alive and other.is_alive:
-            return is_less_than(self.node_id, other.node_id)
-        elif self.is_alive and not other.is_alive:
-            return True
-        elif not self.is_alive and other.is_alive:
-            return False
-        else:
-            return is_less_than(self.node_id, other.node_id)
-
-    def __len__(self):
-        return len(self.node_id)
-
-    def __str__(self):
-        output = "[node_id=%s, ipv4=%s, ipv6=%s, port=%d, time=%d]" % (binascii.b2a_hex(self.node_id), self.ipv4,
-                                                                       self.ipv6, self.port, self.updated_at)
-        return output
-
-    def touch(self):
-        self.updated_at = time.time()
-        self.is_alive = True
-
-    def detect_disconnect(self):
-        self.disconnect_at = time.time()
-        self.is_alive = False
-
-    def update(self, ipv4=None, ipv6=None, port=None):
-        if ipv4 is not None:
-            self.ipv4 = ipv4
-        if ipv6 is not None:
-            self.ipv6 = ipv6
-        if port is not None:
-            self.port = port
-        self.updated_at = time.time()
-
-    def get_nodeinfo(self):
-        if self.ipv4 is not None:
-            ipv4 = socket.inet_pton(socket.AF_INET, self.ipv4)
-        else:
-            ipv4 = socket.inet_pton(socket.AF_INET, "0.0.0.0")
-        if self.ipv6 is not None:
-            ipv6 = socket.inet_pton(socket.AF_INET6, self.ipv6)
-        else:
-            ipv6 = socket.inet_pton(socket.AF_INET6, "::")
-        return self.node_id, ipv4, ipv6, socket.htons(self.port).to_bytes(2, 'big'), \
-               int(self.updated_at).to_bytes(8, 'big')
-
-    def recover_nodeinfo(self, node_id, ipv4, ipv6, port, updated_at=0):
-        self.node_id = node_id
-        if ipv4 != socket.inet_pton(socket.AF_INET, "0.0.0.0"):
-            self.ipv4 = socket.inet_ntop(socket.AF_INET, ipv4)
-        if ipv6 != socket.inet_pton(socket.AF_INET6, "::"):
-            self.ipv6 = socket.inet_ntop(socket.AF_INET6, ipv6)
-        self.port = socket.ntohs(int.from_bytes(port, 'big'))
-        if updated_at > 0:
-            self.updated_at = updated_at
-
-
-class StorageType:
+class StorageType:  # TODO: will be obsoleted in v0.10
     NONE = 0
     FILESYSTEM = 1
     #HTTP_PUT = 2

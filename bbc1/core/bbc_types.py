@@ -28,22 +28,9 @@ class ResourceType:
     Edge = 4
 
 
-class InfraMessageTypeBase:
-    DOMAIN_PING = to_2byte(0)
-    NOTIFY_LEAVE = to_2byte(1)
-    NOTIFY_PEERLIST = to_2byte(2)
-    START_TO_REFRESH = to_2byte(3)
-    REQUEST_PING = to_2byte(4)
-    RESPONSE_PING = to_2byte(5)
-
-    NOTIFY_CROSS_REF = to_2byte(0, 0x10)        # only used in domain_global_0
-    ADVERTISE_DOMAIN_INFO = to_2byte(1, 0x10)   # only used in domain_global_0
-
-    REQUEST_STORE = to_2byte(0, 0x40)
-    RESPONSE_STORE = to_2byte(1, 0x40)
-    RESPONSE_STORE_COPY = to_2byte(2, 0x40)
-    REQUEST_FIND_USER = to_2byte(3, 0x40)
-    RESPONSE_FIND_USER = to_2byte(4, 0x40)
-    REQUEST_FIND_VALUE = to_2byte(5, 0x40)
-    RESPONSE_FIND_VALUE = to_2byte(6, 0x40)
-    MESSAGE_TO_USER = to_2byte(7, 0x40)
+class InfraMessageCategory:
+    CATEGORY_NETWORK = to_2byte(0)
+    CATEGORY_TOPOLOGY = to_2byte(1)
+    CATEGORY_USER = to_2byte(2)
+    CATEGORY_DATA = to_2byte(3)
+    CATEGORY_DOMAIN0 = to_2byte(4)

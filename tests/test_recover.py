@@ -63,10 +63,10 @@ class TestBBcAppClient(object):
         prepare(core_num=core_num, client_num=client_num, loglevel=LOGLEVEL)
         for i in range(core_num):
             start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i)
+            domain_setup_utility(i, domain_id)  # system administrator
         time.sleep(1)
         for i in range(client_num):
             msg_processor[i] = MessageProcessor(index=i)
-            domain_setup_utility(i, domain_id)  # system administrator
             make_client(index=i, core_port_increment=i, callback=msg_processor[i])
         time.sleep(1)
 
@@ -75,22 +75,20 @@ class TestBBcAppClient(object):
 
     def test_10_setup_network(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = clients[0]['app'].get_domain_peerlist(domain_id=domain_id)
+        ret = clients[0]['app'].get_domain_neighborlist(domain_id=domain_id)
         assert ret
         dat = msg_processor[0].synchronize()
-        print("[0] nodeinfo=",dat[0])
+        print("[0] nodeinfo=", dat[0])
         node_id, ipv4, ipv6, port = dat[0]
 
         for i in range(1, client_num):
-            ret = clients[i]['app'].set_domain_static_node(domain_id, node_id, ipv4, ipv6, port)
-            assert ret
-            ret = msg_processor[i].synchronize()
-            print("[%d] set_peer result is %s" %(i, ret))
+            clients[i]['app'].send_domain_ping(domain_id, ipv4, ipv6, port)
+        print("*** wait 15 seconds ***")
+        time.sleep(15)
 
-        time.sleep(3)
         for i in range(core_num):
-            cores[i].networking.domains[domain_id].print_peerlist()
-            cores[i].storage_manager.set_storage_path(domain_id)
+            print(cores[i].networking.domains[domain_id]['neighbor'].show_list())
+            assert len(cores[i].networking.domains[domain_id]['neighbor'].nodeinfo_list) == core_num - 1
 
     def test_11_register(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -117,7 +115,7 @@ class TestBBcAppClient(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         ret = clients[4]['app'].search_transaction(transactions[0].digest())
         assert ret
-        dat = wait_check_result_msg_type(msg_processor[4], bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION)
+        dat = wait_check_result_msg_type(msg_processor[4], bbclib.MsgType.RESPONSE_SEARCH_TRANSACTION)
         assert dat[KeyType.status] == ESUCCESS
 
     def test_14_remove_transaction(self):
@@ -158,7 +156,7 @@ class TestBBcAppClient(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         ret = clients[2]['app'].search_transaction(transactions[0].digest())
         assert ret
-        dat = wait_check_result_msg_type(msg_processor[2], bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION)
+        dat = wait_check_result_msg_type(msg_processor[2], bbclib.MsgType.RESPONSE_SEARCH_TRANSACTION)
         assert dat[KeyType.status] == ESUCCESS
         print("transaction:", binascii.b2a_hex(dat[KeyType.transaction_data]))
         tx_obj = bbclib.recover_transaction_object_from_rawdata(dat[KeyType.transaction_data])
@@ -169,7 +167,7 @@ class TestBBcAppClient(object):
         asset_id = transactions[0].events[0].asset.asset_id
         ret = clients[3]['app'].search_asset(asset_group_id, asset_id)
         assert ret
-        dat = wait_check_result_msg_type(msg_processor[3], bbclib.ServiceMessageType.RESPONSE_SEARCH_ASSET)
+        dat = wait_check_result_msg_type(msg_processor[3], bbclib.MsgType.RESPONSE_SEARCH_ASSET)
         assert dat[KeyType.status] == ESUCCESS
         print(dat[KeyType.asset_file])
 
@@ -186,7 +184,7 @@ class TestBBcAppClient(object):
         asset_id = transactions[0].events[0].asset.asset_id
         ret = clients[3]['app'].search_asset(asset_group_id, asset_id)
         assert ret
-        dat = wait_check_result_msg_type(msg_processor[3], bbclib.ServiceMessageType.RESPONSE_SEARCH_ASSET)
+        dat = wait_check_result_msg_type(msg_processor[3], bbclib.MsgType.RESPONSE_SEARCH_ASSET)
         assert dat[KeyType.status] == ESUCCESS
         print(dat[KeyType.asset_file])
 
@@ -211,7 +209,7 @@ class TestBBcAppClient(object):
         asset_id = transactions[0].events[0].asset.asset_id
         ret = clients[3]['app'].search_asset(asset_group_id, asset_id)
         assert ret
-        dat = wait_check_result_msg_type(msg_processor[3], bbclib.ServiceMessageType.RESPONSE_SEARCH_ASSET)
+        dat = wait_check_result_msg_type(msg_processor[3], bbclib.MsgType.RESPONSE_SEARCH_ASSET)
         assert dat[KeyType.status] == ESUCCESS
         print(dat[KeyType.asset_file])
 
@@ -243,7 +241,7 @@ class TestBBcAppClient(object):
         asset_id = transactions[0].events[0].asset.asset_id
         ret = clients[3]['app'].search_asset(asset_group_id, asset_id)
         assert ret
-        dat = wait_check_result_msg_type(msg_processor[3], bbclib.ServiceMessageType.RESPONSE_SEARCH_ASSET)
+        dat = wait_check_result_msg_type(msg_processor[3], bbclib.MsgType.RESPONSE_SEARCH_ASSET)
         assert dat[KeyType.status] == ESUCCESS
         print(dat[KeyType.asset_file])
         print("transaction:", binascii.b2a_hex(dat[KeyType.transaction_data]))

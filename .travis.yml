@@ -10,23 +10,26 @@ install:
   - pip install -r requirements.txt
 script:
   - cd tests
-  - pytest test_asset_group_info_adv.py
   - pytest test_bbc_app.py
   - pytest test_bbc_app_multi_core.py
   - pytest test_bbc_app_multi_core_many_transactions.py
+  - pytest test_bbc_app_multi_core_notification_with_cancelation.py
+  - pytest test_bbc_app_multi_core_notification_with_disconnection.py
   - pytest test_bbc_app_multiclient.py
   - pytest test_bbc_config.py
+  - pytest test_user_message_routing.py
   - pytest test_bbc_core.py
   #- pytest test_bbc_ethereum.py
-  - pytest test_bbc_ledger.py
   - pytest test_bbc_network.py
-  - pytest test_bbc_network_with_core.py
-  - pytest test_bbc_storage.py
+  - pytest test_bbc_network_encryption.py
+  - pytest test_data_handler_sqlite.py
+  - pytest test_key_exchange_manager.py
   - pytest test_bbclib.py
   - pytest test_fileproof_multi_core.py
   #- pytest test_ledger_subsystem.py
-  - pytest test_many_domains_with_global.py
+  #- pytest test_many_domains_with_global.py
   - pytest test_pending_request.py
   - pytest test_bbc_ping.py
   - pytest test_bbc_stats.py
-  - pytest test_recover.py
+  - pytest test_domain_info_adv.py
+  #- pytest test_recover.py
