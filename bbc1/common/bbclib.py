@@ -345,7 +345,7 @@ class BBcSignature:
 
 
 class BBcTransaction:
-    def __init__(self, version=0, deserialize=None):
+    def __init__(self, version=0, deserialize=None, jsonload=None):
         self.version = version
         self.timestamp = int(time.time())
         self.events = []
@@ -360,6 +360,8 @@ class BBcTransaction:
         self.transaction_data = None
         if deserialize is not None:
             self.deserialize(deserialize)
+        if jsonload is not None:
+            self.jsonload(jsonload)
 
     def add(self, event=None, reference=None, relation=None, witness=None, cross_ref=None):
         if event is not None:
@@ -686,8 +688,8 @@ class BBcTransaction:
             jsontx["transaction_id"] = binascii.b2a_hex(self.transaction_id)
         else:
             jsontx["transaction_id"] = None
-        jsontx["version:"] = self.version
-        jsontx["timestamp:"] = self.timestamp
+        jsontx["version"] = self.version
+        jsontx["timestamp"] = self.timestamp
         jsontx["Event"] = []
         if len(self.events) > 0:
             for i, evt in enumerate(self.events):
@@ -788,6 +790,100 @@ class BBcTransaction:
                 jsontx["Signature"].append(signature)
 
         return jsontx
+
+    def jsonload(self, jsontx):
+        import binascii
+        if jsontx["transaction_id"] is not None:
+            self.transaction_id = binascii.a2b_hex(jsontx["transaction_id"])
+        else:
+            self.transaction_id = None
+        self.version = jsontx["version"]
+        self.timestamp = jsontx["timestamp"]
+        if len(jsontx["Event"]) > 0:
+            for i, event in enumerate(jsontx["Event"]):
+                evt = BBcEvent()
+                evt.asset_group_id =  binascii.a2b_hex(event["asset_group_id"])
+                evt.reference_indices = event["reference_indices"]
+                if len(event["mandatory_approvers"]) > 0:
+                    for user in event["mandatory_approvers"]:
+                        evt.mandatory_approvers.append(binascii.a2b_hex(user))
+                if len(event["option_approvers"]) > 0:
+                    for user in event["option_approvers"]:
+                        evt.option_approvers.append(binascii.a2b_hex(user))
+                evt.option_approver_num_numerator = event["option_approver_num_numerator"]
+                evt.option_approver_num_denominator = event["option_approver_num_denominator"]
+                evt.asset = BBcAsset()
+                evt.asset.asset_id = binascii.a2b_hex(event["Asset"]["asset_id"])
+                if event["Asset"]["user_id"] is not None:
+                    evt.asset.user_id = binascii.a2b_hex(event["Asset"]["user_id"])
+                else:
+                    evt.asset.user_id = None
+                evt.asset.nonce = binascii.a2b_hex(event["Asset"]["nonce"])
+                evt.asset.asset_file_size = event["Asset"]["file_size"]
+                if event["Asset"]["file_digest"] is not None:
+                    evt.asset.asset_file_digest = binascii.a2b_hex(event["Asset"]["file_digest"])
+                evt.asset.asset_body_size = event["Asset"]["body_size"]
+                evt.asset.asset_body = event["Asset"]["body"]
+                self.add(event=evt)
+        if len(jsontx["Reference"]) > 0:
+            for i, reference in enumerate(jsontx["Reference"]):
+                refe = BBcReference()
+                if reference["asset_group_id"] is not None and reference["transaction_id"] is not None:
+                    refe.asset_group_id = binascii.a2b_hex(refe.asset_group_id)
+                    refe.transaction_id = binascii.a2b_hex(reference["transaction_id"])
+                    refe.event_index_in_ref = reference["event_index_in_ref"]
+                    refe.sig_indices = reference["sig_index"]
+                self.add(reference=refe)
+        if len(jsontx["Relation"]) > 0:
+            for i, relation in enumerate(jsontx["Relation"]):
+                rtn = BBcRelation()
+                rtn.asset_group_id = binascii.a2b_hex(relation["asset_group_id"])
+                if len(relation["Pointers"]) > 0:
+                    for pointer in relation["Pointers"]:
+                        pt = BBcPointer()
+                        if pointer["transaction_id"] is not None:
+                            pt.transaction_id = binascii.a2b_hex(pointer["transaction_id"])
+                        else:
+                            pt.transaction_id = None
+                        if pointer["asset_id"] is not None:
+                            pt.asset_id = binascii.a2b_hex(pointer["asset_id"])
+                        else:
+                            pt.asset_id = None
+                    rtn.pointers.append(pt)
+                rtn.asset = BBcAsset()
+                if relation["Asset"] is not None:
+                    rtn.asset.asset_id = binascii.a2b_hex(relation["Asset"]["asset_id"])
+                    if relation["Asset"]["user_id"] is not None:
+                        rtn.asset.user_id = binascii.a2b_hex(relation["Asset"]["user_id"])
+                    else:
+                        rtn.asset.user_id = None
+                    rtn.asset.nonce = binascii.a2b_hex(relation["Asset"]["nonce"])
+                    rtn.asset.asset_file_size = relation["Asset"]["file_size"]
+                    if "file_digest" in relation["Asset"].keys():
+                        rtn.asset.asset_file_digest = binascii.a2b_hex(relation["Asset"]["file_digest"])
+                    rtn.asset.asset_body_size = relation["Asset"]["body_size"]
+                    rtn.asset.asset_body = relation["Asset"]["body"]
+                self.add(relation=rtn)
+        if jsontx["Witness"] is not None:
+            witness = BBcWitness()
+            for witt in jsontx["Witness"]:
+                if witt["user_id"] is not None:
+                    witness.user_ids.append(binascii.a2b_hex(witt["user_id"]))
+                    witness.sig_indices.append(witt["sig_index"])
+            self.add(witness=witness)
+        if len(jsontx["Cross_Ref"]) > 0:
+            for i, xref in enumerate(jsontx["Cross_Ref"]):
+                cross = BBcCrossRef(domain_id=binascii.a2b_hex(xref["domain_id"]), transaction_id=binascii.a2b_hex(xref["transaction_id"]))
+                self.add(cross_ref=cross)
+        if len(jsontx["Signature"]) > 0:
+            for i, signature in enumerate(self.signatures):
+                sig = BBcSignature()
+                if signture is not "*RESERVED*":
+                    sig.type = signature["type"]
+                    sig.signature = binascii.a2b_hex(signature["signature"])
+                    sig.pubkey = binascii.a2b_hex(signature["pubkey"])
+                self.signatures.append(sig)
+        return True
 
 class BBcEvent:
     def __init__(self, asset_group_id=None):
