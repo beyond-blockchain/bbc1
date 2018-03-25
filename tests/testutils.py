@@ -19,14 +19,16 @@ clients = None
 stats = None
 common_domain_id = None
 loglv = 'debug'
+config_file = None
 
 
-def prepare(core_num=1, client_num=1, loglevel='debug'):
-    global cores, clients, stats, loglv
+def prepare(core_num=1, client_num=1, conf_file=None, loglevel='debug'):
+    global cores, clients, stats, config_file, loglv
     cores = [None for i in range(core_num)]
     stats = [None for i in range(core_num)]
     clients = [dict() for i in range(client_num)]
     loglv = loglevel
+    config_file = conf_file
 
 
 def get_core_client():
@@ -49,6 +51,7 @@ def start_core(index, core_port, p2p_port, use_nodekey=False, use_domain0=False,
         shutil.rmtree(".bbc1-%i/" % core_port)
     cores[index] = bbc_core.BBcCoreService(p2p_port=p2p_port, core_port=core_port,
                                            workingdir=".bbc1-%i/" % core_port,
+                                           configfile=config_file,
                                            use_nodekey=use_nodekey,
                                            use_domain0=use_domain0,
                                            server_start=False,
