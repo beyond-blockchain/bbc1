@@ -38,7 +38,7 @@ sys.path.extend(["../../"])
 from bbc1.common import bbclib, message_key_types, logger
 from bbc1.common.message_key_types import KeyType, to_2byte
 from bbc1.common.bbclib import BBcTransaction, MsgType
-from bbc1.core import bbc_network, user_message_routing, data_handler, query_management, bbc_stats
+from bbc1.core import bbc_network, user_message_routing, data_handler, repair_manager, query_management, bbc_stats
 from bbc1.core.bbc_config import BBcConfig
 from bbc1.core.data_handler import InfraMessageCategory
 from bbc1.core import command
@@ -83,6 +83,29 @@ def check_transaction_if_having_asset_file(txdata, asid):
         if evt.asset.asset_file_size > 0:
             return True
     return False
+
+
+def create_search_result(txobj_dict, asset_files_dict):
+    response_info = dict()
+    for txid, txobj in txobj_dict.items():
+        if txid != txobj.transaction_id:
+            response_info.setdefault(KeyType.compromised_transactions, list()).append(txobj.transaction_data)
+            continue
+        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asset_files_dict)
+        if txobj_is_valid:
+            response_info.setdefault(KeyType.transactions, list()).append(txobj.transaction_data)
+        else:
+            response_info.setdefault(KeyType.compromised_transactions, list()).append(txobj.transaction_data)
+
+        if len(valid_assets) > 0:
+            response_info.setdefault(KeyType.all_asset_files, dict())
+            for asid in valid_assets:
+                response_info[KeyType.all_asset_files][asid] = asset_files_dict[asid]
+        if len(invalid_assets) > 0:
+            response_info.setdefault(KeyType.compromised_asset_files, dict())
+            for asid in invalid_assets:
+                response_info[KeyType.compromised_asset_files][asid] = asset_files_dict[asid]
+    return response_info
 
 
 class BBcCoreService:
@@ -290,9 +313,11 @@ class BBcCoreService:
             if txinfo is None:
                 if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
                     user_message_routing.direct_send_to_user(socket, retmsg)
-            else:
-                retmsg.update(txinfo)
-                umr.send_message_to_user(retmsg)
+                return False, None
+            if KeyType.compromised_transaction_data in txinfo or KeyType.compromised_asset_files in txinfo:
+                retmsg[KeyType.status] = EBADTRANSACTION
+            retmsg.update(txinfo)
+            umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_SEARCH_WITH_CONDITIONS:
             if not self.param_check([KeyType.domain_id], dat):
@@ -305,7 +330,7 @@ class BBcCoreService:
                                                             asset_id=dat.get(KeyType.asset_id, None),
                                                             user_id=dat.get(KeyType.user_id, None),
                                                             count=dat.get(KeyType.count, 1))
-            if txinfo is None:
+            if txinfo is None or KeyType.transactions not in txinfo:
                 if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
                     user_message_routing.direct_send_to_user(socket, retmsg)
             else:
@@ -460,6 +485,14 @@ class BBcCoreService:
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.stats] = self.stats.get_stats()
             user_message_routing.direct_send_to_user(socket, retmsg)
+
+        elif cmd == MsgType.REQUEST_REPAIR:
+            if not self.param_check([KeyType.transaction_id], dat):
+                self.logger.debug("REQUEST_REPAIR: bad format")
+                return False, None
+            dat[KeyType.command] = repair_manager.RepairManager.REQUEST_REPAIR_TRANSACTION
+            self.networking.domains[domain_id]['repair'].put_message(dat)
+            return False, None
 
         # --- TODO: REQUEST_GET_PEERLIST will be obsoleted in v0.10
         elif cmd == MsgType.REQUEST_GET_NEIGHBORLIST or cmd == MsgType.REQUEST_GET_PEERLIST:
@@ -695,47 +728,25 @@ class BBcCoreService:
         :param txid:          transaction_id
         :param txdata:        BBcTransaction data
         :param asset_files:   dictionary of { asid=>asset_content,,, }
+        :rtype: BBcTransaction or None
         """
         txobj = BBcTransaction()
         if not txobj.deserialize(txdata):
             self.stats.update_stats_increment("transaction", "invalid", 1)
             self.logger.error("Fail to deserialize transaction data")
             return None
-        digest = txobj.digest()
+        txobj.digest()
 
-        for i, sig in enumerate(txobj.signatures):
-            try:
-                if not sig.verify(digest):
-                    self.stats.update_stats_increment("transaction", "invalid", 1)
-                    self.logger.error("Bad signature [%i]" % i)
-                    return None
-            except:
-                self.stats.update_stats_increment("transaction", "invalid", 1)
-                self.logger.error("Bad signature [%i]" % i)
-                return None
-        if asset_files is None:
+        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asset_files)
+        if not txobj_is_valid:
+            self.stats.update_stats_increment("transaction", "invalid", 1)
+        if len(invalid_assets) > 0:
+            self.stats.update_stats_increment("asset_file", "invalid", 1)
+
+        if txobj_is_valid and len(invalid_assets) == 0:
             return txobj
-
-        # -- if asset_files is given, check them.
-        for idx, evt in enumerate(txobj.events):
-            if evt.asset is None:
-                continue
-            asid = evt.asset.asset_id
-            if asid in asset_files.keys():
-                if evt.asset.asset_file_digest != hashlib.sha256(asset_files[asid]).digest():
-                    self.stats.update_stats_increment("transaction", "invalid", 1)
-                    self.logger.error("Bad asset_id for event[%d]" % idx)
-                    return None
-        for idx, rtn in enumerate(txobj.relations):
-            if rtn.asset is None:
-                continue
-            asid = rtn.asset.asset_id
-            if asid in asset_files.keys():
-                if rtn.asset.asset_file_digest != hashlib.sha256(asset_files[asid]).digest():
-                    self.stats.update_stats_increment("transaction", "invalid", 1)
-                    self.logger.error("Bad asset_id for event[%d]" % idx)
-                    return None
-        return txobj
+        else:
+            return None
 
     def insert_transaction(self, domain_id, txdata, asset_files):
         """
@@ -744,6 +755,7 @@ class BBcCoreService:
         :param domain_id:     domain_id where the transaction is inserted
         :param txdata:        BBcTransaction data
         :param asset_files:   dictionary of { asid=>asset_content,,, }
+        :rtype: **result or str
         """
         self.stats.update_stats_increment("transaction", "insert_count", 1)
         if domain_id is None:
@@ -820,6 +832,7 @@ class BBcCoreService:
 
         :param domain_id:
         :param dat:
+        :rtype: bool
         :return:
         """
         destinations = dat[KeyType.destination_user_ids]
@@ -846,7 +859,8 @@ class BBcCoreService:
 
         :param domain_id:        domain_id where the transaction is inserted
         :param txid:  transaction_id
-        :return: transaction_data and asset_files
+        :rtype: **response_info
+        :return: {transaction_id, transaction_data, asset_files}
         """
         self.stats.update_stats_increment("transaction", "search_count", 1)
         if domain_id is None:
@@ -861,11 +875,14 @@ class BBcCoreService:
         if ret_txobj is None or len(ret_txobj) == 0:
             return None
 
-        response_info = dict()
-        response_info[KeyType.transaction_data] = ret_txobj[0].transaction_data
+        response_info = create_search_result(ret_txobj, ret_asset_files)
         response_info[KeyType.transaction_id] = txid
-        if len(ret_asset_files) > 0:
-            response_info[KeyType.all_asset_files] = ret_asset_files
+        if KeyType.transactions in response_info:
+            response_info[KeyType.transaction_data] = response_info[KeyType.transactions][0]
+            del response_info[KeyType.transactions]
+        elif KeyType.compromised_transactions in response_info:
+            response_info[KeyType.compromised_transaction_data] = response_info[KeyType.compromised_transactions][0]
+            del response_info[KeyType.compromised_transactions]
         return response_info
 
     def search_transaction_with_condition(self, domain_id, asset_group_id=None, asset_id=None, user_id=None, count=1):
@@ -875,23 +892,20 @@ class BBcCoreService:
         :param asset_group_id:
         :param asset_group_id:
         :param user_id:
-        :return: response data including transaction_data, if a transaction is not found in the local DB, None is returned.
+        :rtype: **response_info
+        :return: {transactions, all_asset_files, compromised_transactions, compromised_asset, compromised_asset_files}
         """
         if domain_id is None:
             self.logger.error("No such domain")
             return None
 
         dh = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
-        ret_txobj, ret_asset_files = dh.search_transaction(asset_group_id=asset_group_id, asset_id=asset_id,
-                                                           user_id=user_id, count=count)
+        ret_txobj, ret_asset_files = dh.search_transaction(asset_group_id=asset_group_id,
+                                                           asset_id=asset_id, user_id=user_id, count=count)
         if ret_txobj is None or len(ret_txobj) == 0:
             return None
 
-        response_info = dict()
-        response_info[KeyType.transactions] = [t.transaction_data for t in ret_txobj]
-        if len(ret_asset_files) > 0:
-            response_info[KeyType.all_asset_files] = ret_asset_files
-        return response_info
+        return create_search_result(ret_txobj, ret_asset_files)
 
     def add_cross_ref_into_list(self, domain_id, txid):
         """

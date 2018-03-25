@@ -32,7 +32,7 @@ def direct_send_to_user(sock, msg, name=None):
     if name is None:
         sock.sendall(message_key_types.make_message(PayloadType.Type_msgpack, msg))
     else:
-        sock.sendall(message_key_types.make_message(PayloadType.Type_encrypted_msgpack, msg, name=name))
+        sock.sendall(message_key_types.make_message(PayloadType.Type_encrypted_msgpack, msg, key_name=name))
 
 
 class UserMessageRouting:

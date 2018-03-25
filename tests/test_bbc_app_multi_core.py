@@ -131,8 +131,7 @@ class TestBBcAppClient(object):
         time.sleep(5)
 
         for i in range(client_num):
-            ret = clients[i]['app'].get_domain_neighborlist(domain_id=domain_id)
-            assert ret
+            clients[i]['app'].get_domain_neighborlist(domain_id=domain_id)
             dat = msg_processor[i].synchronize()
             assert len(dat) == core_num
 
@@ -183,8 +182,7 @@ class TestBBcAppClient(object):
             transactions[1].add(cross_ref=cross_ref_list.pop(0))
 
         reference = bbclib.add_reference_to_transaction(asset_group_id, transactions[1], prev_tx, 0)
-        ret = clients[1]['app'].gather_signatures(transactions[1], reference_obj=reference)
-        assert ret
+        clients[1]['app'].gather_signatures(transactions[1], reference_obj=reference)
         dat = msg_processor[1].synchronize()
         assert dat[KeyType.status] == ESUCCESS
         result = dat[KeyType.result]
@@ -200,7 +198,8 @@ class TestBBcAppClient(object):
 
     def test_17_search_asset(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = clients[2]['app'].search_asset(asset_group_id, transactions[1].events[0].asset.asset_id)
+        clients[2]['app'].search_transaction_with_condition(asset_group_id=asset_group_id,
+                                                            asset_id=transactions[1].events[0].asset.asset_id)
         dat = msg_processor[2].synchronize()
         assert dat[KeyType.status] == 0
         assert KeyType.transactions in dat
@@ -213,9 +212,10 @@ class TestBBcAppClient(object):
         asid[1] = 0xff
         asid[2] = 0xff
         clients[3]['app'].search_transaction_with_condition(asset_group_id=asset_group_id, asset_id=bytes(asid))
-        print("* should be NG *")
+        print("* should be NG (no transaction is found) *")
         dat = msg_processor[3].synchronize()
-        assert dat[KeyType.status] < 0
+        assert KeyType.transactions not in dat
+        assert KeyType.all_asset_files not in dat
 
     def test_19_search_asset(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")

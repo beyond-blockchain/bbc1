@@ -295,6 +295,9 @@ class KeyType:
     all_asset_files = to_4byte(4, 0x80)
     signature = to_4byte(5, 0x80)
     cross_refs = to_4byte(6, 0x80)
+    compromised_transaction_data = to_4byte(7, 0x80)
+    compromised_transactions = to_4byte(8, 0x80)
+    compromised_asset_files = to_4byte(9, 0x80)
 
     ledger_subsys_manip = to_4byte(0, 0xA0)     # enable/disable ledger_subsystem
     ledger_subsys_register = to_4byte(1, 0xA0)
