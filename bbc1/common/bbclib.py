@@ -194,6 +194,10 @@ def get_bigint(ptr, dat):
     size = int.from_bytes(dat[ptr:ptr+2], 'little')
     return ptr+2+size, dat[ptr+2:ptr+2+size]
 
+def bin2str_base64(dat):
+    import binascii
+    return binascii.b2a_base64(dat, newline=False).decode("utf-8")
+
 
 class KeyType:
     ECDSA_SECP256k1 = 1
@@ -345,7 +349,7 @@ class BBcSignature:
 
 
 class BBcTransaction:
-    def __init__(self, version=0, deserialize=None):
+    def __init__(self, version=0, deserialize=None, jsonload=None):
         self.version = version
         self.timestamp = int(time.time())
         self.events = []
@@ -360,6 +364,8 @@ class BBcTransaction:
         self.transaction_data = None
         if deserialize is not None:
             self.deserialize(deserialize)
+        if jsonload is not None:
+            self.jsonload(jsonload)
 
     def add(self, event=None, reference=None, relation=None, witness=None, cross_ref=None):
         if event is not None:
@@ -679,6 +685,211 @@ class BBcTransaction:
         else:
             print("  None")
 
+    def jsondump(self):
+        import binascii
+        jsontx = {}
+        if self.transaction_id is not None:
+            jsontx["transaction_id"] = bin2str_base64(self.transaction_id)
+        else:
+            jsontx["transaction_id"] = None
+        jsontx["version"] = self.version
+        jsontx["timestamp"] = self.timestamp
+        jsontx["Event"] = []
+        if len(self.events) > 0:
+            for i, evt in enumerate(self.events):
+                event = {}
+                event["asset_group_id"] =  bin2str_base64(evt.asset_group_id)
+                event["reference_indices"] = evt.reference_indices
+                event["mandatory_approvers"] = []
+                if len(evt.mandatory_approvers) > 0:
+                    for user in evt.mandatory_approvers:
+                        event["mandatory_approvers"].append(bin2str_base64(user))
+                event["option_approvers"] = []
+                if len(evt.option_approvers) > 0:
+                    for user in evt.option_approvers:
+                        event["option_approvers"].append(bin2str_base64(user))
+                event["option_approver_num_numerator"] = evt.option_approver_num_numerator
+                event["option_approver_num_denominator"] = evt.option_approver_num_denominator
+                event["Asset"] = {}
+                event["Asset"]["asset_id"] = bin2str_base64(evt.asset.asset_id)
+                if evt.asset.user_id is not None:
+                    event["Asset"]["user_id"] = bin2str_base64(evt.asset.user_id)
+                else:
+                    event["Asset"]["user_id"] = None
+                event["Asset"]["nonce"] = bin2str_base64(evt.asset.nonce)
+                event["Asset"]["file_size"] = evt.asset.asset_file_size
+                if evt.asset.asset_file_digest is not None:
+                    event["Asset"]["file_digest"] = bin2str_base64(evt.asset.asset_file_digest)
+                event["Asset"]["body_size"] = evt.asset.asset_body_size
+                event["Asset"]["body"] = evt.asset.asset_body.decode("utf-8")
+                jsontx["Event"].append(event)
+        jsontx["Reference"] = []
+        if len(self.references) > 0:
+            for i, refe in enumerate(self.references):
+                reference = {}
+                if refe.asset_group_id is not None and refe.transaction_id is not None:
+                    reference["asset_group_id"] = bin2str_base64(refe.asset_group_id)
+                    reference["transaction_id"] = bin2str_base64(refe.transaction_id)
+                    reference["event_index_in_ref"] = refe.event_index_in_ref
+                    reference["sig_index"] = refe.sig_indices
+                jsontx["Reference"].append(reference)
+        jsontx["Relation"] = []
+        if len(self.relations) > 0:
+            for i, rtn in enumerate(self.relations):
+                relation = {}
+                relation["asset_group_id"] = bin2str_base64(rtn.asset_group_id)
+                relation["Pointers"] = []
+                if len(rtn.pointers) > 0:
+                    for pt in rtn.pointers:
+                        pointer = {}
+                        if pt.transaction_id is not None:
+                            pointer["transaction_id"] = bin2str_base64(pt.transaction_id)
+                        else:
+                            pointer["transaction_id"] = None
+                        if pt.asset_id is not None:
+                            pointer["asset_id"] = bin2str_base64(pt.asset_id)
+                        else:
+                            pointer["asset_id"] = None
+                    relation["Pointers"].append(pointer)
+                relation["Asset"] = {}
+                if rtn.asset is not None:
+                    relation["Asset"]["asset_id"] = bin2str_base64(rtn.asset.asset_id)
+                    if rtn.asset.user_id is not None:
+                        relation["Asset"]["user_id"] = bin2str_base64(rtn.asset.user_id)
+                    else:
+                        relation["Asset"]["user_id"] = None
+                    relation["Asset"]["nonce"] = bin2str_base64(rtn.asset.nonce)
+                    relation["Asset"]["file_size"] = rtn.asset.asset_file_size
+                    if rtn.asset.asset_file_digest is not None:
+                        relation["Asset"]["file_digest"] = bin2str_base64(rtn.asset.asset_file_digest)
+                    relation["Asset"]["body_size"] = rtn.asset.asset_body_size
+                    relation["Asset"]["body"] = rtn.asset.asset_body.decode("utf-8")
+                jsontx["Relation"].append(relation)
+        jsontx["Witness"] = []
+        if self.witness is not None:
+            for i in range(len(self.witness.sig_indices)):
+                witt = {}
+                if self.witness.user_ids[i] is not None:
+                    witt["user_id"] = bin2str_base64(self.witness.user_ids[i])
+                    witt["sig_index"] = self.witness.sig_indices[i]
+                jsontx["Witness"].append(witt)
+        jsontx["Cross_Ref"] = []
+        if len(self.cross_refs) > 0:
+            for i, cross in enumerate(self.cross_refs):
+                xref = {}
+                if cross is not None:
+                    xref["domain_id"] = bin2str_base64(cross.domain_id)
+                    xref["transaction_id"] = bin2str_base64(cross.transaction_id)
+                jsontx["Cross_Ref"].append(xref)
+        jsontx["Signature"] = []
+        if len(self.signatures) > 0:
+            for i, sig in enumerate(self.signatures):
+                signature = {}
+                if sig is None:
+                    signature = "*RESERVED*"
+                    continue
+                signature["type"] = sig.type
+                signature["signature"] = bin2str_base64(sig.signature)
+                signature["pubkey"] = bin2str_base64(sig.pubkey)
+                jsontx["Signature"].append(signature)
+        import json
+        return json.dumps(jsontx)
+
+    def jsonload(self, jsontx):
+        import json
+        jsontx = json.loads(jsontx)
+        import binascii
+        if jsontx["transaction_id"] is not None:
+            self.transaction_id = binascii.a2b_base64(jsontx["transaction_id"])
+        else:
+            self.transaction_id = None
+        self.version = jsontx["version"]
+        self.timestamp = jsontx["timestamp"]
+        if len(jsontx["Event"]) > 0:
+            for i, event in enumerate(jsontx["Event"]):
+                evt = BBcEvent()
+                evt.asset_group_id =  binascii.a2b_base64(event["asset_group_id"])
+                evt.reference_indices = event["reference_indices"]
+                if len(event["mandatory_approvers"]) > 0:
+                    for user in event["mandatory_approvers"]:
+                        evt.mandatory_approvers.append(binascii.a2b_base64(user))
+                if len(event["option_approvers"]) > 0:
+                    for user in event["option_approvers"]:
+                        evt.option_approvers.append(binascii.a2b_base64(user))
+                evt.option_approver_num_numerator = event["option_approver_num_numerator"]
+                evt.option_approver_num_denominator = event["option_approver_num_denominator"]
+                evt.asset = BBcAsset()
+                evt.asset.asset_id = binascii.a2b_base64(event["Asset"]["asset_id"])
+                if event["Asset"]["user_id"] is not None:
+                    evt.asset.user_id = binascii.a2b_base64(event["Asset"]["user_id"])
+                else:
+                    evt.asset.user_id = None
+                evt.asset.nonce = binascii.a2b_base64(event["Asset"]["nonce"])
+                evt.asset.asset_file_size = event["Asset"]["file_size"]
+                if "file_digest" in event["Asset"].keys():
+                    evt.asset.asset_file_digest = binascii.a2b_base64(event["Asset"]["file_digest"])
+                evt.asset.asset_body_size = event["Asset"]["body_size"]
+                evt.asset.asset_body = event["Asset"]["body"].encode("utf-8")
+                self.add(event=evt)
+        if len(jsontx["Reference"]) > 0:
+            for i, reference in enumerate(jsontx["Reference"]):
+                refe = BBcReference(None, None)
+                if reference["asset_group_id"] is not None and reference["transaction_id"] is not None:
+                    refe.asset_group_id = binascii.a2b_base64(reference["asset_group_id"])
+                    refe.transaction_id = binascii.a2b_base64(reference["transaction_id"])
+                    refe.event_index_in_ref = reference["event_index_in_ref"]
+                    refe.sig_indices = reference["sig_index"]
+                self.add(reference=refe)
+        if len(jsontx["Relation"]) > 0:
+            for i, relation in enumerate(jsontx["Relation"]):
+                rtn = BBcRelation()
+                rtn.asset_group_id = binascii.a2b_base64(relation["asset_group_id"])
+                if len(relation["Pointers"]) > 0:
+                    for pointer in relation["Pointers"]:
+                        pt = BBcPointer()
+                        if pointer["transaction_id"] is not None:
+                            pt.transaction_id = binascii.a2b_base64(pointer["transaction_id"])
+                        else:
+                            pt.transaction_id = None
+                        if pointer["asset_id"] is not None:
+                            pt.asset_id = binascii.a2b_base64(pointer["asset_id"])
+                        else:
+                            pt.asset_id = None
+                    rtn.pointers.append(pt)
+                rtn.asset = BBcAsset()
+                if relation["Asset"] is not None:
+                    rtn.asset.asset_id = binascii.a2b_base64(relation["Asset"]["asset_id"])
+                    if relation["Asset"]["user_id"] is not None:
+                        rtn.asset.user_id = binascii.a2b_base64(relation["Asset"]["user_id"])
+                    else:
+                        rtn.asset.user_id = None
+                    rtn.asset.nonce = binascii.a2b_base64(relation["Asset"]["nonce"])
+                    rtn.asset.asset_file_size = relation["Asset"]["file_size"]
+                    if "file_digest" in relation["Asset"].keys():
+                        rtn.asset.asset_file_digest = binascii.a2b_base64(relation["Asset"]["file_digest"])
+                    rtn.asset.asset_body_size = relation["Asset"]["body_size"]
+                    rtn.asset.asset_body = relation["Asset"]["body"].encode("utf-8")
+                self.add(relation=rtn)
+        if jsontx["Witness"] is not None:
+            witness = BBcWitness()
+            for witt in jsontx["Witness"]:
+                if witt["user_id"] is not None:
+                    witness.user_ids.append(binascii.a2b_base64(witt["user_id"]))
+                    witness.sig_indices.append(witt["sig_index"])
+            self.add(witness=witness)
+        if len(jsontx["Cross_Ref"]) > 0:
+            for i, xref in enumerate(jsontx["Cross_Ref"]):
+                cross = BBcCrossRef(domain_id=binascii.a2b_base64(xref["domain_id"]), transaction_id=binascii.a2b_base64(xref["transaction_id"]))
+                self.add(cross_ref=cross)
+        if len(jsontx["Signature"]) > 0:
+            for i, signature in enumerate(self.signatures):
+                sig = BBcSignature()
+                if signture is not "*RESERVED*":
+                    sig.type = signature["type"]
+                    sig.signature = binascii.a2b_base64(signature["signature"])
+                    sig.pubkey = binascii.a2b_base64(signature["pubkey"])
+                self.signatures.append(sig)
+        return True
 
 class BBcEvent:
     def __init__(self, asset_group_id=None):
