@@ -19,7 +19,6 @@ import os
 import binascii
 import hashlib
 import random
-import socket
 import time
 import traceback
 
@@ -193,6 +192,7 @@ def get_n_byte_int(ptr, n, dat):
 def get_bigint(ptr, dat):
     size = int.from_bytes(dat[ptr:ptr+2], 'little')
     return ptr+2+size, dat[ptr+2:ptr+2+size]
+
 
 def bin2str_base64(dat):
     import binascii
@@ -489,15 +489,14 @@ class BBcTransaction:
 
         dat.extend(dat_cross)
 
-        real_signum = 0
-        for sig in self.signatures:
-            if sig is not None:
-                real_signum += 1
-        dat.extend(to_2byte(real_signum))
-        for i in range(real_signum):
-            sig = self.signatures[i].serialize()
-            dat.extend(to_4byte(len(sig)))
-            dat.extend(sig)
+        if None in self.signatures:
+            dat.extend(to_2byte(0))
+        else:
+            dat.extend(to_2byte(len(self.signatures)))
+            for signature in self.signatures:
+                sig = signature.serialize()
+                dat.extend(to_4byte(len(sig)))
+                dat.extend(sig)
         self.transaction_data = bytes(dat)
         return self.transaction_data
 
@@ -740,7 +739,6 @@ class BBcTransaction:
             print("  None")
 
     def jsondump(self):
-        import binascii
         jsontx = {}
         if self.transaction_id is not None:
             jsontx["transaction_id"] = bin2str_base64(self.transaction_id)
@@ -938,12 +936,13 @@ class BBcTransaction:
         if len(jsontx["Signature"]) > 0:
             for i, signature in enumerate(self.signatures):
                 sig = BBcSignature()
-                if signture is not "*RESERVED*":
+                if signature is not "*RESERVED*":
                     sig.type = signature["type"]
                     sig.signature = binascii.a2b_base64(signature["signature"])
                     sig.pubkey = binascii.a2b_base64(signature["pubkey"])
                 self.signatures.append(sig)
         return True
+
 
 class BBcEvent:
     def __init__(self, asset_group_id=None):
