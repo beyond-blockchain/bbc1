@@ -82,7 +82,7 @@ def store_proc(data, approver_id, txid=None):
                                      public_key=key_pair.public_key)
         transaction.add_signature(signature=sig)
     transaction.digest()
-    transaction.dump()
+    print(transaction)
 
     ret = bbc_app_client.insert_transaction(transaction)
     assert ret

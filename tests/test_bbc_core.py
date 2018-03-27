@@ -99,7 +99,7 @@ class TestBBcCore(object):
         sig = transaction.sign(keypair=clients[1]['keypair'])
         transaction.add_signature(user_id=user1, signature=sig)
         transaction.digest()
-        transaction.dump()
+        print(transaction)
         print("register transaction=", binascii.b2a_hex(transaction.transaction_id))
         asset_file = dict()
         asset_file[transaction.events[1].asset.asset_id] = transaction.events[1].asset.asset_file
