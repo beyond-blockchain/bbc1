@@ -36,6 +36,7 @@ from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.core.topology_manager import TopologyManagerBase
 from bbc1.core.user_message_routing import UserMessageRouting
 from bbc1.core.data_handler import DataHandler, DataHandlerDomain0
+from bbc1.core.repair_manager import RepairManager
 from bbc1.core.domain0_manager import Domain0Manager
 from bbc1.core import query_management
 from bbc1.common import bbclib, message_key_types
@@ -260,6 +261,10 @@ class BBcNetwork:
                                                                                       domain_id=domain_id,
                                                                                       logname=self.logname,
                                                                                       loglevel=self.loglevel)
+
+        self.domains[domain_id]['repair'] = RepairManager(self, domain_id, workingdir=workingdir,
+                                                          logname=self.logname, loglevel=self.loglevel)
+
         if self.domain0manager is not None:
             self.domain0manager.update_domain_belong_to()
             for dm in self.domains.keys():
@@ -280,6 +285,7 @@ class BBcNetwork:
             return False
         self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].stop_all_timers()
         self.domains[domain_id][InfraMessageCategory.CATEGORY_USER].stop_all_timers()
+        self.domains[domain_id]['repair'].exit_loop()
         for nd in self.domains[domain_id]["neighbor"].nodeinfo_list.values():
             nd.key_manager.stop_all_timers()
 

@@ -199,6 +199,42 @@ def bin2str_base64(dat):
     return binascii.b2a_base64(dat, newline=False).decode("utf-8")
 
 
+def validate_transaction_object(txobj, asset_files=None):
+    txid = txobj.transaction_id
+    for i, sig in enumerate(txobj.signatures):
+        try:
+            if not sig.verify(txid):
+                return False, (), ()
+        except:
+            return False, (), ()
+
+    if asset_files is None:
+        return True, (), ()
+
+    # -- if asset_files is given, check them.
+    valid_asset = list()
+    invalid_asset = list()
+    for idx, evt in enumerate(txobj.events):
+        if evt.asset is None:
+            continue
+        asid = evt.asset.asset_id
+        if asid in asset_files.keys():
+            if evt.asset.asset_file_digest != hashlib.sha256(asset_files[asid]).digest():
+                invalid_asset.append(asid)
+            else:
+                valid_asset.append(asid)
+    for idx, rtn in enumerate(txobj.relations):
+        if rtn.asset is None:
+            continue
+        asid = rtn.asset.asset_id
+        if asid in asset_files.keys():
+            if rtn.asset.asset_file_digest != hashlib.sha256(asset_files[asid]).digest():
+                invalid_asset.append(asid)
+            else:
+                valid_asset.append(asid)
+    return True, valid_asset, invalid_asset
+
+
 class KeyType:
     ECDSA_SECP256k1 = 1
 
@@ -462,10 +498,13 @@ class BBcTransaction:
             sig = self.signatures[i].serialize()
             dat.extend(to_4byte(len(sig)))
             dat.extend(sig)
-        return bytes(dat)
+        self.transaction_data = bytes(dat)
+        return self.transaction_data
 
     def deserialize(self, data):
+        self.transaction_data = data[:]
         ptr = 0
+        data_size = len(data)
         try:
             ptr, self.version = get_n_byte_int(ptr, 4, data)
             ptr, self.timestamp = get_n_byte_int(ptr, 8, data)
@@ -475,8 +514,11 @@ class BBcTransaction:
                 ptr, size = get_n_byte_int(ptr, 4, data)
                 ptr, evtdata = get_n_bytes(ptr, size, data)
                 evt = BBcEvent()
-                evt.deserialize(evtdata)
+                if not evt.deserialize(evtdata):
+                    return False
                 self.events.append(evt)
+                if ptr >= data_size:
+                    return False
 
             ptr, ref_num = get_n_byte_int(ptr, 2, data)
             self.references = []
@@ -484,8 +526,11 @@ class BBcTransaction:
                 ptr, size = get_n_byte_int(ptr, 4, data)
                 ptr, refdata = get_n_bytes(ptr, size, data)
                 refe = BBcReference(None, None)
-                refe.deserialize(refdata)
+                if not refe.deserialize(refdata):
+                    return False
                 self.references.append(refe)
+                if ptr >= data_size:
+                    return False
 
             ptr, rtn_num = get_n_byte_int(ptr, 2, data)
             self.relations = []
@@ -493,8 +538,11 @@ class BBcTransaction:
                 ptr, size = get_n_byte_int(ptr, 4, data)
                 ptr, rtndata = get_n_bytes(ptr, size, data)
                 rtn = BBcRelation()
-                rtn.deserialize(rtndata)
+                if not rtn.deserialize(rtndata):
+                    return False
                 self.relations.append(rtn)
+                if ptr >= data_size:
+                    return False
 
             ptr, witness_num = get_n_byte_int(ptr, 2, data)
             if witness_num == 0:
@@ -503,7 +551,8 @@ class BBcTransaction:
                 ptr, size = get_n_byte_int(ptr, 4, data)
                 ptr, witnessdata = get_n_bytes(ptr, size, data)
                 self.witness = BBcWitness()
-                self.witness.deserialize(witnessdata)
+                if not self.witness.deserialize(witnessdata):
+                    return False
                 self.witness.transaction = self
 
             ptr, cross_num = get_n_byte_int(ptr, 2, data)
@@ -512,8 +561,11 @@ class BBcTransaction:
                 ptr, size = get_n_byte_int(ptr, 4, data)
                 ptr, crossdata = get_n_bytes(ptr, size, data)
                 cross = BBcCrossRef()
-                cross.deserialize(crossdata)
+                if not cross.deserialize(crossdata):
+                    return False
                 self.cross_refs.append(cross)
+                if ptr >= data_size:
+                    return False
 
             ptr, sig_num = get_n_byte_int(ptr, 2, data)
             self.signatures = []
@@ -521,10 +573,12 @@ class BBcTransaction:
                 ptr, size = get_n_byte_int(ptr, 4, data)
                 ptr, sigdata = get_n_bytes(ptr, size, data)
                 sig = BBcSignature()
-                sig.deserialize(sigdata)
+                if not sig.deserialize(sigdata):
+                    return False
                 self.signatures.append(sig)
+                if ptr > data_size:
+                    return False
             self.digest()
-            self.transaction_data = data
         except Exception as e:
             print("Transaction data deserialize: %s" % e)
             print(traceback.format_exc())
@@ -939,6 +993,7 @@ class BBcEvent:
 
     def deserialize(self, data):
         ptr = 0
+        data_size = len(data)
         try:
             ptr, self.asset_group_id = get_bigint(ptr, data)
             ptr, ref_num = get_n_byte_int(ptr, 2, data)
@@ -946,17 +1001,23 @@ class BBcEvent:
             for i in range(ref_num):
                 ptr, idx = get_n_byte_int(ptr, 2, data)
                 self.reference_indices.append(idx)
+                if ptr >= data_size:
+                    return False
             ptr, appr_num = get_n_byte_int(ptr, 2, data)
             self.mandatory_approvers = []
             for i in range(appr_num):
                 ptr, appr = get_bigint(ptr, data)
                 self.mandatory_approvers.append(appr)
+                if ptr >= data_size:
+                    return False
             ptr, self.option_approver_num_numerator = get_n_byte_int(ptr, 2, data)
             ptr, self.option_approver_num_denominator = get_n_byte_int(ptr, 2, data)
             self.option_approvers = []
             for i in range(self.option_approver_num_denominator):
                 ptr, appr = get_bigint(ptr, data)
                 self.option_approvers.append(appr)
+                if ptr >= data_size:
+                    return False
             ptr, astsize = get_n_byte_int(ptr, 4, data)
             ptr, astdata = get_n_bytes(ptr, astsize, data)
             self.asset = BBcAsset()
@@ -1021,6 +1082,7 @@ class BBcReference:
 
     def deserialize(self, data):
         ptr = 0
+        data_size = len(data)
         try:
             ptr, self.asset_group_id = get_bigint(ptr, data)
             ptr, self.transaction_id = get_bigint(ptr, data)
@@ -1030,6 +1092,8 @@ class BBcReference:
             for i in range(signum):
                 ptr, idx = get_n_byte_int(ptr, 2, data)
                 self.sig_indices.append(idx)
+                if ptr > data_size:
+                    return False
         except:
             return False
         return True
@@ -1070,6 +1134,7 @@ class BBcRelation:
 
     def deserialize(self, data):
         ptr = 0
+        data_size = len(data)
         try:
             ptr, self.asset_group_id = get_bigint(ptr, data)
             ptr, pt_num = get_n_byte_int(ptr, 2, data)
@@ -1077,15 +1142,19 @@ class BBcRelation:
             for i in range(pt_num):
                 ptr, size = get_n_byte_int(ptr, 2, data)
                 ptr, ptdata = get_n_bytes(ptr, size, data)
+                if ptr >= data_size:
+                    return False
                 pt = BBcPointer()
-                pt.deserialize(ptdata)
+                if not pt.deserialize(ptdata):
+                    return False
                 self.pointers.append(pt)
             self.asset = None
             ptr, astsize = get_n_byte_int(ptr, 4, data)
             if astsize > 0:
                 self.asset = BBcAsset()
                 ptr, astdata = get_n_bytes(ptr, astsize, data)
-                self.asset.deserialize(astdata)
+                if not self.asset.deserialize(astdata):
+                    return False
         except:
             return False
         return True
@@ -1147,6 +1216,7 @@ class BBcWitness:
 
     def deserialize(self, data):
         ptr = 0
+        data_size = len(data)
         try:
             ptr, signum = get_n_byte_int(ptr, 2, data)
             self.user_ids = list()
@@ -1156,6 +1226,8 @@ class BBcWitness:
                 self.user_ids.append(uid)
                 ptr, idx = get_n_byte_int(ptr, 2, data)
                 self.sig_indices.append(idx)
+                if ptr > data_size:
+                    return False
         except:
             return False
         return True
@@ -1325,6 +1397,8 @@ class MsgType:
     RESPONSE_SEARCH_WITH_CONDITIONS = 87
     REQUEST_CROSS_REF = 88
     RESPONSE_CROSS_REF = 89
+    REQUEST_REPAIR = 90
+    RESPONSE_REPAIR = 91
 
     REQUEST_REGISTER_HASH_IN_SUBSYS = 128
     RESPONSE_REGISTER_HASH_IN_SUBSYS = 129

@@ -67,6 +67,7 @@ class DataHandler:
     REQUEST_SEARCH = to_2byte(2)
     RESPONSE_SEARCH = to_2byte(3)
     NOTIFY_INSERTED = to_2byte(4)
+    REPAIR_TRANSACTION_DATA = to_2byte(5)
 
     def __init__(self, network=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
         if network is not None:
@@ -237,6 +238,7 @@ class DataHandler:
         :param txdata:
         :param txobj:
         :param asset_files:
+        :param no_replication:
         :return:
         """
         self.stats.update_stats_increment("data_handler", "insert_transaction", 1)
@@ -247,39 +249,67 @@ class DataHandler:
 
         inserted_count = 0
         for i in range(len(self.db_adaptors)):
-            ret = self.exec_sql(db_num=i,
-                                sql="INSERT INTO transaction_table VALUES (%s,%s)" % (self.db_adaptors[0].placeholder,
-                                                                                      self.db_adaptors[0].placeholder),
-                                args=(txobj.transaction_id, txdata))
-            if ret is None:
-                continue
-            inserted_count += 1
-
-            for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
-                self.exec_sql(db_num=i,
-                              sql="INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id) "
-                                "VALUES (%s, %s, %s, %s)" % (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
-                                                             self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
-                                args=(txobj.transaction_id, asset_group_id, asset_id, user_id))
-            for tx_to, tx_from in self.get_topology_info(txobj):
-                self.exec_sql(db_num=i,
-                              sql="INSERT INTO topology_table(tx_to, tx_from) VALUES (%s, %s)" %
-                                (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
-                              args=(tx_to, tx_from))
-
+            if self.insert_transaction_into_a_db(i, txobj):
+                inserted_count += 1
         if inserted_count == 0:
             return None
 
-        asset_group_ids = set()
-        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
-            asset_group_ids.add(asset_group_id)
-            if not self.use_external_storage and asset_files is not None and asset_id in asset_files:
-                self.store_in_storage(asset_group_id, asset_id, asset_files[asset_id])
+        asset_group_ids = self.store_asset_files(txobj, asset_files)
 
         if not no_replication and self.replication_strategy != DataHandler.REPLICATION_EXT:
             self.send_replication_to_other_cores(txdata, asset_files)
 
         return asset_group_ids
+
+    def insert_transaction_into_a_db(self, db_num, txobj):
+        """
+        Insert transaction data into the specified DB
+        :param db_num:
+        :param txobj:
+        :return:
+        """
+        if txobj.transaction_data is None:
+            txobj.serialize()
+        ret = self.exec_sql(db_num=db_num,
+                            sql="INSERT INTO transaction_table VALUES (%s,%s)" % (self.db_adaptors[0].placeholder,
+                                                                                  self.db_adaptors[0].placeholder),
+                            args=(txobj.transaction_id, txobj.transaction_data))
+        if ret is None:
+            return False
+
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
+            self.exec_sql(db_num=db_num,
+                          sql="INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id) "
+                              "VALUES (%s, %s, %s, %s)" % (
+                              self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
+                              self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
+                          args=(txobj.transaction_id, asset_group_id, asset_id, user_id))
+        for tx_to, tx_from in self.get_topology_info(txobj):
+            self.exec_sql(db_num=db_num,
+                          sql="INSERT INTO topology_table(tx_to, tx_from) VALUES (%s, %s)" %
+                              (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
+                          args=(tx_to, tx_from))
+        return True
+
+    def store_asset_files(self, txobj, asset_files):
+        """
+        Store all asset_files related to the transaction_object
+        :param txobj:
+        :param asset_files:
+        :return: asset_group_ids to be stored
+        """
+        asset_group_ids = set()
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
+            asset_group_ids.add(asset_group_id)
+            if not self.use_external_storage and asset_files is not None and asset_id in asset_files:
+                self.store_in_storage(asset_group_id, asset_id, asset_files[asset_id])
+        return asset_group_ids
+
+    def restore_data(self, db_num, transaction_id, txobj, asset_files):
+        self.remove(transaction_id, txobj=txobj, db_num=db_num)
+        self.insert_transaction_into_a_db(db_num=db_num, txobj=txobj)
+        self.remove_asset_files(txobj, asset_files)
+        self.store_asset_files(txobj, asset_files)
 
     def send_replication_to_other_cores(self, txdata, asset_files=None):
         """
@@ -301,39 +331,67 @@ class DataHandler:
         elif self.replication_strategy == DataHandler.REPLICATION_P2P:
             pass  # TODO: implement (destinations determined by TopologyManager)
 
-    def remove(self, transaction_id):
+    def remove(self, transaction_id, txobj=None, db_num=-1):
         """
-        Delete data
+        Delete all data regarding the specified transaction_id
         :param transaction_id:
+        :param txobj:
+        :param db_num:
         :return:
         """
         if transaction_id is None:
             return
-        txdata = self.exec_sql_fetchall(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
-                                            self.db_adaptors[0].placeholder, args=(transaction_id,))
-        txobj = bbclib.BBcTransaction(deserialize=txdata[0][1])
+        if txobj is None:
+            txdata = self.exec_sql_fetchall(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
+                                                self.db_adaptors[0].placeholder, args=(transaction_id,))
+            txobj = bbclib.BBcTransaction(deserialize=txdata[0][1])
+        elif txobj.transaction_id != transaction_id:
+            return
 
-        for i in range(len(self.db_adaptors)):
+        if db_num == -1 or db_num >= len(self.db_adaptors):
+            for i in range(len(self.db_adaptors)):
+                self._remove_transaction(txobj, i)
+        else:
+            self._remove_transaction(txobj, db_num)
+
+        self.remove_asset_files(txobj)
+
+    def _remove_transaction(self, txobj, db_num):
+        self.exec_sql(
+            db_num=db_num,
+            sql="DELETE FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
+            args=(txobj.transaction_id,))
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
             self.exec_sql(
-                db_num=i,
-                sql="DELETE FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
-                args=(transaction_id,))
-            for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
-                self.exec_sql(
-                    db_num=i,
-                    sql="DELETE FROM asset_info_table WHERE asset_group_id = %s AND asset_id = %s AND user_id = %s" %
-                        (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
-                    args=(asset_group_id, asset_id, user_id))
-                if fileflag:
-                    self.remove_in_storage(asset_group_id, asset_id)
-            for tx_to, tx_from in self.get_topology_info(txobj):
-                self.exec_sql(
-                    db_num=i,
-                    sql="DELETE FROM topology_table WHERE tx_to = %s AND tx_from = %s" %
-                        (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
-                    args=(tx_to, tx_from))
+                db_num=db_num,
+                sql="DELETE FROM asset_info_table WHERE asset_group_id = %s AND asset_id = %s AND user_id = %s" %
+                    (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
+                args=(asset_group_id, asset_id, user_id))
+            if fileflag:
+                self.remove_in_storage(asset_group_id, asset_id)
+        for tx_to, tx_from in self.get_topology_info(txobj):
+            self.exec_sql(
+                db_num=db_num,
+                sql="DELETE FROM topology_table WHERE tx_to = %s AND tx_from = %s" %
+                    (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
+                args=(tx_to, tx_from))
 
-    def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None, count=1):
+    def remove_asset_files(self, txobj, asset_files=None):
+        """
+        Remove all asset files related to the transaction
+        :param asset_files:
+        :return:
+        """
+        if self.use_external_storage:
+            return
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
+            if asset_files is not None:
+                if asset_id in asset_files:
+                    self.remove_in_storage(asset_group_id, asset_id)
+            else:
+                self.remove_in_storage(asset_group_id, asset_id)
+
+    def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None, count=1, db_num=0):
         """
         Search transaction data
         :param transaction_id:
@@ -341,11 +399,14 @@ class DataHandler:
         :param asset_id:
         :param user_id:
         :param count:
+        :param idx:
         :return:
         """
         if transaction_id is not None:
-            txinfo = self.exec_sql_fetchall(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
-                                                self.db_adaptors[0].placeholder, args=(transaction_id,))
+            txinfo = self.exec_sql_fetchall(
+                db_num=db_num,
+                sql="SELECT * FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
+                args=(transaction_id,))
             if len(txinfo) == 0:
                 return None, None
         else:
@@ -364,41 +425,25 @@ class DataHandler:
                 sql += " limit %d" % count
             sql += ";"
             args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id)))
-            ret = self.exec_sql_fetchall(sql=sql, args=args)
+            ret = self.exec_sql_fetchall(db_num=db_num, sql=sql, args=args)
             txinfo = list()
             for record in ret:
-                tx = self.exec_sql_fetchall(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
-                                                self.db_adaptors[0].placeholder, args=(record[1],))
+                tx = self.exec_sql_fetchall(
+                    db_num=db_num,
+                    sql="SELECT * FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
+                    args=(record[1],))
                 if tx is not None and len(tx) == 1:
                     txinfo.append(tx[0])
 
-        result_txobj = list()
-        txid_list = dict()
+        result_txobj = dict()
         result_asset_files = dict()
-        compromised_tx = list()
-        compromised_asset_files = list()
         for txid, txdata in txinfo:
-            if txid in txid_list:
-                continue
-            txid_list[txid] = True
-            txobj = bbclib.BBcTransaction()
-            txobj.deserialize(txdata)
-            for sig in txobj.signatures:
-                if not sig.verify(txid):
-                    compromised_tx.append(txid)
-            result_txobj.append(txobj)
+            txobj = bbclib.BBcTransaction(deserialize=txdata)
+            result_txobj[txid] = txobj
             for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
                 if fileflag:
-                    assetfile = self.get_in_storage(asset_group_id, asset_id)
-                    if hashlib.sha256(assetfile).digest() == filedigest:
-                        result_asset_files[asset_id] = assetfile
-                    else:
-                        compromised_asset_files.append(asset_id)
-        if len(compromised_tx) == 0 and len(compromised_asset_files) == 0:
-            return result_txobj, result_asset_files
-        # TODO: implement finding correct transaction data and asset file
-        print(len(compromised_tx), len(compromised_asset_files))
-        return None, None
+                    result_asset_files[asset_id] = self.get_in_storage(asset_group_id, asset_id)
+        return result_txobj, result_asset_files
 
     def search_transaction_topology(self, transaction_id, reverse_link=False):
         """
@@ -521,6 +566,9 @@ class DataHandler:
             asset_group_ids = msg[KeyType.asset_group_ids]
             self.core.send_inserted_notification(self.domain_id, asset_group_ids, transaction_id,
                                                  only_registered_user=True)
+
+        elif msg[KeyType.infra_command] == DataHandler.REPAIR_TRANSACTION_DATA:
+            self.network.domains[self.domain_id]['repair'].put_message(msg)
 
 
 class DataHandlerDomain0(DataHandler):

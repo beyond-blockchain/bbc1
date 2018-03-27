@@ -679,6 +679,16 @@ class BBcAppClient:
         dat[KeyType.user_id] = user_id
         return self.send_msg(dat)
 
+    def request_to_repair_transaction(self, transaction_id):
+        """
+        Request to repair compromised transaction data
+        :param transaction_id:
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_REPAIR)
+        dat[KeyType.transaction_id] = transaction_id
+        return self.send_msg(dat)
+
     def register_in_ledger_subsystem(self, asset_group_id, transaction_id):
         """
         Register transaction_id in the ledger_subsystem
@@ -838,6 +848,8 @@ class Callback:
             self.proc_resp_domain_close(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_ECDH_KEY_EXCHANGE:
             self.proc_resp_ecdh_key_exchange(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_REPAIR:
+            self.proc_resp_repair(dat)
         else:
             self.logger.warn("No method to process for command=%d" % dat[KeyType.command])
 
@@ -898,15 +910,6 @@ class Callback:
         self.queue.put(dat)
 
     def proc_resp_search_transaction(self, dat):
-        if KeyType.transaction_data in dat:
-            tx_obj = bbclib.recover_transaction_object_from_rawdata(dat[KeyType.transaction_data])
-            tx_obj.digest()
-            digest = tx_obj.digest()
-            for i in range(len(tx_obj.signatures)):
-                result = tx_obj.signatures[i].verify(digest)
-                if not result:
-                    dat = {KeyType.status: EBADTXSIGNATURE, KeyType.reason: "Verify failure", KeyType.transaction_data: tx_obj}
-                    break
         self.queue.put(dat)
 
     def proc_user_message(self, dat):
@@ -1005,4 +1008,7 @@ class Callback:
                                                          dat[KeyType.ecdh], dat[KeyType.random])
         message_key_types.set_cipher(shared_key, dat[KeyType.nonce], self.client.aes_key_name, dat[KeyType.hint])
         self.client.is_secure_connection = False
+        self.queue.put(True)
+
+    def proc_resp_repair(self, dat):
         self.queue.put(True)

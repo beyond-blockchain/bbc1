@@ -131,6 +131,8 @@ class TestBBcAppClient(object):
         print("* should be NG *")
         dat = wait_check_result_msg_type(msg_processor[0], bbclib.MsgType.RESPONSE_SEARCH_WITH_CONDITIONS)
         assert dat[KeyType.status] < ESUCCESS
+        assert KeyType.transactions not in dat
+        assert KeyType.all_asset_files not in dat
 
     def test_09_search_asset2(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
