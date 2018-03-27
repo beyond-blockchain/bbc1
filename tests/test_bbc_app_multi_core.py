@@ -161,7 +161,7 @@ class TestBBcAppClient(object):
             import os
             os._exit(1)
         transactions[0].add_signature(user_id=user, signature=sig)
-        transactions[0].dump()
+        print(transactions[0])
         transactions[0].digest()
         global transaction_dat
         transaction_dat = transactions[0].serialize()
@@ -188,7 +188,7 @@ class TestBBcAppClient(object):
         result = dat[KeyType.result]
         transactions[1].references[result[0]].add_signature(user_id=result[1], signature=result[2])
 
-        transactions[1].dump()
+        print(transactions[1])
         transactions[1].digest()
         print("register transaction=", binascii.b2a_hex(transactions[1].transaction_id))
         clients[1]['app'].insert_transaction(transactions[1])

@@ -337,7 +337,7 @@ def verify_file(file):
         print("%s is invalid" % file)
     print("done verify %s" % os.path.basename(file))
     print("Content of the transaction:::")
-    transaction.dump()
+    print(transaction)
 
 
 def create_keypair():

@@ -104,7 +104,7 @@ class TestBBcAppClient(object):
             import os
             os._exit(1)
         transactions[0].add_signature(user_id=clients[0]['user_id'], signature=sig)
-        transactions[0].dump()
+        print(transactions[0])
         transactions[0].digest()
         print("register transaction=", binascii.b2a_hex(transactions[0].transaction_id))
         clients[0]['app'].insert_transaction(transactions[0])
@@ -181,7 +181,7 @@ class TestBBcAppClient(object):
         assert KeyType.transactions in dat
         transaction_data = dat[KeyType.transactions][0]
         txobj = bbclib.BBcTransaction(deserialize=transaction_data)
-        txobj.dump()
+        print(txobj)
 
     @pytest.mark.unregister
     def test_99_unregister(self):

@@ -175,7 +175,7 @@ class TestFileProofClient(object):
         store_transaction.get_sig_index(user_ids[0])
         store_transaction.add_signature(user_id=user_ids[0], signature=sig)
         store_transaction.digest()
-        store_transaction.dump()
+        print(store_transaction)
 
         global transaction_id, asset_id
         transaction_id = store_transaction.transaction_id
@@ -204,7 +204,7 @@ class TestFileProofClient(object):
             print("oooo valid")
         else:
             print("xxxx invalid")
-        txobj.dump()
+        print(txobj)
 
     def test_20_send_and_wait_file(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")

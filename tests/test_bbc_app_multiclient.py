@@ -113,7 +113,7 @@ class TestBBcAppClient(object):
             import os
             os._exit(1)
         transactions[0].add_signature(user_id=clients[0]['user_id'], signature=sig)
-        transactions[0].dump()
+        print(transactions[0])
         transactions[0].digest()
         global transaction_dat
         transaction_dat = transactions[0].serialize()

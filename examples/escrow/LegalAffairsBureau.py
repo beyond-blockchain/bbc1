@@ -81,7 +81,7 @@ def recive():
     recvdat = bbc_app_client.callback.synchronize()
     transaction = bbclib.BBcTransaction()
     transaction.deserialize(recvdat[KeyType.transaction_data])
-    transaction.dump()
+    print(transaction)
     data = json.loads(transaction.events[0].asset.asset_body)
     if transaction.references:
         print("TX has reference...")
