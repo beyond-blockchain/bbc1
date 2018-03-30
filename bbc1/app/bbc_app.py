@@ -482,13 +482,15 @@ class BBcAppClient:
         self.include_admin_info(dat, admin_info, self.domain_keypair)
         return self.send_msg(dat)
 
-    def register_to_core(self):
+    def register_to_core(self, on_multiple_nodes=False):
         """
         Register the client (user_id) to the core node. After that, the client can communicate with the core node
-
+        :param on_multiple_nodes:
         :return:
         """
         dat = self.make_message_structure(MsgType.REGISTER)
+        if on_multiple_nodes:
+            dat[KeyType.on_multinodes] = True
         self.send_msg(dat)
         return True
 
@@ -539,7 +541,7 @@ class BBcAppClient:
         dat[KeyType.count] = number
         return self.send_msg(dat)
 
-    def gather_signatures(self, tx_obj, reference_obj=None, destinations=None, asset_files=None):
+    def gather_signatures(self, tx_obj, reference_obj=None, destinations=None, asset_files=None, anycast=False):
         """
         Request to gather signatures from the specified user_ids
 
@@ -547,12 +549,16 @@ class BBcAppClient:
         :param reference_obj: BBcReference object
         :param destinations: list of destination user_ids
         :param asset_files: dictionary of {asset_id: file_content}
+        :param anycast: True if this message is for anycasting
         :return:
         """
         if reference_obj is None and destinations is None:
             return False
         dat = self.make_message_structure(MsgType.REQUEST_GATHER_SIGNATURE)
         dat[KeyType.transaction_data] = tx_obj.serialize()
+        dat[KeyType.transaction_id] = tx_obj.transaction_id
+        if anycast:
+            dat[KeyType.is_anycast] = True
         if reference_obj is not None:
             dat[KeyType.destination_user_ids] = reference_obj.get_destinations()
             referred_transactions = dict()
@@ -565,11 +571,12 @@ class BBcAppClient:
             dat[KeyType.all_asset_files] = asset_files
         return self.send_msg(dat)
 
-    def sendback_signature(self, dst, ref_index, sig, query_id=None):
+    def sendback_signature(self, dst, transaction_id, ref_index, sig, query_id=None):
         """
         Send back the signed transaction to the source
 
         :param dst:
+        :param transaction_id:
         :param ref_index: Which reference in transaction the signature is for
         :param sig:
         :param query_id:
@@ -577,23 +584,26 @@ class BBcAppClient:
         """
         dat = self.make_message_structure(MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dst
+        dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.ref_index] = ref_index
         dat[KeyType.signature] = sig.serialize()
         if query_id is not None:
             dat[KeyType.query_id] = query_id
         return self.send_msg(dat)
 
-    def sendback_denial_of_sign(self, dst, reason_text, query_id=None):
+    def sendback_denial_of_sign(self, dst, transaction_id, reason_text, query_id=None):
         """
         Send back the denial of sign the transaction
 
         :param dst:
+        :param transaction_id:
         :param reason_text:
         :param query_id:
         :return:
         """
         dat = self.make_message_structure(MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dst
+        dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.status] = EOTHER
         dat[KeyType.reason] = reason_text
         if query_id is not None:
@@ -727,17 +737,20 @@ class BBcAppClient:
         self.include_admin_info(dat, admin_info, self.default_node_keypair)
         return self.send_msg(dat)
 
-    def send_message(self, msg, dst_user_id):
+    def send_message(self, msg, dst_user_id, is_anycast=False):
         """
         Send peer-to-peer message to the specified user_id
 
         :param msg:
         :param dst_user_id:
+        :param is_anycast:
         :return:
         """
         dat = self.make_message_structure(MsgType.MESSAGE)
         dat[KeyType.destination_user_id] = dst_user_id
         dat[KeyType.message] = msg
+        if is_anycast:
+            dat[KeyType.is_anycast] = True
         return self.send_msg(dat)
 
     def start_receiver_loop(self):

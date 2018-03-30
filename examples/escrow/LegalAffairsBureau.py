@@ -90,7 +90,9 @@ def recive():
         list = cur.fetchall()
         if len(list) != 0:
             print("Ref tx has alredy been referenced")
-            bbc_app_client.sendback_denial_of_sign(recvdat[KeyType.source_user_id], "Ref tx has alredy been referenced")
+            bbc_app_client.sendback_denial_of_sign(recvdat[KeyType.source_user_id],
+                                                   transaction.transaction_id,
+                                                   "Ref tx has alredy been referenced")
             return 0;
         else:
             print("Ref tx has not been referenced.")
@@ -99,7 +101,9 @@ def recive():
             list = cur.fetchall()
             if len(list) == 0:
                 print("ref tx is not found")
-                bbc_app_client.sendback_denial_of_sign(recvdat[KeyType.source_user_id], "Ref Tx is not found")
+                bbc_app_client.sendback_denial_of_sign(recvdat[KeyType.source_user_id],
+                                                       transaction.transaction_id,
+                                                       "Ref Tx is not found")
                 return 0;
             else:
                 print("Ref is correct, insert tx to our DB.")
@@ -113,10 +117,11 @@ def recive():
         con.commit()
 
     signature = transaction.sign(keypair=key_pair)
-    bbc_app_client.sendback_signature(recvdat[KeyType.source_user_id],0,signature)
+    bbc_app_client.sendback_signature(recvdat[KeyType.source_user_id], transaction.transaction_id, 0, signature)
+
 
 if __name__ == '__main__':
-    if(not os.path.exists(PRIVATE_KEY) and not os.path.exists(PUBLIC_KEY)):
+    if not os.path.exists(PRIVATE_KEY) and not os.path.exists(PUBLIC_KEY):
         create_keypair()
     with open(PRIVATE_KEY, "rb") as fin:
         private_key = fin.read()
@@ -126,7 +131,7 @@ if __name__ == '__main__':
 
     # If there is no table, create table.
     cur = con.execute("SELECT * FROM sqlite_master WHERE type='table' and name='land'")
-    if cur.fetchone() == None:
+    if cur.fetchone() is None:
         print("Create land table")
         con.execute("CREATE TABLE 'land' (id INTEGER PRIMARY KEY AUTOINCREMENT, asid TEXT, txid TEXT,place TEXT ,owner TEXT, reftx TEXT)")
         con.commit()

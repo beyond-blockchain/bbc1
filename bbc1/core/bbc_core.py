@@ -51,6 +51,7 @@ POOL_SIZE = 1000
 DURATION_GIVEUP_GET = 10
 GET_RETRY_COUNT = 3
 INTERVAL_RETRY = 3
+DEFAULT_ANYCAST_TTL = 5
 
 ticker = query_management.get_ticker()
 core_service = None
@@ -429,6 +430,8 @@ class BBcCoreService:
                                      KeyType.destination_user_id], dat):
                 self.logger.debug("MESSAGE: bad format")
                 return False, None
+            if KeyType.is_anycast in dat:
+                dat[KeyType.anycast_ttl] = DEFAULT_ANYCAST_TTL
             umr.send_message_to_user(dat)
 
         elif cmd == MsgType.REQUEST_REGISTER_HASH_IN_SUBSYS:
@@ -463,7 +466,7 @@ class BBcCoreService:
             user_id = dat[KeyType.source_user_id]
             self.logger.debug("[%s] register_user: %s" % (binascii.b2a_hex(domain_id[:2]),
                                                           binascii.b2a_hex(user_id[:4])))
-            umr.register_user(user_id, socket)
+            umr.register_user(user_id, socket, on_multiple_nodes=dat.get(KeyType.on_multinodes, False))
             return False, (domain_id, user_id)
 
         elif cmd == MsgType.UNREGISTER:

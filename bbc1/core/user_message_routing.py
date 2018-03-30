@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import traceback
+import random
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
@@ -77,17 +77,17 @@ class UserMessageRouting:
         """
         self.aes_name_list[socket] = name
 
-    def register_user(self, user_id, socket, is_multicast=False):
+    def register_user(self, user_id, socket, on_multiple_nodes=False):
         """
         Register user to forward message
         :param user_id:
         :param socket:
-        :param is_multicast:
+        :param on_multiple_nodes:
         :return:
         """
         self.registered_users.setdefault(user_id, set())
         self.registered_users[user_id].add(socket)
-        if is_multicast:
+        if on_multiple_nodes:
             self.send_multicast_join(user_id)
 
     def unregister_user(self, user_id, socket):
@@ -162,6 +162,9 @@ class UserMessageRouting:
             return True
 
         msg[KeyType.infra_msg_type] = InfraMessageCategory.CATEGORY_USER
+        if msg.get(KeyType.is_anycast, False):
+            return self.send_anycast_message(msg)
+
         socks = self.registered_users.get(msg[KeyType.destination_user_id], None)
         if socks is None:
             if direct_only:
@@ -170,15 +173,55 @@ class UserMessageRouting:
             return True
         count = len(socks)
         for s in socks:
-            try:
-                if s in self.aes_name_list:
-                    direct_send_to_user(s, msg, name=self.aes_name_list[s])
-                else:
-                    direct_send_to_user(s, msg)
-                self.stats.update_stats_increment("user_message", "sent_msg_to_user", 1)
-            except:
+            if not self._send(s, msg):
                 count -= 1
         return count > 0
+
+    def _send(self, sock, msg):
+        try:
+            if sock in self.aes_name_list:
+                direct_send_to_user(sock, msg, name=self.aes_name_list[s])
+            else:
+                direct_send_to_user(sock, msg)
+            self.stats.update_stats_increment("user_message", "sent_msg_to_user", 1)
+        except:
+            return False
+        return True
+
+    def send_anycast_message(self, msg):
+        """
+        Send message as anycast
+        :param msg:
+        :return:
+        """
+        dst_user_id = msg[KeyType.destination_user_id]
+        if dst_user_id not in self.forwarding_entries:
+            return False
+        ttl = msg.get(KeyType.anycast_ttl, 0)
+        if ttl == 0:
+            return False
+        randmax = len(self.forwarding_entries[dst_user_id]['nodes'])
+        if dst_user_id in self.registered_users:
+            randmax += 1
+        while ttl > 0:
+            idx = random.randrange(randmax)
+            msg[KeyType.anycast_ttl] = ttl - 1
+            ttl -= 1
+            if idx == randmax - 1:
+                sock = random.choice(tuple(self.registered_users.get(dst_user_id, None)))
+                if sock is not None and self._send(sock, msg):
+                    return True
+            else:
+                msg[KeyType.destination_node_id] = random.choice(tuple(self.forwarding_entries[dst_user_id]['nodes']))
+                try:
+                    self.network.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
+                                                         domain_id=self.domain_id, msg=msg)
+                except:
+                    import traceback
+                    traceback.print_exc()
+                    continue
+                return True
+        return False
 
     def forward_message_to_another_node(self, msg):
         """
@@ -191,7 +234,7 @@ class UserMessageRouting:
             for dst_node_id in self.forwarding_entries[dst_user_id]['nodes']:
                 msg[KeyType.destination_node_id] = dst_node_id
                 try:
-                    self.network.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
+                    self.network.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
                                                          domain_id=self.domain_id, msg=msg)
                 except:
                     import traceback
@@ -336,6 +379,9 @@ class UserMessageRouting:
                 fire_after=UserMessageRouting.REFRESH_FORWARDING_LIST_INTERVAL)
         dst_user_id = msg[KeyType.destination_user_id]
         if dst_user_id not in self.registered_users:
+            if msg.get(KeyType.is_anycast, False):
+                self.send_anycast_message(msg)
+                return
             retmsg = {
                 KeyType.domain_id: self.domain_id,
                 KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_USER,
@@ -347,6 +393,8 @@ class UserMessageRouting:
             self.network.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
                                                  domain_id=self.domain_id, msg=retmsg)
             return
+        if KeyType.is_anycast in msg:
+            del msg[KeyType.is_anycast]
         self.stats.update_stats_increment("user_message", "send_to_user", 1)
         self.send_message_to_user(msg)
 
@@ -355,7 +403,7 @@ class UserMessageRoutingDummy(UserMessageRouting):
     def stop_all_timers(self):
         pass
 
-    def register_user(self, user_id, socket, is_multicast=False):
+    def register_user(self, user_id, socket, on_multiple_nodes=False):
         pass
 
     def unregister_user(self, user_id, socket=None):
