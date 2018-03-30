@@ -250,6 +250,9 @@ class KeyType:
     message_seq = to_4byte(21)
     domain_signature = to_4byte(22)
     domain_admin_info = to_4byte(23)
+    on_multinodes = to_4byte(24)
+    is_anycast = to_4byte(25)
+    anycast_ttl = to_4byte(26)
 
     network_module = to_4byte(0, 0x30)
     storage_type = to_4byte(1, 0x30)

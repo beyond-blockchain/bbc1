@@ -79,7 +79,9 @@ def wait_for_transaction_msg(bbc_app_client=None):
     if KeyType.transaction_data not in response_data or KeyType.all_asset_files not in response_data:
         print("**** Invalid message is received...")
         print(response_data)
-        bbc_app_client.sendback_denial_of_sign(response_data[KeyType.source_user_id], "Invalid message is received.")
+        bbc_app_client.sendback_denial_of_sign(response_data[KeyType.source_user_id],
+                                               response_data[KeyType.transaction_id],
+                                               "Invalid message is received.")
         assert False
     return response_data
 
@@ -217,7 +219,7 @@ class TestFileProofClient(object):
         txobj, source_id = pick_valid_transaction_info(received_data=recvdat,
                                                        bbc_app_client=clients[1])
         signature = txobj.sign(keypair=keypairs[1])
-        clients[1].sendback_signature(source_id, -1, signature)
+        clients[1].sendback_signature(source_id, txobj.transaction_id, -1, signature)
 
         # -- sender
         response_data = clients[0].callback.synchronize()

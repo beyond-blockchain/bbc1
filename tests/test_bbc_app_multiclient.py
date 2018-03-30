@@ -39,7 +39,7 @@ class MessageProcessor(bbc_app.Callback):
         txobj = bbclib.BBcTransaction()
         txobj.deserialize(dat[KeyType.transaction_data])
         signature = txobj.sign(keypair=clients[self.idx]['keypair'])
-        clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], signature)
+        clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], txobj.transaction_id, signature)
 
     def proc_resp_insert(self, dat):
         if KeyType.transaction_id in dat:
