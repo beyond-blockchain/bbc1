@@ -114,7 +114,7 @@ class TestBBcAppClient(object):
         data_handler = cores[0].networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
         sql = "UPDATE transaction_table SET transaction_data = %s WHERE transaction_id = %s" % \
               (data_handler.db_adaptors[0].placeholder, data_handler.db_adaptors[0].placeholder)
-        data_handler.exec_sql(sql=sql, args=(bytes(txdata), txobj.transaction_id))
+        data_handler.exec_sql(sql=sql, args=(bytes(txdata), txobj.transaction_id), commit=True)
 
         print("* forge transaction[1] with the data of transaction[2] and update the data in node 1")
         txobj = transactions[1]
@@ -122,7 +122,7 @@ class TestBBcAppClient(object):
         data_handler = cores[1].networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
         sql = "UPDATE transaction_table SET transaction_data = %s WHERE transaction_id = %s" % \
               (data_handler.db_adaptors[0].placeholder, data_handler.db_adaptors[0].placeholder)
-        data_handler.exec_sql(sql=sql, args=(bytes(txdata), txobj.transaction_id))
+        data_handler.exec_sql(sql=sql, args=(bytes(txdata), txobj.transaction_id), commit=True)
 
     def test_14_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")

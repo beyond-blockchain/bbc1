@@ -144,12 +144,14 @@ class DataHandler:
             d.db_cur.close()
             d.db.close()
 
-    def exec_sql(self, db_num=0, sql=None, args=()):
+    def exec_sql(self, db_num=0, sql=None, args=(), commit=False, fetch_one=False):
         """
         Execute sql sentence
         :param db_num:
         :param sql:
         :param args:
+        :param commit:
+        :param fetch_one:
         :return:
         """
         self.stats.update_stats_increment("data_handler", "exec_sql", 1)
@@ -162,7 +164,14 @@ class DataHandler:
                 ret = self.db_adaptors[db_num].db_cur.execute(sql, args)
             else:
                 ret = self.db_adaptors[db_num].db_cur.execute(sql)
-            self.db_adaptors[db_num].db.commit()
+            if commit:
+                self.db_adaptors[db_num].db.commit()
+                ret = None
+            else:
+                if fetch_one:
+                    ret = self.db_adaptors[db_num].db_cur.fetchone()
+                else:
+                    ret = self.db_adaptors[db_num].db_cur.fetchall()
         except:
             self.logger.error(traceback.format_exc())
             traceback.print_exc()
@@ -172,32 +181,6 @@ class DataHandler:
             return []
         else:
             return list(ret)
-
-    def exec_sql_fetchall(self, db_num=0, sql=None, args=()):
-        """
-        Execute sql sentence
-        :param db_num:
-        :param sql:
-        :param args:
-        :return:
-        """
-        self.stats.update_stats_increment("data_handler", "exec_sql", 1)
-        #print("sql=", sql)
-        try:
-            db_num = 0 if db_num >= len(self.db_adaptors) else db_num
-            if len(args) > 0:
-                self.db_adaptors[db_num].db_cur.execute(sql, args)
-            else:
-                self.db_adaptors[db_num].db_cur.execute(sql)
-            ret = self.db_adaptors[db_num].db_cur.fetchall()
-        except:
-            self.logger.error(traceback.format_exc())
-            traceback.print_exc()
-            self.stats.update_stats_increment("data_handler", "fail_exec_sql", 1)
-            return None
-        if ret is not None:
-            ret = list(ret)
-        return ret
 
     def get_asset_info(self, txobj):
         """
@@ -273,7 +256,7 @@ class DataHandler:
         ret = self.exec_sql(db_num=db_num,
                             sql="INSERT INTO transaction_table VALUES (%s,%s)" % (self.db_adaptors[0].placeholder,
                                                                                   self.db_adaptors[0].placeholder),
-                            args=(txobj.transaction_id, txobj.transaction_data))
+                            args=(txobj.transaction_id, txobj.transaction_data), commit=True)
         if ret is None:
             return False
 
@@ -283,12 +266,12 @@ class DataHandler:
                               "VALUES (%s, %s, %s, %s)" % (
                               self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
                               self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
-                          args=(txobj.transaction_id, asset_group_id, asset_id, user_id))
+                          args=(txobj.transaction_id, asset_group_id, asset_id, user_id), commit=True)
         for tx_to, tx_from in self.get_topology_info(txobj):
             self.exec_sql(db_num=db_num,
                           sql="INSERT INTO topology_table(tx_to, tx_from) VALUES (%s, %s)" %
                               (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
-                          args=(tx_to, tx_from))
+                          args=(tx_to, tx_from), commit=True)
         return True
 
     def store_asset_files(self, txobj, asset_files):
@@ -342,8 +325,8 @@ class DataHandler:
         if transaction_id is None:
             return
         if txobj is None:
-            txdata = self.exec_sql_fetchall(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
-                                                self.db_adaptors[0].placeholder, args=(transaction_id,))
+            txdata = self.exec_sql(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
+                                   self.db_adaptors[0].placeholder, args=(transaction_id,))
             txobj = bbclib.BBcTransaction(deserialize=txdata[0][1])
         elif txobj.transaction_id != transaction_id:
             return
@@ -360,13 +343,13 @@ class DataHandler:
         self.exec_sql(
             db_num=db_num,
             sql="DELETE FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
-            args=(txobj.transaction_id,))
+            args=(txobj.transaction_id,), commit=True)
         for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
             self.exec_sql(
                 db_num=db_num,
                 sql="DELETE FROM asset_info_table WHERE asset_group_id = %s AND asset_id = %s AND user_id = %s" %
                     (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
-                args=(asset_group_id, asset_id, user_id))
+                args=(asset_group_id, asset_id, user_id), commit=True)
             if fileflag:
                 self.remove_in_storage(asset_group_id, asset_id)
         for tx_to, tx_from in self.get_topology_info(txobj):
@@ -374,7 +357,7 @@ class DataHandler:
                 db_num=db_num,
                 sql="DELETE FROM topology_table WHERE tx_to = %s AND tx_from = %s" %
                     (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
-                args=(tx_to, tx_from))
+                args=(tx_to, tx_from), commit=True)
 
     def remove_asset_files(self, txobj, asset_files=None):
         """
@@ -403,7 +386,7 @@ class DataHandler:
         :return:
         """
         if transaction_id is not None:
-            txinfo = self.exec_sql_fetchall(
+            txinfo = self.exec_sql(
                 db_num=db_num,
                 sql="SELECT * FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
                 args=(transaction_id,))
@@ -425,10 +408,10 @@ class DataHandler:
                 sql += " limit %d" % count
             sql += ";"
             args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id)))
-            ret = self.exec_sql_fetchall(db_num=db_num, sql=sql, args=args)
+            ret = self.exec_sql(db_num=db_num, sql=sql, args=args)
             txinfo = list()
             for record in ret:
-                tx = self.exec_sql_fetchall(
+                tx = self.exec_sql(
                     db_num=db_num,
                     sql="SELECT * FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
                     args=(record[1],))
@@ -454,12 +437,12 @@ class DataHandler:
         if transaction_id is None:
             return None
         if reverse_link:
-            return self.exec_sql_fetchall(sql="SELECT * FROM topology_table WHERE tx_from = %s" %
-                                              self.db_adaptors[0].placeholder, args=(transaction_id,))
+            return self.exec_sql(sql="SELECT * FROM topology_table WHERE tx_from = %s" %
+                                 self.db_adaptors[0].placeholder, args=(transaction_id,))
 
         else:
-            return self.exec_sql_fetchall(sql="SELECT * FROM topology_table WHERE tx_to = %s" %
-                                              self.db_adaptors[0].placeholder, args=(transaction_id,))
+            return self.exec_sql(sql="SELECT * FROM topology_table WHERE tx_to = %s" %
+                                 self.db_adaptors[0].placeholder, args=(transaction_id,))
 
     def store_in_storage(self, asset_group_id, asset_id, content):
         """
@@ -653,12 +636,13 @@ class SqliteAdaptor(DbAdaptor):
         sql += ", ".join(["%s %s" % (d[0],d[1]) for d in tbl_definition])
         sql += ", PRIMARY KEY ("+tbl_definition[primary_key][0]+")"
         sql += ");"
-        self.handler.exec_sql(sql=sql)
+        self.handler.exec_sql(sql=sql, commit=True)
         for idx in indices:
-            self.handler.exec_sql(sql="CREATE INDEX %s_idx_%d ON %s (%s);" % (tbl, idx, tbl, tbl_definition[idx][0]))
+            self.handler.exec_sql(sql="CREATE INDEX %s_idx_%d ON %s (%s);" % (tbl, idx, tbl, tbl_definition[idx][0]),
+                                  commit=True)
 
     def check_table_existence(self, tblname):
-        return self.handler.exec_sql_fetchall(sql="SELECT * FROM sqlite_master WHERE type='table' AND name=?", args=(tblname,))
+        return self.handler.exec_sql(sql="SELECT * FROM sqlite_master WHERE type='table' AND name=?", args=(tblname,))
 
 
 class MysqlAdaptor(DbAdaptor):
@@ -699,13 +683,15 @@ class MysqlAdaptor(DbAdaptor):
         else:
             sql += ", PRIMARY KEY (%s)" % tbl_definition[primary_key][0]
         sql += ") CHARSET=utf8;"
-        self.handler.exec_sql(db_num=self.db_num, sql=sql)
+        self.handler.exec_sql(db_num=self.db_num, sql=sql, commit=True)
         for idx in indices:
             if tbl_definition[idx][1] in ["BLOB", "TEXT"]:
-                self.handler.exec_sql(db_num=self.db_num, sql="ALTER TABLE %s ADD INDEX (%s(32));" % (tbl, tbl_definition[idx][0]))
+                self.handler.exec_sql(db_num=self.db_num, sql="ALTER TABLE %s ADD INDEX (%s(32));"
+                                                              % (tbl, tbl_definition[idx][0]), commit=True)
             else:
-                self.handler.exec_sql(db_num=self.db_num, sql="ALTER TABLE %s ADD INDEX (%s);" % (tbl, tbl_definition[idx][0]))
+                self.handler.exec_sql(db_num=self.db_num, sql="ALTER TABLE %s ADD INDEX (%s);"
+                                                              % (tbl, tbl_definition[idx][0]), commit=True)
 
     def check_table_existence(self, tblname):
         sql = "show tables from %s like '%s';" % (self.db_name, tblname)
-        return self.handler.exec_sql_fetchall(db_num=self.db_num, sql=sql)
+        return self.handler.exec_sql(db_num=self.db_num, sql=sql)
