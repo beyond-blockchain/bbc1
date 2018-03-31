@@ -24,7 +24,6 @@ import threading
 import sys
 sys.path.extend(["../../"])
 from bbc1.common import logger
-from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.core.ethereum import bbc_ethereum
 
 
@@ -99,7 +98,7 @@ class LedgerSubsystem:
         self.domain_id = domain_id
         if domain_id is None:
             return
-        self.data_handler = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
+        self.data_handler = self.networking.domains[domain_id]['data']
         self.logger = logger.get_logger(key="ledger_subsystem", level=loglevel, logname=logname)
         self.queue = Queue()
         self.enabled = enabled

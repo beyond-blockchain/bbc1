@@ -43,7 +43,7 @@ class RepairManager:
             self.network = network
             self.core = network.core
             self.stats = network.core.stats
-            self.data_handler = network.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
+            self.data_handler = network.domains[domain_id]['data']
         else:
             self.stats = BBcStats()
         self.repair_log = os.path.join(workingdir, domain_id.hex(), "repair_log.json")

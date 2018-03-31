@@ -238,29 +238,21 @@ class BBcNetwork:
         self.domains[domain_id]['name'] = node_id.hex()[:4]
         self.domains[domain_id]['neighbor'] = NeighborInfo(network=self, domain_id=domain_id, node_id=node_id,
                                                            my_info=self.get_my_socket_info(node_id))
-        self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY] = TopologyManagerBase(network=self,
-                                                                                              domain_id=domain_id,
-                                                                                              node_id=node_id,
-                                                                                              logname=self.logname,
-                                                                                              loglevel=self.loglevel)
-        self.domains[domain_id][InfraMessageCategory.CATEGORY_USER] = UserMessageRouting(self, domain_id,
-                                                                                         logname=self.logname,
-                                                                                         loglevel=self.loglevel)
+        self.domains[domain_id]['topology'] = TopologyManagerBase(network=self, domain_id=domain_id, node_id=node_id,
+                                                                  logname=self.logname, loglevel=self.loglevel)
+        self.domains[domain_id]['user'] = UserMessageRouting(self, domain_id, logname=self.logname,
+                                                             loglevel=self.loglevel)
         self.get_domain_keypair(domain_id)
 
         workingdir = self.config.get_config()['workingdir']
         if domain_id == ZEROS:
-            self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA] = DataHandlerDomain0(self,
-                                                                                             domain_id=domain_id,
-                                                                                             logname=self.logname,
-                                                                                             loglevel=self.loglevel)
+            self.domains[domain_id]['data'] = DataHandlerDomain0(self, domain_id=domain_id, logname=self.logname,
+                                                                 loglevel=self.loglevel)
             self.domain0manager = Domain0Manager(self, node_id=node_id, logname=self.logname, loglevel=self.loglevel)
         else:
-            self.domains[domain_id][InfraMessageCategory.CATEGORY_DATA] = DataHandler(self, config=conf,
-                                                                                      workingdir=workingdir,
-                                                                                      domain_id=domain_id,
-                                                                                      logname=self.logname,
-                                                                                      loglevel=self.loglevel)
+            self.domains[domain_id]['data'] = DataHandler(self, config=conf, workingdir=workingdir,
+                                                          domain_id=domain_id, logname=self.logname,
+                                                          loglevel=self.loglevel)
 
         self.domains[domain_id]['repair'] = RepairManager(self, domain_id, workingdir=workingdir,
                                                           logname=self.logname, loglevel=self.loglevel)
@@ -270,7 +262,7 @@ class BBcNetwork:
             for dm in self.domains.keys():
                 if dm != ZEROS:
                     self.domains[dm]['neighbor'].my_info.update(domain0=True)
-            self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].update_refresh_timer_entry(1)
+            self.domains[domain_id]['topology'].update_refresh_timer_entry(1)
         self.stats.update_stats_increment("network", "num_domains", 1)
         return True
 
@@ -283,8 +275,8 @@ class BBcNetwork:
         """
         if domain_id not in self.domains:
             return False
-        self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].stop_all_timers()
-        self.domains[domain_id][InfraMessageCategory.CATEGORY_USER].stop_all_timers()
+        self.domains[domain_id]['topology'].stop_all_timers()
+        self.domains[domain_id]['user'].stop_all_timers()
         self.domains[domain_id]['repair'].exit_loop()
         for nd in self.domains[domain_id]["neighbor"].nodeinfo_list.values():
             nd.key_manager.stop_all_timers()
@@ -306,7 +298,7 @@ class BBcNetwork:
             for dm in self.domains.keys():
                 if dm != ZEROS:
                     self.domains[dm]['neighbor'].my_info.update(domain0=False)
-                    self.domains[dm][InfraMessageCategory.CATEGORY_TOPOLOGY].update_refresh_timer_entry(1)
+                    self.domains[dm]['topology'].update_refresh_timer_entry(1)
         del self.domains[domain_id]
         if self.domain0manager is not None:
             self.domain0manager.update_domain_belong_to()
@@ -586,7 +578,7 @@ class BBcNetwork:
         is_new = self.domains[domain_id]['neighbor'].add(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port, is_static=is_static)
         if is_new is not None and is_new:
             nodelist = self.domains[domain_id]['neighbor'].nodeinfo_list
-            self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].notify_neighbor_update(node_id, is_new=True)
+            self.domains[domain_id]['topology'].notify_neighbor_update(node_id, is_new=True)
             self.stats.update_stats("network", "neighbor_nodes", len(nodelist))
         return is_new
 
@@ -628,12 +620,15 @@ class BBcNetwork:
         if msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_NETWORK:
             self.process_message(domain_id, ipv4, ipv6, port, msg)
 
-        elif msg[KeyType.infra_msg_type] in [InfraMessageCategory.CATEGORY_USER, InfraMessageCategory.CATEGORY_DATA]:
+        elif msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_USER:
             self.add_neighbor(domain_id, msg[KeyType.source_node_id], ipv4, ipv6, port)
-            self.domains[domain_id][msg[KeyType.infra_msg_type]].process_message(msg)
+            self.domains[domain_id]['user'].process_message(msg)
+        elif msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_DATA:
+            self.add_neighbor(domain_id, msg[KeyType.source_node_id], ipv4, ipv6, port)
+            self.domains[domain_id]['data'].process_message(msg)
         elif msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_TOPOLOGY:
             self.add_neighbor(domain_id, msg[KeyType.source_node_id], ipv4, ipv6, port)
-            self.domains[domain_id][msg[KeyType.infra_msg_type]].process_message(ipv4, ipv6, port, msg)
+            self.domains[domain_id]['topology'].process_message(ipv4, ipv6, port, msg)
         elif msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_DOMAIN0:
             self.add_neighbor(domain_id, msg[KeyType.source_node_id], ipv4, ipv6, port)
             self.domain0manager.process_message(msg)
@@ -683,7 +678,7 @@ class BBcNetwork:
 
         elif msg[KeyType.command] == BBcNetwork.NOTIFY_LEAVE:
             if KeyType.source_node_id in msg:
-                self.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].notify_neighbor_update(source_node_id,
+                self.domains[domain_id]['topology'].notify_neighbor_update(source_node_id,
                                                                                                        is_new=False)
                 self.domains[domain_id]['neighbor'].remove(source_node_id)
 
