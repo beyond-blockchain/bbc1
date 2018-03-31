@@ -338,39 +338,6 @@ class BBcCoreService:
                 retmsg.update(txinfo)
                 umr.send_message_to_user(retmsg)
 
-        # --- TODO: will be obsoleted in v0.10
-        elif cmd == MsgType.REQUEST_SEARCH_USERID:
-            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.user_id], dat):
-                self.logger.debug("REQUEST_SEARCH_USERID: bad format")
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_SEARCH_USERID,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
-            txinfo = self.search_transaction_with_condition(domain_id, asset_group_id=dat[KeyType.asset_group_id],
-                                                            user_id=dat[KeyType.user_id])
-            if txinfo is None:
-                if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
-                    user_message_routing.direct_send_to_user(socket, retmsg)
-            else:
-                retmsg.update(txinfo)
-                umr.send_message_to_user(retmsg)
-
-        # --- TODO: will be obsoleted in v0.10
-        elif cmd == MsgType.REQUEST_SEARCH_ASSET:
-            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.asset_id], dat):
-                self.logger.debug("REQUEST_SEARCH_ASSET: bad format")
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_SEARCH_ASSET,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
-            retmsg[KeyType.asset_group_id] = dat[KeyType.asset_group_id]
-            txinfo = self.search_transaction_with_condition(domain_id, asset_group_id=dat[KeyType.asset_group_id],
-                                                            asset_id=dat[KeyType.asset_id])
-            if txinfo is None:
-                if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
-                    user_message_routing.direct_send_to_user(socket, retmsg)
-            else:
-                retmsg.update(txinfo)
-                umr.send_message_to_user(retmsg)
-
         elif cmd == MsgType.REQUEST_GATHER_SIGNATURE:
             if not self.param_check([KeyType.domain_id, KeyType.transaction_data], dat):
                 self.logger.debug("REQUEST_GATHER_SIGNATURE: bad format")
@@ -497,8 +464,7 @@ class BBcCoreService:
             self.networking.domains[domain_id]['repair'].put_message(dat)
             return False, None
 
-        # --- TODO: REQUEST_GET_PEERLIST will be obsoleted in v0.10
-        elif cmd == MsgType.REQUEST_GET_NEIGHBORLIST or cmd == MsgType.REQUEST_GET_PEERLIST:
+        elif cmd == MsgType.REQUEST_GET_NEIGHBORLIST:
             if not self.networking.check_admin_signature(domain_id, dat):
                 self.logger.error("Illegal access to domain %s" % domain_id.hex())
                 return False, None

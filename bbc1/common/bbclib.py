@@ -654,9 +654,6 @@ class BBcTransaction:
         sig.add(signature=s, pubkey=keypair.public_key)
         return sig
 
-    def dump(self):  # TODO: will be obsoleted
-        print(str(self))
-
     def jsondump(self):
         jsontx = {}
         if self.transaction_id is not None:
@@ -1331,8 +1328,6 @@ class BBcCrossRef:
 class MsgType:
     REQUEST_SETUP_DOMAIN = 0
     RESPONSE_SETUP_DOMAIN = 1
-    REQUEST_GET_PEERLIST = 2        # TODO: will obsolete in v0.10
-    RESPONSE_GET_PEERLIST = 3       # TODO: will obsolete in v0.10
     REQUEST_SET_STATIC_NODE = 4
     RESPONSE_SET_STATIC_NODE = 5
     REQUEST_GET_CONFIG = 8
@@ -1390,11 +1385,3 @@ class MsgType:
     RESPONSE_REGISTER_HASH_IN_SUBSYS = 129
     REQUEST_VERIFY_HASH_IN_SUBSYS = 130
     RESPONSE_VERIFY_HASH_IN_SUBSYS = 131
-
-
-class StorageType:  # TODO: will be obsoleted in v0.10
-    NONE = 0
-    FILESYSTEM = 1
-    #HTTP_PUT = 2
-    #HTTP_POST = 3
-

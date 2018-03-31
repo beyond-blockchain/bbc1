@@ -153,7 +153,7 @@ class TestBBcAppClient(object):
         assert dat[KeyType.status] == 0
         assert KeyType.compromised_transaction_data not in dat
         assert KeyType.transaction_data in dat
-        bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data]).dump()
+        print(bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data]))
 
         print("find txid=", binascii.b2a_hex(transactions[1].transaction_id))
         clients[1]['app'].search_transaction(transactions[1].transaction_id)

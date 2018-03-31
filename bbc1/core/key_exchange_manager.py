@@ -83,7 +83,7 @@ class KeyExchangeManager:
                                                        callback_expire=self.perform_key_exchange,
                                                        retry_count=0)
         if retry_entry:
-            self.timer_entry.data[KeyType.retry_tiemr] = True
+            self.timer_entry.data[KeyType.retry_timer] = True
 
     def set_delete_timer(self, key_name, timeout):
         if key_name is not None:
@@ -97,7 +97,7 @@ class KeyExchangeManager:
         :param query_entry:
         :return:
         """
-        if KeyType.retry_tiemr in query_entry.data and query_entry.data[KeyType.retry_tiemr]:
+        if KeyType.retry_timer in query_entry.data and query_entry.data[KeyType.retry_timer]:
             message_key_types.unset_cipher(self.pending_key_name)
             self.pending_key_name = None
         self.set_state(KeyExchangeManager.STATE_REQUESTING)
@@ -152,7 +152,7 @@ class KeyExchangeManager:
         rand_time = KeyExchangeManager.KEY_EXCHANGE_RETRY_INTERVAL * random.uniform(0.5, 1.5)
         if self.timer_entry is not None and self.timer_entry.active:
             self.timer_entry.update_expiration_time(rand_time)
-            self.timer_entry.data[KeyType.retry_tiemr] = True
+            self.timer_entry.data[KeyType.retry_timer] = True
         else:
             self.set_invoke_timer(rand_time, retry_entry=True)
 
