@@ -9,7 +9,6 @@ import sys
 sys.path.extend(["../"])
 from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
-from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.app import bbc_app
 from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 
@@ -111,18 +110,18 @@ class TestBBcAppClient(object):
         txobj = transactions[0]
         txdata = bytearray(txobj.serialize())
         txdata[int(len(txdata)/2)] = txdata[int(len(txdata)/2)] + 0x01
-        data_handler = cores[0].networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
+        data_handler = cores[0].networking.domains[domain_id]['data']
         sql = "UPDATE transaction_table SET transaction_data = %s WHERE transaction_id = %s" % \
               (data_handler.db_adaptors[0].placeholder, data_handler.db_adaptors[0].placeholder)
-        data_handler.exec_sql(sql=sql, args=(bytes(txdata), txobj.transaction_id))
+        data_handler.exec_sql(sql=sql, args=(bytes(txdata), txobj.transaction_id), commit=True)
 
         print("* forge transaction[1] with the data of transaction[2] and update the data in node 1")
         txobj = transactions[1]
         txdata = transactions[2].serialize()
-        data_handler = cores[1].networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
+        data_handler = cores[1].networking.domains[domain_id]['data']
         sql = "UPDATE transaction_table SET transaction_data = %s WHERE transaction_id = %s" % \
               (data_handler.db_adaptors[0].placeholder, data_handler.db_adaptors[0].placeholder)
-        data_handler.exec_sql(sql=sql, args=(bytes(txdata), txobj.transaction_id))
+        data_handler.exec_sql(sql=sql, args=(bytes(txdata), txobj.transaction_id), commit=True)
 
     def test_14_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -153,7 +152,7 @@ class TestBBcAppClient(object):
         assert dat[KeyType.status] == 0
         assert KeyType.compromised_transaction_data not in dat
         assert KeyType.transaction_data in dat
-        bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data]).dump()
+        print(bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data]))
 
         print("find txid=", binascii.b2a_hex(transactions[1].transaction_id))
         clients[1]['app'].search_transaction(transactions[1].transaction_id)

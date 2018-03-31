@@ -24,7 +24,6 @@ import threading
 import sys
 sys.path.extend(["../../"])
 from bbc1.common import logger
-from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.core.ethereum import bbc_ethereum
 
 
@@ -99,7 +98,7 @@ class LedgerSubsystem:
         self.domain_id = domain_id
         if domain_id is None:
             return
-        self.data_handler = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
+        self.data_handler = self.networking.domains[domain_id]['data']
         self.logger = logger.get_logger(key="ledger_subsystem", level=loglevel, logname=logname)
         self.queue = Queue()
         self.enabled = enabled
@@ -201,7 +200,7 @@ class LedgerSubsystem:
     def get_merkle_base(self, digest):
         lBase = list()
         while True:
-            row = self.data_handler.exec_sql_fetchall(
+            row = self.data_handler.exec_sql(
                 sql="select * from merkle_leaf_table where digest=%s" % self.data_handler.db_adaptors[0].placeholder,
                 args=(digest,)
             )
@@ -280,7 +279,7 @@ class LedgerSubsystem:
         return dic
 
     def verify_digest(self, digest, dic):
-        row = self.data_handler.exec_sql_fetchall(
+        row = self.data_handler.exec_sql(
             sql="select * from merkle_leaf_table where left=%s or right=%s" %
                 (self.data_handler.db_adaptors[0].placeholder, self.data_handler.db_adaptors[0].placeholder),
             args=(digest,digest)
@@ -298,14 +297,14 @@ class LedgerSubsystem:
                 ), 'utf-8')
             })
             digest = row[0][0]
-            row = self.data_handler.exec_sql_fetchall(
+            row = self.data_handler.exec_sql(
                 sql="select * from merkle_branch_table where left=%s or right=%s" %
                     (self.data_handler.db_adaptors[0].placeholder, self.data_handler.db_adaptors[0].placeholder),
                 args=(digest,digest)
             )
             if row is None:
                 break
-        row = self.data_handler.exec_sql_fetchall(
+        row = self.data_handler.exec_sql(
             sql="select * from merkle_root_table where root=%s" % self.data_handler.db_adaptors[0].placeholder,
             args=(digest,)
         )
@@ -331,7 +330,7 @@ class LedgerSubsystem:
         dic['subtree'] = subtree
 
     def write_branch(self, digest=None, left=None, right=None):
-        row = self.data_handler.exec_sql_fetchall(
+        row = self.data_handler.exec_sql(
             sql="select * from merkle_branch_table where digest=%s" % self.data_handler.db_adaptors[0].placeholder,
             args=(digest,)
         )
@@ -343,7 +342,8 @@ class LedgerSubsystem:
                     (self.data_handler.db_adaptors[0].placeholder,
                      self.data_handler.db_adaptors[0].placeholder,
                      self.data_handler.db_adaptors[0].placeholder),
-                args=(digest,left, right)
+                args=(digest, left, right),
+                commit=True
             )
 
     def write_leaf(self, jTemp, digest=None, left=None, right=None):
@@ -353,7 +353,7 @@ class LedgerSubsystem:
             prev = bytes()
         else:
             prev = binascii.a2b_hex(jTemp['prev'])
-        row = self.data_handler.exec_sql_fetchall(
+        row = self.data_handler.exec_sql(
             sql="select * from merkle_leaf_table where digest=%s" % self.data_handler.db_adaptors[0].placeholder,
             args=(digest,)
         )
@@ -367,7 +367,8 @@ class LedgerSubsystem:
                 args=(digest,
                       left if left is not None else binascii.a2b_hex(jTemp['left']),
                       right if right is not None else binascii.a2b_hex(jTemp['right']),
-                      prev)
+                      prev),
+                commit=True
             )
         jTemp['prev'] = jTemp['digest']
         jTemp['digest'] = None
@@ -388,7 +389,7 @@ class LedgerSubsystem:
         self.eth.blockingSet(root)
 
     def write_root(self, root=None, spec=None):
-        root = self.data_handler.exec_sql_fetchall(
+        root = self.data_handler.exec_sql(
             sql="select * from merkle_root_table where root=%s" % self.data_handler.db_adaptors[0].placeholder,
             args=(root,)
         )
@@ -398,7 +399,8 @@ class LedgerSubsystem:
             self.data_handler.exec_sql(
                 sql="insert into merkle_root_table values (%s, %s)" %
                     (self.data_handler.db_adaptors[0].placeholder, self.data_handler.db_adaptors[0].placeholder),
-                args=(root, spec)
+                args=(root, spec),
+                commit=True
             )
 
 # end of core/ledger_subsystem.py

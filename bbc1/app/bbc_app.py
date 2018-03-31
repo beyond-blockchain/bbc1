@@ -29,7 +29,7 @@ import sys
 sys.path.append("../../")
 
 from bbc1.common import bbclib, message_key_types
-from bbc1.common.bbclib import MsgType, StorageType
+from bbc1.common.bbclib import MsgType
 from bbc1.common.message_key_types import KeyType, PayloadType
 from bbc1.common.bbc_error import *
 from bbc1.common import logger
@@ -345,18 +345,6 @@ class BBcAppClient:
         self.include_admin_info(dat, admin_info, self.domain_keypair)
         return self.send_msg(dat)
 
-    def get_domain_peerlist(self, domain_id):
-        """
-        TODO: will be obsoleted in v0.10
-        Get peer list of the domain from the core node (maybe used by a system administrator)
-
-        :param domain_id:
-        :return:
-        """
-        dat = self.make_message_structure(MsgType.REQUEST_GET_PEERLIST)
-        dat[KeyType.domain_id] = domain_id
-        return self.send_msg(dat)
-
     def set_domain_static_node(self, domain_id, node_id, ipv4, ipv6, port):
         """
         Set static node to the core node (maybe used by a system administrator)
@@ -651,20 +639,6 @@ class BBcAppClient:
         dat[KeyType.count] = count
         return self.send_msg(dat)
 
-    def search_asset(self, asset_group_id, asset_id):
-        """
-        TODO: will be obsoleted in v0.10
-        Search request for the specified asset. This would return transaction_data (and asset_file file content)
-
-        :param asset_group_id:
-        :param asset_id:
-        :return:
-        """
-        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_WITH_CONDITIONS)
-        dat[KeyType.asset_group_id] = asset_group_id
-        dat[KeyType.asset_id] = asset_id
-        return self.send_msg(dat)
-
     def search_transaction(self, transaction_id):
         """
         Search request for transaction_data
@@ -674,19 +648,6 @@ class BBcAppClient:
         """
         dat = self.make_message_structure(MsgType.REQUEST_SEARCH_TRANSACTION)
         dat[KeyType.transaction_id] = transaction_id
-        return self.send_msg(dat)
-
-    def search_transaction_by_userid(self, asset_group_id, user_id):
-        """
-        Search request for transaction_data by user_id
-        TODO: will be obsoleted in v0.10
-        :param asset_group_id:
-        :param user_id: user_id of the asset owner
-        :return: The transaction_data that includes asset with the specified user_id
-        """
-        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_WITH_CONDITIONS)
-        dat[KeyType.asset_group_id] = asset_group_id
-        dat[KeyType.user_id] = user_id
         return self.send_msg(dat)
 
     def request_to_repair_transaction(self, transaction_id):
@@ -811,10 +772,6 @@ class Callback:
             self.proc_resp_search_transaction(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_WITH_CONDITIONS:
             self.proc_resp_search_with_condition(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_ASSET:  # TODO: will be obsoleted in v0.10
-            self.proc_resp_search_with_condition(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_USERID: # TODO: will be obsoleted in v0.10
-            self.proc_resp_search_with_condition(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GATHER_SIGNATURE:
             self.proc_resp_gather_signature(dat)
         elif dat[KeyType.command] == MsgType.REQUEST_SIGNATURE:
@@ -835,8 +792,6 @@ class Callback:
             self.proc_resp_verify_hash(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GET_STATS:
             self.proc_resp_get_stats(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_GET_PEERLIST: # TODO: will be obsoleted in v0.10
-            self.proc_resp_get_neighborlist(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GET_NEIGHBORLIST:
             self.proc_resp_get_neighborlist(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GET_DOMAINLIST:

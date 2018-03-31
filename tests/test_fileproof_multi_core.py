@@ -135,7 +135,7 @@ class TestFileProofClient(object):
     def test_01_setup_network(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
 
-        clients[0].get_domain_peerlist(domain_id=domain_id)
+        clients[0].get_domain_neighborlist(domain_id=domain_id)
         dat = clients[0].callback.synchronize()
         print("[0] nodeinfo=",dat[0])
         node_id, ipv4, ipv6, port = dat[0]
@@ -145,7 +145,7 @@ class TestFileProofClient(object):
         time.sleep(3)
 
         for i in range(client_num):
-            clients[i].get_domain_peerlist(domain_id=domain_id)
+            clients[i].get_domain_neighborlist(domain_id=domain_id)
             dat = clients[i].callback.synchronize()
             print("[%d]--> " % i)
             for k in range(len(dat)):

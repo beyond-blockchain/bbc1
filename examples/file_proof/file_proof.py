@@ -268,8 +268,10 @@ def get_file(file):
         sys.exit(0)
 
     get_transaction = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
-    if KeyType.asset_file in response_data:
-        data = response_data[KeyType.asset_file]
+    if KeyType.all_asset_files in response_data:
+        asset_file_dict = response_data[KeyType.asset_file]
+        asset_id = get_transaction.events[0].asset.asset_id
+        data = asset_file_dict[asset_id]
     else:
         data = get_transaction.events[0].asset.asset_body
     out_file_name = file

@@ -172,7 +172,7 @@ class BBcCoreService:
         msg[KeyType.reason] = txt
         domain_id = msg[KeyType.domain_id]
         if domain_id in self.networking.domains:
-            self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER].send_message_to_user(msg)
+            self.networking.domains[domain_id]['user'].send_message_to_user(msg)
             return True
         else:
             return False
@@ -210,7 +210,7 @@ class BBcCoreService:
             traceback.print_exc()
         self.logger.debug("closing socket")
         if user_info is not None:
-            self.networking.domains[user_info[0]][InfraMessageCategory.CATEGORY_USER].unregister_user(user_info[1],
+            self.networking.domains[user_info[0]]['user'].unregister_user(user_info[1],
                                                                                                       socket)
         try:
             socket.shutdown(py_socket.SHUT_RDWR)
@@ -299,7 +299,7 @@ class BBcCoreService:
         umr = None
         if domain_id is not None:
             if domain_id in self.networking.domains:
-                umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+                umr = self.networking.domains[domain_id]['user']
             else:
                 umr = user_message_routing.UserMessageRoutingDummy(network=self.networking, domain_id=domain_id)
 
@@ -332,39 +332,6 @@ class BBcCoreService:
                                                             user_id=dat.get(KeyType.user_id, None),
                                                             count=dat.get(KeyType.count, 1))
             if txinfo is None or KeyType.transactions not in txinfo:
-                if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
-                    user_message_routing.direct_send_to_user(socket, retmsg)
-            else:
-                retmsg.update(txinfo)
-                umr.send_message_to_user(retmsg)
-
-        # --- TODO: will be obsoleted in v0.10
-        elif cmd == MsgType.REQUEST_SEARCH_USERID:
-            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.user_id], dat):
-                self.logger.debug("REQUEST_SEARCH_USERID: bad format")
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_SEARCH_USERID,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
-            txinfo = self.search_transaction_with_condition(domain_id, asset_group_id=dat[KeyType.asset_group_id],
-                                                            user_id=dat[KeyType.user_id])
-            if txinfo is None:
-                if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
-                    user_message_routing.direct_send_to_user(socket, retmsg)
-            else:
-                retmsg.update(txinfo)
-                umr.send_message_to_user(retmsg)
-
-        # --- TODO: will be obsoleted in v0.10
-        elif cmd == MsgType.REQUEST_SEARCH_ASSET:
-            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.asset_id], dat):
-                self.logger.debug("REQUEST_SEARCH_ASSET: bad format")
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_SEARCH_ASSET,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
-            retmsg[KeyType.asset_group_id] = dat[KeyType.asset_group_id]
-            txinfo = self.search_transaction_with_condition(domain_id, asset_group_id=dat[KeyType.asset_group_id],
-                                                            asset_id=dat[KeyType.asset_id])
-            if txinfo is None:
                 if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
                     user_message_routing.direct_send_to_user(socket, retmsg)
             else:
@@ -497,8 +464,7 @@ class BBcCoreService:
             self.networking.domains[domain_id]['repair'].put_message(dat)
             return False, None
 
-        # --- TODO: REQUEST_GET_PEERLIST will be obsoleted in v0.10
-        elif cmd == MsgType.REQUEST_GET_NEIGHBORLIST or cmd == MsgType.REQUEST_GET_PEERLIST:
+        elif cmd == MsgType.REQUEST_GET_NEIGHBORLIST:
             if not self.networking.check_admin_signature(domain_id, dat):
                 self.logger.error("Illegal access to domain %s" % domain_id.hex())
                 return False, None
@@ -507,7 +473,7 @@ class BBcCoreService:
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             if domain_id in self.networking.domains:
                 retmsg[KeyType.domain_id] = domain_id
-                retmsg[KeyType.neighbor_list] = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].make_neighbor_list()
+                retmsg[KeyType.neighbor_list] = self.networking.domains[domain_id]['topology'].make_neighbor_list()
             else:
                 retmsg[KeyType.status] = False
                 retmsg[KeyType.reason] = "No such domain"
@@ -572,7 +538,7 @@ class BBcCoreService:
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_NODEID,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             data = bytearray()
-            data.extend(self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].my_node_id)
+            data.extend(self.networking.domains[domain_id]['topology'].my_node_id)
             retmsg[KeyType.node_id] = bytes(data)
             user_message_routing.direct_send_to_user(socket, retmsg)
 
@@ -695,7 +661,7 @@ class BBcCoreService:
         self.insert_notification_user_list.setdefault(domain_id, dict())
         self.insert_notification_user_list[domain_id].setdefault(asset_group_id, set())
         self.insert_notification_user_list[domain_id][asset_group_id].add(user_id)
-        umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+        umr = self.networking.domains[domain_id]['user']
         umr.send_multicast_join(asset_group_id, permanent=True)
 
     def remove_from_notification_list(self, domain_id, asset_group_id, user_id):
@@ -719,7 +685,7 @@ class BBcCoreService:
         self.insert_notification_user_list[domain_id][asset_group_id].remove(user_id)
         if len(self.insert_notification_user_list[domain_id][asset_group_id]) == 0:
             self.insert_notification_user_list[domain_id].pop(asset_group_id, None)
-            umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+            umr = self.networking.domains[domain_id]['user']
             umr.send_multicast_leave(asset_group_id)
         if len(self.insert_notification_user_list[domain_id]) == 0:
             self.insert_notification_user_list.pop(domain_id, None)
@@ -777,7 +743,7 @@ class BBcCoreService:
         self.logger.debug("[node:%s] insert_transaction %s" %
                           (self.networking.domains[domain_id]['name'], binascii.b2a_hex(txobj.transaction_id[:4])))
 
-        asset_group_ids = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA].insert_transaction(
+        asset_group_ids = self.networking.domains[domain_id]['data'].insert_transaction(
                                 txdata, txobj=txobj, asset_files=asset_files)
         if asset_group_ids is None:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
@@ -797,7 +763,7 @@ class BBcCoreService:
         :param only_registered_user:  If True, notification is not sent to other nodes
         :return:
         """
-        umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+        umr = self.networking.domains[domain_id]['user']
         destination_users = set()
         destination_nodes = set()
         for asset_group_id in asset_group_ids:
@@ -841,7 +807,7 @@ class BBcCoreService:
         destinations = dat[KeyType.destination_user_ids]
         msg = make_message_structure(domain_id, MsgType.REQUEST_SIGNATURE, None, dat[KeyType.query_id])
         msg[KeyType.source_user_id] = dat[KeyType.source_user_id]
-        umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+        umr = self.networking.domains[domain_id]['user']
         for dst in destinations:
             if dst == dat[KeyType.source_user_id]:
                 continue
@@ -873,7 +839,7 @@ class BBcCoreService:
             self.logger.error("Transaction_id must not be None")
             return None
 
-        dh = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
+        dh = self.networking.domains[domain_id]['data']
         ret_txobj, ret_asset_files = dh.search_transaction(transaction_id=txid)
         if ret_txobj is None or len(ret_txobj) == 0:
             return None
@@ -902,7 +868,7 @@ class BBcCoreService:
             self.logger.error("No such domain")
             return None
 
-        dh = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
+        dh = self.networking.domains[domain_id]['data']
         ret_txobj, ret_asset_files = dh.search_transaction(asset_group_id=asset_group_id,
                                                            asset_id=asset_id, user_id=user_id, count=count)
         if ret_txobj is None or len(ret_txobj) == 0:

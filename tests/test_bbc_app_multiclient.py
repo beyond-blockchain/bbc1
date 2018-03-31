@@ -51,9 +51,6 @@ class MessageProcessor(bbc_app.Callback):
     def proc_resp_search_asset(self, dat):
         if KeyType.transaction_data in dat:
             self.logger.debug("OK: Asset [%s] is found." % binascii.b2a_hex(dat[KeyType.asset_id]))
-            if KeyType.asset_file in dat:
-                self.logger.debug(" [%s] in_storage --> %s" % (binascii.b2a_hex(dat[KeyType.asset_id][:4]),
-                                                               dat[KeyType.asset_file]))
             tx_obj = bbclib.recover_transaction_object_from_rawdata(dat[KeyType.transaction_data])
             for evt in tx_obj.events:
                 if evt.asset.asset_body_size > 0:
