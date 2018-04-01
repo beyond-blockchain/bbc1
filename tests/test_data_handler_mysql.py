@@ -72,6 +72,7 @@ class TestDataHandler(object):
             txobj.digest()
             transactions.append(txobj)
 
+    """
     def test_02_check_table_existence(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         ret = data_handler.db_adaptors[0].check_table_existence('transaction_table')
@@ -136,10 +137,10 @@ class TestDataHandler(object):
         for i in range(2):
             assert ret[i][2] in [txid1, transactions[0].transaction_id]
 
-        ret = data_handler.search_transaction_topology(transactions[1].transaction_id, reverse_link=True)
+        ret = data_handler.search_transaction_topology(transactions[1].transaction_id, traverse_to_past=False)
         assert len(ret) == 1
         assert ret[0][1] == transactions[2].transaction_id
-
+    """
 
 if __name__ == '__main__':
     pytest.main()

@@ -52,6 +52,7 @@ DURATION_GIVEUP_GET = 10
 GET_RETRY_COUNT = 3
 INTERVAL_RETRY = 3
 DEFAULT_ANYCAST_TTL = 5
+TX_TRAVERSAL_MAX = 30
 
 ticker = query_management.get_ticker()
 core_service = None
@@ -336,6 +337,26 @@ class BBcCoreService:
                     user_message_routing.direct_send_to_user(socket, retmsg)
             else:
                 retmsg.update(txinfo)
+                umr.send_message_to_user(retmsg)
+
+        if cmd == MsgType.REQUEST_TRAVERSE_TRANSACTIONS:
+            if not self.param_check([KeyType.domain_id, KeyType.transaction_id,
+                                     KeyType.direction, KeyType.hop_count], dat):
+                self.logger.debug("REQUEST_TRAVERSE_TRANSACTIONS: bad format")
+                return False, None
+            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_TRAVERSE_TRANSACTIONS,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg[KeyType.transaction_id] = dat[KeyType.transaction_id]
+            all_included, txtree, asset_files = self.traverse_transactions(domain_id, dat[KeyType.transaction_id],
+                                                                           dat[KeyType.direction], dat[KeyType.hop_count])
+            if txtree is None or len(txtree) == 0:
+                if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
+                    user_message_routing.direct_send_to_user(socket, retmsg)
+            else:
+                retmsg[KeyType.transaction_tree] = txtree
+                retmsg[KeyType.all_included] = all_included
+                if len(asset_files) > 0:
+                    retmsg[KeyType.all_asset_files] = asset_files
                 umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_GATHER_SIGNATURE:
@@ -743,8 +764,8 @@ class BBcCoreService:
         self.logger.debug("[node:%s] insert_transaction %s" %
                           (self.networking.domains[domain_id]['name'], binascii.b2a_hex(txobj.transaction_id[:4])))
 
-        asset_group_ids = self.networking.domains[domain_id]['data'].insert_transaction(
-                                txdata, txobj=txobj, asset_files=asset_files)
+        asset_group_ids = self.networking.domains[domain_id]['data'].insert_transaction(txdata, txobj=txobj,
+                                                                                        asset_files=asset_files)
         if asset_group_ids is None:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("[%s] Fail to insert a transaction into the ledger" % self.networking.domains[domain_id]['name'])
@@ -875,6 +896,71 @@ class BBcCoreService:
             return None
 
         return create_search_result(ret_txobj, ret_asset_files)
+
+    def traverse_transactions(self, domain_id, transaction_id, direction=1, hop_count=3):
+        """
+        Get transaction tree from a base txid
+        :param domain_id:
+        :param transaction_id:
+        :param direction: 1:backward, non-1:forward
+        :param hop_count:
+        :return:
+        """
+        self.stats.update_stats_increment("transaction", "search_count", 1)
+        if domain_id is None:
+            self.logger.error("No such domain")
+            return None
+        if transaction_id is None:
+            self.logger.error("Transaction_id must not be None")
+            return None
+
+        dh = self.networking.domains[domain_id]['data']
+        txtree = list()
+        asset_files = dict()
+
+        traverse_to_past = True if direction == 1 else False
+        tx_count = 0
+        txids = dict()
+        current_txids = [transaction_id]
+        include_all_flag = True
+        if hop_count > TX_TRAVERSAL_MAX * 2:
+            hop_count = TX_TRAVERSAL_MAX * 2
+            include_all_flag = False
+        for i in range(hop_count):
+            tx_brothers = list()
+            next_txids = list()
+            #print("### txcount=%d, len(current_txids)=%d" % (tx_count, len(current_txids)))
+            if tx_count + len(current_txids) > TX_TRAVERSAL_MAX:  # up to 30 entries
+                include_all_flag = False
+                break
+            #print("[%d] current_txids:%s" % (i, [d.hex() for d in current_txids]))
+            for txid in current_txids:
+                if txid in txids:
+                    continue
+                tx_count += 1
+                txids[txid] = True
+                ret_txobj, ret_asset_files = dh.search_transaction(transaction_id=txid)
+                if ret_txobj is None or len(ret_txobj) == 0:
+                    continue
+                tx_brothers.append(ret_txobj[txid].transaction_data)
+                if len(ret_asset_files) > 0:
+                    asset_files.update(ret_asset_files)
+
+                ret = dh.search_transaction_topology(transaction_id=txid, traverse_to_past=traverse_to_past)
+                #print("txid=%s: (%d) ret=%s" % (txid.hex(), len(ret), ret))
+                if ret is not None:
+                    for topology in ret:
+                        if traverse_to_past:
+                            next_txid = topology[2]
+                        else:
+                            next_txid = topology[1]
+                        if next_txid not in txids:
+                            next_txids.append(next_txid)
+            if len(tx_brothers) > 0:
+                txtree.append(tx_brothers)
+            current_txids = next_txids
+
+        return include_all_flag, txtree, asset_files
 
     def add_cross_ref_into_list(self, domain_id, txid):
         """

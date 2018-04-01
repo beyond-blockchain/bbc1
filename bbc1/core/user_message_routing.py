@@ -180,7 +180,7 @@ class UserMessageRouting:
     def _send(self, sock, msg):
         try:
             if sock in self.aes_name_list:
-                direct_send_to_user(sock, msg, name=self.aes_name_list[s])
+                direct_send_to_user(sock, msg, name=self.aes_name_list[sock])
             else:
                 direct_send_to_user(sock, msg)
             self.stats.update_stats_increment("user_message", "sent_msg_to_user", 1)
@@ -409,13 +409,13 @@ class UserMessageRoutingDummy(UserMessageRouting):
     def unregister_user(self, user_id, socket=None):
         pass
 
-    def add_user_for_forwarding(self, user_id, node_id):
+    def add_user_for_forwarding(self, user_id, node_id, permanent=False):
         pass
 
     def remove_user_from_forwarding(self, query_entry=None, user_id=None, node_id=None):
         pass
 
-    def send_message_to_user(self, msg, sock=None):
+    def send_message_to_user(self, msg, direct_only=False):
         pass
 
     def forward_message_to_another_node(self, msg):
@@ -430,7 +430,7 @@ class UserMessageRoutingDummy(UserMessageRouting):
     def resolve_failure(self, query_entry):
         pass
 
-    def send_multicast_join(self, user_id):
+    def send_multicast_join(self, user_id, permanent=False):
         pass
 
     def process_message(self, msg):

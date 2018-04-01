@@ -26,19 +26,6 @@ sys.path.extend(["../../"])
 from bbc1.common import logger
 from bbc1.core.ethereum import bbc_ethereum
 
-
-merkle_branch_db_definition = [
-    ["digest", "BLOB"], ["left", "BLOB"], ["right", "BLOB"],
-]
-
-merkle_leaf_db_definition = [
-    ["digest", "BLOB"], ["left", "BLOB"], ["right", "BLOB"], ["prev", "BLOB"],
-]
-
-merkle_root_db_definition = [
-    ["root", "BLOB"], ["spec", "BLOB"],
-]
-
 temp_json = {
     "digest": None,
     "left": None,
@@ -46,8 +33,6 @@ temp_json = {
     "prev": None,
     "count": 0,
 }
-
-DB_NAME = 'merkle_db'
 
 
 class Queue:
@@ -280,7 +265,7 @@ class LedgerSubsystem:
 
     def verify_digest(self, digest, dic):
         row = self.data_handler.exec_sql(
-            sql="select * from merkle_leaf_table where left=%s or right=%s" %
+            sql="select * from merkle_leaf_table where leaf_left=%s or leaf_right=%s" %
                 (self.data_handler.db_adaptors[0].placeholder, self.data_handler.db_adaptors[0].placeholder),
             args=(digest,digest)
         )
@@ -298,7 +283,7 @@ class LedgerSubsystem:
             })
             digest = row[0][0]
             row = self.data_handler.exec_sql(
-                sql="select * from merkle_branch_table where left=%s or right=%s" %
+                sql="select * from merkle_branch_table where leaf_left=%s or leaf_right=%s" %
                     (self.data_handler.db_adaptors[0].placeholder, self.data_handler.db_adaptors[0].placeholder),
                 args=(digest,digest)
             )
