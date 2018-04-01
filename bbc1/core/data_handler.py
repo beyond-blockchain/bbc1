@@ -38,16 +38,16 @@ asset_info_definition = [
 ]
 
 topology_info_definition = [
-    ["id", "INTEGER"], ["tx_to", "BLOB"], ["tx_from", "BLOB"]
+    ["id", "INTEGER"], ["base", "BLOB"], ["point_to", "BLOB"]
 ]
 
 #--- for anchoring ethereum/bitcoin blockchain ---
 merkle_branch_db_definition = [
-    ["digest", "BLOB"], ["left", "BLOB"], ["right", "BLOB"],
+    ["digest", "BLOB"], ["leaf_left", "BLOB"], ["leaf_right", "BLOB"],
 ]
 
 merkle_leaf_db_definition = [
-    ["digest", "BLOB"], ["left", "BLOB"], ["right", "BLOB"], ["prev", "BLOB"],
+    ["digest", "BLOB"], ["leaf_left", "BLOB"], ["leaf_right", "BLOB"], ["prev", "BLOB"],
 ]
 
 merkle_root_db_definition = [
@@ -161,9 +161,9 @@ class DataHandler:
         try:
             db_num = 0 if db_num >= len(self.db_adaptors) else db_num
             if len(args) > 0:
-                ret = self.db_adaptors[db_num].db_cur.execute(sql, args)
+                self.db_adaptors[db_num].db_cur.execute(sql, args)
             else:
-                ret = self.db_adaptors[db_num].db_cur.execute(sql)
+                self.db_adaptors[db_num].db_cur.execute(sql)
             if commit:
                 self.db_adaptors[db_num].db.commit()
                 ret = None
@@ -209,10 +209,10 @@ class DataHandler:
         """
         info = list()
         for reference in txobj.references:
-            info.append((txobj.transaction_id, reference.transaction_id))
+            info.append((txobj.transaction_id, reference.transaction_id))  # (base, point_to)
         for idx, rtn in enumerate(txobj.relations):
             for pt in rtn.pointers:
-                info.append((txobj.transaction_id, pt.transaction_id))
+                info.append((txobj.transaction_id, pt.transaction_id))  # (base, point_to)
         return info
 
     def insert_transaction(self, txdata, txobj=None, asset_files=None, no_replication=False):
@@ -267,11 +267,12 @@ class DataHandler:
                               self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
                               self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
                           args=(txobj.transaction_id, asset_group_id, asset_id, user_id), commit=True)
-        for tx_to, tx_from in self.get_topology_info(txobj):
+        for base, point_to in self.get_topology_info(txobj):
             self.exec_sql(db_num=db_num,
-                          sql="INSERT INTO topology_table(tx_to, tx_from) VALUES (%s, %s)" %
+                          sql="INSERT INTO topology_table(base, point_to) VALUES (%s, %s)" %
                               (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
-                          args=(tx_to, tx_from), commit=True)
+                          args=(base, point_to), commit=True)
+            #print("topology: base:%s, point_to:%s" % (base.hex(), point_to.hex()))
         return True
 
     def store_asset_files(self, txobj, asset_files):
@@ -352,12 +353,12 @@ class DataHandler:
                 args=(asset_group_id, asset_id, user_id), commit=True)
             if fileflag:
                 self.remove_in_storage(asset_group_id, asset_id)
-        for tx_to, tx_from in self.get_topology_info(txobj):
+        for base, point_to in self.get_topology_info(txobj):
             self.exec_sql(
                 db_num=db_num,
-                sql="DELETE FROM topology_table WHERE tx_to = %s AND tx_from = %s" %
+                sql="DELETE FROM topology_table WHERE base = %s AND point_to = %s" %
                     (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
-                args=(tx_to, tx_from), commit=True)
+                args=(base, point_to), commit=True)
 
     def remove_asset_files(self, txobj, asset_files=None):
         """
@@ -428,20 +429,21 @@ class DataHandler:
                     result_asset_files[asset_id] = self.get_in_storage(asset_group_id, asset_id)
         return result_txobj, result_asset_files
 
-    def search_transaction_topology(self, transaction_id, reverse_link=False):
+    def search_transaction_topology(self, transaction_id, traverse_to_past=True):
         """
         Search in topology info
         :param transaction_id:
+        :param traverse_to_past:
         :return:
         """
         if transaction_id is None:
             return None
-        if reverse_link:
-            return self.exec_sql(sql="SELECT * FROM topology_table WHERE tx_from = %s" %
+        if traverse_to_past:
+            return self.exec_sql(sql="SELECT * FROM topology_table WHERE base = %s" %
                                  self.db_adaptors[0].placeholder, args=(transaction_id,))
 
         else:
-            return self.exec_sql(sql="SELECT * FROM topology_table WHERE tx_to = %s" %
+            return self.exec_sql(sql="SELECT * FROM topology_table WHERE point_to = %s" %
                                  self.db_adaptors[0].placeholder, args=(transaction_id,))
 
     def store_in_storage(self, asset_group_id, asset_id, content):

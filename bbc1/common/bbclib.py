@@ -1117,7 +1117,7 @@ class BBcPointer:
         self.asset_id = asset_id
 
     def __str__(self):
-        ret =  "     domain_id: %s\n" % str_binary(self.transaction_id)
+        ret =  "     transaction_id: %s\n" % str_binary(self.transaction_id)
         ret += "     asset_id: %s\n" % str_binary(self.asset_id)
         return ret
 
@@ -1372,10 +1372,12 @@ class MsgType:
     RESPONSE_SEARCH_TRANSACTION = 83
     REQUEST_SEARCH_WITH_CONDITIONS = 86
     RESPONSE_SEARCH_WITH_CONDITIONS = 87
-    REQUEST_CROSS_REF = 88
-    RESPONSE_CROSS_REF = 89
-    REQUEST_REPAIR = 90
-    RESPONSE_REPAIR = 91
+    REQUEST_TRAVERSE_TRANSACTIONS = 88
+    RESPONSE_TRAVERSE_TRANSACTIONS = 89
+    REQUEST_CROSS_REF = 90
+    RESPONSE_CROSS_REF = 91
+    REQUEST_REPAIR = 92
+    RESPONSE_REPAIR = 93
 
     REQUEST_REGISTER_HASH_IN_SUBSYS = 128
     RESPONSE_REGISTER_HASH_IN_SUBSYS = 129

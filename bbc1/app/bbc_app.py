@@ -650,6 +650,21 @@ class BBcAppClient:
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
+    def traverse_transactions(self, transaction_id, direction=1, hop_count=3):
+        """
+        Search request for transaction_data
+
+        :param transaction_id:
+        :param direction: 1:backforward, non-1:forward
+        :param hop_count:
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_TRAVERSE_TRANSACTIONS)
+        dat[KeyType.transaction_id] = transaction_id
+        dat[KeyType.direction] = direction
+        dat[KeyType.hop_count] = hop_count
+        return self.send_msg(dat)
+
     def request_to_repair_transaction(self, transaction_id):
         """
         Request to repair compromised transaction data
@@ -772,6 +787,8 @@ class Callback:
             self.proc_resp_search_transaction(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_WITH_CONDITIONS:
             self.proc_resp_search_with_condition(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_TRAVERSE_TRANSACTIONS:
+            self.proc_resp_travarse_transactions(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GATHER_SIGNATURE:
             self.proc_resp_gather_signature(dat)
         elif dat[KeyType.command] == MsgType.REQUEST_SIGNATURE:
@@ -878,6 +895,9 @@ class Callback:
         self.queue.put(dat)
 
     def proc_resp_search_transaction(self, dat):
+        self.queue.put(dat)
+
+    def proc_resp_travarse_transactions(self, dat):
         self.queue.put(dat)
 
     def proc_user_message(self, dat):
