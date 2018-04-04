@@ -138,7 +138,7 @@ class TestFileProofClient(object):
         clients[0].get_domain_neighborlist(domain_id=domain_id)
         dat = clients[0].callback.synchronize()
         print("[0] nodeinfo=",dat[0])
-        node_id, ipv4, ipv6, port = dat[0]
+        node_id, ipv4, ipv6, port, domain0 = dat[0]
 
         clients[1].send_domain_ping(domain_id, ipv4, ipv6, port)  # if this line is commented out, error occurs later.
 
@@ -149,7 +149,7 @@ class TestFileProofClient(object):
             dat = clients[i].callback.synchronize()
             print("[%d]--> " % i)
             for k in range(len(dat)):
-                node_id, ipv4, ipv6, port = dat[k]
+                node_id, ipv4, ipv6, port, domain0 = dat[k]
                 if k == 0:
                     print(" *myself*    %s, %s, %s, %d" % (binascii.b2a_hex(node_id[:4]), ipv4, ipv6, port))
                 else:

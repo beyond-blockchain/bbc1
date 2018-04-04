@@ -72,7 +72,7 @@ def deserialize_data(payload_type, dat):
 
 def make_binary(dat):
     ret = bytearray()
-    if isinstance(dat, list):
+    if isinstance(dat, list) or isinstance(dat, tuple):
         ret.extend(int(3).to_bytes(4, "big"))  # data type = list
         total_len = 0
         array_dat = bytearray()
@@ -253,6 +253,7 @@ class KeyType:
     on_multinodes = to_4byte(24)
     is_anycast = to_4byte(25)
     anycast_ttl = to_4byte(26)
+    is_replication = to_4byte(27)
 
     static_entry = to_4byte(0, 0x30)
     ipv4_address = to_4byte(1, 0x30)
@@ -292,10 +293,15 @@ class KeyType:
     ref_index = to_4byte(3, 0x70)
     all_asset_files = to_4byte(4, 0x70)
     signature = to_4byte(5, 0x70)
-    cross_refs = to_4byte(6, 0x70)
-    compromised_transaction_data = to_4byte(7, 0x70)
-    compromised_transactions = to_4byte(8, 0x70)
-    compromised_asset_files = to_4byte(9, 0x70)
+    cross_ref = to_4byte(6, 0x70)
+    cross_refs = to_4byte(7, 0x70)
+    outer_domain_id = to_4byte(8, 0x70)
+    txid_having_cross_ref = to_4byte(9, 0x70)
+    cross_ref_digest = to_4byte(10, 0x70)
+    cross_ref_digests = to_4byte(11, 0x70)
+    compromised_transaction_data = to_4byte(12, 0x70)
+    compromised_transactions = to_4byte(13, 0x70)
+    compromised_asset_files = to_4byte(14, 0x70)
 
     ledger_subsys_manip = to_4byte(0, 0xA0)     # enable/disable ledger_subsystem
     ledger_subsys_register = to_4byte(1, 0xA0)

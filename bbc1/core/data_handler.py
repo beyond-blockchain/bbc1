@@ -41,6 +41,11 @@ topology_info_definition = [
     ["id", "INTEGER"], ["base", "BLOB"], ["point_to", "BLOB"]
 ]
 
+cross_ref_tbl_definition = [
+    ["id", "INTEGER"], ["domain_id", "BLOB"], ["transaction_id", "BLOB"],
+    ["outer_domain_id", "BLOB"], ["txid_having_cross_ref", "BLOB"],
+]
+
 #--- for anchoring ethereum/bitcoin blockchain ---
 merkle_branch_db_definition = [
     ["digest", "BLOB"], ["leaf_left", "BLOB"], ["leaf_right", "BLOB"],
@@ -69,13 +74,10 @@ class DataHandler:
     NOTIFY_INSERTED = to_2byte(4)
     REPAIR_TRANSACTION_DATA = to_2byte(5)
 
-    def __init__(self, network=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
-        if network is not None:
-            self.network = network
-            self.core = network.core
-            self.stats = network.core.stats
-        else:
-            self.stats = BBcStats()
+    def __init__(self, networking=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
+        self.networking = networking
+        self.core = networking.core
+        self.stats = networking.core.stats
         self.logger = logger.get_logger(key="data_handler", level=loglevel, logname=logname)
         self.domain_id = domain_id
         self.domain_id_str = bbclib.convert_id_to_string(domain_id)
@@ -122,6 +124,7 @@ class DataHandler:
             db.create_table('transaction_table', transaction_tbl_definition, primary_key=0, indices=[0])
             db.create_table('asset_info_table', asset_info_definition, primary_key=0, indices=[0, 1, 2, 3, 4])
             db.create_table('topology_table', topology_info_definition, primary_key=0, indices=[0, 1, 2])
+            db.create_table('cross_ref_table', cross_ref_tbl_definition, primary_key=0, indices=[1, 2])
             db.create_table('merkle_branch_table', merkle_branch_db_definition, primary_key=0, indices=[1, 2])
             db.create_table('merkle_leaf_table', merkle_leaf_db_definition, primary_key=0, indices=[1, 2])
             db.create_table('merkle_root_table', merkle_root_db_definition, primary_key=0, indices=[0])
@@ -242,6 +245,15 @@ class DataHandler:
         if not no_replication and self.replication_strategy != DataHandler.REPLICATION_EXT:
             self.send_replication_to_other_cores(txdata, asset_files)
 
+        if self.networking.domain0manager is not None:
+            self.networking.domain0manager.distribute_cross_ref_in_domain0(domain_id=self.domain_id, transaction_id=txobj.transaction_id)
+            if len(txobj.cross_refs) > 0:
+                for cross_ref in txobj.cross_refs:
+                    self.networking.domain0manager.cross_ref_registered(domain_id=self.domain_id,
+                                                                        transaction_id=txobj.transaction_id,
+                                                                        cross_ref=(cross_ref.domain_id,
+                                                                                   cross_ref.transaction_id))
+
         return asset_group_ids
 
     def insert_transaction_into_a_db(self, db_num, txobj):
@@ -274,6 +286,29 @@ class DataHandler:
                           args=(base, point_to), commit=True)
             #print("topology: base:%s, point_to:%s" % (base.hex(), point_to.hex()))
         return True
+
+    def insert_cross_ref(self, domain_id, transaction_id, outer_domain_id, txid_having_cross_ref):
+        sql = "INSERT INTO cross_ref_table (domain_id, transaction_id, outer_domain_id, txid_having_cross_ref) " + \
+              "VALUES (%s, %s, %s, %s)" % (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
+                                            self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder)
+        for i in range(len(self.db_adaptors)):
+            self.exec_sql(db_num=i, sql=sql, args=(domain_id, transaction_id, outer_domain_id, txid_having_cross_ref),
+                          commit=True)
+
+    def count_domain_in_cross_ref(self, outer_domain_id):
+        # TODO: need to consider registered_time
+        sql = "SELECT count(*) FROM cross_ref_table WHERE outer_domain = %s" % self.db_adaptors[0].placeholder
+        ret = self.exec_sql(sql=sql, args=(outer_domain_id,))
+        return ret
+
+    def search_domain_having_cross_ref(self, domain_id, transaction_id=None):
+        if transaction_id is not None:
+            sql = "SELECT * FROM cross_ref_table WHERE domanin_id = %s AND transaction_id = %s" %\
+                  (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder)
+            return self.exec_sql(sql=sql, args=(domain_id, transaction_id))
+        else:
+            sql = "SELECT * FROM cross_ref_table WHERE domanin_id = %s" % self.db_adaptors[0].placeholder
+            return self.exec_sql(sql=sql, args=(domain_id,))
 
     def store_asset_files(self, txobj, asset_files):
         """
@@ -310,7 +345,7 @@ class DataHandler:
         if asset_files is not None:
             msg[KeyType.all_asset_files] = asset_files
         if self.replication_strategy == DataHandler.REPLICATION_ALL:
-            self.network.broadcast_message_in_network(domain_id=self.domain_id,
+            self.networking.broadcast_message_in_network(domain_id=self.domain_id,
                                                       payload_type=PayloadType.Type_msgpack, msg=msg)
         elif self.replication_strategy == DataHandler.REPLICATION_P2P:
             pass  # TODO: implement (destinations determined by TopologyManager)
@@ -507,6 +542,16 @@ class DataHandler:
             return
         os.remove(path)
 
+    def add_cross_ref_into_list(self, cross_ref):
+        """
+        (internal use) register cross_ref info in the list
+
+        :param cross_ref:  tuple(domain_id, transaction_id)
+        :return:
+        """
+        self.stats.update_stats_increment("cross_ref", "total_num", 1)
+        self.cross_ref_list.append(cross_ref)
+
     def process_message(self, msg):
         """
         (internal use) process received message
@@ -535,7 +580,7 @@ class DataHandler:
             else:
                 msg[KeyType.result] = True
                 msg[KeyType.transaction_data] = ret[0][1]
-            self.network.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
+            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
                                                  domain_id=self.domain_id, msg=msg)
 
         elif msg[KeyType.infra_command] == DataHandler.RESPONSE_SEARCH:
@@ -553,11 +598,11 @@ class DataHandler:
                                                  only_registered_user=True)
 
         elif msg[KeyType.infra_command] == DataHandler.REPAIR_TRANSACTION_DATA:
-            self.network.domains[self.domain_id]['repair'].put_message(msg)
+            self.networking.domains[self.domain_id]['repair'].put_message(msg)
 
 
 class DataHandlerDomain0(DataHandler):
-    def __init__(self, network=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
+    def __init__(self, networking=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
         pass
 
     def close_db(self):

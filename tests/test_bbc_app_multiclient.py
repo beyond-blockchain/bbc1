@@ -24,7 +24,6 @@ domain_id = bbclib.get_new_id("testdomain")
 asset_group_id = bbclib.get_new_id("asset_group_1")
 transactions = [None for i in range(client_num)]
 transaction_dat = None
-cross_ref_list = [[] for i in range(client_num)]
 
 msg_processor = [None for i in range(client_num)]
 
@@ -94,12 +93,6 @@ class TestBBcAppClient(object):
         transactions[0].events[0].asset.add(user_id=user, asset_body=b'123456')
         transactions[0].events[1].asset.add(user_id=user, asset_file=b'abcdefg')
         transactions[0].events[1].add(mandatory_approver=clients[1]['user_id'])
-
-        for i, cl in enumerate(clients):
-            ret = cl['app'].get_cross_refs(asset_group_id=asset_group_id, number=2)
-            assert ret
-            dat = msg_processor[i].synchronize()
-            cross_ref_list[i].extend(dat)
 
     def test_04_insert(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")

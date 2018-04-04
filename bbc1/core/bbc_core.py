@@ -32,13 +32,15 @@ import hashlib
 import binascii
 import traceback
 import json
+import random
 
 import sys
 sys.path.extend(["../../"])
 from bbc1.common import bbclib, message_key_types, logger
 from bbc1.common.message_key_types import KeyType, to_2byte
 from bbc1.common.bbclib import BBcTransaction, MsgType
-from bbc1.core import bbc_network, user_message_routing, data_handler, repair_manager, query_management, bbc_stats
+from bbc1.core import bbc_network, user_message_routing, data_handler, repair_manager
+from bbc1.core import domain0_manager, query_management, bbc_stats
 from bbc1.core.bbc_config import BBcConfig
 from bbc1.core.data_handler import InfraMessageCategory
 from bbc1.core import command
@@ -128,7 +130,6 @@ class BBcCoreService:
         self.logger.debug("config = %s" % conf)
         self.test_tx_obj = BBcTransaction()
         self.insert_notification_user_list = dict()
-        self.cross_ref_list = []
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port,
                                                  external_ip4addr=ip4addr, external_ip6addr=ip6addr,
                                                  loglevel=loglevel, logname=logname)
@@ -302,7 +303,7 @@ class BBcCoreService:
             if domain_id in self.networking.domains:
                 umr = self.networking.domains[domain_id]['user']
             else:
-                umr = user_message_routing.UserMessageRoutingDummy(network=self.networking, domain_id=domain_id)
+                umr = user_message_routing.UserMessageRoutingDummy(networking=self.networking, domain_id=domain_id)
 
         cmd = dat[KeyType.command]
         if cmd == MsgType.REQUEST_SEARCH_TRANSACTION:
@@ -403,24 +404,27 @@ class BBcCoreService:
             retmsg[KeyType.source_user_id] = dat[KeyType.source_user_id]
             umr.send_message_to_user(retmsg)
 
-        elif cmd == MsgType.REQUEST_CROSS_REF:
-            if KeyType.count in dat:
-                num = dat[KeyType.count]
-            else:
-                num = 1
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_CROSS_REF,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
-            retmsg[KeyType.cross_refs] = self.pop_cross_refs(num=num)
-            umr.send_message_to_user(retmsg)
-
         elif cmd == MsgType.MESSAGE:
-            if not self.param_check([KeyType.domain_id, KeyType.source_user_id,
-                                     KeyType.destination_user_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.destination_user_id], dat):
                 self.logger.debug("MESSAGE: bad format")
                 return False, None
             if KeyType.is_anycast in dat:
                 dat[KeyType.anycast_ttl] = DEFAULT_ANYCAST_TTL
             umr.send_message_to_user(dat)
+
+        elif cmd == MsgType.REQUEST_CROSS_REF_VERIFY:
+            if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.transaction_id], dat):
+                self.logger.debug("REQUEST_CROSS_REF_VERIFY: bad format")
+                return False, None
+            dat[KeyType.command] = domain0_manager.Domain0Manager.REQUEST_VERIFY
+            self.networking.send_message_to_a_domain0_manager(domain_id, dat)
+
+        elif cmd == MsgType.REQUEST_CROSS_REF_RANDOM_PICK:
+            if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.count], dat):
+                self.logger.debug("REQUEST_CROSS_REF_RANDOM_PICK: bad format")
+                return False, None
+            dat[KeyType.command] = domain0_manager.Domain0Manager.REQUEST_VERIFY
+            self.networking.send_message_to_a_domain0_manager(domain_id, dat)
 
         elif cmd == MsgType.REQUEST_REGISTER_HASH_IN_SUBSYS:
             if not self.param_check([KeyType.transaction_id], dat):
@@ -962,28 +966,20 @@ class BBcCoreService:
 
         return include_all_flag, txtree, asset_files
 
-    def add_cross_ref_into_list(self, domain_id, txid):
-        """
-        (internal use) register cross_ref info in the list
-
-        :param domain_id:
-        :param txid:
-        :return:
-        """
-        self.stats.update_stats_increment("cross_ref", "total_num", 1)
-        self.cross_ref_list.append([domain_id, txid])
-
-    def pop_cross_refs(self, num=1):
+    def pop_cross_refs(self, domain_id, num=1):
         """
         Return TxIDs for cross_refs
-
+        :param domain_id:
         :param num: The number of set of (txid, domain_id) to return
         :return:
         """
         refs = []
+        if domain_id is None:
+            self.logger.error("No such domain")
+            return refs
         for i in range(num):
-            if len(self.cross_ref_list) > 0:
-                refs.append(self.cross_ref_list.pop(0))
+            if len(self.networking.domains[domain_id]['data'].cross_ref_list) > 0:
+                refs.append(self.networking.domains[domain_id]['user'].cross_ref_list.pop(0))
                 self.stats.update_stats_decrement("cross_ref", "total_num", 1)
             else:
                 break

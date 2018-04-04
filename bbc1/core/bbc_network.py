@@ -323,6 +323,22 @@ class BBcNetwork:
         self.config.update_config()
         self.logger.info("Done...")
 
+    def send_message_to_a_domain0_manager(self, domain_id, msg):
+        """
+        Choose one of domain0_managers and send msg to it
+        :param domain_id:
+        :param msg:
+        :return:
+        """
+        if domain_id not in self.domains:
+            return None
+        managers = tuple(filter(lambda nd: nd.is_domain0_node, self.domains[domain_id]['neighbor'].nodeinfo.values()))
+        if len(managers) == 0:
+            return None
+        msg[KeyType.destination_node_id] = random.choice(managers)
+        msg[KeyType.infra_msg_type] = InfraMessageCategory.CATEGORY_DOMAIN0
+        self.domains[domain_id].send_message_in_network(None, PayloadType.Type_msgpack, domain_id, msg)
+
     def get_domain_keypair(self, domain_id):
         """
         (internal use) Get domain_keys (private key and public key)
@@ -678,8 +694,7 @@ class BBcNetwork:
 
         elif msg[KeyType.command] == BBcNetwork.NOTIFY_LEAVE:
             if KeyType.source_node_id in msg:
-                self.domains[domain_id]['topology'].notify_neighbor_update(source_node_id,
-                                                                                                       is_new=False)
+                self.domains[domain_id]['topology'].notify_neighbor_update(source_node_id, is_new=False)
                 self.domains[domain_id]['neighbor'].remove(source_node_id)
 
     def setup_udp_socket(self):
@@ -982,9 +997,6 @@ class NodeInfo:
         self.updated_at = time.time()
         self.is_alive = True
         return change_flag
-
-    def seq_increment(self):
-        self.admin_sequence_number += 1
 
     def get_nodeinfo(self):
         if self.ipv4 is not None:

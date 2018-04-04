@@ -28,7 +28,6 @@ domain_id = bbclib.get_new_id("testdomain", include_timestamp=False)
 asset_group_id = bbclib.get_new_id("asset_group_1")
 transactions = [None for i in range(client_num)]
 transaction_dat = None
-cross_ref_list = []
 
 msg_processor = [None for i in range(client_num)]
 
@@ -154,7 +153,7 @@ class TestBBcAppClient(object):
         clients[4]['app'].get_domain_neighborlist(domain_id=domain_id)
         dat = msg_processor[4].synchronize()
         print("[4] nodeinfo=",dat[0])
-        node_id, ipv4, ipv6, port = dat[0]
+        node_id, ipv4, ipv6, port, domain0 = dat[0]
 
         clients[0]['app'].set_domain_static_node(domain_id, node_id, ipv4, ipv6, port)
         clients[1]['app'].set_domain_static_node(domain_id, node_id, ipv4, ipv6, port)
@@ -170,9 +169,9 @@ class TestBBcAppClient(object):
         for i in range(2, client_num):
             clients[i]['app'].get_domain_neighborlist(domain_id=domain_id)
             dat = msg_processor[i].synchronize()
-            print(dat)
+            print("Neighbor list -->", dat)
             assert len(dat) == core_num - 2
-    """
+
     def test_13_insert_first_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         user = clients[3]['user_id']
@@ -180,8 +179,6 @@ class TestBBcAppClient(object):
         transactions[0].events[0].asset.add(user_id=user, asset_body=b'123456')
         transactions[0].events[1].asset.add(user_id=user, asset_file=b'abcdefg')
         transactions[0].events[0].add(reference_index=0, mandatory_approver=user)
-        if len(cross_ref_list) > 0:
-            transactions[0].add(cross_ref=cross_ref_list.pop(0))
 
         transactions[0].get_sig_index(user)
         sig = transactions[0].sign(keypair=clients[0]['keypair'])
@@ -191,8 +188,8 @@ class TestBBcAppClient(object):
             import os
             os._exit(1)
         transactions[0].add_signature(user_id=user, signature=sig)
-        transactions[0].dump()
         transactions[0].digest()
+        print(transactions[0])
         global transaction_dat
         transaction_dat = transactions[0].serialize()
         print("register transaction=", binascii.b2a_hex(transactions[0].transaction_id))
@@ -208,7 +205,7 @@ class TestBBcAppClient(object):
             msg = "message to %d" % i
             clients[4]['app'].send_message(msg, clients[i]['user_id'])
         for i in range(2, client_num-1):
-            dat = msg_processor[4].synchronize()
+            dat = msg_processor[i].synchronize()
             assert KeyType.message in dat
             print("recv=", dat)
 
@@ -234,7 +231,7 @@ class TestBBcAppClient(object):
             core.networking.save_all_static_node_list()
             ret = core.config.update_config()
             assert ret
-    """
+
 
 if __name__ == '__main__':
     pytest.main()

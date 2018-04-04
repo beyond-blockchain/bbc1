@@ -27,7 +27,6 @@ domain_id = bbclib.get_new_id("testdomain")
 asset_group_id = bbclib.get_new_id("asset_group_1")
 transactions = [None for i in range(client_num)]
 transaction_dat = None
-cross_ref_list = []
 
 msg_processor = [None for i in range(client_num)]
 
@@ -119,7 +118,7 @@ class TestBBcAppClient(object):
         assert ret
         dat = msg_processor[0].synchronize()
         print("[0] nodeinfo=",dat[0])
-        node_id, ipv4, ipv6, port = dat[0]
+        node_id, ipv4, ipv6, port, domain0 = dat[0]
 
         for i in range(1, client_num):
             ret = clients[i]['app'].set_domain_static_node(domain_id, node_id, ipv4, ipv6, port)
@@ -131,15 +130,8 @@ class TestBBcAppClient(object):
         for i in range(client_num):
             clients[i]['app'].get_domain_neighborlist(domain_id=domain_id)
             dat = msg_processor[i].synchronize()
+            print("Neighbor list -->", dat)
             assert len(dat) == core_num
-
-    def test_12_cross_ref(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        for i, cl in enumerate(clients):
-            ret = cl['app'].get_cross_refs(number=2)
-            assert ret
-            dat = msg_processor[i].synchronize()
-            cross_ref_list.extend(dat)
 
     def test_13_insert_first_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -148,8 +140,6 @@ class TestBBcAppClient(object):
         transactions[0].events[0].asset.add(user_id=user, asset_body=b'123456')
         transactions[0].events[1].asset.add(user_id=user, asset_file=b'abcdefg')
         transactions[0].events[0].add(reference_index=0, mandatory_approver=user)
-        if len(cross_ref_list) > 0:
-            transactions[0].add(cross_ref=cross_ref_list.pop(0))
 
         transactions[0].get_sig_index(user)
         sig = transactions[0].sign(keypair=clients[0]['keypair'])
@@ -176,8 +166,6 @@ class TestBBcAppClient(object):
         user = clients[1]['user_id']
         transactions[1] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
         transactions[1].events[0].asset.add(user_id=user, asset_body=b'123456')
-        if len(cross_ref_list) > 0:
-            transactions[1].add(cross_ref=cross_ref_list.pop(0))
 
         reference = bbclib.add_reference_to_transaction(asset_group_id, transactions[1], prev_tx, 0)
         clients[1]['app'].gather_signatures(transactions[1], reference_obj=reference)

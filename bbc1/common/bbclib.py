@@ -1054,6 +1054,7 @@ class BBcRelation:
             for i, pt in enumerate(self.pointers):
                 ret += "   [%d]\n" % i
                 ret += str(pt)
+        ret += str(self.asset)
         return ret
 
     def add(self, asset_group_id=None, asset=None, pointer=None):
@@ -1367,6 +1368,7 @@ class MsgType:
     REQUEST_INSERT = 71
     RESPONSE_INSERT = 72
     NOTIFY_INSERTED = 73
+    NOTIFY_CROSS_REF = 74
 
     REQUEST_SEARCH_TRANSACTION = 82
     RESPONSE_SEARCH_TRANSACTION = 83
@@ -1374,10 +1376,12 @@ class MsgType:
     RESPONSE_SEARCH_WITH_CONDITIONS = 87
     REQUEST_TRAVERSE_TRANSACTIONS = 88
     RESPONSE_TRAVERSE_TRANSACTIONS = 89
-    REQUEST_CROSS_REF = 90
-    RESPONSE_CROSS_REF = 91
-    REQUEST_REPAIR = 92
-    RESPONSE_REPAIR = 93
+    REQUEST_CROSS_REF_VERIFY = 90
+    RESPONSE_CROSS_REF_VERIFY = 91
+    REQUEST_CROSS_REF_RANDOM_PICK = 92
+    RESPONSE_CROSS_REF_RANDOM_PICK = 93
+    REQUEST_REPAIR = 94
+    RESPONSE_REPAIR = 95
 
     REQUEST_REGISTER_HASH_IN_SUBSYS = 128
     RESPONSE_REGISTER_HASH_IN_SUBSYS = 129

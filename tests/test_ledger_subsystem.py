@@ -57,6 +57,7 @@ default_config = {
     },
 }
 
+
 class DummyCore:
     class UserMessageRouting:
         def add_domain(self, domain_id):
