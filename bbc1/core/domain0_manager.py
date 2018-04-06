@@ -51,8 +51,6 @@ class Domain0Manager:
     REQUEST_VERIFY = to_2byte(4)
     REQUEST_VERIFY_FROM_OUTER_DOMAIN = to_2byte(5)
     RESPONSE_VERIFY_FROM_OUTER_DOMAIN = to_2byte(6)
-    REQUEST_RANDOM_PICK = to_2byte(7)
-    RESPONSE_RANDOM_PICK = to_2byte(8)
 
     def __init__(self, networking=None, node_id=None, loglevel="all", logname=None):
         self.networking = networking
@@ -60,7 +58,7 @@ class Domain0Manager:
         self.my_node_id = node_id
         self.logger = logger.get_logger(key="domain0", level=loglevel, logname=logname)
         self.domains_belong_to = set()
-        self.domain_list = dict()        # {domain_id: set(node_id,,,)}
+        self.domain_list = dict()        # {domain_id: list(node_id,,,)}
         self.node_domain_list = dict()   # {node_id: {domain_id: expiration_time}}
         self.domain_accept_margin = dict()
         self.requested_cross_refs = dict()
@@ -82,7 +80,7 @@ class Domain0Manager:
 
     def register_node(self, domain_id, node_id):
         self.domain_list.setdefault(domain_id, list())
-        if node_id not in self.domain_list:
+        if node_id not in self.domain_list[domain_id]:
             self.domain_list[domain_id].append(node_id)
         self.node_domain_list.setdefault(node_id, dict())[domain_id] = int(time.time())
 
@@ -265,7 +263,7 @@ class Domain0Manager:
         # TODO: need implementation
         return ret+1
 
-    def _purge_left_cross_ref(self):
+    def _purge_left_cross_ref(self, query_entry):
         now = int(time.time())
         for dm in tuple(self.requested_cross_refs.keys()):
             for txid in tuple(self.requested_cross_refs[dm].keys()):
@@ -283,10 +281,10 @@ class Domain0Manager:
         cross_ref_domain_id = cross_ref[0]
         cross_ref_txid = cross_ref[1]
         if cross_ref_domain_id not in self.requested_cross_refs or cross_ref_txid not in self.requested_cross_refs[cross_ref_domain_id]:
-            print("!!!!!!")
             return
         del self.requested_cross_refs[cross_ref_domain_id][cross_ref_txid]
         self.stats.update_stats_increment("domain0", "cross_ref_registered", 1)
+
         try:
             msg = {
                 KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_DOMAIN0,
@@ -324,22 +322,14 @@ class Domain0Manager:
             self._assign_cross_ref(msg[KeyType.cross_ref])
 
         elif msg[KeyType.command] == Domain0Manager.NOTIFY_CROSS_REF_REGISTERED:
-            print("NOTIFY_CROSS_REF_REGISTERED")
             if KeyType.domain_id not in msg or KeyType.txid_having_cross_ref not in msg:
                 return
-            self.stats.update_stats_increment("domain0", "NOTIFY_CROSS_REF", 1)
             outer_domain_id = msg[KeyType.outer_domain_id]
             txid_having_cross_ref = msg[KeyType.txid_having_cross_ref]
             domain_id = msg[KeyType.cross_ref][0]
             transaction_id = msg[KeyType.cross_ref][1]
-            # TODO: なぜか１つ必ず足りない
-            print("Cross_ref registered: domain=%s, txid=%s" % (outer_domain_id.hex(), txid_having_cross_ref.hex()))
-            self.networking.domains[domain_id]['data'].insert_cross_ref(domain_id, transaction_id, outer_domain_id,
+            self.networking.domains[domain_id]['data'].insert_cross_ref(transaction_id, outer_domain_id,
                                                                         txid_having_cross_ref)
-            if KeyType.is_replication not in msg:
-                # TODO: copy replication to domain0_managers in the domain
-                #target_nodes = list(filter(lambda d: d == domain_global_0, self.networking.domains.keys())) XXXX
-                msg[KeyType.is_replication] = True
 
         elif msg[KeyType.command] == Domain0Manager.REQUEST_VERIFY:
             self.stats.update_stats_increment("domain0", "REQUEST_VERIFY", 1)
@@ -384,38 +374,3 @@ class Domain0Manager:
                 KeyType.cross_ref_digest: msg[KeyType.cross_ref_digest],
             }
             self.networking.domains[domain_id]['user'].send_message_to_user(msg2)
-
-        elif msg[KeyType.command] == Domain0Manager.REQUEST_RANDOM_PICK:
-            self.stats.update_stats_increment("domain0", "REQUEST_RANDOM_PICK", 1)
-            domain_id = msg[KeyType.domain_id]
-            domain_list = self.networking.domains[domain_id]['data'].search_domain_having_cross_ref(domain_id)
-            if domain_list is not None or len(domain_id) == 0:
-                return
-            dm = random.choice(domain_list)  # "domain_id","transaction_id", "outer_domain_id", "txid_having_cross_ref"
-            dst_node_id = self.domain_list.get(dm[2], None)
-            if dst_node_id is None:
-                return
-            msg = {
-                KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_DOMAIN0,
-                KeyType.command: Domain0Manager.REQUEST_RANDOM_PICK,
-                KeyType.domain_id: domain_global_0,
-                KeyType.destination_node_id: dst_node_id,
-                KeyType.source_user_id: msg[KeyType.source_user_id],
-                KeyType.outer_domain_id: domain_id,
-            }
-            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
-                                                    domain_id=domain_global_0, msg=msg)
-
-        elif msg[KeyType.command] == Domain0Manager.RESPONSE_RANDOM_PICK:
-            domain_id = msg[KeyType.domain_id]
-            transaction_id = msg[KeyType.transaction_id]
-            msg2 = {
-                KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_USER,
-                KeyType.command: MsgType.RESPONSE_CROSS_REF_VERIFY,
-                KeyType.domain_id: domain_id,
-                KeyType.source_user_id: msg[KeyType.source_user_id],
-                KeyType.transaction_id: transaction_id,
-                KeyType.cross_ref_digests: msg[KeyType.cross_ref_digests],
-            }
-            self.networking.domains[domain_id]['user'].send_message_to_user(msg2)
-

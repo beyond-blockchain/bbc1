@@ -332,12 +332,14 @@ class BBcNetwork:
         """
         if domain_id not in self.domains:
             return None
-        managers = tuple(filter(lambda nd: nd.is_domain0_node, self.domains[domain_id]['neighbor'].nodeinfo.values()))
+        managers = tuple(filter(lambda nd: nd.is_domain0_node,
+                                self.domains[domain_id]['neighbor'].nodeinfo_list.values()))
         if len(managers) == 0:
             return None
-        msg[KeyType.destination_node_id] = random.choice(managers)
+        dst_manager = random.choice(managers)
+        msg[KeyType.destination_node_id] = dst_manager.node_id
         msg[KeyType.infra_msg_type] = InfraMessageCategory.CATEGORY_DOMAIN0
-        self.domains[domain_id].send_message_in_network(None, PayloadType.Type_msgpack, domain_id, msg)
+        self.domains[domain_id].send_message_in_network(dst_manager, PayloadType.Type_msgpack, domain_id, msg)
 
     def get_domain_keypair(self, domain_id):
         """

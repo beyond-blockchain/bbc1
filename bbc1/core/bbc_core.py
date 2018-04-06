@@ -32,7 +32,7 @@ import hashlib
 import binascii
 import traceback
 import json
-import random
+import copy
 
 import sys
 sys.path.extend(["../../"])
@@ -423,7 +423,7 @@ class BBcCoreService:
             if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.count], dat):
                 self.logger.debug("REQUEST_CROSS_REF_RANDOM_PICK: bad format")
                 return False, None
-            dat[KeyType.command] = domain0_manager.Domain0Manager.REQUEST_VERIFY
+            dat[KeyType.command] = domain0_manager.Domain0Manager.REQUEST_RANDOM_PICK
             self.networking.send_message_to_a_domain0_manager(domain_id, dat)
 
         elif cmd == MsgType.REQUEST_REGISTER_HASH_IN_SUBSYS:
@@ -478,7 +478,7 @@ class BBcCoreService:
                 return False, None
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_STATS,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
-            retmsg[KeyType.stats] = self.stats.get_stats()
+            retmsg[KeyType.stats] = copy.deepcopy(self.stats.get_stats())
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_REPAIR:
