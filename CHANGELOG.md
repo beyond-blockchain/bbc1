@@ -1,6 +1,9 @@
 Change log
 ======
 
+## v0.9.1
+* Add libraries for token and id management
+
 ## v0.9
 * Change APIs in bbc_app.py (remove asset_group_id options)
 * Modify schemas of bbc_ledger tables
