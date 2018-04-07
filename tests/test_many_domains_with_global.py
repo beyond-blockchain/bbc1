@@ -50,10 +50,11 @@ class TestBBcAppClient(object):
 
     def test_00_setup(self):
         print("-----", sys._getframe().f_code.co_name, "-----")
+
         global msg_processor
         prepare(core_num=core_num, client_num=client_num, loglevel=LOGLEVEL)
         for i in range(core_num):
-            start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i, use_global=True)
+            start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i, use_domain0=True)
             domain_setup_utility(i, domain_ids[i % domain_num])
         time.sleep(1)
         for i in range(client_num):
@@ -74,6 +75,7 @@ class TestBBcAppClient(object):
             assert ret
             ret = msg_processor[i].synchronize()
             node_info.append(ret[0])
+
         for i in range(3, client_num):
             node_id, ipv4, ipv6, port = node_info[i%domain_num]
             ret = clients[i]['app'].set_domain_static_node(domain_ids[i%domain_num], node_id, ipv4, ipv6, port)
@@ -142,7 +144,7 @@ class TestBBcAppClient(object):
 
     def test_99_quit(self):
         for core in cores:
-            core.networking.save_all_peer_lists()
+            core.networking.save_all_static_node_list()
             core.config.update_config()
 
 

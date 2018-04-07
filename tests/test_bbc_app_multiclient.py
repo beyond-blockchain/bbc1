@@ -39,7 +39,7 @@ class MessageProcessor(bbc_app.Callback):
         txobj = bbclib.BBcTransaction()
         txobj.deserialize(dat[KeyType.transaction_data])
         signature = txobj.sign(keypair=clients[self.idx]['keypair'])
-        clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], signature)
+        clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], txobj.transaction_id, signature)
 
     def proc_resp_insert(self, dat):
         if KeyType.transaction_id in dat:
@@ -51,9 +51,6 @@ class MessageProcessor(bbc_app.Callback):
     def proc_resp_search_asset(self, dat):
         if KeyType.transaction_data in dat:
             self.logger.debug("OK: Asset [%s] is found." % binascii.b2a_hex(dat[KeyType.asset_id]))
-            if KeyType.asset_file in dat:
-                self.logger.debug(" [%s] in_storage --> %s" % (binascii.b2a_hex(dat[KeyType.asset_id][:4]),
-                                                               dat[KeyType.asset_file]))
             tx_obj = bbclib.recover_transaction_object_from_rawdata(dat[KeyType.transaction_data])
             for evt in tx_obj.events:
                 if evt.asset.asset_body_size > 0:
@@ -113,64 +110,70 @@ class TestBBcAppClient(object):
             import os
             os._exit(1)
         transactions[0].add_signature(user_id=clients[0]['user_id'], signature=sig)
-        transactions[0].dump()
+        print(transactions[0])
         transactions[0].digest()
         global transaction_dat
         transaction_dat = transactions[0].serialize()
         print("register transaction=", binascii.b2a_hex(transactions[0].transaction_id))
-        ret = clients[0]['app'].insert_transaction(transactions[0])
-        assert ret
-        msg_processor[0].synchronize()
+        clients[0]['app'].insert_transaction(transactions[0])
+        dat = msg_processor[0].synchronize()
+        assert KeyType.transaction_id in dat
+        assert dat[KeyType.transaction_id] == transactions[0].transaction_id
 
-    def test_07_search_asset(self):
+    def test_07_search_asset_event0(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = clients[0]['app'].search_asset(asset_group_id, transactions[0].events[0].asset.asset_id)
-        assert ret
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_ASSET)
-        assert dat[KeyType.status] == ESUCCESS
+        clients[0]['app'].search_transaction_with_condition(asset_group_id=asset_group_id,
+                                                            asset_id=transactions[0].events[0].asset.asset_id)
+        dat = msg_processor[0].synchronize()
+        assert dat[KeyType.status] == 0
+        assert KeyType.transactions in dat
+        txobj = bbclib.BBcTransaction(deserialize=dat[KeyType.transactions][0])
+        assert txobj.transaction_id == transactions[0].transaction_id
 
-    def test_08_search_asset(self):
+    def test_08_search_asset_failure(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         asid = bytearray(transactions[0].events[0].asset.asset_id)
         asid[1] = 0xff
         asid[2] = 0xff
-        ret = clients[0]['app'].search_asset(asset_group_id, bytes(asid))  # NG is expected
-        assert ret
+        clients[0]['app'].search_transaction_with_condition(asset_group_id=asset_group_id, asset_id=bytes(asid))
         print("* should be NG *")
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_ASSET)
+        dat = msg_processor[0].synchronize()
         assert dat[KeyType.status] < ESUCCESS
 
-    def test_09_search_asset(self):
+    def test_09_search_asset_event1(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = clients[0]['app'].search_asset(asset_group_id, transactions[0].events[1].asset.asset_id)
-        assert ret
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_ASSET)
-        assert dat[KeyType.status] == ESUCCESS
+        clients[3]['app'].search_transaction_with_condition(asset_group_id=asset_group_id,
+                                                            asset_id=transactions[0].events[1].asset.asset_id)
+        dat = msg_processor[3].synchronize()
+        assert dat[KeyType.status] == 0
+        assert KeyType.transactions in dat
+        txobj = bbclib.BBcTransaction(deserialize=dat[KeyType.transactions][0])
+        assert txobj.transaction_id == transactions[0].transaction_id
 
     def test_10_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         transactions[0] = bbclib.BBcTransaction()
         transactions[0].deserialize(transaction_dat)
         print("find txid=", binascii.b2a_hex(transactions[0].transaction_id))
-        ret = clients[0]['app'].search_transaction(transactions[0].transaction_id)
-        assert ret
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION)
-        assert dat[KeyType.status] == ESUCCESS
+        clients[1]['app'].search_transaction(transactions[0].transaction_id)
+        dat = msg_processor[1].synchronize()
+        assert dat[KeyType.status] == 0
+        assert KeyType.transaction_data in dat
+        txobj = bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data])
+        assert txobj.transaction_id == transactions[0].transaction_id
 
     def test_11_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = clients[0]['app'].search_transaction(b'4898g9fh')  # NG is expected
-        assert ret
+        clients[0]['app'].search_transaction(b'4898g9fh')  # NG is expected
         print("* should be NG *")
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION)
+        dat = wait_check_result_msg_type(msg_processor[0], bbclib.MsgType.RESPONSE_SEARCH_TRANSACTION)
         assert dat[KeyType.status] < ESUCCESS
 
     def test_20_messaging(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i in range(1, client_num):
             msg = "message from %d" % i
-            ret = clients[0]['app'].send_message(msg, clients[i]['user_id'])
-            assert ret
+            clients[0]['app'].send_message(msg, clients[i]['user_id'])
         for i in range(1, client_num):
             print("recv=",msg_processor[i].synchronize()[KeyType.message])
 

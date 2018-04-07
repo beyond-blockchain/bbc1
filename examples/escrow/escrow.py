@@ -117,7 +117,7 @@ def sendback_exception_asset(approver_id, asset_group, asid):
     transaction = add_ref_tx(asset_group, transaction, ref_tx, 0)
 
     transaction.digest()
-    transaction.dump()
+    print(transaction)
 
     ret = bbc_app_client.insert_transaction(transaction)
     assert ret
@@ -203,7 +203,7 @@ def execute_escrow():
     transaction.add_signature(user_id=result[1], signature=result[2])
 
     transaction.digest()
-    transaction.dump()
+    print(transaction)
 
     print("insert coin asset group")
     ret = coin_client.insert_transaction(transaction)

@@ -147,7 +147,7 @@ class TestBBcLib(object):
             assert sig
         reference2.add_signature(user_id=user_id, signature=sig)
 
-        transaction2.dump()
+        print(transaction2)
 
     def test_05_transaction_with_reference2(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -180,7 +180,7 @@ class TestBBcLib(object):
             assert sig
         reference.add_signature(user_id=user_id, signature=sig)
 
-        transaction1.dump()
+        print(transaction1)
 
     def test_06_transaction_with_witness(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -207,7 +207,7 @@ class TestBBcLib(object):
             assert sig
         witness.add_signature(user_id=user_id, signature=sig)
 
-        transaction1.dump()
+        print(transaction1)
 
     def test_06_transaction_with_relation_and_witness(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -236,7 +236,7 @@ class TestBBcLib(object):
             assert sig
         transaction1.witness.add_signature(user_id=user_id, signature=sig)
 
-        transaction1.dump()
+        print(transaction1)
 
     def test_07_proof(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")

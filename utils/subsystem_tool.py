@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     if parsed_args.start or parsed_args.stop:
         bbcclient.manipulate_ledger_subsystem(parsed_args.start)
-        dat = wait_check_result_msg_type(bbcclient.callback, bbclib.ServiceMessageType.RESPONSE_MANIP_LEDGER_SUBSYS)
+        dat = wait_check_result_msg_type(bbcclient.callback, bbclib.MsgType.RESPONSE_MANIP_LEDGER_SUBSYS)
         print("Done")
         sys.exit(0)
 
@@ -85,13 +85,13 @@ if __name__ == '__main__':
             print("--> Try to verify")
             bbcclient.verify_in_ledger_subsystem(asset_group_id, transaction_id)
             dat = wait_check_result_msg_type(bbcclient.callback,
-                                             bbclib.ServiceMessageType.RESPONSE_VERIFY_HASH_IN_SUBSYS)
+                                             bbclib.MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS)
             print(dat[KeyType.markle_tree])  # TODO: Please modify here (how to treat the result)
             print("Done")
         elif parsed_args.register:
             print("--> Try to register")
             bbcclient.register_in_ledger_subsystem(asset_group_id, transaction_id)
             dat = wait_check_result_msg_type(bbcclient.callback,
-                                             bbclib.ServiceMessageType.RESPONSE_REGISTER_HASH_IN_SUBSYS)
+                                             bbclib.MsgType.RESPONSE_REGISTER_HASH_IN_SUBSYS)
             print("Done")
     sys.exit(0)
