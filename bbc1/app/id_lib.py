@@ -426,12 +426,12 @@ class BBcIdPublickeyMap:
 
 
     def __update_local_database(self, user_id):
-        self.__app.search_transaction_by_userid(self.namespace_id, user_id)
+        self.__app.search_transaction_with_condition(
+                asset_group_id=self.namespace_id, user_id=user_id)
         res = self.__app.callback.synchronize(2) # FIXME: slow when not found
         if res is None or res[KeyType.status] < ESUCCESS:
             raise ValueError('not found')
-        tx = bbclib.recover_transaction_object_from_rawdata(
-                res[KeyType.transaction_data])
+        tx = bbclib.BBcTransaction(deserialize=res[KeyType.transactions][0])
         tx_last = tx
         tx_directives = []
         while True:
