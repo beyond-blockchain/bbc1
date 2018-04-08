@@ -99,7 +99,7 @@ def store_proc(data, approver_id,txid=None):
     store_transaction.add_signature(user_id=result[1], signature=result[2])
 
     store_transaction.digest()
-    store_transaction.dump()
+    print(store_transaction)
 
     ret = bbc_app_client.insert_transaction(store_transaction)
     assert ret

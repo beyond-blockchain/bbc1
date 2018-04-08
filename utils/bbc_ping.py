@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
     domain_id = bbclib.convert_idstring_to_bytes(parsed_args.domain_id)
     bbcclient.domain_setup(domain_id, "simple_cluster")
-    dat = wait_check_result_msg_type(bbcclient.callback, bbclib.ServiceMessageType.RESPONSE_SETUP_DOMAIN)
+    dat = wait_check_result_msg_type(bbcclient.callback, bbclib.MsgType.RESPONSE_SETUP_DOMAIN)
     assert dat[KeyType.status] == ESUCCESS
 
     send_domain_ping(bbcclient, domain_id, parsed_args.dst_address, parsed_args.dst_port)
