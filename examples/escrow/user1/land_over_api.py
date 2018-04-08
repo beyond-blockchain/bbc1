@@ -22,7 +22,6 @@ import json
 from datetime import datetime
 import urllib.request, json
 
-
 sys.path.extend(["../../../"])
 from bbc1.common import bbclib
 from bbc1.app import bbc_app
@@ -33,8 +32,8 @@ from bbc1.common.bbc_error import *
 PRIVATE_KEY = ".private_key"
 PUBLIC_KEY = ".public_key"
 
-domain_id = bbclib.get_new_id("coindomain", include_timestamp=False)
-asset_group_id = bbclib.get_new_id("coin_asset_group", include_timestamp=False)
+domain_id = bbclib.get_new_id("landdomain", include_timestamp=False)
+asset_group_id = bbclib.get_new_id("land_asset_group", include_timestamp=False)
 user_id = None
 
 key_pair = None
@@ -88,6 +87,61 @@ def store_proc(data, approver_id, txid=None):
     print("TXID: %s" % response["result"])
     print("ASID: %s" % jsontx["Event"][0]["Asset"]["asset_id"])
     return True
+'''
+def store_proc(data, approver_id,txid=None):
+    bbc_app_client = setup_bbc_client()
+    store_transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
+    store_transaction.events[0].add(mandatory_approver=approver_id, asset_group_id=asset_group_id)
+    store_transaction.events[0].asset.add(user_id=user_id, asset_body=data)
+
+    LAB_id = bbclib.get_new_id("LegalAffairsBureau", include_timestamp=False)
+    store_transaction.events[0].add(option_approver=LAB_id)
+
+    if txid:
+        bbc_app_client.search_transaction(txid)
+        response_data = bbc_app_client.callback.synchronize()
+        if response_data[KeyType.status] < ESUCCESS:
+            print("ERROR: ", response_data[KeyType.reason].decode())
+            sys.exit(0)
+        prev_tx = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
+        reference = bbclib.add_reference_to_transaction(asset_group_id, store_transaction, prev_tx, 0)
+        sig = store_transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
+                                     private_key=key_pair.private_key,
+                                     public_key=key_pair.public_key)
+        store_transaction.references[0].add_signature(user_id=user_id, signature=sig)
+    else:
+        sig = store_transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
+                                     private_key=key_pair.private_key,
+                                     public_key=key_pair.public_key)
+        store_transaction.add_signature(signature=sig)
+    store_transaction.add_signature(user_id=user_id, signature=sig)
+
+    # Get signature from LegalAffairsBureau
+    bbc_app_client.gather_signatures(store_transaction,destinations=[LAB_id])
+    response_data = bbc_app_client.callback.synchronize()
+
+    if response_data[KeyType.status] < ESUCCESS:
+        print("Rejected because ", response_data[KeyType.reason].decode(), "")
+        sys.exit(0)
+    result = response_data[KeyType.result]
+    store_transaction.get_sig_index(result[1])
+    store_transaction.add_signature(user_id=result[1], signature=result[2])
+
+    store_transaction.digest()
+    store_transaction.dump()
+
+    ret = bbc_app_client.insert_transaction(store_transaction)
+    assert ret
+    response_data = bbc_app_client.callback.synchronize()
+    if response_data[KeyType.status] < ESUCCESS:
+        print("ERROR: ", response_data[KeyType.reason].decode())
+        sys.exit(0)
+    print("TxID: %s", binascii.b2a_hex(response_data[KeyType.transaction_id]))
+    print("AsID: %s", binascii.b2a_hex(store_transaction.events[0].asset.asset_id))
+
+    txinfo = [store_transaction.transaction_id, store_transaction.events[0].asset.asset_id]
+    return txinfo
+'''
 
 def json_post(obj):
     url = "http://localhost:3000"
@@ -100,7 +154,7 @@ def json_post(obj):
     response = json.loads(response_body)
     return response
 
-def get_coindata(asid):
+def get_landdata(asid):
     obj = {"jsonrpc": "2.0",
            "method": "bbc1_GetTransactionfromAsset",
            "params":{
@@ -123,25 +177,26 @@ def create_keypair():
         fout.write(keypair.public_key)
     print("created private_key and public_key : %s, %s" % (PRIVATE_KEY, PUBLIC_KEY))
 
-def registration(price):
-    data = {"owner":bbclib.bin2str_base64(user_id),"price":price,"date":datetime.now().strftime('%s')}
+def registration(place):
+    data = {"owner":bbclib.bin2str_base64(user_id),"place":place,"date":datetime.now().strftime('%s')}
     jsondata = json.dumps(data)
     store_proc(data=jsondata, approver_id=user_id ,txid=None)
-    print("Coin is generated!: %s" % jsondata)
+    print("Land registration is done!: %s" % jsondata)
 
-def chown(new_owner, asid):
-    prevtx = json.loads(get_coindata(asid))
+def chown(new_owner,asid):
+    prevtx = json.loads(get_landdata(asid))
     asset = json.loads(prevtx["Event"][0]["Asset"]["body"])
     if asset["owner"] != bbclib.bin2str_base64(user_id):
-        print("Owner of this coin is not you")
+        print("Owner of this land is not you")
         return 0
     asset["owner"] = new_owner
     asset["date"] = datetime.now().strftime('%s')
     data = json.dumps(asset)
 
-    coin = json.loads(get_coindata(asid))
-    transaction_id = coin["transaction_id"]
+    land = json.loads(get_landdata(asid))
+    transaction_id = land["transaction_id"]
     transaction_info = store_proc(data, approver_id=binascii.a2b_base64(new_owner), txid=transaction_id)
+
 
 if __name__ == '__main__':
     if(not os.path.exists(PRIVATE_KEY) and not os.path.exists(PUBLIC_KEY)):
@@ -151,38 +206,38 @@ if __name__ == '__main__':
     with open(PUBLIC_KEY, "rb") as fin:
         public_key = fin.read()
 
+
     key_pair = bbclib.KeyPair(privkey=private_key, pubkey=public_key)
     user_id = bbclib.get_new_id(str(binascii.b2a_hex(key_pair.public_key)), include_timestamp=False)
-    print("welcome to sample coin manage!")
+    print("welcome to sample land manage!")
     print("Your id: %s" % bbclib.bin2str_base64(user_id))
     print("Type command(help to see command list)")
     while(True):
         command = input('>> ')
         if command == "help":
-            print("generate - generate coin")
-            print("get - get coin info")
-            print("send - send coin")
-            print("recieve - wait for recieve coin")
-            print("exit - exit coin manage")
-        elif command == "generate":
-            print("Type price generate coin")
+            print("regist - regist land")
+            print("get - get land info")
+            print("chown - change owner of land")
+            print("exit - exit land manage")
+        elif command == "regist":
+            print("Type regist address")
             address = input('>> ')
             registration(address)
         elif command == "get":
-            print("Type AsID of coin")
+            print("Type AsID of land")
             asid = input('>> ')
-            tx = json.loads(get_coindata(asid))
+            tx = json.loads(get_landdata(asid))
             print("TXID: %s" % tx["transaction_id"])
             print("ASID: %s" % tx["Event"][0]["Asset"]["asset_id"])
             print(tx["Event"][0]["Asset"]["body"])
-        elif command == "send":
-            print("Type AsID of coin")
+        elif command == "chown":
+            print("Type AsID of land")
             asid = input('>> ')
-            tx = json.loads(get_coindata(asid))
+            tx = json.loads(get_landdata(asid))
             print("TXID: %s" % tx["transaction_id"])
             print("ASID: %s" % tx["Event"][0]["Asset"]["asset_id"])
             print(tx["Event"][0]["Asset"]["body"])
-            print("You want send coin(%s)"% asid)
+            print("You want send land(%s)"% asid)
             print("Type new owner ID")
             new_owner = input('>> ')
             chown(new_owner, asid)
