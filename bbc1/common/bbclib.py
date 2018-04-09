@@ -246,6 +246,19 @@ def validate_transaction_object(txobj, asset_files=None):
     return True, valid_asset, invalid_asset
 
 
+def verify_using_cross_ref(domain_id, transaction_id, transaction_base_digest, cross_ref_data, sigdata):
+    cross = BBcCrossRef(deserialize=cross_ref_data)
+    if cross.domain_id != domain_id or cross.transaction_id != transaction_id:
+        return False
+    sig = BBcSignature(deserialize=sigdata)
+    dat = bytearray(transaction_base_digest)
+    dat.extend(to_2byte(1))
+    dat.extend(to_4byte(len(cross_ref_data)))
+    dat.extend(cross_ref_data)
+    digest = hashlib.sha256(bytes(dat)).digest()
+    return sig.verify(digest) == 1
+
+
 class KeyType:
     ECDSA_SECP256k1 = 1
 
@@ -343,11 +356,13 @@ class KeyPair:
 
 
 class BBcSignature:
-    def __init__(self, key_type=KeyType.ECDSA_SECP256k1):
+    def __init__(self, key_type=KeyType.ECDSA_SECP256k1, deserialize=None):
         self.type = key_type
         self.signature = None
         self.pubkey = None
         self.keypair = None
+        if deserialize is not None:
+            self.deserialize(deserialize)
 
     def add(self, signature=None, pubkey=None):
         if signature is not None:
@@ -389,6 +404,11 @@ class BBcSignature:
         return True
 
     def verify(self, digest):
+        """
+        Verify digest using pubkey in signature
+        :param digest:
+        :return: 0:invalid, 1:valid
+        """
         reset_error()
         if self.keypair is None:
             set_error(code=EBADKEYPAIR, txt="Bad private_key/public_key")
@@ -409,7 +429,7 @@ class BBcTransaction:
         self.references = []
         self.relations = []
         self.witness = None
-        self.cross_refs = []
+        self.cross_ref = None
         self.signatures = []
         self.userid_sigidx_mapping = dict()
         self.transaction_id = None
@@ -438,10 +458,7 @@ class BBcTransaction:
             ret += " [%d]\n" % i
             ret += str(rtn)
         ret += str(self.witness)
-        ret += "Cross_Ref[]: %d\n" % len(self.cross_refs)
-        for i, cross in enumerate(self.cross_refs):
-            ret += " [%d]\n" % i
-            ret += str(cross)
+        ret += str(self.cross_ref)
         ret += "Signature[]: %d\n" % len(self.signatures)
         for i, sig in enumerate(self.signatures):
             ret += " [%d]\n" % i
@@ -468,10 +485,7 @@ class BBcTransaction:
             witness.transaction = self
             self.witness = witness
         if cross_ref is not None:
-            if isinstance(cross_ref, list):
-                self.cross_refs.extend(cross_ref)
-            else:
-                self.cross_refs.append(cross_ref)
+            self.cross_ref = cross_ref
         return True
 
     def get_sig_index(self, user_id):
@@ -518,14 +532,16 @@ class BBcTransaction:
             dat.extend(witness)
         else:
             dat.extend(to_2byte(0))
-        if for_id:
-            self.transaction_base_digest = hashlib.sha256(dat).digest()
+        self.transaction_base_digest = hashlib.sha256(dat).digest()
 
-        dat_cross = bytearray(to_2byte(len(self.cross_refs)))
-        for i in range(len(self.cross_refs)):
-            cross = self.cross_refs[i].serialize()
+        dat_cross = bytearray()
+        if self.cross_ref is not None:
+            cross = self.cross_ref.serialize()
+            dat_cross.extend(to_2byte(1))
             dat_cross.extend(to_4byte(len(cross)))
             dat_cross.extend(cross)
+        else:
+            dat_cross.extend(to_2byte(0))
 
         if for_id:
             dat2 = bytearray(self.transaction_base_digest)
@@ -600,15 +616,13 @@ class BBcTransaction:
                 self.witness.transaction = self
 
             ptr, cross_num = get_n_byte_int(ptr, 2, data)
-            self.cross_refs = []
-            for i in range(cross_num):
+            if cross_num == 0:
+                self.cross_ref = None
+            else:
                 ptr, size = get_n_byte_int(ptr, 4, data)
                 ptr, crossdata = get_n_bytes(ptr, size, data)
-                cross = BBcCrossRef()
-                if not cross.deserialize(crossdata):
-                    return False
-                self.cross_refs.append(cross)
-                if ptr >= data_size:
+                self.cross_ref = BBcCrossRef()
+                if not self.cross_ref.deserialize(crossdata):
                     return False
 
             ptr, sig_num = get_n_byte_int(ptr, 2, data)
@@ -746,13 +760,11 @@ class BBcTransaction:
                     witt["sig_index"] = self.witness.sig_indices[i]
                 jsontx["Witness"].append(witt)
         jsontx["Cross_Ref"] = []
-        if len(self.cross_refs) > 0:
-            for i, cross in enumerate(self.cross_refs):
-                xref = {}
-                if cross is not None:
-                    xref["domain_id"] = bin2str_base64(cross.domain_id)
-                    xref["transaction_id"] = bin2str_base64(cross.transaction_id)
-                jsontx["Cross_Ref"].append(xref)
+        if self.cross_ref is not None:
+            xref = {}
+            xref["domain_id"] = bin2str_base64(self.cross_ref.domain_id)
+            xref["transaction_id"] = bin2str_base64(self.cross_ref.transaction_id)
+            jsontx["Cross_Ref"].append(xref)
         jsontx["Signature"] = []
         if len(self.signatures) > 0:
             for i, sig in enumerate(self.signatures):
@@ -849,10 +861,11 @@ class BBcTransaction:
                     witness.user_ids.append(binascii.a2b_base64(witt["user_id"]))
                     witness.sig_indices.append(witt["sig_index"])
             self.add(witness=witness)
-        if len(jsontx["Cross_Ref"]) > 0:
-            for i, xref in enumerate(jsontx["Cross_Ref"]):
-                cross = BBcCrossRef(domain_id=binascii.a2b_base64(xref["domain_id"]), transaction_id=binascii.a2b_base64(xref["transaction_id"]))
-                self.add(cross_ref=cross)
+        if jsontx["Cross_Ref"] is not None:
+            xref = jsontx["Cross_Ref"]
+            cross = BBcCrossRef(domain_id=binascii.a2b_base64(xref["domain_id"]),
+                                transaction_id=binascii.a2b_base64(xref["transaction_id"]))
+            self.add(cross_ref=cross)
         if len(jsontx["Signature"]) > 0:
             for i, signature in enumerate(self.signatures):
                 sig = BBcSignature()
@@ -1058,6 +1071,7 @@ class BBcRelation:
             for i, pt in enumerate(self.pointers):
                 ret += "   [%d]\n" % i
                 ret += str(pt)
+        ret += str(self.asset)
         return ret
 
     def add(self, asset_group_id=None, asset=None, pointer=None):
@@ -1305,12 +1319,15 @@ class BBcAsset:
 
 
 class BBcCrossRef:
-    def __init__(self, domain_id=None, transaction_id=None):
+    def __init__(self, domain_id=None, transaction_id=None, deserialize=None):
         self.domain_id = domain_id
         self.transaction_id = transaction_id
+        if deserialize is not None:
+            self.deserialize(deserialize)
 
     def __str__(self):
-        ret =  "  domain_id: %s\n" % str_binary(self.domain_id)
+        ret  = "Cross_Ref:\n"
+        ret += "  domain_id: %s\n" % str_binary(self.domain_id)
         ret += "  transaction_id: %s\n" % str_binary(self.transaction_id)
         return ret
 
@@ -1371,6 +1388,7 @@ class MsgType:
     REQUEST_INSERT = 71
     RESPONSE_INSERT = 72
     NOTIFY_INSERTED = 73
+    NOTIFY_CROSS_REF = 74
 
     REQUEST_SEARCH_TRANSACTION = 82
     RESPONSE_SEARCH_TRANSACTION = 83
@@ -1378,10 +1396,12 @@ class MsgType:
     RESPONSE_SEARCH_WITH_CONDITIONS = 87
     REQUEST_TRAVERSE_TRANSACTIONS = 88
     RESPONSE_TRAVERSE_TRANSACTIONS = 89
-    REQUEST_CROSS_REF = 90
-    RESPONSE_CROSS_REF = 91
-    REQUEST_REPAIR = 92
-    RESPONSE_REPAIR = 93
+    REQUEST_CROSS_REF_VERIFY = 90
+    RESPONSE_CROSS_REF_VERIFY = 91
+    REQUEST_CROSS_REF_LIST = 92
+    RESPONSE_CROSS_REF_LIST = 93
+    REQUEST_REPAIR = 94
+    RESPONSE_REPAIR = 95
 
     REQUEST_REGISTER_HASH_IN_SUBSYS = 128
     RESPONSE_REGISTER_HASH_IN_SUBSYS = 129

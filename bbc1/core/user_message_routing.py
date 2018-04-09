@@ -21,7 +21,7 @@ import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.common import message_key_types
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
-from bbc1.common import logger
+from bbc1.common import logger, bbclib
 from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.core import query_management
 
@@ -41,18 +41,21 @@ class UserMessageRouting:
     """
     REFRESH_FORWARDING_LIST_INTERVAL = 300
     RESOLVE_TIMEOUT = 5
+    MAX_CROSS_REF_STOCK = 10
     RESOLVE_USER_LOCATION = to_2byte(0)
     RESPONSE_USER_LOCATION = to_2byte(1)
     RESPONSE_NO_SUCH_USER = to_2byte(2)
     JOIN_MULTICAST_RECEIVER = to_2byte(3)
     LEAVE_MULTICAST_RECEIVER = to_2byte(4)
+    CROSS_REF_ASSIGNMENT = to_2byte(5)
 
-    def __init__(self, network, domain_id, loglevel="all", logname=None):
-        self.network = network
-        self.stats = network.core.stats
+    def __init__(self, networking, domain_id, loglevel="all", logname=None):
+        self.networking = networking
+        self.stats = networking.core.stats
         self.domain_id = domain_id
         self.logger = logger.get_logger(key="user_message_routing", level=loglevel, logname=logname)
         self.aes_name_list = dict()
+        self.cross_ref_list = list()
         self.registered_users = dict()
         self.forwarding_entries = dict()
         self.on_going_timers = set()
@@ -208,14 +211,15 @@ class UserMessageRouting:
             msg[KeyType.anycast_ttl] = ttl - 1
             ttl -= 1
             if idx == randmax - 1:
-                sock = random.choice(tuple(self.registered_users.get(dst_user_id, None)))
-                if sock is not None and self._send(sock, msg):
-                    return True
+                if len(self.registered_users) > 0:
+                    sock = random.choice(tuple(self.registered_users.get(dst_user_id, None)))
+                    if sock is not None and self._send(sock, msg):
+                        return True
             else:
-                msg[KeyType.destination_node_id] = random.choice(tuple(self.forwarding_entries[dst_user_id]['nodes']))
                 try:
-                    self.network.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
-                                                         domain_id=self.domain_id, msg=msg)
+                    msg[KeyType.destination_node_id] = random.choice(tuple(self.forwarding_entries[dst_user_id]['nodes']))
+                    self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
+                                                            domain_id=self.domain_id, msg=msg)
                 except:
                     import traceback
                     traceback.print_exc()
@@ -234,8 +238,8 @@ class UserMessageRouting:
             for dst_node_id in self.forwarding_entries[dst_user_id]['nodes']:
                 msg[KeyType.destination_node_id] = dst_node_id
                 try:
-                    self.network.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
-                                                         domain_id=self.domain_id, msg=msg)
+                    self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
+                                                            domain_id=self.domain_id, msg=msg)
                 except:
                     import traceback
                     traceback.print_exc()
@@ -271,7 +275,7 @@ class UserMessageRouting:
             msg[KeyType.nonce] = query_entry.nonce
         if src_user_id is not None:
             msg[KeyType.source_user_id] = src_user_id
-        self.network.broadcast_message_in_network(domain_id=self.domain_id, msg=msg)
+        self.networking.broadcast_message_in_network(domain_id=self.domain_id, msg=msg)
 
     def resolve_success(self, query_entry):
         """
@@ -310,7 +314,7 @@ class UserMessageRouting:
             KeyType.static_entry: permanent,
         }
         self.stats.update_stats_increment("multicast", "join", 1)
-        self.network.broadcast_message_in_network(domain_id=self.domain_id, msg=msg)
+        self.networking.broadcast_message_in_network(domain_id=self.domain_id, msg=msg)
 
     def send_multicast_leave(self, user_id):
         """
@@ -325,7 +329,24 @@ class UserMessageRouting:
             KeyType.user_id: user_id,
         }
         self.stats.update_stats_increment("multicast", "leave", 1)
-        self.network.broadcast_message_in_network(domain_id=self.domain_id, msg=msg)
+        self.networking.broadcast_message_in_network(domain_id=self.domain_id, msg=msg)
+
+    def _distribute_cross_refs_to_nodes(self):
+        if len(self.registered_users) == 0:
+            return
+        try:
+            for i in range(len(self.cross_ref_list)):
+                msg = {
+                    KeyType.domain_id: self.domain_id,
+                    KeyType.command: bbclib.MsgType.NOTIFY_CROSS_REF,
+                    KeyType.destination_user_id: random.choice(tuple(self.registered_users.keys())),
+                    KeyType.cross_ref: self.cross_ref_list.pop(0),
+                }
+                self.send_message_to_user(msg)
+        except:
+            import traceback
+            traceback.print_exc()
+            return
 
     def process_message(self, msg):
         """
@@ -345,8 +366,8 @@ class UserMessageRouting:
                     msg[KeyType.destination_user_id] = msg[KeyType.source_user_id]
                 msg[KeyType.source_user_id] = user_id
                 msg[KeyType.infra_command] = UserMessageRouting.RESPONSE_USER_LOCATION
-                self.network.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
-                                                     domain_id=self.domain_id, msg=msg)
+                self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
+                                                        domain_id=self.domain_id, msg=msg)
 
             elif msg[KeyType.infra_command] == UserMessageRouting.RESPONSE_USER_LOCATION:
                 self.stats.update_stats_increment("user_message", "RESPONSE_USER_LOCATION", 1)
@@ -371,6 +392,13 @@ class UserMessageRouting:
                     self.remove_user_from_forwarding(user_id=msg[KeyType.user_id],
                                                      node_id=msg[KeyType.source_node_id])
 
+            elif msg[KeyType.infra_command] == UserMessageRouting.CROSS_REF_ASSIGNMENT:
+                self.stats.update_stats_increment("user_message", "CROSS_REF_ASSIGNMENT", 1)
+                if KeyType.cross_ref in msg:
+                    self.cross_ref_list.append(msg[KeyType.cross_ref])
+                    if len(self.cross_ref_list) > UserMessageRouting.MAX_CROSS_REF_STOCK:
+                        self._distribute_cross_refs_to_nodes()
+
             return
 
         src_user_id = msg[KeyType.source_user_id]
@@ -390,8 +418,8 @@ class UserMessageRouting:
                 KeyType.user_id: dst_user_id,
             }
             self.stats.update_stats_increment("user_message", "fail_to_find_user", 1)
-            self.network.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
-                                                 domain_id=self.domain_id, msg=retmsg)
+            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
+                                                    domain_id=self.domain_id, msg=retmsg)
             return
         if KeyType.is_anycast in msg:
             del msg[KeyType.is_anycast]

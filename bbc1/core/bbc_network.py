@@ -323,6 +323,24 @@ class BBcNetwork:
         self.config.update_config()
         self.logger.info("Done...")
 
+    def send_message_to_a_domain0_manager(self, domain_id, msg):
+        """
+        Choose one of domain0_managers and send msg to it
+        :param domain_id:
+        :param msg:
+        :return:
+        """
+        if domain_id not in self.domains:
+            return None
+        managers = tuple(filter(lambda nd: nd.is_domain0_node,
+                                self.domains[domain_id]['neighbor'].nodeinfo_list.values()))
+        if len(managers) == 0:
+            return None
+        dst_manager = random.choice(managers)
+        msg[KeyType.destination_node_id] = dst_manager.node_id
+        msg[KeyType.infra_msg_type] = InfraMessageCategory.CATEGORY_DOMAIN0
+        self.send_message_in_network(dst_manager, PayloadType.Type_msgpack, domain_id, msg)
+
     def get_domain_keypair(self, domain_id):
         """
         (internal use) Get domain_keys (private key and public key)
@@ -678,8 +696,7 @@ class BBcNetwork:
 
         elif msg[KeyType.command] == BBcNetwork.NOTIFY_LEAVE:
             if KeyType.source_node_id in msg:
-                self.domains[domain_id]['topology'].notify_neighbor_update(source_node_id,
-                                                                                                       is_new=False)
+                self.domains[domain_id]['topology'].notify_neighbor_update(source_node_id, is_new=False)
                 self.domains[domain_id]['neighbor'].remove(source_node_id)
 
     def setup_udp_socket(self):
@@ -857,7 +874,7 @@ class NeighborInfo:
         self.purge_timer = query_management.QueryEntry(expire_after=NeighborInfo.PURGE_INTERVAL_SEC,
                                                        callback_expire=self.purge, retry_count=3)
 
-    def add(self, node_id, ipv4=None, ipv6=None, port=None, is_static=False, domain0=False):
+    def add(self, node_id, ipv4=None, ipv6=None, port=None, is_static=False, domain0=None):
         if node_id not in self.nodeinfo_list:
             self.nodeinfo_list[node_id] = NodeInfo(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port,
                                                    is_static=is_static, domain0=domain0)
@@ -983,9 +1000,6 @@ class NodeInfo:
         self.is_alive = True
         return change_flag
 
-    def seq_increment(self):
-        self.admin_sequence_number += 1
-
     def get_nodeinfo(self):
         if self.ipv4 is not None:
             ipv4 = socket.inet_pton(socket.AF_INET, self.ipv4)
@@ -996,5 +1010,4 @@ class NodeInfo:
         else:
             ipv6 = socket.inet_pton(socket.AF_INET6, "::")
         domain0 = int(1).to_bytes(1, 'little') if self.is_domain0_node else int(0).to_bytes(1, 'little')
-        return self.node_id, ipv4, ipv6, socket.htons(self.port).to_bytes(2, 'big'), \
-               domain0, int(self.updated_at).to_bytes(8, 'big')
+        return self.node_id, ipv4, ipv6, socket.htons(self.port).to_bytes(2, 'big'), domain0, int(self.updated_at).to_bytes(8, 'big')

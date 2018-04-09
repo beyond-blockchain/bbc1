@@ -21,7 +21,6 @@ cores = None
 clients = None
 domain_id = bbclib.get_new_id("testdomain")
 asset_group_id = bbclib.get_new_id("asset_group_1")
-cross_refs = []
 transaction = None
 txid = None
 user_id1 = bbclib.get_new_id("destination_id_test1")
@@ -75,23 +74,12 @@ class TestBBcCore(object):
         for i in range(core_num):
             cores[i].networking.create_domain(domain_id=domain_id)
 
-    def test_02_get_cross_ref(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        for idx, core in enumerate(cores):
-            ret = core.pop_cross_refs(2)
-            for cross in ret:
-                print("[%i] %s" % (idx, ret))
-                c = bbclib.BBcCrossRef(domain_id=cross[0], transaction_id=cross[1])
-                cross_refs.append(c)
-
     def test_03_transaction_insert(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         global transaction
         print("-- insert transaction only at core_node_1 --")
         user1 = clients[1]['user_id']
         transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
-        if len(cross_refs) > 0:
-            transaction.add(cross_ref=cross_refs.pop(0))
         transaction.events[0].asset.add(user_id=user1, asset_body=b'123456')
         transaction.events[1].asset.add(user_id=user1, asset_file=b'abcdefg')
         transaction.get_sig_index(user1)
@@ -105,8 +93,6 @@ class TestBBcCore(object):
         asset_file[transaction.events[1].asset.asset_id] = transaction.events[1].asset.asset_file
         ret = cores[1].insert_transaction(domain_id, transaction.serialize(), asset_file)
         assert ret[KeyType.transaction_id] == transaction.transaction_id
-        for i in range(len(cores)):
-            print("[%d] cross_ref_list=%d" % (i, len(cores[i].cross_ref_list)))
 
     def test_04_1_search_transaction_by_txid(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -135,8 +121,6 @@ class TestBBcCore(object):
         global transaction
         user1 = clients[2]['user_id']
         transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
-        if len(cross_refs) > 0:
-            transaction.add(cross_ref=cross_refs.pop(0))
         transaction.events[0].asset.add(user_id=user1, asset_body=b'aaddbbdd')
         transaction.events[1].asset.add(user_id=user1, asset_file=b'112423')
 

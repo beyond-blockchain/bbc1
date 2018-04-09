@@ -31,13 +31,6 @@ class MessageProcessor(bbc_app.Callback):
         super(MessageProcessor, self).__init__(self)
         self.idx = index
 
-    def proc_resp_cross_ref(self, dat):
-        for cross_ref in dat[KeyType.cross_refs]:
-            cross = bbclib.BBcCrossRef(cross_ref[0], cross_ref[1])
-            transactions[self.idx].add(cross_ref=cross)
-            self.logger.info("cross_refs: %s" % binascii.b2a_hex(cross_ref[0]))
-        self.queue.put(dat)
-
     def proc_resp_search_asset(self, dat):
         if KeyType.transaction_data in dat:
             self.logger.info("OK: Asset [%s] is found." % binascii.b2a_hex(dat[KeyType.asset_id]))
@@ -86,10 +79,6 @@ class TestBBcAppClient(object):
         transactions[0] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
         transactions[0].events[0].asset.add(user_id=user, asset_body=b'123456')
         transactions[0].events[1].asset.add(user_id=user, asset_file=b'abcdefg')
-
-        clients[0]['app'].get_cross_refs(number=2)
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.MsgType.RESPONSE_CROSS_REF)
-        assert KeyType.cross_refs in dat
 
     def test_03_insert(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -164,10 +153,6 @@ class TestBBcAppClient(object):
         transactions[0] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
         transactions[0].events[0].asset.add(user_id=user, asset_body=b'123456')
         transactions[0].events[1].asset.add(user_id=user, asset_file=b'abcdefg')
-
-        clients[0]['app'].get_cross_refs(asset_group_id=asset_group_id, number=2)
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.MsgType.RESPONSE_CROSS_REF)
-        assert dat[KeyType.status] == ESUCCESS
 
     def test_21_search_transaction_by_userid(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")

@@ -5,6 +5,7 @@ import pprint
 import sys
 sys.path.extend(["../"])
 from bbc1.common import bbclib
+from bbc1.core import bbc_stats
 from bbc1.core.data_handler import DataHandler
 
 user_id1 = bbclib.get_new_id("destination_id_test1")
@@ -38,13 +39,25 @@ config = {
 }
 
 
+class DummyCore:
+    class BBcNetwork:
+        def __init__(self, core):
+            self.core = core
+            self.domain0manager = None
+
+    def __init__(self):
+        self.networking = DummyCore.BBcNetwork(self)
+        self.stats = bbc_stats.BBcStats()
+
+
 class TestDataHandler(object):
 
     def test_01_setup(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         global data_handler
+        dummycore = DummyCore()
         conf = config["domains"][bbclib.convert_id_to_string(domain_id)]
-        data_handler = DataHandler(config=conf, workingdir="testdir", domain_id=domain_id)
+        data_handler = DataHandler(networking=dummycore.networking, config=conf, workingdir="testdir", domain_id=domain_id)
         global transactions
         for i in range(10):
             txobj = bbclib.BBcTransaction()
@@ -72,7 +85,6 @@ class TestDataHandler(object):
             txobj.digest()
             transactions.append(txobj)
 
-    """
     def test_02_check_table_existence(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         ret = data_handler.db_adaptors[0].check_table_existence('transaction_table')
@@ -140,7 +152,7 @@ class TestDataHandler(object):
         ret = data_handler.search_transaction_topology(transactions[1].transaction_id, traverse_to_past=False)
         assert len(ret) == 1
         assert ret[0][1] == transactions[2].transaction_id
-    """
+
 
 if __name__ == '__main__':
     pytest.main()

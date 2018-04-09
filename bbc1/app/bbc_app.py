@@ -153,7 +153,7 @@ class BBcAppClient:
         self.logger = logger.get_logger(key="bbc_app", level=loglevel, logname=logname)
         self.connection = socket.create_connection((host, port))
         self.callback = Callback(log=self.logger)
-        self.set_client = self
+        self.callback.set_client(self)
         self.domain_keypair = None
         self.default_node_keypair = None
         self.use_query_id_based_message_wait = False
@@ -163,6 +163,7 @@ class BBcAppClient:
         self.privatekey_for_ecdh = None
         self.aes_key_name = None
         self.is_secure_connection = False
+        self.cross_ref_list = list()
         self.start_receiver_loop()
 
     def set_callback(self, callback_obj):
@@ -517,18 +518,6 @@ class BBcAppClient:
         dat[KeyType.asset_group_id] = asset_group_id
         return self.send_msg(dat)
 
-    def get_cross_refs(self, asset_group_id=None, number=1):
-        """
-        Get cross_refs
-
-        :param asset_group_id:  TODO: will be obsoleted in v0.10
-        :param number:
-        :return:
-        """
-        dat = self.make_message_structure(MsgType.REQUEST_CROSS_REF)
-        dat[KeyType.count] = number
-        return self.send_msg(dat)
-
     def gather_signatures(self, tx_obj, reference_obj=None, destinations=None, asset_files=None, anycast=False):
         """
         Request to gather signatures from the specified user_ids
@@ -675,6 +664,25 @@ class BBcAppClient:
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
+    def request_verify_by_cross_ref(self, transaction_id):
+        """
+        Request to verify the transaction by Cross_ref in transaction of outer domain
+        :param transaction_id:
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_CROSS_REF_VERIFY)
+        dat[KeyType.transaction_id] = transaction_id
+        return self.send_msg(dat)
+
+    def request_cross_ref_holders_list(self):
+        """
+        Request the list of transaction_ids that are registered as cross_ref in outer domains
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_CROSS_REF_LIST)
+        # TODO: need to limit the number of entries??
+        return self.send_msg(dat)
+
     def register_in_ledger_subsystem(self, asset_group_id, transaction_id):
         """
         Register transaction_id in the ledger_subsystem
@@ -751,6 +759,15 @@ class BBcAppClient:
             print(traceback.format_exc())
         self.connection.close()
 
+    def include_cross_ref(self, txobj):
+        """
+        Include BBcCrossRef if cross_ref has been assigned to the client from other domains
+        :param txobj:
+        :return:
+        """
+        if len(self.cross_ref_list) > 0:
+            txobj.add(cross_ref=self.cross_ref_list.pop(0))
+
 
 class Callback:
     """
@@ -799,10 +816,14 @@ class Callback:
             self.proc_resp_insert(dat)
         elif dat[KeyType.command] == MsgType.NOTIFY_INSERTED:
             self.proc_notify_inserted(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_CROSS_REF:
-            self.proc_resp_cross_ref(dat)
+        elif dat[KeyType.command] == MsgType.NOTIFY_CROSS_REF:
+            self.proc_notify_cross_ref(dat)
         elif dat[KeyType.command] == MsgType.MESSAGE:
             self.proc_user_message(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_CROSS_REF_VERIFY:
+            self.proc_resp_verify_cross_ref(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_CROSS_REF_LIST:
+            self.proc_resp_cross_ref_list(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_REGISTER_HASH_IN_SUBSYS:
             self.proc_resp_register_hash(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS:
@@ -865,12 +886,9 @@ class Callback:
         except:
             return None
 
-    def proc_resp_cross_ref(self, dat):
-        cross_refs = []
-        for cross_ref in dat[KeyType.cross_refs]:
-            cross = bbclib.BBcCrossRef(cross_ref[0], cross_ref[1])
-            cross_refs.append(cross)
-        self.queue.put(cross_refs)
+    def proc_notify_cross_ref(self, dat):
+        cross_ref = bbclib.BBcCrossRef(dat[KeyType.cross_ref][0], dat[KeyType.cross_ref][1])
+        self.client.cross_ref_list.append(cross_ref)
 
     def proc_cmd_sign_request(self, dat):
         self.queue.put(dat)
@@ -901,6 +919,12 @@ class Callback:
         self.queue.put(dat)
 
     def proc_user_message(self, dat):
+        self.queue.put(dat)
+
+    def proc_resp_verify_cross_ref(self, dat):
+        self.queue.put(dat)
+
+    def proc_resp_cross_ref_list(self, dat):
         self.queue.put(dat)
 
     def proc_resp_ledger_subsystem(self, dat):
@@ -938,13 +962,14 @@ class Callback:
         results = []
         count = int.from_bytes(neighbor_list[:4], 'big')
         for i in range(count):
-            base = 4 + i*(32+4+16+2+8)
+            base = 4 + i*(32+4+16+2+1+8)
             node_id = neighbor_list[base:base+32]
             ipv4 = socket.inet_ntop(socket.AF_INET, neighbor_list[base + 32:base + 36])
             ipv6 = socket.inet_ntop(socket.AF_INET6, neighbor_list[base + 36:base + 52])
             port = socket.ntohs(int.from_bytes(neighbor_list[base + 52:base + 54], 'big'))
-            updated_at = neighbor_list[base+54:base+62]
-            results.append([node_id, ipv4, ipv6, port])
+            domain0 = True if neighbor_list[base + 54] == 0x01 else False
+            updated_at = neighbor_list[base+55:base+63]
+            results.append([node_id, ipv4, ipv6, port, domain0])
         self.queue.put(results)
 
     def proc_resp_get_domainlist(self, dat):
