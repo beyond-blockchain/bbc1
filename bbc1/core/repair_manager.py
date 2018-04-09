@@ -132,7 +132,7 @@ class RepairManager:
             KeyType.nonce: random_nonce,
         }
         self.network.broadcast_message_in_network(domain_id=self.domain_id,
-                                                  payload_type=PayloadType.Type_msgpack, msg=msg)
+                                                  payload_type=PayloadType.Type_any, msg=msg)
         return
 
     def send_transaction_data(self, dat):

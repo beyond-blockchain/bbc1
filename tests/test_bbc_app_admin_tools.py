@@ -127,7 +127,7 @@ class TestBBcAppClient(object):
         assert ret
         dat = msg_processor[0].synchronize()
         print("[0] nodeinfo=", dat[0])
-        node_id, ipv4, ipv6, port = dat[0]
+        node_id, ipv4, ipv6, port, domain0 = dat[0]
 
         for i in range(1, client_num):
             clients[i]['app'].send_domain_ping(domain_id, ipv4, ipv6, port)

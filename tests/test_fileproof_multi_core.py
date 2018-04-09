@@ -138,7 +138,7 @@ class TestFileProofClient(object):
         clients[0].get_domain_neighborlist(domain_id=domain_id)
         dat = clients[0].callback.synchronize()
         print("[0] nodeinfo=",dat[0])
-        node_id, ipv4, ipv6, port = dat[0]
+        node_id, ipv4, ipv6, port, domain0 = dat[0]
 
         clients[1].send_domain_ping(domain_id, ipv4, ipv6, port)  # if this line is commented out, error occurs later.
 
@@ -149,7 +149,7 @@ class TestFileProofClient(object):
             dat = clients[i].callback.synchronize()
             print("[%d]--> " % i)
             for k in range(len(dat)):
-                node_id, ipv4, ipv6, port = dat[k]
+                node_id, ipv4, ipv6, port, domain0 = dat[k]
                 if k == 0:
                     print(" *myself*    %s, %s, %s, %d" % (binascii.b2a_hex(node_id[:4]), ipv4, ipv6, port))
                 else:
@@ -227,8 +227,10 @@ class TestFileProofClient(object):
         result = response_data[KeyType.result]
         transfer_tx.references[result[0]].add_signature(user_id=result[1], signature=result[2])
         transfer_tx.digest()
+
         insert_signed_transaction_to_bbc_core(tx_obj=transfer_tx, bbc_app_client=clients[0])
         transaction_info = ["testfile", transfer_tx.transaction_id]
+        time.sleep(1)
         clients[0].send_message(transaction_info, user_ids[1])
 
         # -- receiver

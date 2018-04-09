@@ -38,9 +38,6 @@ def make_transaction(client_idx):
     sig = transaction.sign(keypair=cl['keypair'])
     transaction.add_signature(user_id=cl['user_id'], signature=sig)
     transaction.digest()
-    print(">>> domain=%s, txid=%s, num_cross_ref=%d" % (binascii.b2a_hex(domain_ids[client_idx%domain_num][:4]),
-                                                        binascii.b2a_hex(transaction.transaction_id[:4]),
-                                                        len(transaction.cross_refs)))
     ret = cl['app'].insert_transaction(transaction)
     assert ret
     msg_processor[client_idx].synchronize()
