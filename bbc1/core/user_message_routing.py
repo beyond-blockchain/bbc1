@@ -211,14 +211,15 @@ class UserMessageRouting:
             msg[KeyType.anycast_ttl] = ttl - 1
             ttl -= 1
             if idx == randmax - 1:
-                sock = random.choice(tuple(self.registered_users.get(dst_user_id, None)))
-                if sock is not None and self._send(sock, msg):
-                    return True
+                if len(self.registered_users) > 0:
+                    sock = random.choice(tuple(self.registered_users.get(dst_user_id, None)))
+                    if sock is not None and self._send(sock, msg):
+                        return True
             else:
-                msg[KeyType.destination_node_id] = random.choice(tuple(self.forwarding_entries[dst_user_id]['nodes']))
                 try:
+                    msg[KeyType.destination_node_id] = random.choice(tuple(self.forwarding_entries[dst_user_id]['nodes']))
                     self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
-                                                           domain_id=self.domain_id, msg=msg)
+                                                            domain_id=self.domain_id, msg=msg)
                 except:
                     import traceback
                     traceback.print_exc()
@@ -365,7 +366,7 @@ class UserMessageRouting:
                     msg[KeyType.destination_user_id] = msg[KeyType.source_user_id]
                 msg[KeyType.source_user_id] = user_id
                 msg[KeyType.infra_command] = UserMessageRouting.RESPONSE_USER_LOCATION
-                self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
+                self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
                                                         domain_id=self.domain_id, msg=msg)
 
             elif msg[KeyType.infra_command] == UserMessageRouting.RESPONSE_USER_LOCATION:
@@ -417,7 +418,7 @@ class UserMessageRouting:
                 KeyType.user_id: dst_user_id,
             }
             self.stats.update_stats_increment("user_message", "fail_to_find_user", 1)
-            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
+            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
                                                     domain_id=self.domain_id, msg=retmsg)
             return
         if KeyType.is_anycast in msg:

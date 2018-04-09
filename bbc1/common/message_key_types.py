@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import os
+import threading
 import msgpack
 import struct
 from cryptography.hazmat.backends import default_backend
@@ -197,6 +198,7 @@ class Message:
         self.payload_type = 0
         self.format_version = 0
         self.msg_len = 0
+        self.lock = threading.Lock()
 
     def recv(self, dat):
         self.pending_buf.extend(dat)
@@ -221,7 +223,7 @@ class Message:
 
         if self.msg_len > 0 and len(self.pending_buf) >= self.msg_len+Message.HEADER_LEN:
             self.is_new_chunk = True
-            self.msg_body = self.pending_buf[Message.HEADER_LEN:(self.msg_len+Message.HEADER_LEN)]
+            self.msg_body = self.pending_buf[Message.HEADER_LEN:(self.msg_len + Message.HEADER_LEN)]
             self.pending_buf = self.pending_buf[(self.msg_len+Message.HEADER_LEN):]
             #print("  --self.msg_len > Message.HEADER_LEN -->true")
             return deserialize_data(self.payload_type, self.msg_body)
@@ -280,12 +282,13 @@ class KeyType:
 
     user_id = to_4byte(0, 0x60)
     transaction_id = to_4byte(1, 0x60)
-    asset_group_id = to_4byte(2, 0x60)
-    asset_group_ids = to_4byte(3, 0x60)
-    asset_id = to_4byte(4, 0x60)
-    direction = to_4byte(5, 0x60)
-    hop_count = to_4byte(6, 0x60)
-    all_included = to_4byte(7, 0x60)
+    transaction_id_list = to_4byte(2, 0x60)
+    asset_group_id = to_4byte(3, 0x60)
+    asset_group_ids = to_4byte(4, 0x60)
+    asset_id = to_4byte(5, 0x60)
+    direction = to_4byte(6, 0x60)
+    hop_count = to_4byte(7, 0x60)
+    all_included = to_4byte(8, 0x60)
 
     transaction_data = to_4byte(0, 0x70)
     transactions = to_4byte(1, 0x70)
@@ -294,14 +297,14 @@ class KeyType:
     all_asset_files = to_4byte(4, 0x70)
     signature = to_4byte(5, 0x70)
     cross_ref = to_4byte(6, 0x70)
-    cross_refs = to_4byte(7, 0x70)
-    outer_domain_id = to_4byte(8, 0x70)
+    outer_domain_id = to_4byte(7, 0x70)
+    source_domain_id = to_4byte(8, 0x70)
     txid_having_cross_ref = to_4byte(9, 0x70)
-    cross_ref_digest = to_4byte(10, 0x70)
-    cross_ref_digests = to_4byte(11, 0x70)
-    compromised_transaction_data = to_4byte(12, 0x70)
-    compromised_transactions = to_4byte(13, 0x70)
-    compromised_asset_files = to_4byte(14, 0x70)
+    cross_ref_verification_info = to_4byte(10, 0x70)
+
+    compromised_transaction_data = to_4byte(0, 0x90)
+    compromised_transactions = to_4byte(1, 0x90)
+    compromised_asset_files = to_4byte(2, 0x90)
 
     ledger_subsys_manip = to_4byte(0, 0xA0)     # enable/disable ledger_subsystem
     ledger_subsys_register = to_4byte(1, 0xA0)

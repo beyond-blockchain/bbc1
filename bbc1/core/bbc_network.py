@@ -339,7 +339,7 @@ class BBcNetwork:
         dst_manager = random.choice(managers)
         msg[KeyType.destination_node_id] = dst_manager.node_id
         msg[KeyType.infra_msg_type] = InfraMessageCategory.CATEGORY_DOMAIN0
-        self.domains[domain_id].send_message_in_network(dst_manager, PayloadType.Type_msgpack, domain_id, msg)
+        self.send_message_in_network(dst_manager, PayloadType.Type_msgpack, domain_id, msg)
 
     def get_domain_keypair(self, domain_id):
         """
@@ -874,7 +874,7 @@ class NeighborInfo:
         self.purge_timer = query_management.QueryEntry(expire_after=NeighborInfo.PURGE_INTERVAL_SEC,
                                                        callback_expire=self.purge, retry_count=3)
 
-    def add(self, node_id, ipv4=None, ipv6=None, port=None, is_static=False, domain0=False):
+    def add(self, node_id, ipv4=None, ipv6=None, port=None, is_static=False, domain0=None):
         if node_id not in self.nodeinfo_list:
             self.nodeinfo_list[node_id] = NodeInfo(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port,
                                                    is_static=is_static, domain0=domain0)
@@ -1010,5 +1010,4 @@ class NodeInfo:
         else:
             ipv6 = socket.inet_pton(socket.AF_INET6, "::")
         domain0 = int(1).to_bytes(1, 'little') if self.is_domain0_node else int(0).to_bytes(1, 'little')
-        return self.node_id, ipv4, ipv6, socket.htons(self.port).to_bytes(2, 'big'), \
-               domain0, int(self.updated_at).to_bytes(8, 'big')
+        return self.node_id, ipv4, ipv6, socket.htons(self.port).to_bytes(2, 'big'), domain0, int(self.updated_at).to_bytes(8, 'big')

@@ -42,8 +42,7 @@ topology_info_definition = [
 ]
 
 cross_ref_tbl_definition = [
-    ["id", "INTEGER"], ["domain_id", "BLOB"], ["transaction_id", "BLOB"],
-    ["outer_domain_id", "BLOB"], ["txid_having_cross_ref", "BLOB"],
+    ["id", "INTEGER"], ["transaction_id", "BLOB"], ["outer_domain_id", "BLOB"], ["txid_having_cross_ref", "BLOB"],
 ]
 
 #--- for anchoring ethereum/bitcoin blockchain ---
@@ -125,7 +124,7 @@ class DataHandler:
             db.create_table('transaction_table', transaction_tbl_definition, primary_key=0, indices=[0])
             db.create_table('asset_info_table', asset_info_definition, primary_key=0, indices=[0, 1, 2, 3, 4])
             db.create_table('topology_table', topology_info_definition, primary_key=0, indices=[0, 1, 2])
-            db.create_table('cross_ref_table', cross_ref_tbl_definition, primary_key=0, indices=[1, 2])
+            db.create_table('cross_ref_table', cross_ref_tbl_definition, primary_key=0, indices=[1])
             db.create_table('merkle_branch_table', merkle_branch_db_definition, primary_key=0, indices=[1, 2])
             db.create_table('merkle_leaf_table', merkle_leaf_db_definition, primary_key=0, indices=[1, 2])
             db.create_table('merkle_root_table', merkle_root_db_definition, primary_key=0, indices=[0])
@@ -290,12 +289,11 @@ class DataHandler:
 
     def insert_cross_ref(self, transaction_id, outer_domain_id, txid_having_cross_ref, no_replication=False):
         self.stats.update_stats_increment("data_handler", "insert_cross_ref", 1)
-        sql = "INSERT INTO cross_ref_table (domain_id, transaction_id, outer_domain_id, txid_having_cross_ref) " + \
-              "VALUES (%s, %s, %s, %s)" % (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
-                                            self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder)
+        sql = "INSERT INTO cross_ref_table (transaction_id, outer_domain_id, txid_having_cross_ref) " + \
+              "VALUES (%s, %s, %s)" % (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
+                                       self.db_adaptors[0].placeholder)
         for i in range(len(self.db_adaptors)):
-            self.exec_sql(db_num=i, sql=sql, args=(self.domain_id, transaction_id, outer_domain_id,
-                                                   txid_having_cross_ref), commit=True)
+            self.exec_sql(db_num=i, sql=sql, args=(transaction_id, outer_domain_id, txid_having_cross_ref), commit=True)
 
         if not no_replication:
             self.send_cross_ref_replication_to_other_cores(transaction_id, outer_domain_id, txid_having_cross_ref)
@@ -306,14 +304,12 @@ class DataHandler:
         ret = self.exec_sql(sql=sql, args=(outer_domain_id,))
         return ret
 
-    def search_domain_having_cross_ref(self, domain_id, transaction_id=None):
+    def search_domain_having_cross_ref(self, transaction_id=None):
         if transaction_id is not None:
-            sql = "SELECT * FROM cross_ref_table WHERE domanin_id = %s AND transaction_id = %s" %\
-                  (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder)
-            return self.exec_sql(sql=sql, args=(domain_id, transaction_id))
+            sql = "SELECT * FROM cross_ref_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder
+            return self.exec_sql(sql=sql, args=(transaction_id,))
         else:
-            sql = "SELECT * FROM cross_ref_table WHERE domanin_id = %s" % self.db_adaptors[0].placeholder
-            return self.exec_sql(sql=sql, args=(domain_id,))
+            return self.exec_sql(sql="SELECT * FROM cross_ref_table")
 
     def store_asset_files(self, txobj, asset_files):
         """
@@ -351,7 +347,7 @@ class DataHandler:
             msg[KeyType.all_asset_files] = asset_files
         if self.replication_strategy == DataHandler.REPLICATION_ALL:
             self.networking.broadcast_message_in_network(domain_id=self.domain_id,
-                                                      payload_type=PayloadType.Type_msgpack, msg=msg)
+                                                         payload_type=PayloadType.Type_any, msg=msg)
         elif self.replication_strategy == DataHandler.REPLICATION_P2P:
             pass  # TODO: implement (destinations determined by TopologyManager)
 
@@ -373,7 +369,7 @@ class DataHandler:
         }
         if self.replication_strategy == DataHandler.REPLICATION_ALL:
             self.networking.broadcast_message_in_network(domain_id=self.domain_id,
-                                                         payload_type=PayloadType.Type_msgpack, msg=msg)
+                                                         payload_type=PayloadType.Type_any, msg=msg)
         elif self.replication_strategy == DataHandler.REPLICATION_P2P:
             pass  # TODO: implement (destinations determined by TopologyManager)
 
@@ -607,8 +603,8 @@ class DataHandler:
             else:
                 msg[KeyType.result] = True
                 msg[KeyType.transaction_data] = ret[0][1]
-            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
-                                                 domain_id=self.domain_id, msg=msg)
+            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
+                                                    domain_id=self.domain_id, msg=msg)
 
         elif msg[KeyType.infra_command] == DataHandler.RESPONSE_SEARCH:
             self.stats.update_stats_increment("data_handler", "RESPONSE_SEARCH", 1)

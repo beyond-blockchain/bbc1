@@ -242,6 +242,19 @@ def validate_transaction_object(txobj, asset_files=None):
     return True, valid_asset, invalid_asset
 
 
+def verify_using_cross_ref(domain_id, transaction_id, transaction_base_digest, cross_ref_data, sigdata):
+    cross = BBcCrossRef(deserialize=cross_ref_data)
+    if cross.domain_id != domain_id or cross.transaction_id != transaction_id:
+        return False
+    sig = BBcSignature(deserialize=sigdata)
+    dat = bytearray(transaction_base_digest)
+    dat.extend(to_2byte(1))
+    dat.extend(to_4byte(len(cross_ref_data)))
+    dat.extend(cross_ref_data)
+    digest = hashlib.sha256(bytes(dat)).digest()
+    return sig.verify(digest) == 1
+
+
 class KeyType:
     ECDSA_SECP256k1 = 1
 
@@ -339,11 +352,13 @@ class KeyPair:
 
 
 class BBcSignature:
-    def __init__(self, key_type=KeyType.ECDSA_SECP256k1):
+    def __init__(self, key_type=KeyType.ECDSA_SECP256k1, deserialize=None):
         self.type = key_type
         self.signature = None
         self.pubkey = None
         self.keypair = None
+        if deserialize is not None:
+            self.deserialize(deserialize)
 
     def add(self, signature=None, pubkey=None):
         if signature is not None:
@@ -385,6 +400,11 @@ class BBcSignature:
         return True
 
     def verify(self, digest):
+        """
+        Verify digest using pubkey in signature
+        :param digest:
+        :return: 0:invalid, 1:valid
+        """
         reset_error()
         if self.keypair is None:
             set_error(code=EBADKEYPAIR, txt="Bad private_key/public_key")
@@ -512,8 +532,8 @@ class BBcTransaction:
 
         dat_cross = bytearray()
         if self.cross_ref is not None:
-            dat.extend(to_2byte(1))
             cross = self.cross_ref.serialize()
+            dat_cross.extend(to_2byte(1))
             dat_cross.extend(to_4byte(len(cross)))
             dat_cross.extend(cross)
         else:
@@ -1295,9 +1315,11 @@ class BBcAsset:
 
 
 class BBcCrossRef:
-    def __init__(self, domain_id=None, transaction_id=None):
+    def __init__(self, domain_id=None, transaction_id=None, deserialize=None):
         self.domain_id = domain_id
         self.transaction_id = transaction_id
+        if deserialize is not None:
+            self.deserialize(deserialize)
 
     def __str__(self):
         ret  = "Cross_Ref:\n"
@@ -1372,8 +1394,8 @@ class MsgType:
     RESPONSE_TRAVERSE_TRANSACTIONS = 89
     REQUEST_CROSS_REF_VERIFY = 90
     RESPONSE_CROSS_REF_VERIFY = 91
-    REQUEST_CROSS_REF_RANDOM_PICK = 92
-    RESPONSE_CROSS_REF_RANDOM_PICK = 93
+    REQUEST_CROSS_REF_LIST = 92
+    RESPONSE_CROSS_REF_LIST = 93
     REQUEST_REPAIR = 94
     RESPONSE_REPAIR = 95
 

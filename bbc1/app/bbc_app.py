@@ -674,14 +674,13 @@ class BBcAppClient:
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
-    def request_randompick_cross_ref(self, count):
+    def request_cross_ref_holders_list(self):
         """
-        Request to pick up cross refs in outer domains
-        :param count: number fo cross refs to pick up
+        Request the list of transaction_ids that are registered as cross_ref in outer domains
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_CROSS_REF_RANDOM_PICK)
-        dat[KeyType.count] = count
+        dat = self.make_message_structure(MsgType.REQUEST_CROSS_REF_LIST)
+        # TODO: need to limit the number of entries??
         return self.send_msg(dat)
 
     def register_in_ledger_subsystem(self, asset_group_id, transaction_id):
@@ -823,8 +822,8 @@ class Callback:
             self.proc_user_message(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_CROSS_REF_VERIFY:
             self.proc_resp_verify_cross_ref(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_CROSS_REF_RANDOM_PICK:
-            self.proc_resp_randompick_cross_ref(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_CROSS_REF_LIST:
+            self.proc_resp_cross_ref_list(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_REGISTER_HASH_IN_SUBSYS:
             self.proc_resp_register_hash(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS:
@@ -925,7 +924,7 @@ class Callback:
     def proc_resp_verify_cross_ref(self, dat):
         self.queue.put(dat)
 
-    def proc_resp_randompick_cross_ref(self, dat):
+    def proc_resp_cross_ref_list(self, dat):
         self.queue.put(dat)
 
     def proc_resp_ledger_subsystem(self, dat):

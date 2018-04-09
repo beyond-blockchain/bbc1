@@ -23,10 +23,10 @@ import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core.bbc_types import InfraMessageCategory
-from bbc1.core import query_management, user_message_routing
+from bbc1.core import query_management, user_message_routing, repair_manager
+from bbc1.common import bbclib, logger
 from bbc1.common.bbclib import MsgType
 from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
-from bbc1.common import logger
 
 
 ticker = query_management.get_ticker()
@@ -212,7 +212,7 @@ class Domain0Manager:
                 continue
             dst_node_id = random.choice(self.domain_list[dm])
             msg[KeyType.destination_node_id] = dst_node_id
-            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
+            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
                                                     domain_id=domain_global_0, msg=msg)
 
     def _assign_cross_ref(self, cross_ref):
@@ -237,21 +237,28 @@ class Domain0Manager:
             KeyType.cross_ref: cross_ref,
         }
 
-        i = Domain0Manager.NUM_OF_COPIES
+        i = len(self.networking.domains)
+        if domain_global_0 in self.networking.domains:
+            i -= 1
+        if i <= 0:
+            return
+        if i > Domain0Manager.NUM_OF_COPIES:
+            i = Domain0Manager.NUM_OF_COPIES
         dup_check = set()
         while i > 0:
             target_domain = random.choice(tuple(self.networking.domains.keys()))
             if target_domain == domain_global_0:
                 continue
-            dst_node_id = random.choice(tuple(self.networking.domains[target_domain]['neighbor'].nodeinfo_list.keys()))
-            if (target_domain, dst_node_id) in dup_check:
-                continue
-            msg[KeyType.domain_id] = target_domain
-            msg[KeyType.destination_node_id] = dst_node_id
-            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
-                                                    domain_id=target_domain, msg=msg)
-            dup_check.add((target_domain, dst_node_id))
-            self.stats.update_stats_increment("domain0", "assign_cross_ref_to_nodes", 1)
+            if len(self.networking.domains[target_domain]['neighbor'].nodeinfo_list) > 0:
+                dst_node_id = random.choice(tuple(self.networking.domains[target_domain]['neighbor'].nodeinfo_list.keys()))
+                if (target_domain, dst_node_id) in dup_check:
+                    continue
+                msg[KeyType.domain_id] = target_domain
+                msg[KeyType.destination_node_id] = dst_node_id
+                self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
+                                                        domain_id=target_domain, msg=msg)
+                dup_check.add((target_domain, dst_node_id))
+                self.stats.update_stats_increment("domain0", "assign_cross_ref_to_nodes", 1)
             i -= 1
 
     def _get_acceptance_margin(self, domain_id):
@@ -284,7 +291,8 @@ class Domain0Manager:
             return
         del self.requested_cross_refs[cross_ref_domain_id][cross_ref_txid]
         self.stats.update_stats_increment("domain0", "cross_ref_registered", 1)
-
+        if len(self.domain_list[cross_ref_domain_id]) == 0:
+            return
         try:
             msg = {
                 KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_DOMAIN0,
@@ -299,6 +307,22 @@ class Domain0Manager:
                                                     domain_id=domain_global_0, msg=msg)
         except:
             return
+
+    def _get_transaction_data_for_verification(self, domain_id, transaction_id):
+        txobjs, asts = self.networking.domains[domain_id]['data'].search_transaction(transaction_id=transaction_id)
+        if transaction_id not in txobjs:
+            return None
+        txobj = txobjs[transaction_id]
+        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asts)
+        if not txobj_is_valid:
+            msg = {
+                KeyType.command: repair_manager.RepairManager.REQUEST_REPAIR_TRANSACTION,
+                KeyType.transaction_id: transaction_id,
+            }
+            self.networking.domains[domain_id]['repair'].put_message(msg)
+            return None
+        txobj.digest()
+        return txobj.transaction_base_digest, txobj.cross_ref.serialize(), txobj.signatures[0].serialize()
 
     def process_message(self, msg):
         """
@@ -335,42 +359,54 @@ class Domain0Manager:
             self.stats.update_stats_increment("domain0", "REQUEST_VERIFY", 1)
             domain_id = msg[KeyType.domain_id]
             transaction_id = msg[KeyType.transaction_id]
-            domain_list = self.networking.domains[domain_id]['data'].search_domain_having_cross_ref(domain_id, transaction_id)
-            if domain_list is not None or len(domain_id) == 0:
+            domain_list = self.networking.domains[domain_id]['data'].search_domain_having_cross_ref(transaction_id)
+            if domain_list is None or len(domain_list) == 0:
                 return
-            dm = random.choice(domain_list)  # "domain_id","transaction_id", "outer_domain_id", "txid_having_cross_ref"
-            dst_node_id = self.domain_list.get(dm[2], None)
-            if dst_node_id is None:
+            dm = random.choice(domain_list)  # "id", "transaction_id", "outer_domain_id", "txid_having_cross_ref"
+            if dm[2] not in self.domain_list or len(self.domain_list[dm[2]]) == 0:
                 return
-            msg = {
+            dst_node_id = random.choice(self.domain_list[dm[2]])
+            msg2 = {
                 KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_DOMAIN0,
                 KeyType.command: Domain0Manager.REQUEST_VERIFY_FROM_OUTER_DOMAIN,
                 KeyType.domain_id: domain_global_0,
                 KeyType.destination_node_id: dst_node_id,
                 KeyType.source_user_id: msg[KeyType.source_user_id],
                 KeyType.transaction_id: transaction_id,
-                KeyType.outer_domain_id: domain_id,
+                KeyType.source_domain_id: domain_id,
+                KeyType.outer_domain_id: dm[2],
                 KeyType.txid_having_cross_ref: dm[3],
             }
-            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
-                                                    domain_id=domain_global_0, msg=msg)
+            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
+                                                    domain_id=domain_global_0, msg=msg2)
 
         elif msg[KeyType.command] == Domain0Manager.REQUEST_VERIFY_FROM_OUTER_DOMAIN:
-            domain_id = msg[KeyType.domain_id]
-            transaction_id = msg[KeyType.transaction_id]
-            ret = self.networking.domains[domain_id]['data'].search_transaction(transaction_id=transaction_id)
-            if ret is None or len(ret) == 0:
+            if KeyType.outer_domain_id not in msg or KeyType.txid_having_cross_ref not in msg:
                 return
+            domain_id = msg.pop(KeyType.outer_domain_id, None)
+            if domain_id not in self.networking.domains:
+                return
+            transaction_id = msg.pop(KeyType.txid_having_cross_ref, None)
+            if transaction_id is None:
+                return
+            ret = self._get_transaction_data_for_verification(domain_id, transaction_id)
+            if ret is None:
+                return
+            msg[KeyType.cross_ref_verification_info] = ret
+            msg[KeyType.command] = Domain0Manager.RESPONSE_VERIFY_FROM_OUTER_DOMAIN
+            msg[KeyType.destination_node_id] = msg[KeyType.source_node_id]
+            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
+                                                    domain_id=domain_global_0, msg=msg)
 
         elif msg[KeyType.command] == Domain0Manager.RESPONSE_VERIFY_FROM_OUTER_DOMAIN:
-            domain_id = msg[KeyType.outer_domain_id]
-            transaction_id = msg[KeyType.transaction_id]
+            domain_id = msg[KeyType.source_domain_id]
             msg2 = {
                 KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_USER,
                 KeyType.command: MsgType.RESPONSE_CROSS_REF_VERIFY,
                 KeyType.domain_id: domain_id,
+                KeyType.destination_user_id: msg[KeyType.source_user_id],
                 KeyType.source_user_id: msg[KeyType.source_user_id],
-                KeyType.transaction_id: transaction_id,
-                KeyType.cross_ref_digest: msg[KeyType.cross_ref_digest],
+                KeyType.transaction_id: msg[KeyType.transaction_id],
+                KeyType.cross_ref_verification_info: msg[KeyType.cross_ref_verification_info],
             }
             self.networking.domains[domain_id]['user'].send_message_to_user(msg2)

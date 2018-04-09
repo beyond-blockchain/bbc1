@@ -340,7 +340,7 @@ class BBcCoreService:
                 retmsg.update(txinfo)
                 umr.send_message_to_user(retmsg)
 
-        if cmd == MsgType.REQUEST_TRAVERSE_TRANSACTIONS:
+        elif cmd == MsgType.REQUEST_TRAVERSE_TRANSACTIONS:
             if not self.param_check([KeyType.domain_id, KeyType.transaction_id,
                                      KeyType.direction, KeyType.hop_count], dat):
                 self.logger.debug("REQUEST_TRAVERSE_TRANSACTIONS: bad format")
@@ -419,12 +419,16 @@ class BBcCoreService:
             dat[KeyType.command] = domain0_manager.Domain0Manager.REQUEST_VERIFY
             self.networking.send_message_to_a_domain0_manager(domain_id, dat)
 
-        elif cmd == MsgType.REQUEST_CROSS_REF_RANDOM_PICK:
-            if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.count], dat):
-                self.logger.debug("REQUEST_CROSS_REF_RANDOM_PICK: bad format")
+        elif cmd == MsgType.REQUEST_CROSS_REF_LIST:
+            if not self.param_check([KeyType.domain_id, KeyType.source_user_id], dat):
+                self.logger.debug("REQUEST_CROSS_REF_LIST: bad format")
                 return False, None
-            dat[KeyType.command] = domain0_manager.Domain0Manager.REQUEST_RANDOM_PICK
-            self.networking.send_message_to_a_domain0_manager(domain_id, dat)
+            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_CROSS_REF_LIST,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            domain_list = self.networking.domains[domain_id]['data'].search_domain_having_cross_ref()
+            # domain_list = list of ["id", "transaction_id", "outer_domain_id", "txid_having_cross_ref"]
+            retmsg[KeyType.transaction_id_list] = [row[1] for row in domain_list]
+            umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_REGISTER_HASH_IN_SUBSYS:
             if not self.param_check([KeyType.transaction_id], dat):

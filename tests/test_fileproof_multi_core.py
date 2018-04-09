@@ -227,8 +227,10 @@ class TestFileProofClient(object):
         result = response_data[KeyType.result]
         transfer_tx.references[result[0]].add_signature(user_id=result[1], signature=result[2])
         transfer_tx.digest()
+
         insert_signed_transaction_to_bbc_core(tx_obj=transfer_tx, bbc_app_client=clients[0])
         transaction_info = ["testfile", transfer_tx.transaction_id]
+        time.sleep(1)
         clients[0].send_message(transaction_info, user_ids[1])
 
         # -- receiver

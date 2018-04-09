@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-import pprint
+import random
 import time
 
 import sys
 sys.path.extend(["../"])
 from bbc1.common import bbclib
-from bbc1.app import bbc_app
 from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 from bbc1.core import domain0_manager, user_message_routing
 from bbc1.common.message_key_types import KeyType
@@ -30,6 +29,8 @@ core_domains = [None for i in range(core_num)]
 msg_processor = [None for i in range(client_num)]
 
 num_assign_cross_ref = 0
+num_cross_ref_registered = 0
+cross_ref_regsistered_list = dict()
 
 
 def show_domain_list(domain_list):
@@ -233,7 +234,7 @@ class TestBBcAppClient(object):
                 i += 1
         time.sleep(5)
 
-        num_cross_ref_registered = 0
+        global num_cross_ref_registered
         for i, cl in enumerate(clients):
             if i % 2 == 1:
                 continue
@@ -246,6 +247,36 @@ class TestBBcAppClient(object):
                     num_cross_ref_registered += stat[b'domain0'][b'cross_ref_registered']
                 print("[%d] insert_cross_ref=%d" % (i, stat[b'data_handler'][b'insert_cross_ref']))
         assert num_including_cross_ref == num_cross_ref_registered
+
+    def test_22_get_cross_ref_list(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        num_in_registered_list = 0
+        global cross_ref_regsistered_list
+        for i in [7, 17, 27]:
+            clients[i]['app'].request_cross_ref_holders_list()
+            dat = msg_processor[i].synchronize()
+            assert KeyType.transaction_id_list in dat
+            dm = clients[i]['app'].domain_id
+            num_in_registered_list += len(dat[KeyType.transaction_id_list])
+            cross_ref_regsistered_list.setdefault(dm, list())
+            print("----")
+            for txid in dat[KeyType.transaction_id_list]:
+                print("txid:", txid.hex())
+                cross_ref_regsistered_list[dm].append(txid)
+        assert num_in_registered_list == num_cross_ref_registered
+
+    def test_23_verify_cross_ref(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        for i in [6, 16, 26]:
+            dm = clients[i]['app'].domain_id
+            if len(cross_ref_regsistered_list[dm]) == 0:
+                continue
+            txid_to_verify = random.choice(cross_ref_regsistered_list[dm])
+            clients[i]['app'].request_verify_by_cross_ref(txid_to_verify)
+            dat = msg_processor[i].synchronize()
+            assert KeyType.cross_ref_verification_info in dat
+            transaction_base_digest, cross_ref_data, sigdata = dat[KeyType.cross_ref_verification_info]
+            assert bbclib.verify_using_cross_ref(dm, txid_to_verify, transaction_base_digest, cross_ref_data, sigdata)
 
 
 if __name__ == '__main__':
