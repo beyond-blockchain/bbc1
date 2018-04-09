@@ -188,6 +188,10 @@ def to_2byte(val):
     return val.to_bytes(2, 'little')
 
 
+def to_1byte(val):
+    return val.to_bytes(1, 'little')
+
+
 def get_n_bytes(ptr, n, dat):
     return ptr+n, dat[ptr:ptr+n]
 
