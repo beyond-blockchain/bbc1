@@ -98,7 +98,7 @@ class BBcIdPublickeyMap:
     def __init__(self, domain_id, namespace_id=default_namespace_id,
             port=DEFAULT_CORE_PORT, logname="-", loglevel="none"):
         self.logger = logger.get_logger(key="id_lib", level=loglevel,
-                logname=logname) # FIXME: user the logger
+                logname=logname) # FIXME: use the logger
         self.domain_id = domain_id
         self.namespace_id = namespace_id
         self.__app = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT,
@@ -200,7 +200,7 @@ class BBcIdPublickeyMap:
 
         ret = self.__app.insert_transaction(transaction)
         assert ret
-        res = self.__app.callback.synchronize()
+        res = self.__app.callback.sync_by_queryid(ret)
         if res[KeyType.status] < ESUCCESS:
             raise RuntimeError(res[KeyType.reason].decode())
 
@@ -351,8 +351,8 @@ class BBcIdPublickeyMap:
 
 
     def __get_transaction(self, tx_id):
-        self.__app.search_transaction(tx_id)
-        res = self.__app.callback.synchronize()
+        ret = self.__app.search_transaction(tx_id)
+        res = self.__app.callback.sync_by_queryid(ret)
         if res[KeyType.status] < ESUCCESS:
             raise RuntimeError(res[KeyType.reason].decode())
         return bbclib.recover_transaction_object_from_rawdata(
@@ -426,9 +426,9 @@ class BBcIdPublickeyMap:
 
 
     def __update_local_database(self, user_id):
-        self.__app.search_transaction_with_condition(
+        ret = self.__app.search_transaction_with_condition(
                 asset_group_id=self.namespace_id, user_id=user_id)
-        res = self.__app.callback.synchronize(2) # FIXME: slow when not found
+        res = self.__app.callback.sync_by_queryid(ret, 2) # FIXME: slow when not found
         if res is None or res[KeyType.status] < ESUCCESS:
             raise ValueError('not found')
         tx = bbclib.BBcTransaction(deserialize=res[KeyType.transactions][0])
