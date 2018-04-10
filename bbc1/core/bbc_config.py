@@ -17,11 +17,11 @@ limitations under the License.
 import os
 import json
 import copy
+from collections import Mapping
 
 import sys
 sys.path.extend(["../../"])
 from bbc1.common import bbclib
-from bbc1.common.bbclib import StorageType
 
 
 DEFAULT_WORKING_DIR = '.bbc1'
@@ -39,29 +39,14 @@ current_config = {
     'client': {
         'port': DEFAULT_CORE_PORT,
     },
-    'ledger': {
-        'type': "sqlite3",
-        'transaction_db': "bbc_transaction.sqlite3",
-        'auxiliary_db': "bbc_aux.sqlite3",
-        'merkle_db': "bbc_merkle.sqlite3",
-    },
-    'storage': {
-        #'path': "path/to/somewhere",
-        #'path': "/path/to/somewhere",
-    },
     'network': {
         'p2p_port': DEFAULT_P2P_PORT,
         'max_connections': 100,
-        'modules': {
-            'simple_cluster': {
-                'test': 1,
-            },
-            'p2p_kademlia': {
-                'concurrent_lookup_num': 3,
-                'redundancy': 3,
-                'k_value': 10,
-            },
-        },
+    },
+    'domain_auth_key': {
+        'use': False,
+        'directory': DEFAULT_WORKING_DIR,
+        'obsolete_timeout': 300,
     },
     'domains': {
         '0000000000000000000000000000000000000000000000000000000000000000': {
@@ -69,12 +54,14 @@ current_config = {
             'static_nodes': {
                 # id : [ipv4, ipv6, port]
             },
-            'peer_list': {
-                # id : [ipv4, ipv6, port]
+            'use_ledger_subsystem': False,  # if this items does not exist or False, ledger_subsystem will not be used
+            'ledger_subsystem': {
+                'subsystem': 'ethereum',
+                'max_transactions': 4096,
+                'max_seconds': 60 * 60,
             },
         },
     },
-    'use_ledger_subsystem': False,
     'ethereum': {
         'chain_id': DEFAULT_ETHEREUM_CHAIN_ID,
         'port': DEFAULT_ETHEREUM_GETH_PORT,
@@ -84,32 +71,43 @@ current_config = {
         'contract': 'BBcAnchor',
         'contract_address': '',
     },
-    'ledger_subsystem': {
-        'subsystem': 'ethereum',
-        'max_transactions': 4096,
-        'max_seconds': 60 * 60,
-    },
 }
+
+
+def update_deep(d, u):
+    for k, v in u.items():
+        # this condition handles the problem
+        if not isinstance(d, Mapping):
+            d = u
+        elif isinstance(v, Mapping):
+            r = update_deep(d.get(k, {}), v)
+            d[k] = r
+        else:
+            d[k] = u[k]
+
+    return d
 
 
 class BBcConfig:
     def __init__(self, directory=None, file=None):
         self.config = copy.deepcopy(current_config)
-        self.config_file = DEFAULT_CONFIG_FILE
-        self.working_dir = self.config['workingdir']
         if directory is not None:
             self.working_dir = directory
             self.config['workingdir'] = self.working_dir
+        else:
+            self.working_dir = self.config['workingdir']
         if file is not None:
             self.config_file = file
+        else:
+            self.config_file = os.path.join(self.working_dir, DEFAULT_CONFIG_FILE)
 
         if not os.path.exists(self.working_dir):
             os.mkdir(self.working_dir)
 
-        if os.path.isfile(os.path.join(self.working_dir, self.config_file)):
-            with open(os.path.join(self.working_dir, self.config_file), "r") as f:
+        if os.path.isfile(self.config_file):
+            with open(self.config_file, "r") as f:
                 try:
-                    self.config.update(json.load(f))
+                    update_deep(self.config, json.load(f))
                 except:
                     print("config file must be in JSON format")
                     os._exit(1)
@@ -117,7 +115,7 @@ class BBcConfig:
 
     def update_config(self):
         try:
-            with open(os.path.join(self.working_dir, self.config_file), "w") as f:
+            with open(self.config_file, "w") as f:
                 json.dump(self.config, f, indent=4)
             return True
         except:
@@ -136,11 +134,17 @@ class BBcConfig:
         domain_id_str = bbclib.convert_id_to_string(domain_id)
         if create_if_new and domain_id_str not in self.config['domains']:
             self.config['domains'][domain_id_str] = {
-                'module': 'simple_cluster',
-                'static_nodes': {
-                    # id : [ipv4, ipv6, port]
+                'storage': {
+                    "type": "internal",  # or "external"
                 },
-                'peer_list': {
+                'db': {
+                    "db_type": "sqlite",            # or "mysql"
+                    "db_name": "bbc_ledger.sqlite",
+                    "replication_strategy": "all",  # or "p2p"/"external" (valid only in db_type=mysql)
+                    "db_servers": [{"db_addr": "127.0.0.1", "db_port": 3306, "db_user": "user", "db_pass": "pass"}]
+                    # valid only in the case of db_type=mysql
+                },
+                'static_nodes': {
                     # id : [ipv4, ipv6, port]
                 },
             }

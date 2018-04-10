@@ -21,10 +21,13 @@ cores = None
 clients = None
 domain_id = bbclib.get_new_id("testdomain")
 asset_group_id = bbclib.get_new_id("asset_group_1")
-cross_refs = []
 transaction = None
 txid = None
+user_id1 = bbclib.get_new_id("destination_id_test1")
+txid1 = bbclib.get_new_id("dummy_txid_1")
 
+keypair = bbclib.KeyPair()
+keypair.generate()
 result_queue = queue.Queue()
 
 
@@ -69,27 +72,14 @@ class TestBBcCore(object):
         global cores, clients
         cores, clients = get_core_client()
         for i in range(core_num):
-            cores[i].networking.create_domain(network_module="simple_cluster", domain_id=domain_id)
-            cores[i].ledger_manager.add_domain(domain_id)
-            cores[i].send_message = dummy_send_message
-            cores[i].storage_manager.set_storage_path(domain_id)
-
-    def test_02_get_cross_ref(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        for idx, core in enumerate(cores):
-            ret = core.pop_cross_refs(2)
-            for cross in ret:
-                print("[%i] %s" % (idx, ret))
-                c = bbclib.BBcCrossRef(domain_id=cross[0], transaction_id=cross[1])
-                cross_refs.append(c)
+            cores[i].networking.create_domain(domain_id=domain_id)
 
     def test_03_transaction_insert(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         global transaction
+        print("-- insert transaction only at core_node_1 --")
         user1 = clients[1]['user_id']
         transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
-        if len(cross_refs) > 0:
-            transaction.add(cross_ref=cross_refs.pop(0))
         transaction.events[0].asset.add(user_id=user1, asset_body=b'123456')
         transaction.events[1].asset.add(user_id=user1, asset_file=b'abcdefg')
         transaction.get_sig_index(user1)
@@ -97,46 +87,40 @@ class TestBBcCore(object):
         sig = transaction.sign(keypair=clients[1]['keypair'])
         transaction.add_signature(user_id=user1, signature=sig)
         transaction.digest()
-        transaction.dump()
+        print(transaction)
         print("register transaction=", binascii.b2a_hex(transaction.transaction_id))
         asset_file = dict()
         asset_file[transaction.events[1].asset.asset_id] = transaction.events[1].asset.asset_file
         ret = cores[1].insert_transaction(domain_id, transaction.serialize(), asset_file)
-        print(ret)
-        for i in range(len(cores)):
-            print("[%d] cross_ref_list=%d" % (i, len(cores[i].cross_ref_list)))
+        assert ret[KeyType.transaction_id] == transaction.transaction_id
 
-    def test_04_1_search_transaction_by_txid_locally(self):
+    def test_04_1_search_transaction_by_txid(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        print(transaction.transaction_id.hex())
-        ret = cores[1].search_transaction_by_txid(domain_id, transaction.transaction_id,
-                                                  clients[1]['user_id'], b'aaaa')
-        print(ret)
+        ret = cores[1].search_transaction_by_txid(domain_id, transaction.transaction_id)
         assert ret is not None
 
-    def test_04_2_search_asset_by_asid_locally(self):
+    def test_04_2_search_asset_by_asid(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         asid = transaction.events[0].asset.asset_id
-        ret = cores[1].search_asset_by_asid(domain_id, asset_group_id, asid, clients[1]['user_id'], b'aaaa')
+        ret = cores[1].search_transaction_with_condition(domain_id, asset_group_id=asset_group_id, asset_id=asid)
         print(ret)
         assert ret is not None
 
     def test_04_3_search_asset_by_asid_locally_in_storage(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         asid = transaction.events[1].asset.asset_id
-        ret = cores[1].search_asset_by_asid(domain_id, asset_group_id, asid, clients[1]['user_id'], b'aaaa')
+        ret = cores[1].search_transaction_with_condition(domain_id, asset_group_id=asset_group_id, asset_id=asid)
         print(ret)
         assert ret is not None
+        assert asid in ret[KeyType.all_asset_files]
 
     def test_05_1_search_transaction_by_txid_other_node_not_found(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
 
-        # -- insert transaction only at core_node_2
+        print("-- insert transaction only at core_node_2 --")
         global transaction
         user1 = clients[2]['user_id']
         transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
-        if len(cross_refs) > 0:
-            transaction.add(cross_ref=cross_refs.pop(0))
         transaction.events[0].asset.add(user_id=user1, asset_body=b'aaddbbdd')
         transaction.events[1].asset.add(user_id=user1, asset_file=b'112423')
 
@@ -145,171 +129,84 @@ class TestBBcCore(object):
             transaction.add_signature(user_id=clients[i]['user_id'], signature=sig)
         transaction.digest()
         print("register transaction=", binascii.b2a_hex(transaction.transaction_id))
-        transaction.dump()
         asset_file = dict()
         asset_file[transaction.events[1].asset.asset_id] = transaction.events[1].asset.asset_file
-        cores[2].ledger_manager.insert_transaction_locally(domain_id, transaction.transaction_id,
-                                                           transaction.serialize())
-        asid1 = transaction.events[0].asset.asset_id
-        cores[2].ledger_manager.insert_asset_info_locally(domain_id, transaction.transaction_id,
-                                                          asset_group_id, asid1, clients[2]['user_id'])
+        ret = cores[2].insert_transaction(domain_id, transaction.serialize(), asset_file)
+        assert ret[KeyType.transaction_id] == transaction.transaction_id
 
         # -- search the transaction at core_node_0
-        ret = cores[0].search_transaction_by_txid(domain_id, transaction.transaction_id,
-                                                  clients[2]['user_id'], b'bbbb')
+        ret = cores[0].search_transaction_by_txid(domain_id, transaction.transaction_id)
         print(ret)
         assert ret is None
-        print("wait queue: 1")
-        total = wait_results(1)
-        assert total == 0
 
     def test_05_2_search_asset_by_asid_other_node_not_found(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         # -- search the asset at core_node_0
         asid = transaction.events[0].asset.asset_id
-        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[1]['user_id'], b'aaaa')
+        ret = cores[0].search_transaction_with_condition(domain_id, asset_group_id=asset_group_id, asset_id=asid)
         assert ret is None
-        print("wait queue: 1")
-        total = wait_results(1)
-        assert total == 0
 
-    def test_05_3_search_asset_by_asid_in_storage_other_node_not_found(self):
+    def test_06_send_ping(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        # -- search the asset at core_node_0
-        asid = transaction.events[1].asset.asset_id
-        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[1]['user_id'], b'aaaa')
-        assert ret is None
-        print("wait queue: 1")
-        total = wait_results(1)
-        assert total == 0
 
-    def test_06_make_peerlist(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        node_id = cores[0].networking.domains[domain_id].node_id
+        ipv4 = cores[0].networking.ip_address
+        ipv6 = cores[0].networking.ip6_address
+        port = cores[0].networking.port
         for i in range(1, core_num):
-            cores[i].networking.domains[domain_id].add_peer_node(node_id=node_id, ip4=True,
-                                                                 addr_info=(cores[0].networking.ip_address,
-                                                                            cores[0].networking.port))
-            cores[i].networking.domains[domain_id].send_ping(node_id, None)
-        time.sleep(1)
-        cores[0].networking.domains[domain_id].alive_check()
-        print("*** wait for 16 sec for topology construction ***")
-        time.sleep(16)
+            cores[i].networking.send_domain_ping(domain_id=domain_id, ipv4=ipv4, ipv6=ipv6, port=port, is_static=True)
+        print("-- wait 2 seconds --")
+        time.sleep(2)
         for i in range(core_num):
-            cores[i].networking.domains[domain_id].print_peerlist()
+            print(cores[i].networking.domains[domain_id]['neighbor'].show_list())
 
-    def test_07_1_search_transaction_by_txid_other_node(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        # -- search the transaction at core_node_0
-        ret = cores[0].search_transaction_by_txid(domain_id, transaction.transaction_id,
-                                                  clients[0]['user_id'], b'cccc')
-        assert ret is None
-        print("wait queue: 1")
-        total = wait_results(1)
-        assert total == 1
-
-    def test_07_2_search_asset_by_asid_other_node(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        # -- search the asset at core_node_0
-        asid = transaction.events[0].asset.asset_id
-        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[0]['user_id'], b'dddd')
-        assert ret is None
-        print("wait queue: 1")
-        total = wait_results(1)
-        assert total == 1
-
-    def test_07_3_search_asset_by_asid_other_node_not_found(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        # -- search the asset at core_node_0
-        asid = transaction.events[1].asset.asset_id
-        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[0]['user_id'], b'dddd')
-        assert ret is None
-        print("wait queue: 1")
-        total = wait_results(1)
-        assert total == 0
-
-    def test_07_4_search_asset_by_asid_in_storage_other_node_not_found(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        # -- search the asset at core_node_0
-        asid = transaction.events[1].asset.asset_id
-        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[0]['user_id'], b'eeee')
-        assert ret is None
-        print("wait queue: 1")
-        total = wait_results(1)
-        assert total == 0
-
-    def test_08_store_asset_2(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        # -- store asset file at core_node_2
-        asid2 = transaction.events[1].asset.asset_id
-        cores[2].ledger_manager.insert_asset_info_locally(domain_id, transaction.transaction_id,
-                                                          asset_group_id, asid2, clients[2]['user_id'])
-        cores[2].storage_manager.store_locally(domain_id, asset_group_id, asid2,
-                                               transaction.events[1].asset.asset_file)
-
-    def test_09_1_search_asset_by_asid_other_node_not_found(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        # -- search the asset at core_node_0
-        asid = transaction.events[1].asset.asset_id
-        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[0]['user_id'], b'dddd')
-        assert ret is None
-        print("wait queue: 1")
-        total = wait_results(1)
-        assert total == 1
-
-    def test_09_2_search_asset_by_asid_in_storage_other_node_not_found(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        # -- search the asset at core_node_0
-        asid = transaction.events[1].asset.asset_id
-        ret = cores[0].search_asset_by_asid(domain_id, asset_group_id, asid, clients[0]['user_id'], b'eeee')
-        assert ret is None
-        print("wait queue: 1")
-        total = wait_results(1)
-        assert total == 1
-
-    def test_10_get_cross_ref(self):
-        print("\n-----", sys._getframe().f_code.co_name, "-----")
-        for idx, core in enumerate(cores):
-            ret = core.pop_cross_refs(2)
-            for cross in ret:
-                print("[%i] %s" % (idx, ret))
-                c = bbclib.BBcCrossRef(domain_id=cross[0], transaction_id=cross[1])
-                cross_refs.append(c)
-
-    def test_11_transaction_insert(self):
+    def test_07_1_insert_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         global transaction
-        user1 = clients[1]['user_id']
-        transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
-        if len(cross_refs) > 0:
-            transaction.add(cross_ref=cross_refs.pop(0))
-        transaction.events[0].asset.add(user_id=user1, asset_body=b'123456')
-        transaction.events[1].asset.add(user_id=user1, asset_file=b'abcdefgh')
-
-        for i, user in enumerate(clients):
-            sig = transaction.sign(keypair=clients[i]['keypair'])
-            transaction.add_signature(user_id=clients[i]['user_id'], signature=sig)
+        transaction = bbclib.BBcTransaction()
+        rtn = bbclib.BBcRelation()
+        rtn.asset_group_id = asset_group_id
+        rtn.asset = bbclib.BBcAsset()
+        rtn.asset.add(user_id=user_id1, asset_body=b'bbbbbb', asset_file=b'cccccccccc')
+        ptr = bbclib.BBcPointer()
+        ptr.add(transaction_id=txid1)
+        rtn.add(pointer=ptr)
+        wit = bbclib.BBcWitness()
+        transaction.add(relation=rtn, witness=wit)
+        wit.add_witness(user_id1)
+        sig = transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
+                               private_key=keypair.private_key, public_key=keypair.public_key)
+        transaction.add_signature(user_id=user_id1, signature=sig)
         transaction.digest()
-        print("register transaction=", binascii.b2a_hex(transaction.transaction_id))
-        transaction.dump()
-        asset_file = dict()
-        asset_file[transaction.events[1].asset.asset_id] = transaction.events[1].asset.asset_file
-        ret = cores[1].insert_transaction(domain_id, transaction.serialize(), asset_file)
-        print(ret)
-        for i in range(len(cores)):
-            print("[%d] cross_ref_list=%d" % (i, len(cores[i].cross_ref_list)))
+        asset_files = {
+            transaction.relations[0].asset.asset_id: transaction.relations[0].asset.asset_file,
+        }
+        ret = cores[0].insert_transaction(domain_id, transaction.serialize(), asset_files)
+        assert ret[KeyType.transaction_id] == transaction.transaction_id
 
-    def test_12_transaction_search_by_userid_locally(self):
+        ret = cores[0].search_transaction_by_txid(domain_id, transaction.transaction_id)
+        assert ret is not None
+        assert len(ret[KeyType.all_asset_files]) == 1
+        print(ret)
+
+        print("-- wait 2 seconds --")
+        time.sleep(2)
+
+    def test_07_2_search_transaction_by_txid_other_node(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = cores[1].search_transaction_by_userid_locally(domain_id, asset_group_id, clients[1]['user_id'],
-                                                            clients[1]['user_id'], b'aaaa')
-        transaction_data = ret[KeyType.transaction_data]
-        txobj = bbclib.BBcTransaction()
-        txobj.deserialize(transaction_data)
-        txobj.dump()
-        assert txobj.transaction_id == transaction.transaction_id
-        print("expected: %s" % binascii.b2a_hex(transaction.transaction_id))
-        print("obtained: %s" % binascii.b2a_hex(txobj.transaction_id))
+        # -- search the transaction at core_node_1
+        ret = cores[1].search_transaction_by_txid(domain_id, transaction.transaction_id)
+        assert ret is not None
+        assert len(ret[KeyType.all_asset_files]) == 1
+        print(ret)
+
+    def test_07_2_search_asset_by_userid_other_node(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        # -- search the asset at core_node_2
+        asid = transaction.relations[0].asset.asset_id
+        ret = cores[2].search_transaction_with_condition(domain_id, asset_group_id=asset_group_id, user_id=user_id1)
+        print(ret)
+        assert ret is not None
+        assert asid in ret[KeyType.all_asset_files]
 
 
 if __name__ == '__main__':

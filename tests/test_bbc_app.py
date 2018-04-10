@@ -31,19 +31,9 @@ class MessageProcessor(bbc_app.Callback):
         super(MessageProcessor, self).__init__(self)
         self.idx = index
 
-    def proc_resp_cross_ref(self, dat):
-        for cross_ref in dat[KeyType.cross_refs]:
-            cross = bbclib.BBcCrossRef(cross_ref[0], cross_ref[1])
-            transactions[self.idx].add(cross_ref=cross)
-            self.logger.info("cross_refs: %s" % binascii.b2a_hex(cross_ref[0]))
-        self.queue.put(dat)
-
     def proc_resp_search_asset(self, dat):
         if KeyType.transaction_data in dat:
             self.logger.info("OK: Asset [%s] is found." % binascii.b2a_hex(dat[KeyType.asset_id]))
-            if KeyType.asset_file in dat:
-                self.logger.info(" [%s] in_storage --> %s" % (binascii.b2a_hex(dat[KeyType.asset_id][:4]),
-                                                              dat[KeyType.asset_file]))
             tx_obj = bbclib.recover_transaction_object_from_rawdata(dat[KeyType.transaction_data])
             for evt in tx_obj.events:
                 if evt.asset.asset_body_size > 0:
@@ -73,27 +63,26 @@ class TestBBcAppClient(object):
 
     def test_01_register(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = clients[0]['app'].get_domain_peerlist(domain_id=domain_id)
+        for i in range(client_num):
+            ret = clients[i]['app'].register_to_core()
+            assert ret
+
+        ret = clients[0]['app'].get_domain_neighborlist(domain_id=domain_id)
         assert ret
         dat = msg_processor[0].synchronize()
         print("nodeinfo=",dat)
 
-        ret = clients[0]['app'].register_to_core()
-        assert ret
-
     def test_02_make_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         user = clients[0]['user_id']
+        global transactions
         transactions[0] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
         transactions[0].events[0].asset.add(user_id=user, asset_body=b'123456')
         transactions[0].events[1].asset.add(user_id=user, asset_file=b'abcdefg')
 
-        ret = clients[0]['app'].get_cross_refs(asset_group_id=asset_group_id, number=2)
-        assert ret
-        wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_CROSS_REF)
-
     def test_03_insert(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
+        transactions[0].get_sig_index(user_id=clients[0]['user_id'])
         sig = transactions[0].sign(keypair=clients[0]['keypair'])
         assert sig is not None
         if sig is None:
@@ -101,22 +90,22 @@ class TestBBcAppClient(object):
             import os
             os._exit(1)
         transactions[0].add_signature(user_id=clients[0]['user_id'], signature=sig)
-        transactions[0].dump()
+        print(transactions[0])
         transactions[0].digest()
         print("register transaction=", binascii.b2a_hex(transactions[0].transaction_id))
-        ret = clients[0]['app'].insert_transaction(transactions[0])
-        assert ret
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_INSERT)
+        clients[0]['app'].insert_transaction(transactions[0])
+        dat = wait_check_result_msg_type(msg_processor[0], bbclib.MsgType.RESPONSE_INSERT)
         assert dat[KeyType.status] == ESUCCESS
 
     def test_07_search_asset0(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         asid = transactions[0].events[0].asset.asset_id
         print(" search for asset:%s"%binascii.b2a_hex(asid))
-        ret = clients[0]['app'].search_asset(asset_group_id, asid)
-        assert ret
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_ASSET)
+        clients[0]['app'].search_transaction_with_condition(asset_group_id=asset_group_id, asset_id=asid)
+        dat = wait_check_result_msg_type(msg_processor[0], bbclib.MsgType.RESPONSE_SEARCH_WITH_CONDITIONS)
         assert dat[KeyType.status] == ESUCCESS
+        print(dat)
+        assert KeyType.transactions in dat
 
     def test_08_search_asset_not_found(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -124,36 +113,37 @@ class TestBBcAppClient(object):
         asid[1] = 0xff
         asid[2] = 0xff
         print(" search for asset:%s"%binascii.b2a_hex(asid))
-        ret = clients[0]['app'].search_asset(asset_group_id, bytes(asid))
-        assert ret
+        clients[0]['app'].search_transaction_with_condition(asset_group_id=asset_group_id, asset_id=bytes(asid))
         print("* should be NG *")
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_ASSET)
+        dat = wait_check_result_msg_type(msg_processor[0], bbclib.MsgType.RESPONSE_SEARCH_WITH_CONDITIONS)
         assert dat[KeyType.status] < ESUCCESS
+        assert KeyType.transactions not in dat
+        assert KeyType.all_asset_files not in dat
 
     def test_09_search_asset2(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         asid = transactions[0].events[1].asset.asset_id
         print(" search for asset:%s"%binascii.b2a_hex(asid))
-        ret = clients[0]['app'].search_asset(asset_group_id, asid)
-        assert ret
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_ASSET)
+        clients[0]['app'].search_transaction_with_condition(asset_group_id=asset_group_id, asset_id=asid)
+        dat = wait_check_result_msg_type(msg_processor[0], bbclib.MsgType.RESPONSE_SEARCH_WITH_CONDITIONS)
+        print(dat)
         assert dat[KeyType.status] == ESUCCESS
+        assert KeyType.transactions in dat
 
     def test_15_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         transactions[0].digest()
         print("find txid=", binascii.b2a_hex(transactions[0].transaction_id))
-        ret = clients[0]['app'].search_transaction(transactions[0].transaction_id)
-        assert ret
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION)
+        clients[0]['app'].search_transaction(transactions[0].transaction_id)
+        dat = wait_check_result_msg_type(msg_processor[0], bbclib.MsgType.RESPONSE_SEARCH_TRANSACTION)
         assert dat[KeyType.status] == ESUCCESS
+        assert KeyType.transaction_data in dat
 
     def test_16_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = clients[0]['app'].search_transaction(b'4898g9fh')
-        assert ret
+        clients[0]['app'].search_transaction(b'4898g9fh')
         print("* should be NG *")
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_TRANSACTION)
+        dat = wait_check_result_msg_type(msg_processor[0], bbclib.MsgType.RESPONSE_SEARCH_TRANSACTION)
         assert dat[KeyType.status] < ESUCCESS
 
     def test_20_make_transaction(self):
@@ -164,27 +154,20 @@ class TestBBcAppClient(object):
         transactions[0].events[0].asset.add(user_id=user, asset_body=b'123456')
         transactions[0].events[1].asset.add(user_id=user, asset_file=b'abcdefg')
 
-        ret = clients[0]['app'].get_cross_refs(asset_group_id=asset_group_id, number=2)
-        assert ret
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_CROSS_REF)
-        assert dat[KeyType.status] == ESUCCESS
-        transactions[0].dump()
-
     def test_21_search_transaction_by_userid(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = clients[0]['app'].search_transaction_by_userid(asset_group_id, clients[0]['user_id'])
-        assert ret
-        dat = wait_check_result_msg_type(msg_processor[0], bbclib.ServiceMessageType.RESPONSE_SEARCH_USERID)
+        clients[0]['app'].search_transaction_with_condition(asset_group_id=asset_group_id,
+                                                            user_id=clients[0]['user_id'])
+        dat = wait_check_result_msg_type(msg_processor[0], bbclib.MsgType.RESPONSE_SEARCH_WITH_CONDITIONS)
         assert dat[KeyType.status] == ESUCCESS
-        transaction_data = dat[KeyType.transaction_data]
-        txobj = bbclib.BBcTransaction()
-        txobj.deserialize(transaction_data)
-        txobj.dump()
+        assert KeyType.transactions in dat
+        transaction_data = dat[KeyType.transactions][0]
+        txobj = bbclib.BBcTransaction(deserialize=transaction_data)
+        print(txobj)
 
     @pytest.mark.unregister
     def test_99_unregister(self):
-        ret = clients[0]['app'].unregister_from_core()
-        assert ret
+        clients[0]['app'].unregister_from_core()
 
 
 if __name__ == '__main__':

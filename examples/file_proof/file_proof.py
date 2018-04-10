@@ -148,6 +148,7 @@ def wait_for_transaction_msg(bbc_app_client=None):
         print("**** Invalid message is received...")
         print(response_data)
         bbc_app_client.sendback_denial_of_sign(response_data[KeyType.source_user_id],
+                                               response_data[KeyType.transaction_id],
                                                "Invalid message is received.")
         sys.exit(1)
     return response_data
@@ -161,7 +162,9 @@ def pick_valid_transaction_info(received_data=None, bbc_app_client=None):
     if asset_id not in asset_files:
         print("**** No valid file is received...")
         print(received_data)
-        bbc_app_client.sendback_denial_of_sign(received_data[KeyType.source_user_id], "No valid file is received.")
+        bbc_app_client.sendback_denial_of_sign(received_data[KeyType.source_user_id],
+                                               transaction.transaction_id,
+                                               "No valid file is received.")
         sys.exit(1)
 
     file_to_obtain = asset_files[asset_id]
@@ -174,11 +177,11 @@ def pick_valid_transaction_info(received_data=None, bbc_app_client=None):
     return transaction, received_data[KeyType.source_user_id]
 
 
-def prompt_user_to_accept_the_file(bbc_app_client=None, source_id=None):
+def prompt_user_to_accept_the_file(bbc_app_client=None, source_id=None, transaction_id=None):
     print("====> Do you want to accept the file?")
     answer = input('(Y/N) >> ')
     if answer != "Y":
-        bbc_app_client.sendback_denial_of_sign(source_id, "Denied to accept the file")
+        bbc_app_client.sendback_denial_of_sign(source_id, transaction_id, "Denied to accept the file")
         sys.exit(1)
 
 
@@ -265,8 +268,10 @@ def get_file(file):
         sys.exit(0)
 
     get_transaction = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
-    if KeyType.asset_file in response_data:
-        data = response_data[KeyType.asset_file]
+    if KeyType.all_asset_files in response_data:
+        asset_file_dict = response_data[KeyType.asset_file]
+        asset_id = get_transaction.events[0].asset.asset_id
+        data = asset_file_dict[asset_id]
     else:
         data = get_transaction.events[0].asset.asset_body
     out_file_name = file
@@ -337,7 +342,7 @@ def verify_file(file):
         print("%s is invalid" % file)
     print("done verify %s" % os.path.basename(file))
     print("Content of the transaction:::")
-    transaction.dump()
+    print(transaction)
 
 
 def create_keypair():
@@ -357,9 +362,9 @@ def enter_file_wait_mode():
     transaction, source_id = pick_valid_transaction_info(received_data=recvdat,
                                                          bbc_app_client=bbc_app_client)
 
-    prompt_user_to_accept_the_file(bbc_app_client=bbc_app_client, source_id=source_id)
+    prompt_user_to_accept_the_file(bbc_app_client=bbc_app_client, source_id=source_id, transaction_id=transaction.transaction_id)
     signature = transaction.sign(keypair=key_pair)
-    bbc_app_client.sendback_signature(source_id, -1, signature)
+    bbc_app_client.sendback_signature(source_id, transaction.transaction_id, -1, signature)
     filename, transaction_id = wait_for_file_info_msg(bbc_app_client=bbc_app_client)
 
     bbc_app.store_id_mappings(os.path.basename(filename.decode()),

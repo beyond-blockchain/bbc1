@@ -675,12 +675,12 @@ class Store:
     def get_mint_data(self, index):
         store_id = self.store_ids[index]
 
-        self.app.search_transaction_by_userid(self.mint_id, store_id)
+        self.app.search_transaction_with_condition(
+                asset_group_id=self.mint_id, user_id=store_id)
         res = self.app.callback.synchronize()
         if res[KeyType.status] < ESUCCESS:
             raise ValueError('not found')
-        tx = bbclib.recover_transaction_object_from_rawdata(
-                res[KeyType.transaction_data])
+        tx = bbclib.BBcTransaction(deserialize=res[KeyType.transactions][0])
         return tx.events[0].asset.asset_body
 
 
@@ -821,11 +821,12 @@ class Store:
         store_id = self.store_ids[index]
 
         if update:
-            self.app.search_transaction_by_userid(self.mint_id, store_id)
+            self.app.search_transaction_with_condition(
+                    asset_group_id=self.mint_id, user_id=store_id)
             res = self.app.callback.synchronize()
             if res[KeyType.status] >= ESUCCESS:
-                reftx = bbclib.recover_transaction_object_from_rawdata(
-                        res[KeyType.transaction_data])
+                reftx = bbclib.BBcTransaction(
+                        deserialize=res[KeyType.transactions][0])
         else:
             reftx = None
 
@@ -924,7 +925,7 @@ class BBcMint:
         assert ret
 
         self.store = Store(self.domain_id, self.mint_id, self.app)
-        self.app.request_insert_completion_notification(self.mint_id, True)
+        self.app.request_insert_completion_notification(self.mint_id)
 
 
     def get_balance_of(self, user_id, eval_time=None):
@@ -1127,7 +1128,8 @@ class MintCallback(bbc_app.Callback):
 
         self.mint.store.reserve_referred_utxos(tx)
         self.mint.store.push_tx(tx.transaction_id, tx)
-        self.mint.app.sendback_signature(source_user_id, -1, sig)
+        self.mint.app.sendback_signature(source_user_id, tx.transaction_id,
+                -1, sig)
 
 
     def proc_notify_inserted(self, dat):

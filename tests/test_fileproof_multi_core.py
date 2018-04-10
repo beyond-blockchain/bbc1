@@ -79,7 +79,9 @@ def wait_for_transaction_msg(bbc_app_client=None):
     if KeyType.transaction_data not in response_data or KeyType.all_asset_files not in response_data:
         print("**** Invalid message is received...")
         print(response_data)
-        bbc_app_client.sendback_denial_of_sign(response_data[KeyType.source_user_id], "Invalid message is received.")
+        bbc_app_client.sendback_denial_of_sign(response_data[KeyType.source_user_id],
+                                               response_data[KeyType.transaction_id],
+                                               "Invalid message is received.")
         assert False
     return response_data
 
@@ -133,22 +135,21 @@ class TestFileProofClient(object):
     def test_01_setup_network(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
 
-        ret = clients[0].get_domain_peerlist(domain_id=domain_id)
-        assert ret
+        clients[0].get_domain_neighborlist(domain_id=domain_id)
         dat = clients[0].callback.synchronize()
         print("[0] nodeinfo=",dat[0])
-        node_id, ipv4, ipv6, port = dat[0]
+        node_id, ipv4, ipv6, port, domain0 = dat[0]
 
         clients[1].send_domain_ping(domain_id, ipv4, ipv6, port)  # if this line is commented out, error occurs later.
 
         time.sleep(3)
 
         for i in range(client_num):
-            clients[i].get_domain_peerlist(domain_id=domain_id)
+            clients[i].get_domain_neighborlist(domain_id=domain_id)
             dat = clients[i].callback.synchronize()
             print("[%d]--> " % i)
             for k in range(len(dat)):
-                node_id, ipv4, ipv6, port = dat[k]
+                node_id, ipv4, ipv6, port, domain0 = dat[k]
                 if k == 0:
                     print(" *myself*    %s, %s, %s, %d" % (binascii.b2a_hex(node_id[:4]), ipv4, ipv6, port))
                 else:
@@ -176,7 +177,7 @@ class TestFileProofClient(object):
         store_transaction.get_sig_index(user_ids[0])
         store_transaction.add_signature(user_id=user_ids[0], signature=sig)
         store_transaction.digest()
-        store_transaction.dump()
+        print(store_transaction)
 
         global transaction_id, asset_id
         transaction_id = store_transaction.transaction_id
@@ -186,16 +187,16 @@ class TestFileProofClient(object):
         if response_data[KeyType.status] < ESUCCESS:
             print("ERROR: ", response_data[KeyType.reason].decode())
             assert False
+        time.sleep(1)
 
     def test_11_verify_file(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         # -- verify by user_1
-        ret = clients[1].search_asset(asset_group_id, asset_id)
-        assert ret
+        clients[1].search_transaction_with_condition(asset_group_id=asset_group_id, asset_id=asset_id)
         response_data = clients[1].callback.synchronize()
         assert response_data[KeyType.status] == ESUCCESS
 
-        txobj = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
+        txobj = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transactions][0])
         digest = txobj.digest()
         ret = txobj.signatures[0].verify(digest)
         assert ret
@@ -205,7 +206,7 @@ class TestFileProofClient(object):
             print("oooo valid")
         else:
             print("xxxx invalid")
-        txobj.dump()
+        print(txobj)
 
     def test_20_send_and_wait_file(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -218,7 +219,7 @@ class TestFileProofClient(object):
         txobj, source_id = pick_valid_transaction_info(received_data=recvdat,
                                                        bbc_app_client=clients[1])
         signature = txobj.sign(keypair=keypairs[1])
-        clients[1].sendback_signature(source_id, -1, signature)
+        clients[1].sendback_signature(source_id, txobj.transaction_id, -1, signature)
 
         # -- sender
         response_data = clients[0].callback.synchronize()
@@ -226,8 +227,10 @@ class TestFileProofClient(object):
         result = response_data[KeyType.result]
         transfer_tx.references[result[0]].add_signature(user_id=result[1], signature=result[2])
         transfer_tx.digest()
+
         insert_signed_transaction_to_bbc_core(tx_obj=transfer_tx, bbc_app_client=clients[0])
         transaction_info = ["testfile", transfer_tx.transaction_id]
+        time.sleep(1)
         clients[0].send_message(transaction_info, user_ids[1])
 
         # -- receiver
@@ -244,7 +247,7 @@ class TestFileProofClient(object):
 
     def test_99_quit(self):
         for core in cores:
-            core.networking.save_all_peer_lists()
+            core.networking.save_all_static_node_list()
             core.config.update_config()
 
 

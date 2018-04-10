@@ -6,7 +6,7 @@ sys.path.extend(["../"])
 import bbc1.common.message_key_types as message_key_types
 import bbc1.common.bbc_error as bbc_error
 
-from bbc1.common.bbclib import ServiceMessageType as MsgType
+from bbc1.common.bbclib import MsgType
 # dummy start.
 #class MsgType:
 #    MESSAGE = 34
@@ -17,7 +17,6 @@ def _bytes_to_str(bytes_str):
     """
     """
     return bytes_str.decode('utf-8')
-
 
 
 def test_to_4byte():
@@ -42,8 +41,8 @@ def test_make_message():
     data = {  }
     message = message_key_types.make_message(message_key_types.PayloadType.Type_msgpack, data, 0)
     # print(message)
-    assert (message == b'\x00\x01\x00\x00\x00\x00\x00\x01\x80')
-    assert (message[:message_key_types.Message.HEADER_LEN] == b'\x00\x01\x00\x00\x00\x00\x00\x01')
+    assert (message == b'\x00\x02\x00\x00\x00\x00\x00\x01\x80')
+    assert (message[:message_key_types.Message.HEADER_LEN] == b'\x00\x02\x00\x00\x00\x00\x00\x01')
 
 
 def test_make_message2():
@@ -58,7 +57,7 @@ def test_make_message2():
     }
     message = message_key_types.make_message(message_key_types.PayloadType.Type_msgpack, data, 0)
     # print(message)
-    assert (message[:message_key_types.Message.HEADER_LEN] == b'\x00\x01\x00\x00\x00\x00\x00S')
+    assert (message[:message_key_types.Message.HEADER_LEN] == b'\x00\x02\x00\x00\x00\x00\x00S')
 
     msg_obj = message_key_types.Message()
     msg_obj.recv(bytes(message))
