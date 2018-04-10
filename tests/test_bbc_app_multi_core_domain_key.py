@@ -60,7 +60,7 @@ class MessageProcessor(bbc_app.Callback):
             txo.deserialize(txdata)
             objs[txid] = txo
 
-        txobj.dump()
+        print(txobj)
         for i, reference in enumerate(txobj.references):
             event = objs[reference.transaction_id].events[reference.event_index_in_ref]
             if clients[self.idx]['user_id'] in event.mandatory_approvers:
