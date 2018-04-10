@@ -11,6 +11,9 @@ Although there are many TODOs in BBc-1, this reference implementation includes m
 
 Every directory includes README.md. Please read it for the details. Furthermore, directory docs/ includes documents and slide decks (PDF) that explain the design of the BBc-1 and its implementation.
 
+### Plan for v1.0
+The next update will be a major version up to v1.0. However, the basic feature will be the same as v0.10. Re-design of package structure, updating documents and implementing admin tools are main task for v1.0.
+
 # Environment
 
 * Python
