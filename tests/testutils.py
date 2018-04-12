@@ -55,7 +55,7 @@ def start_core(index, core_port, p2p_port, use_nodekey=False, use_domain0=False,
                                            use_domain0=use_domain0,
                                            server_start=False,
                                            loglevel=loglv)
-    cores[index].start_server(port=core_port)
+    cores[index]._start_server(port=core_port)
 
 
 def domain_setup_utility(core_port_increment, dom_id, network_module=None):

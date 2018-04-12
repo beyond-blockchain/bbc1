@@ -19,9 +19,8 @@ import random
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
-from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType
+from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
 from bbc1.core import bbclib
-from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.core import query_management, message_key_types, logger
 
 ticker = query_management.get_ticker()
@@ -109,7 +108,7 @@ class UserMessageRouting:
             del self.aes_name_list[socket]
         self.send_multicast_leave(user_id=user_id)
 
-    def add_user_for_forwarding(self, user_id, node_id, permanent=False):
+    def _add_user_for_forwarding(self, user_id, node_id, permanent=False):
         """
         Register user to forwarding list
         :param user_id:
@@ -121,7 +120,7 @@ class UserMessageRouting:
         if not permanent:
             if 'refresh' not in self.forwarding_entries[user_id]:
                 query_entry = query_management.QueryEntry(expire_after=UserMessageRouting.REFRESH_FORWARDING_LIST_INTERVAL,
-                                                          callback_expire=self.remove_user_from_forwarding,
+                                                          callback_expire=self._remove_user_from_forwarding,
                                                           data={
                                                               KeyType.user_id: user_id,
                                                           }, retry_count=0)
@@ -132,7 +131,7 @@ class UserMessageRouting:
         self.forwarding_entries[user_id]['nodes'].add(node_id)
         self.stats.update_stats("user_message", "registered_users_in_forwarding_list", len(self.forwarding_entries))
 
-    def remove_user_from_forwarding(self, query_entry=None, user_id=None, node_id=None):
+    def _remove_user_from_forwarding(self, query_entry=None, user_id=None, node_id=None):
         """
         Unregister user to forwarding list
         :param query_entry:
@@ -157,7 +156,7 @@ class UserMessageRouting:
         """
         Forward message to connecting user
         :param msg:
-        :param direct_only: If true, forward_message_to_another_node is not called.
+        :param direct_only: If true, _forward_message_to_another_node is not called.
         :return:
         """
         if KeyType.destination_user_id not in msg:
@@ -165,13 +164,13 @@ class UserMessageRouting:
 
         msg[KeyType.infra_msg_type] = InfraMessageCategory.CATEGORY_USER
         if msg.get(KeyType.is_anycast, False):
-            return self.send_anycast_message(msg)
+            return self._send_anycast_message(msg)
 
         socks = self.registered_users.get(msg[KeyType.destination_user_id], None)
         if socks is None:
             if direct_only:
                 return False
-            self.forward_message_to_another_node(msg)
+            self._forward_message_to_another_node(msg)
             return True
         count = len(socks)
         for s in socks:
@@ -190,7 +189,7 @@ class UserMessageRouting:
             return False
         return True
 
-    def send_anycast_message(self, msg):
+    def _send_anycast_message(self, msg):
         """
         Send message as anycast
         :param msg:
@@ -226,7 +225,7 @@ class UserMessageRouting:
                 return True
         return False
 
-    def forward_message_to_another_node(self, msg):
+    def _forward_message_to_another_node(self, msg):
         """
         Try to forward message to another node
         :param msg:
@@ -245,9 +244,9 @@ class UserMessageRouting:
                     pass
             return
         src_user_id = msg[KeyType.source_user_id]
-        self.resolve_accommodating_core_node(dst_user_id, src_user_id, msg)
+        self._resolve_accommodating_core_node(dst_user_id, src_user_id, msg)
 
-    def resolve_accommodating_core_node(self, dst_user_id, src_user_id, orig_msg=None):
+    def _resolve_accommodating_core_node(self, dst_user_id, src_user_id, orig_msg=None):
         """
         Resolve which node the user connects to
         :param dst_user_id:
@@ -257,8 +256,8 @@ class UserMessageRouting:
         """
         if orig_msg is not None:
             query_entry = query_management.QueryEntry(expire_after=UserMessageRouting.RESOLVE_TIMEOUT,
-                                                      callback_expire=self.resolve_failure,
-                                                      callback=self.resolve_success,
+                                                      callback_expire=self._resolve_failure,
+                                                      callback=self._resolve_success,
                                                       data={
                                                           KeyType.message: orig_msg,
                                                       },
@@ -276,7 +275,7 @@ class UserMessageRouting:
             msg[KeyType.source_user_id] = src_user_id
         self.networking.broadcast_message_in_network(domain_id=self.domain_id, msg=msg)
 
-    def resolve_success(self, query_entry):
+    def _resolve_success(self, query_entry):
         """
         Called if succeeded to resolve the location
         :param query_entry:
@@ -284,9 +283,9 @@ class UserMessageRouting:
         """
         self.on_going_timers.remove(query_entry.nonce)
         msg = query_entry.data[KeyType.message]
-        self.forward_message_to_another_node(msg=msg)
+        self._forward_message_to_another_node(msg=msg)
 
-    def resolve_failure(self, query_entry):
+    def _resolve_failure(self, query_entry):
         """
         Called if failed to resolve the location
         :param query_entry:
@@ -359,7 +358,7 @@ class UserMessageRouting:
                 user_id = msg[KeyType.destination_user_id]
                 if user_id not in self.registered_users:
                     return
-                self.add_user_for_forwarding(msg[KeyType.source_user_id], msg[KeyType.source_node_id])
+                self._add_user_for_forwarding(msg[KeyType.source_user_id], msg[KeyType.source_node_id])
                 msg[KeyType.destination_node_id] = msg[KeyType.source_node_id]
                 if KeyType.source_user_id in msg:
                     msg[KeyType.destination_user_id] = msg[KeyType.source_user_id]
@@ -370,7 +369,7 @@ class UserMessageRouting:
 
             elif msg[KeyType.infra_command] == UserMessageRouting.RESPONSE_USER_LOCATION:
                 self.stats.update_stats_increment("user_message", "RESPONSE_USER_LOCATION", 1)
-                self.add_user_for_forwarding(msg[KeyType.source_user_id], msg[KeyType.source_node_id])
+                self._add_user_for_forwarding(msg[KeyType.source_user_id], msg[KeyType.source_node_id])
                 if KeyType.nonce in msg:
                     query_entry = ticker.get_entry(msg[KeyType.nonce])
                     if query_entry is not None and query_entry.active:
@@ -378,17 +377,17 @@ class UserMessageRouting:
 
             elif msg[KeyType.infra_command] == UserMessageRouting.RESPONSE_NO_SUCH_USER:
                 self.stats.update_stats_increment("user_message", "RESPONSE_NO_SUCH_USER", 1)
-                self.remove_user_from_forwarding(user_id=msg[KeyType.user_id], node_id=msg[KeyType.source_node_id])
+                self._remove_user_from_forwarding(user_id=msg[KeyType.user_id], node_id=msg[KeyType.source_node_id])
 
             elif msg[KeyType.infra_command] == UserMessageRouting.JOIN_MULTICAST_RECEIVER:
                 self.stats.update_stats_increment("user_message", "JOIN_MULTICAST_RECEIVER", 1)
-                self.add_user_for_forwarding(msg[KeyType.user_id], msg[KeyType.source_node_id],
+                self._add_user_for_forwarding(msg[KeyType.user_id], msg[KeyType.source_node_id],
                                              permanent=msg.get(KeyType.static_entry, False))
 
             elif msg[KeyType.infra_command] == UserMessageRouting.LEAVE_MULTICAST_RECEIVER:
                 self.stats.update_stats_increment("user_message", "LEAVE_MULTICAST_RECEIVER", 1)
                 if msg[KeyType.user_id] in self.forwarding_entries:
-                    self.remove_user_from_forwarding(user_id=msg[KeyType.user_id],
+                    self._remove_user_from_forwarding(user_id=msg[KeyType.user_id],
                                                      node_id=msg[KeyType.source_node_id])
 
             elif msg[KeyType.infra_command] == UserMessageRouting.CROSS_REF_ASSIGNMENT:
@@ -407,7 +406,7 @@ class UserMessageRouting:
         dst_user_id = msg[KeyType.destination_user_id]
         if dst_user_id not in self.registered_users:
             if msg.get(KeyType.is_anycast, False):
-                self.send_anycast_message(msg)
+                self._send_anycast_message(msg)
                 return
             retmsg = {
                 KeyType.domain_id: self.domain_id,
@@ -436,25 +435,25 @@ class UserMessageRoutingDummy(UserMessageRouting):
     def unregister_user(self, user_id, socket=None):
         pass
 
-    def add_user_for_forwarding(self, user_id, node_id, permanent=False):
+    def _add_user_for_forwarding(self, user_id, node_id, permanent=False):
         pass
 
-    def remove_user_from_forwarding(self, query_entry=None, user_id=None, node_id=None):
+    def _remove_user_from_forwarding(self, query_entry=None, user_id=None, node_id=None):
         pass
 
     def send_message_to_user(self, msg, direct_only=False):
         pass
 
-    def forward_message_to_another_node(self, msg):
+    def _forward_message_to_another_node(self, msg):
         pass
 
-    def resolve_accommodating_core_node(self, dst_user_id, src_user_id, orig_msg=None):
+    def _resolve_accommodating_core_node(self, dst_user_id, src_user_id, orig_msg=None):
         pass
 
-    def resolve_success(self, query_entry):
+    def _resolve_success(self, query_entry):
         pass
 
-    def resolve_failure(self, query_entry):
+    def _resolve_failure(self, query_entry):
         pass
 
     def send_multicast_join(self, user_id, permanent=False):

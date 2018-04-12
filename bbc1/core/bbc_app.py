@@ -42,87 +42,7 @@ MESSAGE_WITH_NO_RESPONSE = (MsgType.MESSAGE, MsgType.REGISTER, MsgType.UNREGISTE
                             MsgType.REQUEST_INSERT_NOTIFICATION, MsgType.CANCEL_INSERT_NOTIFICATION)
 
 
-def store_id_mappings(name, asset_group_id, transaction_id=None, asset_ids=None):
-    if transaction_id is None and asset_ids is None:
-        return
-    mapping = dict()
-    asset_group_id_str = binascii.b2a_hex(asset_group_id).decode()
-    if os.path.exists(MAPPING_FILE):
-        with open(MAPPING_FILE, "r") as f:
-            mapping = json.load(f)
-
-    mapping.setdefault(asset_group_id_str, dict()).setdefault(name, dict())
-    if transaction_id is not None:
-        mapping[asset_group_id_str][name]['transaction_id'] = binascii.b2a_hex(transaction_id).decode()
-    if asset_ids is not None:
-        if isinstance(asset_ids, list):
-            entry = []
-            for ast in asset_ids:
-                entry.append(binascii.b2a_hex(ast))
-            mapping[asset_group_id_str][name]['asset_id'] = entry
-        else:
-            mapping[asset_group_id_str][name]['asset_id'] = binascii.b2a_hex(asset_ids).decode()
-
-    with open(MAPPING_FILE, "w") as f:
-        json.dump(mapping, f, indent=4)
-
-
-def remove_id_mappings(name, asset_group_id):
-    mapping = dict()
-    asset_group_id_str = binascii.b2a_hex(asset_group_id).decode()
-    if os.path.exists(MAPPING_FILE):
-        with open(MAPPING_FILE, "r") as f:
-            mapping = json.load(f)
-    if asset_group_id_str in mapping:
-        mapping[asset_group_id_str].pop(name, None)
-        if len(mapping[asset_group_id_str].keys()) == 0:
-            del mapping[asset_group_id_str]
-
-    with open(MAPPING_FILE, "w") as f:
-        json.dump(mapping, f, indent=4)
-
-
-def get_id_from_mappings(name, asset_group_id):
-    if not os.path.exists(MAPPING_FILE):
-        return None
-    asset_group_id_str = binascii.b2a_hex(asset_group_id).decode()
-    with open(MAPPING_FILE, "r") as f:
-        mapping = json.load(f)
-    if mapping is None:
-        return None
-    if asset_group_id_str in mapping and name in mapping[asset_group_id_str]:
-        result = dict()
-        if 'transaction_id' in mapping[asset_group_id_str][name]:
-            result['transaction_id'] = binascii.a2b_hex(mapping[asset_group_id_str][name]['transaction_id'])
-        if 'asset_id' in mapping[asset_group_id_str][name]:
-            if isinstance(mapping[asset_group_id_str][name]['asset_id'], list):
-                entry = []
-                for ast in mapping[asset_group_id_str][name]['asset_id']:
-                    entry.append(binascii.a2b_hex(ast))
-                result['asset_id'] = entry
-            else:
-                result['asset_id'] = binascii.a2b_hex(mapping[asset_group_id_str][name]['asset_id'])
-        return result
-    return None
-
-
-def get_list_from_mappings(asset_group_id):
-    if not os.path.exists(MAPPING_FILE):
-        return None
-    asset_group_id_str = binascii.b2a_hex(asset_group_id).decode()
-    with open(MAPPING_FILE, "r") as f:
-        mapping = json.load(f)
-    if mapping is None:
-        return None
-    if asset_group_id_str in mapping:
-        result  = []
-        for name in mapping[asset_group_id_str]:
-            result.append(name)
-        return result
-    return None
-
-
-def parse_one_level_list(dat):
+def _parse_one_level_list(dat):
     results = []
     count = int.from_bytes(dat[:2], 'big')
     for i in range(count):
@@ -131,7 +51,7 @@ def parse_one_level_list(dat):
     return results
 
 
-def parse_two_level_dict(dat):
+def _parse_two_level_dict(dat):
     results = dict()
     count = int.from_bytes(dat[:2], 'big')
     ptr = 2
@@ -232,7 +152,7 @@ class BBcAppClient:
         else:
             dat.update(admin_info)
 
-    def make_message_structure(self, cmd):
+    def _make_message_structure(self, cmd):
         """
         (internal use) make a base message structure for sending to the core node
 
@@ -284,7 +204,7 @@ class BBcAppClient:
         if self.domain_id is None:
             self.logger.error("Need to set domain first!")
             return None
-        dat = self.make_message_structure(MsgType.REQUEST_ECDH_KEY_EXCHANGE)
+        dat = self._make_message_structure(MsgType.REQUEST_ECDH_KEY_EXCHANGE)
         self.privatekey_for_ecdh, dat[KeyType.ecdh], self.aes_key_name = message_key_types.get_ECDH_parameters()
         dat[KeyType.nonce] = os.urandom(16)
         dat[KeyType.hint] = self.aes_key_name
@@ -299,7 +219,7 @@ class BBcAppClient:
         :param config:       in json format
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_SETUP_DOMAIN)
+        dat = self._make_message_structure(MsgType.REQUEST_SETUP_DOMAIN)
         admin_info = {
             KeyType.domain_id: domain_id,
             KeyType.random: bbclib.get_random_value(32)
@@ -314,7 +234,7 @@ class BBcAppClient:
         Close domain leading to remove_domain in the core
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_CLOSE_DOMAIN)
+        dat = self._make_message_structure(MsgType.REQUEST_CLOSE_DOMAIN)
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
@@ -328,7 +248,7 @@ class BBcAppClient:
         :param domain_id:
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_GET_NODEID)
+        dat = self._make_message_structure(MsgType.REQUEST_GET_NODEID)
         return self.send_msg(dat)
 
     def get_domain_neighborlist(self, domain_id):
@@ -338,7 +258,7 @@ class BBcAppClient:
         :param domain_id:
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_GET_NEIGHBORLIST)
+        dat = self._make_message_structure(MsgType.REQUEST_GET_NEIGHBORLIST)
         dat[KeyType.domain_id] = domain_id
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
@@ -357,7 +277,7 @@ class BBcAppClient:
         :param port:
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_SET_STATIC_NODE)
+        dat = self._make_message_structure(MsgType.REQUEST_SET_STATIC_NODE)
         dat[KeyType.domain_id] = domain_id
         admin_info = {
             KeyType.node_info: [node_id, ipv4, ipv6, port]
@@ -377,7 +297,7 @@ class BBcAppClient:
         """
         if ipv4 is None and ipv6 is None:
             return
-        dat = self.make_message_structure(MsgType.DOMAIN_PING)
+        dat = self._make_message_structure(MsgType.DOMAIN_PING)
         dat[KeyType.domain_id] = domain_id
         admin_info = dict()
         if ipv4 is not None and ipv4 != "0.0.0.0":
@@ -395,7 +315,7 @@ class BBcAppClient:
 
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_GET_CONFIG)
+        dat = self._make_message_structure(MsgType.REQUEST_GET_CONFIG)
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
@@ -408,7 +328,7 @@ class BBcAppClient:
 
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_GET_DOMAINLIST)
+        dat = self._make_message_structure(MsgType.REQUEST_GET_DOMAINLIST)
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
@@ -421,7 +341,7 @@ class BBcAppClient:
 
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_GET_USERS)
+        dat = self._make_message_structure(MsgType.REQUEST_GET_USERS)
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
@@ -434,7 +354,7 @@ class BBcAppClient:
 
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_GET_FORWARDING_LIST)
+        dat = self._make_message_structure(MsgType.REQUEST_GET_FORWARDING_LIST)
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
@@ -447,7 +367,7 @@ class BBcAppClient:
 
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_GET_NOTIFICATION_LIST)
+        dat = self._make_message_structure(MsgType.REQUEST_GET_NOTIFICATION_LIST)
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
@@ -462,7 +382,7 @@ class BBcAppClient:
         :param domain_id: 
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_MANIP_LEDGER_SUBSYS)
+        dat = self._make_message_structure(MsgType.REQUEST_MANIP_LEDGER_SUBSYS)
         dat[KeyType.domain_id] = domain_id
         admin_info = {
             KeyType.ledger_subsys_manip: enable,
@@ -477,7 +397,7 @@ class BBcAppClient:
         :param on_multiple_nodes:
         :return:
         """
-        dat = self.make_message_structure(MsgType.REGISTER)
+        dat = self._make_message_structure(MsgType.REGISTER)
         if on_multiple_nodes:
             dat[KeyType.on_multinodes] = True
         self.send_msg(dat)
@@ -489,7 +409,7 @@ class BBcAppClient:
 
         :return:
         """
-        dat = self.make_message_structure(MsgType.UNREGISTER)
+        dat = self._make_message_structure(MsgType.UNREGISTER)
         self.send_msg(dat)
         if self.aes_key_name is not None:
             message_key_types.unset_cipher(self.aes_key_name)
@@ -504,7 +424,7 @@ class BBcAppClient:
         :param asset_group_id:
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_INSERT_NOTIFICATION)
+        dat = self._make_message_structure(MsgType.REQUEST_INSERT_NOTIFICATION)
         dat[KeyType.asset_group_id] = asset_group_id
         return self.send_msg(dat)
 
@@ -514,7 +434,7 @@ class BBcAppClient:
         :param asset_group_id:
         :return:
         """
-        dat = self.make_message_structure(MsgType.CANCEL_INSERT_NOTIFICATION)
+        dat = self._make_message_structure(MsgType.CANCEL_INSERT_NOTIFICATION)
         dat[KeyType.asset_group_id] = asset_group_id
         return self.send_msg(dat)
 
@@ -531,7 +451,7 @@ class BBcAppClient:
         """
         if reference_obj is None and destinations is None:
             return False
-        dat = self.make_message_structure(MsgType.REQUEST_GATHER_SIGNATURE)
+        dat = self._make_message_structure(MsgType.REQUEST_GATHER_SIGNATURE)
         dat[KeyType.transaction_data] = tx_obj.serialize()
         dat[KeyType.transaction_id] = tx_obj.transaction_id
         if anycast:
@@ -559,7 +479,7 @@ class BBcAppClient:
         :param query_id:
         :return:
         """
-        dat = self.make_message_structure(MsgType.RESPONSE_SIGNATURE)
+        dat = self._make_message_structure(MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dst
         dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.ref_index] = ref_index
@@ -578,7 +498,7 @@ class BBcAppClient:
         :param query_id:
         :return:
         """
-        dat = self.make_message_structure(MsgType.RESPONSE_SIGNATURE)
+        dat = self._make_message_structure(MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dst
         dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.status] = EOTHER
@@ -597,7 +517,7 @@ class BBcAppClient:
         """
         if tx_obj.transaction_id is None:
             tx_obj.digest()
-        dat = self.make_message_structure(MsgType.REQUEST_INSERT)
+        dat = self._make_message_structure(MsgType.REQUEST_INSERT)
         dat[KeyType.transaction_data] = tx_obj.serialize()
         ast = dict()
         for evt in tx_obj.events:
@@ -618,7 +538,7 @@ class BBcAppClient:
         :param count:
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_WITH_CONDITIONS)
+        dat = self._make_message_structure(MsgType.REQUEST_SEARCH_WITH_CONDITIONS)
         if asset_group_id is not None:
             dat[KeyType.asset_group_id] = asset_group_id
         if asset_id is not None:
@@ -635,11 +555,11 @@ class BBcAppClient:
         :param transaction_id:
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_TRANSACTION)
+        dat = self._make_message_structure(MsgType.REQUEST_SEARCH_TRANSACTION)
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
-    def traverse_transactions(self, transaction_id, direction=1, hop_count=3):
+    def _traverse_transactions(self, transaction_id, direction=1, hop_count=3):
         """
         Search request for transaction_data
 
@@ -648,7 +568,7 @@ class BBcAppClient:
         :param hop_count:
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_TRAVERSE_TRANSACTIONS)
+        dat = self._make_message_structure(MsgType.REQUEST_TRAVERSE_TRANSACTIONS)
         dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.direction] = direction
         dat[KeyType.hop_count] = hop_count
@@ -660,7 +580,7 @@ class BBcAppClient:
         :param transaction_id:
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_REPAIR)
+        dat = self._make_message_structure(MsgType.REQUEST_REPAIR)
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
@@ -670,7 +590,7 @@ class BBcAppClient:
         :param transaction_id:
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_CROSS_REF_VERIFY)
+        dat = self._make_message_structure(MsgType.REQUEST_CROSS_REF_VERIFY)
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
@@ -679,7 +599,7 @@ class BBcAppClient:
         Request the list of transaction_ids that are registered as cross_ref in outer domains
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_CROSS_REF_LIST)
+        dat = self._make_message_structure(MsgType.REQUEST_CROSS_REF_LIST)
         # TODO: need to limit the number of entries??
         return self.send_msg(dat)
 
@@ -691,7 +611,7 @@ class BBcAppClient:
         :param transaction_id:
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_REGISTER_HASH_IN_SUBSYS)
+        dat = self._make_message_structure(MsgType.REQUEST_REGISTER_HASH_IN_SUBSYS)
         dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.asset_group_id] = asset_group_id
         return self.send_msg(dat)
@@ -704,7 +624,7 @@ class BBcAppClient:
         :param transaction_id:
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_VERIFY_HASH_IN_SUBSYS)
+        dat = self._make_message_structure(MsgType.REQUEST_VERIFY_HASH_IN_SUBSYS)
         dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.asset_group_id] = asset_group_id
         return self.send_msg(dat)
@@ -714,7 +634,7 @@ class BBcAppClient:
         Get statistics of bbc_core
         :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_GET_STATS)
+        dat = self._make_message_structure(MsgType.REQUEST_GET_STATS)
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
@@ -730,7 +650,7 @@ class BBcAppClient:
         :param is_anycast:
         :return:
         """
-        dat = self.make_message_structure(MsgType.MESSAGE)
+        dat = self._make_message_structure(MsgType.MESSAGE)
         dat[KeyType.destination_user_id] = dst_user_id
         dat[KeyType.message] = msg
         if is_anycast:
@@ -982,7 +902,7 @@ class Callback:
         if KeyType.domain_list not in dat:
             self.queue.put(None)
             return
-        self.queue.put(parse_one_level_list(dat[KeyType.domain_list]))
+        self.queue.put(_parse_one_level_list(dat[KeyType.domain_list]))
 
     def proc_resp_get_userlist(self, dat):
         """
@@ -993,19 +913,19 @@ class Callback:
         if KeyType.user_list not in dat:
             self.queue.put(None)
             return
-        self.queue.put(parse_one_level_list(dat[KeyType.user_list]))
+        self.queue.put(_parse_one_level_list(dat[KeyType.user_list]))
 
     def proc_resp_get_forwardinglist(self, dat):
         if KeyType.forwarding_list not in dat:
             self.queue.put(None)
             return
-        self.queue.put(parse_two_level_dict(dat[KeyType.forwarding_list]))
+        self.queue.put(_parse_two_level_dict(dat[KeyType.forwarding_list]))
 
     def proc_resp_get_notificationlist(self, dat):
         if KeyType.notification_list not in dat:
             self.queue.put(None)
             return
-        self.queue.put(parse_two_level_dict(dat[KeyType.notification_list]))
+        self.queue.put(_parse_two_level_dict(dat[KeyType.notification_list]))
 
     def proc_resp_get_node_id(self, dat):
         if KeyType.node_id not in dat:

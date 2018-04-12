@@ -22,11 +22,10 @@ import threading
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
-from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.core import query_management, user_message_routing, repair_manager, logger
 from bbc1.core import bbclib
 from bbc1.core.bbclib import MsgType
-from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType
+from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
 
 
 ticker = query_management.get_ticker()
@@ -64,9 +63,9 @@ class Domain0Manager:
         self.requested_cross_refs = dict()
         self.remove_lock = threading.Lock()
         self.advertise_timer_entry = None
-        self.update_advertise_timer_entry()
+        self._update_advertise_timer_entry()
         self.cross_ref_timer_entry = None
-        self.purge_cross_ref_timer_entry()
+        self._purge_cross_ref_timer_entry()
 
     def stop_all_timers(self):
         """
@@ -78,20 +77,20 @@ class Domain0Manager:
         if self.cross_ref_timer_entry is not None:
             self.cross_ref_timer_entry.deactivate()
 
-    def register_node(self, domain_id, node_id):
+    def _register_node(self, domain_id, node_id):
         self.domain_list.setdefault(domain_id, list())
         if node_id not in self.domain_list[domain_id]:
             self.domain_list[domain_id].append(node_id)
         self.node_domain_list.setdefault(node_id, dict())[domain_id] = int(time.time())
 
-    def remove_node(self, domain_id, node_id):
+    def _remove_node(self, domain_id, node_id):
         """
         Remove node from the lists
         :param domain_id:
         :param node_id:
         :return:
         """
-        #print("*** remove_node at %s:" % self.my_node_id.hex(), node_id.hex(), "in domain", domain_id.hex())
+        #print("*** _remove_node at %s:" % self.my_node_id.hex(), node_id.hex(), "in domain", domain_id.hex())
         #print(" ==> before: len(node_domain_list)=%d" % len(self.node_domain_list.keys()))
         self.remove_lock.acquire()
         if domain_id in self.domain_list:
@@ -115,41 +114,41 @@ class Domain0Manager:
         """
         self.domains_belong_to = set(self.networking.domains.keys())
 
-    def update_advertise_timer_entry(self):
+    def _update_advertise_timer_entry(self):
         rand_interval = random.randint(int(Domain0Manager.DOMAIN_INFO_ADVERTISE_INTERVAL * 5 / 6),
                                        int(Domain0Manager.DOMAIN_INFO_ADVERTISE_INTERVAL * 7 / 6))
-        self.logger.debug("update_advertise_timer_entry: %d" % rand_interval)
+        self.logger.debug("_update_advertise_timer_entry: %d" % rand_interval)
         self.advertise_timer_entry = query_management.QueryEntry(
-                expire_after=rand_interval, callback_expire=self.advertise_domain_info, retry_count=0)
+                expire_after=rand_interval, callback_expire=self._advertise_domain_info, retry_count=0)
 
-    def purge_cross_ref_timer_entry(self):
+    def _purge_cross_ref_timer_entry(self):
         rand_interval = random.randint(int(Domain0Manager.DOMAIN_ACCEPTANCE_RECOVER_INTERVAL * 5 / 6),
                                        int(Domain0Manager.DOMAIN_ACCEPTANCE_RECOVER_INTERVAL * 7 / 6))
         self.logger.debug("update_cross_ref_timer_entry: %d" % rand_interval)
         self.cross_ref_timer_entry = query_management.QueryEntry(
                 expire_after=rand_interval, callback_expire=self._purge_left_cross_ref, retry_count=0)
 
-    def eliminate_obsoleted_entries(self):
+    def _eliminate_obsoleted_entries(self):
         """
         Check expiration of the node_domain_list
         :return:
         """
-        #print("eliminate_obsoleted_entries at %s: len(node_domain_list)=%d" % (self.my_node_id.hex(),
+        #print("_eliminate_obsoleted_entries at %s: len(node_domain_list)=%d" % (self.my_node_id.hex(),
         #                                                                       len(self.node_domain_list.keys())))
         for node_id in list(self.node_domain_list.keys()):
             for domain_id in list(self.node_domain_list[node_id].keys()):
                 prev_time = self.node_domain_list[node_id][domain_id]
                 if int(time.time()) - prev_time > Domain0Manager.DOMAIN_INFO_LIFETIME:
                     #print(" --> expire node_id=%s in domain %s" % (node_id.hex(), domain_id.hex()))
-                    self.remove_node(domain_id, node_id)
+                    self._remove_node(domain_id, node_id)
 
-    def advertise_domain_info(self, query_entry):
+    def _advertise_domain_info(self, query_entry):
         """
         Advertise domain list in the domain 0 network
         :return:
         """
-        #print("[%s]: advertise_domain_info" % self.my_node_id.hex()[:4])
-        self.eliminate_obsoleted_entries()
+        #print("[%s]: _advertise_domain_info" % self.my_node_id.hex()[:4])
+        self._eliminate_obsoleted_entries()
         domain_list = list(filter(lambda d: d != domain_global_0, self.networking.domains.keys()))
         if len(domain_list) > 0:
             msg = {
@@ -162,7 +161,7 @@ class Domain0Manager:
             self.networking.broadcast_message_in_network(domain_id=domain_global_0,
                                                          payload_type=PayloadType.Type_msgpack, msg=msg)
             self.stats.update_stats_increment("domain0", "send_advertisement", 1)
-        self.update_advertise_timer_entry()
+        self._update_advertise_timer_entry()
 
     def _update_domain_list(self, msg):
         """
@@ -180,10 +179,10 @@ class Domain0Manager:
             self.remove_lock.release()
             #print("deleted:", [dm.hex() for dm in deleted])
             for dm in deleted:
-                self.remove_node(dm, src_node_id)
+                self._remove_node(dm, src_node_id)
         for dm in new_domains:
             #print("NEW:", dm.hex())
-            self.register_node(dm, src_node_id)
+            self._register_node(dm, src_node_id)
 
     def distribute_cross_ref_in_domain0(self, domain_id, transaction_id):
         """

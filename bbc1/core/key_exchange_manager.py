@@ -78,18 +78,18 @@ class KeyExchangeManager:
             self.timer_entry.deactivate()
         #print("(%d) set_invoke_timer:" % int(time.time()), timeout)
         self.timer_entry = query_management.QueryEntry(expire_after=timeout,
-                                                       callback_expire=self.perform_key_exchange,
+                                                       callback_expire=self._perform_key_exchange,
                                                        retry_count=0)
         if retry_entry:
             self.timer_entry.data[KeyType.retry_timer] = True
 
-    def set_delete_timer(self, key_name, timeout):
+    def _set_delete_timer(self, key_name, timeout):
         if key_name is not None:
-            #print("(%d) set_delete_timer:" % int(time.time()), key_name.hex()[:10], timeout)
+            #print("(%d) _set_delete_timer:" % int(time.time()), key_name.hex()[:10], timeout)
             query_management.QueryEntry(expire_after=timeout, callback_expire=remove_old_key,
                                         data={KeyType.hint: key_name}, retry_count=0)
 
-    def perform_key_exchange(self, query_entry):
+    def _perform_key_exchange(self, query_entry):
         """
         Perform ECDH key exhange to establish secure channel to the node
         :param query_entry:
@@ -99,7 +99,7 @@ class KeyExchangeManager:
             message_key_types.unset_cipher(self.pending_key_name)
             self.pending_key_name = None
         self.set_state(KeyExchangeManager.STATE_REQUESTING)
-        #print("# (%d) perform_key_exchange: to" % int(time.time()), self.counter_node_id.hex())
+        #print("# (%d) _perform_key_exchange: to" % int(time.time()), self.counter_node_id.hex())
         self.secret_key, self.peer_public_key, self.pending_key_name = message_key_types.get_ECDH_parameters()
         self.nonce = os.urandom(16)
         self.random = os.urandom(8)
@@ -162,7 +162,7 @@ class KeyExchangeManager:
         rand_time = int(KeyExchangeManager.KEY_REFRESH_INTERVAL*random.uniform(0.9, 1.1))
         self.set_invoke_timer(rand_time)
         self.shared_key = message_key_types.derive_shared_key(self.secret_key, pubkey, random_val)
-        self.set_delete_timer(self.key_name, KeyExchangeManager.KEY_OBSOLETE_TIMER)
+        self._set_delete_timer(self.key_name, KeyExchangeManager.KEY_OBSOLETE_TIMER)
         self.networking.send_key_exchange_message(self.domain_id, self.counter_node_id, "confirm", self.peer_public_key,
                                                  self.nonce, self.random, self.pending_key_name)
         self.key_name = self.pending_key_name
@@ -177,7 +177,7 @@ class KeyExchangeManager:
             return
         rand_time = int(KeyExchangeManager.KEY_REFRESH_INTERVAL*random.uniform(0.9, 1.1))
         self.set_invoke_timer(rand_time)
-        self.set_delete_timer(self.key_name, KeyExchangeManager.KEY_OBSOLETE_TIMER)
+        self._set_delete_timer(self.key_name, KeyExchangeManager.KEY_OBSOLETE_TIMER)
         self.key_name = self.pending_key_name
         self.set_state(KeyExchangeManager.STATE_ESTABLISHED)
         #print("*STATE_ESTABLISHED")

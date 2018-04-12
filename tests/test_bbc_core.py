@@ -93,9 +93,9 @@ class TestBBcCore(object):
         ret = cores[1].insert_transaction(domain_id, transaction.serialize(), asset_file)
         assert ret[KeyType.transaction_id] == transaction.transaction_id
 
-    def test_04_1_search_transaction_by_txid(self):
+    def test_04_1__search_transaction_by_txid(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = cores[1].search_transaction_by_txid(domain_id, transaction.transaction_id)
+        ret = cores[1]._search_transaction_by_txid(domain_id, transaction.transaction_id)
         assert ret is not None
 
     def test_04_2_search_asset_by_asid(self):
@@ -113,7 +113,7 @@ class TestBBcCore(object):
         assert ret is not None
         assert asid in ret[KeyType.all_asset_files]
 
-    def test_05_1_search_transaction_by_txid_other_node_not_found(self):
+    def test_05_1__search_transaction_by_txid_other_node_not_found(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
 
         print("-- insert transaction only at core_node_2 --")
@@ -134,7 +134,7 @@ class TestBBcCore(object):
         assert ret[KeyType.transaction_id] == transaction.transaction_id
 
         # -- search the transaction at core_node_0
-        ret = cores[0].search_transaction_by_txid(domain_id, transaction.transaction_id)
+        ret = cores[0]._search_transaction_by_txid(domain_id, transaction.transaction_id)
         print(ret)
         assert ret is None
 
@@ -182,7 +182,7 @@ class TestBBcCore(object):
         ret = cores[0].insert_transaction(domain_id, transaction.serialize(), asset_files)
         assert ret[KeyType.transaction_id] == transaction.transaction_id
 
-        ret = cores[0].search_transaction_by_txid(domain_id, transaction.transaction_id)
+        ret = cores[0]._search_transaction_by_txid(domain_id, transaction.transaction_id)
         assert ret is not None
         assert len(ret[KeyType.all_asset_files]) == 1
         print(ret)
@@ -190,10 +190,10 @@ class TestBBcCore(object):
         print("-- wait 2 seconds --")
         time.sleep(2)
 
-    def test_07_2_search_transaction_by_txid_other_node(self):
+    def test_07_2__search_transaction_by_txid_other_node(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         # -- search the transaction at core_node_1
-        ret = cores[1].search_transaction_by_txid(domain_id, transaction.transaction_id)
+        ret = cores[1]._search_transaction_by_txid(domain_id, transaction.transaction_id)
         assert ret is not None
         assert len(ret[KeyType.all_asset_files]) == 1
         print(ret)
