@@ -21,16 +21,15 @@ limitations under the License.
 """
 import argparse
 import time
-import binascii
 import sys
 import ipaddress
 sys.path.append("../")
 
-from bbc1.app import bbc_app
-from bbc1.core.bbc_config import DEFAULT_CORE_PORT, DEFAULT_P2P_PORT
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import KeyType
-from bbc1.common.bbc_error import *
+from bbc1.core import bbc_app
+from bbc1.core.bbc_config import DEFAULT_CORE_PORT
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType
+from bbc1.core.bbc_error import *
 
 
 def wait_check_result_msg_type(callback, msg_type):

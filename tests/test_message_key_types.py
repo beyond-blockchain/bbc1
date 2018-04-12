@@ -3,10 +3,10 @@ sys.path.extend(["../"])
 
 
 #import unittest
-import bbc1.common.message_key_types as message_key_types
-import bbc1.common.bbc_error as bbc_error
+import bbc1.core.message_key_types as message_key_types
+import bbc1.core.bbc_error as bbc_error
 
-from bbc1.common.bbclib import MsgType
+from bbc1.core.bbclib import MsgType
 # dummy start.
 #class MsgType:
 #    MESSAGE = 34

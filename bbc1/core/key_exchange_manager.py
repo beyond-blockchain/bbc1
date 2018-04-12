@@ -16,13 +16,11 @@ limitations under the License.
 """
 
 import random
-import time
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
-from bbc1.core import query_management
-from bbc1.common import message_key_types
-from bbc1.common.message_key_types import KeyType
+from bbc1.core import query_management, message_key_types
+from bbc1.core.message_key_types import KeyType
 
 
 def remove_old_key(query_entry):

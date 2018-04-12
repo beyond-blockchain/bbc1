@@ -14,17 +14,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-import binascii
 import hashlib
 import sys
 import time
 
 sys.path.append("../../")
 
-from bbc1.app import bbc_app, app_support_lib
-from bbc1.common import bbclib, logger
-from bbc1.common.bbc_error import *
-from bbc1.common.message_key_types import KeyType
+from bbc1.app import app_support_lib
+from bbc1.core import bbclib
+from bbc1.core import logger, bbc_app
+from bbc1.core.bbc_error import *
+from bbc1.core.message_key_types import KeyType
 from bbc1.core.bbc_config import DEFAULT_CORE_PORT
 
 
@@ -98,11 +98,11 @@ class BBcIdPublickeyMap:
     def __init__(self, domain_id, namespace_id=default_namespace_id,
             port=DEFAULT_CORE_PORT, logname="-", loglevel="none"):
         self.logger = logger.get_logger(key="id_lib", level=loglevel,
-                logname=logname) # FIXME: use the logger
+                                        logname=logname) # FIXME: use the logger
         self.domain_id = domain_id
         self.namespace_id = namespace_id
         self.__app = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT,
-                loglevel=loglevel)
+                                          loglevel=loglevel)
         self.__app.set_user_id(id_publickey_map_user_id)
         self.__app.set_domain_id(domain_id)
         self.__app.set_callback(bbc_app.Callback())

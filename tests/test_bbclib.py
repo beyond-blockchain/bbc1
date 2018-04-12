@@ -4,9 +4,9 @@ import pytest
 import binascii
 import sys
 sys.path.extend(["../"])
-from bbc1.common.bbclib import BBcTransaction, BBcEvent, BBcReference, BBcWitness, BBcRelation, BBcAsset, \
+from bbc1.core.bbclib import BBcTransaction, BBcEvent, BBcReference, BBcWitness, BBcRelation, BBcAsset, \
     BBcCrossRef, KeyPair, KeyType
-from bbc1.common import bbclib
+from bbc1.core import bbclib
 
 user_id = bbclib.get_new_id("user_id_test1")
 user_id2 = bbclib.get_new_id("user_id_test2")

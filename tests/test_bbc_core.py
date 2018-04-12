@@ -7,9 +7,8 @@ import time
 
 import sys
 sys.path.extend(["../"])
-from bbc1.core.bbc_types import ResourceType
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import KeyType
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType
 from testutils import prepare, start_core_thread, get_core_client, make_client
 
 LOGLEVEL = 'debug'

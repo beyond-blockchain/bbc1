@@ -21,7 +21,7 @@ from collections import Mapping
 
 import sys
 sys.path.extend(["../../"])
-from bbc1.common import bbclib
+from bbc1.core import bbclib
 
 
 DEFAULT_WORKING_DIR = '.bbc1'

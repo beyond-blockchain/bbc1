@@ -6,10 +6,10 @@ import time
 
 import sys
 sys.path.extend(["../"])
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import KeyType
-from bbc1.common.bbc_error import *
-from bbc1.app import bbc_app
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType
+from bbc1.core.bbc_error import *
+from bbc1.core import bbc_app
 from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 
 

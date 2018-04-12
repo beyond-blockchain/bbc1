@@ -8,10 +8,9 @@ import copy
 
 import sys
 sys.path.extend(["../"])
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import KeyType
-from bbc1.app import bbc_app
-from bbc1.core import bbc_core
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType
+from bbc1.core import bbc_core, bbc_app
 from bbc1.core.bbc_config import DEFAULT_CORE_PORT, DEFAULT_P2P_PORT
 
 cores = None
@@ -60,7 +59,7 @@ def start_core(index, core_port, p2p_port, use_nodekey=False, use_domain0=False,
 
 
 def domain_setup_utility(core_port_increment, dom_id, network_module=None):
-    cl = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT+core_port_increment)
+    cl = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT + core_port_increment)
     cl.domain_setup(dom_id)
     global common_domain_id
     common_domain_id = dom_id
@@ -77,7 +76,7 @@ def make_client(index, core_port_increment, callback=None, connect_to_core=True,
         if domain_id is None:
             global common_domain_id
             domain_id = common_domain_id
-        clients[index]['app'] = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT+core_port_increment, loglevel=loglv)
+        clients[index]['app'] = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT + core_port_increment, loglevel=loglv)
         clients[index]['app'].set_user_id(clients[index]['user_id'])
         clients[index]['app'].set_domain_id(domain_id)
     if callback is not None:

@@ -28,11 +28,11 @@ import os
 import sys
 sys.path.append("../../")
 
-from bbc1.common import bbclib, message_key_types
-from bbc1.common.bbclib import MsgType
-from bbc1.common.message_key_types import KeyType, PayloadType
-from bbc1.common.bbc_error import *
-from bbc1.common import logger
+from bbc1.core import bbclib
+from bbc1.core import message_key_types, logger
+from bbc1.core.bbclib import MsgType
+from bbc1.core.message_key_types import KeyType, PayloadType
+from bbc1.core.bbc_error import *
 
 DEFAULT_CORE_PORT = 9000
 DEFAULT_P2P_PORT = 6641

@@ -18,10 +18,10 @@ import argparse
 import sys
 sys.path.append("../")
 
-from bbc1.app import bbc_app
+from bbc1.core import bbc_app
 from bbc1.core.bbc_config import DEFAULT_CORE_PORT
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import KeyType
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType
 
 
 domain_id = bbclib.get_new_id("test_domain", include_timestamp=False)

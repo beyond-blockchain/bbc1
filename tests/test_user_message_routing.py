@@ -18,10 +18,9 @@ import os
 import sys
 sys.path.extend(["../"])
 
-from bbc1.common import bbclib, message_key_types
-from bbc1.common.message_key_types import KeyType
-from bbc1.core import bbc_network, user_message_routing, bbc_config, query_management, bbc_stats
-
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType
+from bbc1.core import bbc_network, user_message_routing, bbc_config, query_management, bbc_stats, message_key_types
 
 LOGLEVEL = 'debug'
 LOGLEVEL = 'info'

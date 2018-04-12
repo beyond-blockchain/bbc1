@@ -18,17 +18,14 @@ import sys
 import os
 import binascii
 import json
-import time
-import threading
-from datetime import datetime
 import sqlite3
 
 sys.path.extend(["../../"])
-from bbc1.common import bbclib
-from bbc1.app import bbc_app
+from bbc1.core import bbclib
+from bbc1.core import bbc_app
 from bbc1.core.bbc_config import DEFAULT_CORE_PORT
-from bbc1.common.message_key_types import KeyType
-from bbc1.common.bbc_error import *
+from bbc1.core.message_key_types import KeyType
+from bbc1.core.bbc_error import *
 
 
 PRIVATE_KEY = ".private_key"

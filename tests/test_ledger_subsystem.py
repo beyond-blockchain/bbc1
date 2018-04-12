@@ -13,7 +13,7 @@ import time
 import sys
 sys.path.append('.')
 sys.path.append('..')
-from bbc1.common import bbclib
+from bbc1.core import bbclib
 from bbc1.core import ledger_subsystem, bbc_stats, bbc_network, bbc_config
 from bbc1.core.ethereum import setup
 from bbc1.core.ethereum import bbc_ethereum

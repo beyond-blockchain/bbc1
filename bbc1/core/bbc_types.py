@@ -17,7 +17,7 @@ limitations under the License.
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
-from bbc1.common.message_key_types import to_2byte
+from bbc1.core.message_key_types import to_2byte
 
 
 class ResourceType:

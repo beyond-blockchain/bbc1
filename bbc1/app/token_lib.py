@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-import binascii
 import fractions
 import hashlib
 import sys
@@ -22,10 +21,11 @@ import time
 
 sys.path.append("../../")
 
-from bbc1.app import bbc_app, app_support_lib, id_lib
-from bbc1.common import bbclib, logger
-from bbc1.common.bbc_error import *
-from bbc1.common.message_key_types import KeyType
+from bbc1.app import app_support_lib
+from bbc1.core import bbclib
+from bbc1.core import logger, bbc_app
+from bbc1.core.bbc_error import *
+from bbc1.core.message_key_types import KeyType
 from bbc1.core.bbc_config import DEFAULT_CORE_PORT
 
 
@@ -910,14 +910,14 @@ class BBcMint:
     def __init__(self, domain_id, mint_id, user_id, idPublickeyMap,
                     port=DEFAULT_CORE_PORT, logname="-", loglevel="none"):
         self.logger = logger.get_logger(key="token_lib", level=loglevel,
-                logname=logname) # FIXME: use logger
+                                        logname=logname) # FIXME: use logger
         self.condition = 0
         self.domain_id = domain_id
         self.mint_id = mint_id
         self.user_id = user_id
         self.idPublickeyMap = idPublickeyMap
         self.app = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT,
-                loglevel=loglevel)
+                                        loglevel=loglevel)
         self.app.set_user_id(user_id)
         self.app.set_domain_id(domain_id)
         self.app.set_callback(MintCallback(logger, self))

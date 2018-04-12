@@ -7,11 +7,11 @@ import hashlib
 
 import sys
 sys.path.extend(["../"])
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import KeyType
-from bbc1.common.bbc_error import *
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType
+from bbc1.core.bbc_error import *
 from bbc1.core.bbc_config import DEFAULT_CORE_PORT
-from bbc1.app import bbc_app
+from bbc1.core import bbc_app
 import testutils
 from testutils import prepare, start_core_thread
 
@@ -36,7 +36,7 @@ large_data = b"aaaaaaaaaa" * 200
 
 
 def setup_bbc_client(port_increase=0, user_id=None):
-    bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT+port_increase, loglevel="all")
+    bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT + port_increase, loglevel="all")
     bbc_app_client.set_user_id(user_id)
     bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_callback(bbc_app.Callback())

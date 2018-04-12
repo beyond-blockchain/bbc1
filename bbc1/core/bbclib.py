@@ -24,7 +24,7 @@ import traceback
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(os.path.join(current_dir, "../.."))
-from bbc1.common.bbc_error import *
+from bbc1.core.bbc_error import *
 
 directory, filename = os.path.split(os.path.realpath(__file__))
 from ctypes import *

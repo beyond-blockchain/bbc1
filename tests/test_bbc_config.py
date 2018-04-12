@@ -4,7 +4,7 @@ import pytest
 import binascii
 import sys
 sys.path.extend(["../"])
-from bbc1.common import bbclib
+from bbc1.core import bbclib
 from bbc1.core.bbc_config import BBcConfig
 
 

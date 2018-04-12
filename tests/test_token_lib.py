@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-import binascii
-import pytest
 import sys
 import time
 
 sys.path.extend(["../"])
-from bbc1.app import bbc_app, id_lib, token_lib
-from bbc1.common import bbclib
+from bbc1.app import id_lib, token_lib
+from bbc1.core import bbc_app
+from bbc1.core import bbclib
 from bbc1.core.bbc_config import DEFAULT_CORE_PORT
 
 

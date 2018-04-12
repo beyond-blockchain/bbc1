@@ -38,11 +38,10 @@ from bbc1.core.user_message_routing import UserMessageRouting
 from bbc1.core.data_handler import DataHandler, DataHandlerDomain0
 from bbc1.core.repair_manager import RepairManager
 from bbc1.core.domain0_manager import Domain0Manager
-from bbc1.core import query_management
-from bbc1.common import bbclib, message_key_types
-from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
-from bbc1.common import logger
-from bbc1.common.bbc_error import *
+from bbc1.core import query_management, message_key_types, logger
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType
+from bbc1.core.bbc_error import *
 
 TCP_THRESHOLD_SIZE = 1300
 ZEROS = bytes([0] * 32)
