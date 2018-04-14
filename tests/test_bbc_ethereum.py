@@ -23,7 +23,7 @@ class Args:
     def __init__(self):
 
         self.workingdir = bbc_config.DEFAULT_WORKING_DIR
-        self.config = TEST_CONFIG_FILE
+        self.config = os.path.join(self.workingdir, TEST_CONFIG_FILE)
         self.networkid = bbc_config.DEFAULT_ETHEREUM_CHAIN_ID
         self.port = bbc_config.DEFAULT_ETHEREUM_GETH_PORT
         self.log = TEST_LOG_FILE
@@ -159,10 +159,11 @@ def test_setup_run(default_config):
     assert s.find(str(pid)) >= 0
     assert s.find('geth') >= 0
 
-    time.sleep(5)
+    print("\ngeth has started; 15-second interval for mining.")
+    time.sleep(15)
 
     os.chdir(prevdir)
-    print("\n==> geth is running.")
+    print("==> geth is running.")
 
 
 def test_setup_deploy(default_config):
@@ -189,18 +190,20 @@ def test_setup_deploy(default_config):
                                    config['ethereum']['passphrase'],
                                    address)
 
+    print("\ncontract has been deployed; setting a value.")
     eth.blockingSet(0x1234)
 
     assert eth.test(0x1230) == 0
     assert eth.test(0x1234) > 0
 
+    print("value has been set; setting another value.")
     eth.blockingSet(b'\x43\x21')
 
     assert eth.test(0x4321) > 0
     assert eth.test(b'\x43\x21') > 0
 
     os.chdir(prevdir)
-    print("\n==> BBcAnchor is deployed and tested.")
+    print("==> BBcAnchor is deployed and tested.")
 
 
 def test_setup_stop(default_config):
