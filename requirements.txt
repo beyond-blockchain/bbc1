@@ -8,3 +8,4 @@ msgpack-python>=0.4.8
 mysql-connector-python==8.0.5
 populus==2.1.0
 eth-utils==0.7.4
+web3==3.16.5
