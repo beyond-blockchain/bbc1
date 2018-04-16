@@ -71,7 +71,7 @@ class MessageProcessor(bbc_app.Callback):
     def proc_resp_search_asset(self, dat):
         if KeyType.transaction_data in dat:
             self.logger.debug("OK: Asset [%s] is found." % binascii.b2a_hex(dat[KeyType.asset_id]))
-            tx_obj = bbclib.recover_transaction_object_from_rawdata(dat[KeyType.transaction_data])
+            tx_obj = bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data])
             for evt in tx_obj.events:
                 if evt.asset.asset_body_size > 0:
                     self.logger.debug(" [%s] asset_body --> %s" % (binascii.b2a_hex(evt.asset.asset_id[:4]),
@@ -174,19 +174,22 @@ class TestBBcAppClient(object):
     def test_13_insert_first_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         user = clients[3]['user_id']
-        transactions[0] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
-        transactions[0].events[0].asset.add(user_id=user, asset_body=b'123456')
-        transactions[0].events[1].asset.add(user_id=user, asset_file=b'abcdefg')
+        transactions[0] = bbclib.make_transaction(event_num=2, witness=True)
         transactions[0].events[0].add(reference_index=0, mandatory_approver=user)
+        bbclib.add_event_asset(transactions[0], event_idx=0, asset_group_id=asset_group_id,
+                               user_id=user, asset_body=b'123456')
+        bbclib.add_event_asset(transactions[0], event_idx=1, asset_group_id=asset_group_id,
+                               user_id=user, asset_body=b'abcdefg')
 
-        transactions[0].get_sig_index(user)
+        transactions[0].witness.add_witness(user_id=user)
         sig = transactions[0].sign(keypair=clients[0]['keypair'])
         assert sig is not None
         if sig is None:
             print(bbclib.error_text)
             import os
             os._exit(1)
-        transactions[0].add_signature(user_id=user, signature=sig)
+        transactions[0].witness.add_signature(user_id=user, signature=sig)
+
         transactions[0].digest()
         print(transactions[0])
         global transaction_dat

@@ -48,26 +48,27 @@ def setup_bbc_client(port_increase=0, user_id=None):
 def create_transaction_object_and_send_sign_req(idx, receiver_user_id, ref_txids=None, file_data=None):
     if ref_txids is None or ref_txids[0] is None:
         ref_txids = []
-    txobj = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
 
-    txobj.events[0].asset.add(user_id=receiver_user_id,
-                              asset_body="transferred",
-                              asset_file=file_data)
-    txobj.events[0].add(mandatory_approver=receiver_user_id)
+    txobj = bbclib.make_transaction(relation_num=1, witness=True)
+    bbclib.add_relation_asset(txobj, relation_idx=0, asset_group_id=asset_group_id,
+                              user_id=receiver_user_id, asset_body="transferred", asset_file=file_data)
+    txobj.witness.add_witness(user_ids[idx])
+    txobj.witness.add_witness(receiver_user_id)
 
     for i, ref_txid in enumerate(ref_txids):
         clients[idx].search_transaction(ref_txid)
         response_data = clients[idx].callback.synchronize()
-        assert response_data[KeyType.status] == ESUCCESS
-        prev_tx = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
-        bbclib.add_reference_to_transaction(asset_group_id, txobj, prev_tx, 0)
+        if response_data[KeyType.status] < ESUCCESS:
+            print("ERROR: ", response_data[KeyType.reason].decode())
+            sys.exit(0)
+        prev_tx = bbclib.BBcTransaction(deserialize=response_data[KeyType.transaction_data])
+        bbclib.add_relation_pointer(txobj, 0, ref_transaction_id=prev_tx.digest())
 
-    sig_mine = txobj.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
-                          private_key=keypairs[idx].private_key,
+    sig_mine = txobj.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1, private_key=keypairs[idx].private_key,
                           public_key=keypairs[idx].public_key)
-    txobj.references[0].add_signature(user_id=user_ids[idx], signature=sig_mine)
+    txobj.witness.add_signature(user_id=user_ids[idx], signature=sig_mine)
 
-    asset_id = txobj.events[0].asset.asset_id
+    asset_id = txobj.relations[0].asset.asset_id
     asset_files = {asset_id: file_data}
     ret = clients[idx].gather_signatures(txobj, destinations=[receiver_user_id], asset_files=asset_files)
     assert ret
@@ -90,13 +91,13 @@ def pick_valid_transaction_info(received_data=None, bbc_app_client=None):
     transaction = bbclib.BBcTransaction()
     transaction.deserialize(received_data[KeyType.transaction_data])
     asset_files = received_data[KeyType.all_asset_files]
-    asid = transaction.events[0].asset.asset_id
+    asid = transaction.relations[0].asset.asset_id
     assert asid in asset_files
     file_to_obtain = asset_files[asid]
     file_digest = hashlib.sha256(file_to_obtain).digest()
     print("----------------[Receiver]----------------")
     print("File digest written in the transaction data:  ",
-          binascii.b2a_hex(transaction.events[0].asset.asset_file_digest).decode())
+          binascii.b2a_hex(transaction.relations[0].asset.asset_file_digest).decode())
     print("File digest calculated from the received file:", binascii.b2a_hex(file_digest).decode())
     print("------------------------------------------")
     return transaction, received_data[KeyType.source_user_id]
@@ -165,12 +166,11 @@ class TestFileProofClient(object):
     def test_10_store_file(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         # -- first file store by user_0
-        store_transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
-        store_transaction.events[0].add(mandatory_approver=user_ids[0])
-        store_transaction.events[0].asset.add(user_id=user_ids[0],
-                                              asset_body="Owner is 0",
-                                              asset_file=large_data)
+        store_transaction = bbclib.make_transaction(relation_num=1, witness=True)
+        bbclib.add_relation_asset(store_transaction, relation_idx=0, asset_group_id=asset_group_id,
+                                  user_id=user_ids[0], asset_body="Owner is 0", asset_file=large_data)
 
+        store_transaction.witness.add_witness(user_ids[0])
         sig = store_transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
                                      private_key=keypairs[0].private_key,
                                      public_key=keypairs[0].public_key)
@@ -181,7 +181,7 @@ class TestFileProofClient(object):
 
         global transaction_id, asset_id
         transaction_id = store_transaction.transaction_id
-        asset_id = store_transaction.events[0].asset.asset_id
+        asset_id = store_transaction.relations[0].asset.asset_id
         clients[0].insert_transaction(store_transaction)
         response_data = clients[0].callback.synchronize()
         if response_data[KeyType.status] < ESUCCESS:
@@ -196,13 +196,13 @@ class TestFileProofClient(object):
         response_data = clients[1].callback.synchronize()
         assert response_data[KeyType.status] == ESUCCESS
 
-        txobj = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transactions][0])
+        txobj = bbclib.BBcTransaction(deserialize=response_data[KeyType.transactions][0])
         digest = txobj.digest()
         ret = txobj.signatures[0].verify(digest)
         assert ret
 
         file_digest = hashlib.sha256(large_data).digest()
-        if file_digest == txobj.events[0].asset.asset_file_digest:
+        if file_digest == txobj.relations[0].asset.asset_file_digest:
             print("oooo valid")
         else:
             print("xxxx invalid")
@@ -216,8 +216,7 @@ class TestFileProofClient(object):
 
         # -- receiver
         recvdat = wait_for_transaction_msg(bbc_app_client=clients[1])
-        txobj, source_id = pick_valid_transaction_info(received_data=recvdat,
-                                                       bbc_app_client=clients[1])
+        txobj, source_id = pick_valid_transaction_info(received_data=recvdat, bbc_app_client=clients[1])
         signature = txobj.sign(keypair=keypairs[1])
         clients[1].sendback_signature(source_id, txobj.transaction_id, -1, signature)
 
@@ -225,7 +224,7 @@ class TestFileProofClient(object):
         response_data = clients[0].callback.synchronize()
         assert response_data[KeyType.status] == ESUCCESS
         result = response_data[KeyType.result]
-        transfer_tx.references[result[0]].add_signature(user_id=result[1], signature=result[2])
+        transfer_tx.witness.add_signature(user_id=result[1], signature=result[2])
         transfer_tx.digest()
 
         insert_signed_transaction_to_bbc_core(tx_obj=transfer_tx, bbc_app_client=clients[0])
@@ -239,6 +238,7 @@ class TestFileProofClient(object):
         assert KeyType.message in response_data
         filename, txid = response_data[KeyType.message]
         print("--> file name is %s and the transaction_id is %s" % (filename, txid))
+        print(transfer_tx)
 
     def test_98_unregister(self):
         for cl in clients:

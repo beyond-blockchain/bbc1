@@ -714,7 +714,7 @@ class Store:
         res = self.app.callback.synchronize()
         if res[KeyType.status] < ESUCCESS:
             raise ValueError('not found')
-        tx = bbclib.recover_transaction_object_from_rawdata(
+        tx = bbclib.BBcTransaction(deserialize=
                 res[KeyType.transaction_data])
         return tx
 
@@ -830,15 +830,16 @@ class Store:
         else:
             reftx = None
 
-        tx = bbclib.make_transaction_for_base_asset(
-                asset_group_id=self.mint_id, event_num=1)
-        tx.events[0].asset.add(user_id=store_id, asset_body=asset_body)
+        tx = bbclib.make_transaction(event_num=1)
+        bbclib.add_event_asset(tx, event_idx=0, asset_group_id=self.mint_id,
+                               user_id=store_id, asset_body=asset_body)
         tx.events[0].add(mandatory_approver=self.mint_id)
+        bbclib.add_reference_to_transaction(tx, self.namespace_id, reftx, 0)
         if reftx is None:
             tx.add(witness=bbclib.BBcWitness())
             tx.witness.add_witness(self.mint_id)
         else:
-            bbclib.add_reference_to_transaction(self.mint_id, tx, reftx, 0)
+            bbclib.add_reference_to_transaction(tx, self.mint_id, reftx, 0)
 
         if keypair is None:
             return tx
@@ -949,21 +950,18 @@ class BBcMint:
             eval_time = int(time.time())
         return # FIXME: implement this
 
-
     def issue(self, to_user_id, amount, time_of_origin=None, keypair=None):
         if self.user_id != self.mint_id:
             raise RuntimeError('issuer must be the mint')
 
-        tx = bbclib.make_transaction_for_base_asset(
-                asset_group_id=self.mint_id, event_num=1)
+        tx = bbclib.make_transaction(event_num=1, witness=True)
         if time_of_origin is None:
             time_of_origin = tx.timestamp
-        tx.events[0].asset.add(user_id=to_user_id, asset_body=IssuedAssetBody(
-                amount, time_of_origin,
-                self.currency_spec.variation_specs).serialize())
+        bbclib.add_event_asset(tx, event_idx=0, asset_group_id=self.mint_id, user_id=to_user_id,
+                               asset_body=IssuedAssetBody(amount, time_of_origin,
+                                                          self.currency_spec.variation_specs).serialize())
         tx.events[0].add(mandatory_approver=self.mint_id)
         tx.events[0].add(mandatory_approver=to_user_id)
-        tx.add(witness=bbclib.BBcWitness())
         tx.witness.add_witness(self.mint_id)
 
         if keypair is None:
@@ -971,7 +969,6 @@ class BBcMint:
 
         return self.store.sign_and_insert(tx, self.mint_id, keypair,
                 self.idPublickeyMap)
-
 
     def make_event(self, ref_indice, user_id, body):
         event = bbclib.BBcEvent(asset_group_id=self.mint_id)

@@ -28,9 +28,9 @@ msg_processor = [None for i in range(client_num)]
 
 
 def make_transaction(user_id, keypair):
-    txobj = bbclib.make_transaction_with_relation(asset_group_id=asset_group_id)
-    txobj.relations[0].asset.add(user_id=user_id, asset_body="data=%d" % random.randint(1, 10000))
-    bbclib.make_transaction_with_witness(txobj)
+    txobj = bbclib.make_transaction(relation_num=1, witness=True)
+    bbclib.add_relation_asset(txobj, relation_idx=0, asset_group_id=asset_group_id,
+                              user_id=user_id, asset_body="data=%d" % random.randint(1, 10000))
     txobj.witness.add_witness(user_id)
     sig = txobj.sign(keypair)
     txobj.add_signature(user_id, sig)

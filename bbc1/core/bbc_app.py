@@ -526,6 +526,12 @@ class BBcAppClient:
             asset_digest, content = evt.asset.get_asset_file()
             if content is not None:
                 ast[evt.asset.asset_id] = content
+        for rtn in tx_obj.relations:
+            if rtn.asset is None:
+                continue
+            asset_digest, content = rtn.asset.get_asset_file()
+            if content is not None:
+                ast[rtn.asset.asset_id] = content
         dat[KeyType.all_asset_files] = ast
         return self.send_msg(dat)
 

@@ -61,17 +61,18 @@ def setup_bbc_client():
 
 def store_proc(data, approver_id, txid=None):
     bbc_app_client = setup_bbc_client()
-    transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
-    transaction.events[0].add(mandatory_approver=approver_id, asset_group_id=asset_group_id)
-    transaction.events[0].asset.add(user_id=user_id, asset_body=data)
+    transaction = bbclib.make_transaction(event_num=1)
+    transaction.events[0].add(mandatory_approver=approver_id)
+    bbclib.add_event_asset(transaction, event_idx=0, asset_group_id=asset_group_id,
+                           user_id=user_id, asset_body=data)
     if txid:
         bbc_app_client.search_transaction(txid)
         response_data = bbc_app_client.callback.synchronize()
         if response_data[KeyType.status] < ESUCCESS:
             print("ERROR: ", response_data[KeyType.reason].decode())
             sys.exit(0)
-        prev_tx = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
-        reference = bbclib.add_reference_to_transaction(asset_group_id, transaction, prev_tx, 0)
+        prev_tx = bbclib.BBcTransaction(deserialize=response_data[KeyType.transaction_data])
+        reference = bbclib.add_reference_to_transaction(transaction, asset_group_id, prev_tx, 0)
         sig = transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
                                      private_key=key_pair.private_key,
                                      public_key=key_pair.public_key)

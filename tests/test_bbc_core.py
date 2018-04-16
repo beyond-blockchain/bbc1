@@ -78,13 +78,16 @@ class TestBBcCore(object):
         global transaction
         print("-- insert transaction only at core_node_1 --")
         user1 = clients[1]['user_id']
-        transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
-        transaction.events[0].asset.add(user_id=user1, asset_body=b'123456')
-        transaction.events[1].asset.add(user_id=user1, asset_file=b'abcdefg')
-        transaction.get_sig_index(user1)
+        transaction = bbclib.make_transaction(event_num=2, witness=True)
+        transaction.events[0].add(mandatory_approver=clients[1]['user_id'])
+        bbclib.add_event_asset(transaction, event_idx=0, asset_group_id=asset_group_id,
+                               user_id=user1, asset_body=b'123456')
+        bbclib.add_event_asset(transaction, event_idx=1, asset_group_id=asset_group_id,
+                               user_id=user1, asset_file=b'abcdefg')
+        transaction.witness.add_witness(user_id=user1)
 
         sig = transaction.sign(keypair=clients[1]['keypair'])
-        transaction.add_signature(user_id=user1, signature=sig)
+        transaction.witness.add_signature(user_id=user1, signature=sig)
         transaction.digest()
         print(transaction)
         print("register transaction=", binascii.b2a_hex(transaction.transaction_id))
@@ -119,18 +122,23 @@ class TestBBcCore(object):
         print("-- insert transaction only at core_node_2 --")
         global transaction
         user1 = clients[2]['user_id']
-        transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
-        transaction.events[0].asset.add(user_id=user1, asset_body=b'aaddbbdd')
-        transaction.events[1].asset.add(user_id=user1, asset_file=b'112423')
-
+        transaction = bbclib.make_transaction(event_num=2, witness=True)
+        bbclib.add_event_asset(transaction, event_idx=0, asset_group_id=asset_group_id,
+                               user_id=user1, asset_body=b'aaddbbdd')
+        bbclib.add_event_asset(transaction, event_idx=1, asset_group_id=asset_group_id,
+                               user_id=user1, asset_file=b'112423')
+        for i, user in enumerate(clients):
+            transaction.witness.add_witness(user_id=clients[i]['user_id'])
         for i, user in enumerate(clients):
             sig = transaction.sign(keypair=clients[i]['keypair'])
-            transaction.add_signature(user_id=clients[i]['user_id'], signature=sig)
+            transaction.witness.add_signature(user_id=clients[i]['user_id'], signature=sig)
         transaction.digest()
+        print(transaction)
         print("register transaction=", binascii.b2a_hex(transaction.transaction_id))
         asset_file = dict()
         asset_file[transaction.events[1].asset.asset_id] = transaction.events[1].asset.asset_file
         ret = cores[2].insert_transaction(domain_id, transaction.serialize(), asset_file)
+        assert KeyType.transaction_id in ret
         assert ret[KeyType.transaction_id] == transaction.transaction_id
 
         # -- search the transaction at core_node_0

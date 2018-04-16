@@ -75,8 +75,8 @@ def add_ref_tx(asset_group,transaction,ref_tx,ref_index):
     if response_data[KeyType.status] < ESUCCESS:
         print("ERROR: ", response_data[KeyType.reason].decode())
         sys.exit(0)
-    prev_tx = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
-    reference = bbclib.add_reference_to_transaction(asset_group, transaction, prev_tx,0)
+    prev_tx = bbclib.BBcTransaction(deserialize=response_data[KeyType.transaction_data])
+    reference = bbclib.add_reference_to_transaction(transaction, asset_group, prev_tx,0)
     sig = transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
                                  private_key=key_pair.private_key,
                                  public_key=key_pair.public_key)
@@ -109,9 +109,10 @@ def sendback_exception_asset(approver_id, asset_group, asid):
 
     bbc_app_client = setup_bbc_client()
 
-    transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group, event_num=1)
-    transaction.events[0].add(mandatory_approver=binascii.unhexlify(approver_id), asset_group_id=asset_group)
-    transaction.events[0].asset.add(user_id=user_id, asset_body=data)
+    transaction = bbclib.make_transaction(event_num=1)
+    transaction.events[0].add(mandatory_approver=binascii.unhexlify(approver_id))
+    bbclib.add_event_asset(transaction, event_idx=0, asset_group_id=asset_group,
+                           user_id=user_id, asset_body=data)
 
     ref_tx = get_txid_from_asid(asset_group, asid)
     transaction = add_ref_tx(asset_group, transaction, ref_tx, 0)
@@ -153,19 +154,20 @@ def execute_escrow():
 
     # Make TX
     land_client = setup_bbc_client()
-    transaction = bbclib.make_transaction_for_base_asset(asset_group_id=land_asset_group, event_num=2)
+    transaction = bbclib.make_transaction(event_num=2)
 
     # Add event and asset
     print("Add event and asset")
-    transaction.events[0].add(mandatory_approver=binascii.unhexlify(escrow["newowner"]), asset_group_id=land_asset_group)
-    transaction.events[0].asset.add(user_id=user_id, asset_body=landasset)
-
+    bbclib.add_event_asset(transaction, event_idx=0, asset_group_id=land_asset_group,
+                           user_id=user_id, asset_body=landasset)
+    transaction.events[0].add(mandatory_approver=binascii.unhexlify(escrow["newowner"]))
     LAB_id = bbclib.get_new_id("LegalAffairsBureau", include_timestamp=False)
     transaction.events[0].add(option_approver=LAB_id)
 
     coin_client = setup_bbc_client()
-    transaction.events[1].add(mandatory_approver=binascii.unhexlify(escrow["owner"]), asset_group_id=coin_asset_group)
-    transaction.events[1].asset.add(user_id=user_id, asset_body=coinasset)
+    bbclib.add_event_asset(transaction, event_idx=1, asset_group_id=coin_asset_group,
+                           user_id=user_id, asset_body=coinasset)
+    transaction.events[1].add(mandatory_approver=binascii.unhexlify(escrow["owner"]))
 
     # Add reference
     print("Add reference")
@@ -174,16 +176,16 @@ def execute_escrow():
     if response_data[KeyType.status] < ESUCCESS:
         print("ERROR: ", response_data[KeyType.reason].decode())
         sys.exit(0)
-    prev_tx = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
-    reference = bbclib.add_reference_to_transaction(land_asset_group, transaction, prev_tx, 0)
+    prev_tx = bbclib.BBcTransaction(deserialize=response_data[KeyType.transaction_data])
+    reference = bbclib.add_reference_to_transaction(transaction, land_asset_group, prev_tx, 0)
 
     coin_client.search_transaction(cointx_id)
     response_data = coin_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
         print("ERROR: ", response_data[KeyType.reason].decode())
         sys.exit(0)
-    prev_tx = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
-    reference = bbclib.add_reference_to_transaction(coin_asset_group, transaction, prev_tx,0)
+    prev_tx = bbclib.BBcTransaction(deserialize=response_data[KeyType.transaction_data])
+    reference = bbclib.add_reference_to_transaction(transaction, coin_asset_group, prev_tx,0)
 
     # Add signature
     print("Add signature to escrow TX")

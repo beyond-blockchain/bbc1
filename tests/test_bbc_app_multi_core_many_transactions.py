@@ -34,8 +34,8 @@ class MessageProcessor(bbc_app.Callback):
 
     def proc_cmd_sign_request(self, dat):
         self.logger.debug("[%i] Recv SIGN_REQUEST from %s" % (self.idx, binascii.b2a_hex(dat[KeyType.source_user_id])))
-        txobj = bbclib.BBcTransaction()
-        txobj.deserialize(dat[KeyType.transaction_data])
+        print("[%i] Recv SIGN_REQUEST from %s" % (self.idx, binascii.b2a_hex(dat[KeyType.source_user_id])))
+        txobj = bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data])
 
         objs = dict()
         for txid, txdata in dat[KeyType.transactions].items():
@@ -101,12 +101,14 @@ class TestBBcAppClient(object):
         for i, cl in enumerate(clients):
             print("---- start transaction ---")
             user = cl['user_id']
-            transactions[i] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
-
-            transactions[i].events[0].asset.add(user_id=user, asset_body="data=%d"%i)
             other_user = (i+1) % client_num
-            transactions[i].events[0].add(mandatory_approver=clients[other_user]['user_id'])
 
+            transactions[i] = bbclib.make_transaction(event_num=1, witness=True)
+            transactions[i].events[0].add(mandatory_approver=clients[other_user]['user_id'])
+            bbclib.add_event_asset(transactions[i], event_idx=0, asset_group_id=asset_group_id,
+                                   user_id=user, asset_body=b"data=%d"%i)
+
+            transactions[i].witness.add_witness(user_id=cl['user_id'])
             sig = transactions[i].sign(keypair=cl['keypair'])
             transactions[i].add_signature(user_id=cl['user_id'], signature=sig)
 
@@ -118,18 +120,19 @@ class TestBBcAppClient(object):
             assert KeyType.transaction_id in dat
             assert dat[KeyType.transaction_id] == transactions[i].transaction_id
             print("    ==> got insert")
+        time.sleep(2)
 
     def test_13_make_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i, cl in enumerate(clients):
             user = cl['user_id']
-            txobj = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
+            other_user = (i + 1) % client_num
 
-            txobj.events[0].asset.add(user_id=user, asset_body=b"data2=%d"%i)
-            other_user = (i+1) % client_num
+            txobj = bbclib.make_transaction(event_num=1, witness=True)
             txobj.events[0].add(reference_index=0, mandatory_approver=clients[other_user]['user_id'])
-
-            reference = bbclib.add_reference_to_transaction(asset_group_id, txobj, transactions[i], 0)
+            bbclib.add_event_asset(txobj, event_idx=0, asset_group_id=asset_group_id,
+                                   user_id=user, asset_body=b"data=%d"%i)
+            reference = bbclib.add_reference_to_transaction(txobj, asset_group_id, transactions[i], 0)
             ret = cl['app'].gather_signatures(txobj, reference_obj=reference)
             assert ret
             dat = msg_processor[i].synchronize()

@@ -44,10 +44,8 @@ class TestBBcLib(object):
     def test_01_asset(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         global asset1, asset2
-        asset1 = BBcAsset()
-        asset1.add(asset_body=b'12345678', user_id=user_id)
-        asset2 = BBcAsset()
-        asset2.add(asset_file=asset_content, user_id=user_id)
+        asset1 = BBcAsset(user_id=user_id, asset_body=b'12345678')
+        asset2 = BBcAsset(user_id=user_id, asset_file=asset_content)
 
         # --- for checking serialization function ---
         digest = asset1.digest()
@@ -208,12 +206,10 @@ class TestBBcLib(object):
 
     def test_06_transaction_with_relation_and_witness(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        asset1 = BBcAsset()
-        asset1.add(user_id=user_id, asset_body=b'ccccc')
-        transaction1 = bbclib.make_transaction_with_relation(asset_group_id=asset_group_id, asset=asset1)
-        bbclib.add_relation_pointer(transaction1.relations[0], transaction2.digest(), None)
-
-        transaction1 = bbclib.make_transaction_with_witness(transaction1)
+        transaction1 = bbclib.make_transaction(relation_num=1, witness=True)
+        bbclib.add_relation_asset(transaction1, relation_idx=0, asset_group_id=asset_group_id,
+                                  user_id=user_id, asset_body=b'ccccc')
+        bbclib.add_relation_pointer(transaction1, 0, ref_transaction_id=transaction2.digest())
         transaction1.witness.add_witness(user_id)
         transaction1.witness.add_witness(user_id2)
 

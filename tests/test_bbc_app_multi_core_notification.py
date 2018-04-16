@@ -125,14 +125,15 @@ class TestBBcAppClient(object):
         for i, cl in enumerate(clients):
             print("---- start transaction at node %d---" % i)
             user = cl['user_id']
-            transactions[i] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
-
-            transactions[i].events[0].asset.add(user_id=user, asset_body="data=%d"%i)
             other_user = (i+1) % client_num
+            transactions[i] = bbclib.make_transaction(event_num=1, witness=True)
             transactions[i].events[0].add(mandatory_approver=clients[other_user]['user_id'])
+            bbclib.add_event_asset(transactions[i], event_idx=0, asset_group_id=asset_group_id,
+                                   user_id=user, asset_body="data=%d"%i)
 
+            transactions[i].witness.add_witness(user_id=cl['user_id'])
             sig = transactions[i].sign(keypair=cl['keypair'])
-            transactions[i].add_signature(user_id=cl['user_id'], signature=sig)
+            transactions[i].witness.add_signature(user_id=cl['user_id'], signature=sig)
 
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
@@ -155,15 +156,15 @@ class TestBBcAppClient(object):
         for i, cl in enumerate(clients):
             print("---- start transaction at node %d---" % i)
             user = cl['user_id']
-            transactions[i] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
-
-            transactions[i].events[0].asset.add(user_id=user, asset_body="data=%d"%i)
             other_user = (i+1) % client_num
+            transactions[i] = bbclib.make_transaction(event_num=1, witness=True)
             transactions[i].events[0].add(mandatory_approver=clients[other_user]['user_id'])
+            bbclib.add_event_asset(transactions[i], event_idx=0, asset_group_id=asset_group_id,
+                                   user_id=user, asset_body="data=%d"%i)
 
+            transactions[i].witness.add_witness(user_id=cl['user_id'])
             sig = transactions[i].sign(keypair=cl['keypair'])
-            transactions[i].add_signature(user_id=cl['user_id'], signature=sig)
-
+            transactions[i].witness.add_signature(user_id=cl['user_id'], signature=sig)
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
             cl['app'].insert_transaction(transactions[i])
@@ -184,14 +185,15 @@ class TestBBcAppClient(object):
         for i, cl in enumerate(clients):
             print("---- start transaction at node %d---" % i)
             user = cl['user_id']
-            transactions[i] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
-            transactions[i].events[0].asset.add(user_id=user, asset_body="data=%d"%i)
             other_user = (i+1) % client_num
+            transactions[i] = bbclib.make_transaction(event_num=1, witness=True)
             transactions[i].events[0].add(mandatory_approver=clients[other_user]['user_id'])
+            bbclib.add_event_asset(transactions[i], event_idx=0, asset_group_id=asset_group_id,
+                                   user_id=user, asset_body="data=%d"%i)
 
+            transactions[i].witness.add_witness(user_id=cl['user_id'])
             sig = transactions[i].sign(keypair=cl['keypair'])
-            transactions[i].add_signature(user_id=cl['user_id'], signature=sig)
-
+            transactions[i].witness.add_signature(user_id=cl['user_id'], signature=sig)
             transactions[i].digest()
             print("insert_transaction=", binascii.b2a_hex(transactions[i].transaction_id))
             cl['app'].insert_transaction(transactions[i])
