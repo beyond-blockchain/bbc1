@@ -93,9 +93,6 @@ def store_proc(data, approver_id, txid=None):
     print("TxID: %s", binascii.b2a_hex(response_data[KeyType.transaction_id]))
     print("AsID: %s", binascii.b2a_hex(transaction.events[0].asset.asset_id))
 
-    bbc_app.store_id_mappings(data, asset_group_id,
-                              transaction_id=response_data[KeyType.transaction_id],
-                              asset_ids=transaction.events[0].asset.asset_id)
     txinfo = [transaction.transaction_id, transaction.events[0].asset.asset_id]
     return txinfo
 
@@ -103,14 +100,14 @@ def store_proc(data, approver_id, txid=None):
 def get_coindata(asid):
     bbc_app_client = setup_bbc_client()
     asid = binascii.unhexlify(asid)
-    ret = bbc_app_client.search_asset(asset_group_id, asid)
+    ret = bbc_app_client.search_transaction_with_condition(asset_group_id, asid)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
         print("ERROR: ", response_data[KeyType.reason].decode())
         sys.exit(0)
     get_transaction = bbclib.BBcTransaction()
-    get_transaction.deserialize(response_data[KeyType.transaction_data])
+    get_transaction.deserialize(response_data[KeyType.transactions][0])
 
     retdata = get_transaction.events[0].asset.asset_body
     refdata = get_transaction.references
@@ -143,14 +140,15 @@ def chown(new_owner,asid):
     data = json.dumps(asset)
 
     bbc_app_client = setup_bbc_client()
-    ret = bbc_app_client.search_asset(asset_group_id, binascii.unhexlify(asid))
+    asid = binascii.unhexlify(asid)
+    ret = bbc_app_client.search_transaction_with_condition(asset_group_id, asid)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
         print("ERROR: ", response_data[KeyType.reason].decode())
         sys.exit(0)
     get_transaction = bbclib.BBcTransaction()
-    get_transaction.deserialize(response_data[KeyType.transaction_data])
+    get_transaction.deserialize(response_data[KeyType.transactions][0])
     transaction_id = get_transaction.transaction_id
     transaction_info = store_proc(data, approver_id=binascii.unhexlify(new_owner),txid=transaction_id)
     bbc_app_client.send_message(transaction_info, binascii.unhexlify(new_owner))
