@@ -52,7 +52,6 @@ def setup_bbc_client():
     bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
     bbc_app_client.set_user_id(user_id)
     bbc_app_client.set_domain_id(domain_id)
-    bbc_app_client.set_asset_group_id(asset_group_id)
     bbc_app_client.set_callback(bbc_app.Callback())
     ret = bbc_app_client.register_to_core()
     assert ret
@@ -116,15 +115,15 @@ def store_proc(data, approver_id,txid=None):
 def get_landdata(asid):
     bbc_app_client = setup_bbc_client()
     asid = binascii.unhexlify(asid)
-    ret = bbc_app_client.search_asset(asset_group_id, asid)
+    ret = bbc_app_client.search_transaction_with_condition(asset_group_id, asid)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
         print("ERROR: ", response_data[KeyType.reason].decode())
         sys.exit(0)
-
     get_transaction = bbclib.BBcTransaction()
-    get_transaction.deserialize(response_data[KeyType.transaction_data])
+    get_transaction.deserialize(response_data[KeyType.transactions][0])
+
     retdata = get_transaction.events[0].asset.asset_body
     refdata = get_transaction.references
     print("get: %s" % retdata)
@@ -156,11 +155,15 @@ def chown(new_owner,asid):
     data = json.dumps(asset)
 
     bbc_app_client = setup_bbc_client()
-    ret = bbc_app_client.search_asset(asset_group_id, binascii.unhexlify(asid))
+    asid = binascii.unhexlify(asid)
+    ret = bbc_app_client.search_transaction_with_condition(asset_group_id, asid)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
+    if response_data[KeyType.status] < ESUCCESS:
+        print("ERROR: ", response_data[KeyType.reason].decode())
+        sys.exit(0)
     get_transaction = bbclib.BBcTransaction()
-    get_transaction.deserialize(response_data[KeyType.transaction_data])
+    get_transaction.deserialize(response_data[KeyType.transactions][0])
     transaction_id = get_transaction.transaction_id
     transaction_info = store_proc(data,approver_id=binascii.unhexlify(new_owner),txid=transaction_id)
     bbc_app_client.send_message(transaction_info, binascii.unhexlify(new_owner))
