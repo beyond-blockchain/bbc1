@@ -10,8 +10,6 @@ import sys
 sys.path.extend(["../"])
 from bbc1.common import bbclib
 from bbc1.common.message_key_types import KeyType
-from bbc1.core.data_handler import InfraMessageCategory
-from bbc1.common.bbc_error import *
 from bbc1.app import bbc_app
 from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility, get_stats, get_stat_diffs
 
@@ -129,7 +127,7 @@ class TestBBcAppClient(object):
         assert ret
         dat = msg_processor[0].synchronize()
         print("[0] nodeinfo=", dat[0])
-        node_id, ipv4, ipv6, port = dat[0]
+        node_id, ipv4, ipv6, port, domain0 = dat[0]
 
         for i in range(1, client_num):
             clients[i]['app'].send_domain_ping(domain_id, ipv4, ipv6, port)
@@ -150,7 +148,7 @@ class TestBBcAppClient(object):
         time.sleep(2)
 
         for i in range(core_num):
-            fe = cores[i].networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER].forwarding_entries
+            fe = cores[i].networking.domains[domain_id]['user'].forwarding_entries
             assert asset_group_id3 in fe
             print(fe[asset_group_id3]['nodes'])
             num = len(fe[asset_group_id3]['nodes'])

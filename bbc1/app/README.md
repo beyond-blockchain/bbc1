@@ -1,5 +1,6 @@
 SDK for BBc-1 applications
 ==========================
+## bbc_app.py
 bbc_app.py contains utility classes for communication with a core node.
 
 ### BBcAppClient
@@ -38,3 +39,43 @@ The mapping information is stored in .bbc_id_mappings (JSON file). These methods
 * store_id_mappings
 * remove_id_mappings
 * get_id_mappings
+
+
+## app_support_lib.py
+app_support_lib.py contains utility functions and classes for application development. In particular, it provides functionality to create an application-support directory and a database class that currently supports SQLite3 only, whose files would reside in the application-support directory.
+
+
+## id_lib.py
+id_lib.py contains a class whose objects provide autonomous generation of user identifiers and mapping between a set of public keys and a generated identifier. The mapping can be updated by some designated authority (currently, just by the user represented by the identifier) in a domain. The class also provides standard means to verify that a transaction is signed by correct user or users in light of the mapping.
+
+The following methods are provided:
+* create_user_id() to autonomously create a user identifier and its initial mapping to a set of public keys.
+* get_mapped_public_keys() to receive public keys mapped to an identifier at a given time.
+* is_mapped() to see whether an identifier and a public key are (were) mapped at a given time.
+* update() to update the mapping.
+* verify_signers() to verify the correctness of signers to a transaction.
+
+
+## token_lib.py
+token_lib.py contains a mint class to deal with creation, transfer and destruction of currency tokens. The face value of such tokens can vary over time according to pre-programmed settings. Such settings can be switched according to external events (represented as a conditional change to the mint).
+
+The following methods are provided:
+* get_balance_of() to receive (estimated) token balance of a user at a given time.
+* get_condition() to receive the condition (in the form of numbers) of the mint.
+* get_currency_spec() to receive the specifications of the tokens.
+* get_total_supply() to receive the total (estimated) token balance at the mint.
+* issue() to issue a token to a user.
+* set_condition() to set the condition (in the form of numbers) of the mint.
+* set_currency_spec() to set the specifications of the tokens.
+* set_keypair() to set the key-pair used for automatically responding to sign requests.
+* transfer() to transfer tokens from a user to another user.
+
+
+
+
+
+
+
+
+
+

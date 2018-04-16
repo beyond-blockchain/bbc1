@@ -24,7 +24,6 @@ domain_id = bbclib.get_new_id("testdomain")
 asset_group_id = bbclib.get_new_id("asset_group_1")
 transactions = [None for i in range(client_num)]
 transaction_dat = None
-cross_ref_list = [[] for i in range(client_num)]
 
 msg_processor = [None for i in range(client_num)]
 
@@ -39,7 +38,7 @@ class MessageProcessor(bbc_app.Callback):
         txobj = bbclib.BBcTransaction()
         txobj.deserialize(dat[KeyType.transaction_data])
         signature = txobj.sign(keypair=clients[self.idx]['keypair'])
-        clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], signature)
+        clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], txobj.transaction_id, signature)
 
     def proc_resp_insert(self, dat):
         if KeyType.transaction_id in dat:
@@ -51,9 +50,6 @@ class MessageProcessor(bbc_app.Callback):
     def proc_resp_search_asset(self, dat):
         if KeyType.transaction_data in dat:
             self.logger.debug("OK: Asset [%s] is found." % binascii.b2a_hex(dat[KeyType.asset_id]))
-            if KeyType.asset_file in dat:
-                self.logger.debug(" [%s] in_storage --> %s" % (binascii.b2a_hex(dat[KeyType.asset_id][:4]),
-                                                               dat[KeyType.asset_file]))
             tx_obj = bbclib.recover_transaction_object_from_rawdata(dat[KeyType.transaction_data])
             for evt in tx_obj.events:
                 if evt.asset.asset_body_size > 0:
@@ -98,12 +94,6 @@ class TestBBcAppClient(object):
         transactions[0].events[1].asset.add(user_id=user, asset_file=b'abcdefg')
         transactions[0].events[1].add(mandatory_approver=clients[1]['user_id'])
 
-        for i, cl in enumerate(clients):
-            ret = cl['app'].get_cross_refs(asset_group_id=asset_group_id, number=2)
-            assert ret
-            dat = msg_processor[i].synchronize()
-            cross_ref_list[i].extend(dat)
-
     def test_04_insert(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         sig = transactions[0].sign(keypair=clients[0]['keypair'])
@@ -113,7 +103,7 @@ class TestBBcAppClient(object):
             import os
             os._exit(1)
         transactions[0].add_signature(user_id=clients[0]['user_id'], signature=sig)
-        transactions[0].dump()
+        print(transactions[0])
         transactions[0].digest()
         global transaction_dat
         transaction_dat = transactions[0].serialize()

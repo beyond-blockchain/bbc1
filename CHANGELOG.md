@@ -1,6 +1,21 @@
 Change log
 ======
 
+## v0.10
+* The core part is totally re-designed
+  * user_message_routing.py, data_handler.py, topology_manager.py, key_exchange_manager.py, key_exchange_manager.py are newley added
+  * inter-nodes and core-app communications are secured by AES256 encryption
+* Implement domain/node key verification for administrative messages
+* Scheme for recovery of forged transaction data is modified
+  * A user (bbc_app) explicitly triggers the recovery when it obtains forged transaction data
+* Anycast support
+* Add currency library (token_lib)
+* Add a new search method to obtain series of transaction data
+* Cross_ref support
+
+## v0.9.1
+* Add libraries for token and id management
+
 ## v0.9
 * Change APIs in bbc_app.py (remove asset_group_id options)
 * Modify schemas of bbc_ledger tables

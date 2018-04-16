@@ -24,7 +24,6 @@ clients = None
 domain_id = bbclib.get_new_id("testdomain")
 asset_group_id = bbclib.get_new_id("asset_group_1")
 transactions = [None for i in range(client_num)]
-cross_ref_list = [[] for i in range(client_num)]
 msg_processor = [None for i in range(client_num)]
 
 
@@ -48,7 +47,8 @@ class MessageProcessor(bbc_app.Callback):
             event = objs[reference.transaction_id].events[reference.event_index_in_ref]
             if clients[self.idx]['user_id'] in event.mandatory_approvers:
                 signature = txobj.sign(keypair=clients[self.idx]['keypair'])
-                clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], i, signature)
+                clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], txobj.transaction_id,
+                                                            i, signature)
                 return
 
 
@@ -78,7 +78,7 @@ class TestBBcAppClient(object):
         assert ret
         dat = msg_processor[0].synchronize()
         print("[0] nodeinfo=", dat[0])
-        node_id, ipv4, ipv6, port = dat[0]
+        node_id, ipv4, ipv6, port, domain0 = dat[0]
 
         for i in range(1, client_num):
             clients[i]['app'].send_domain_ping(domain_id, ipv4, ipv6, port)
@@ -102,13 +102,6 @@ class TestBBcAppClient(object):
             print("---- start transaction ---")
             user = cl['user_id']
             transactions[i] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
-            cl['app'].get_cross_refs(asset_group_id=asset_group_id, number=2)
-            print("  ----> wait cross_ref")
-            dat = msg_processor[i].synchronize()
-            cross_ref_list[i].extend(dat)
-            print("    ==> got cross_ref")
-            if len(cross_ref_list[i]) > 0:
-                transactions[i].add(cross_ref=cross_ref_list[i].pop(0))
 
             transactions[i].events[0].asset.add(user_id=user, asset_body="data=%d"%i)
             other_user = (i+1) % client_num
@@ -126,19 +119,11 @@ class TestBBcAppClient(object):
             assert dat[KeyType.transaction_id] == transactions[i].transaction_id
             print("    ==> got insert")
 
-        for i in range(len(cores)):
-            print("[%d] cross_ref_list=%d" % (i, len(cores[i].cross_ref_list)))
-
     def test_13_make_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         for i, cl in enumerate(clients):
             user = cl['user_id']
             txobj = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
-            cl['app'].get_cross_refs(asset_group_id=asset_group_id, number=2)
-            dat = msg_processor[i].synchronize()
-            cross_ref_list[i].extend(dat)
-            if len(cross_ref_list[i]) > 0:
-                txobj.add(cross_ref=cross_ref_list[i].pop(0))
 
             txobj.events[0].asset.add(user_id=user, asset_body=b"data2=%d"%i)
             other_user = (i+1) % client_num
@@ -158,9 +143,6 @@ class TestBBcAppClient(object):
             assert KeyType.transaction_id in dat
             assert dat[KeyType.transaction_id] == txobj.transaction_id
             transactions[i] = txobj
-
-        for i in range(len(cores)):
-            print("[%d] cross_ref_list=%d" % (i, len(cores[i].cross_ref_list)))
 
     @pytest.mark.unregister
     def test_98_unregister(self):

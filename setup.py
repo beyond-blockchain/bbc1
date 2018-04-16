@@ -31,7 +31,10 @@ bbc1_requires = [
                  'pytest>=3.0.5',
                  'gevent>=1.2.1',
                  'populus',
-                 'msgpack-python>=0.4.8']
+                 'msgpack-python>=0.4.8',
+                 'populus==2.1.0',
+                 'eth-utils==0.7.4',
+                ]
 
 bbc1_packages = ['bbc1', 'bbc1.core', 'bbc1.core.ethereum', 'bbc1.common', 'bbc1.common.libbbcsig', 'bbc1.app']
 
@@ -50,7 +53,7 @@ bbc1_classifiers = [
 
 setup(
     name='bbc1',
-    version='0.9',
+    version='0.10.0',
     description='A core system of Beyond Blockchain One',
     long_description=readme,
     url='https://github.com/beyond-blockchain/bbc1',

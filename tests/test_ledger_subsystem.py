@@ -2,7 +2,7 @@
 """
 Run tests/test_bbc_ethereum.py before this to fill an account data and deploy
 a contract for testing.
-After the test is complete, the program needs to be stopped by a keyboard
+After the test is complete, the program may need to be stopped by a keyboard
 interrupt.
 """
 import pytest
@@ -27,35 +27,6 @@ DEFAULT_ETHEREUM_GETH_PORT = 30303
 domain_id1 = bbclib.get_new_id("test_domain1")
 domain_id2 = bbclib.get_new_id("test_domain2")
 
-default_config = {
-    'domains': {
-        domain_id1.hex(): {
-            'use_ledger_subsystem': True,  # if this items does not exist or False, ledger_subsystem will not be used
-            'ledger_subsystem': {
-                'subsystem': 'ethereum',
-                'max_transactions': 4096,
-                'max_seconds': 60 * 60,
-            },
-        },
-        domain_id2.hex(): {
-            'use_ledger_subsystem': True,  # if this items does not exist or False, ledger_subsystem will not be used
-            'ledger_subsystem': {
-                'subsystem': 'ethereum',
-                'max_transactions': 4096,
-                'max_seconds': 60 * 60,
-            },
-        },
-    },
-    'ethereum': {
-        'chain_id': DEFAULT_ETHEREUM_CHAIN_ID,
-        'port': DEFAULT_ETHEREUM_GETH_PORT,
-        'log': DEFAULT_ETHEREUM_LOG_FILE,
-        'account': '',
-        'passphrase': '',
-        'contract': 'BBcAnchor',
-        'contract_address': '',
-    },
-}
 
 class DummyCore:
     class UserMessageRouting:
@@ -75,11 +46,48 @@ def default_config():
 
     config = setup.setup_config(test_bbc_ethereum.Args())
     conf = config.get_config()
-    conf['ledger_subsystem'] = {
-        'subsystem': 'ethereum',
-        'max_transactions': 100,
-        'max_seconds': 30,
+
+    db_conf = {
+        "db_type": "sqlite",
+        "db_name": "bbc_ledger.sqlite",
+        "replication_strategy": "all",
+        "db_servers": [
+            {
+                "db_addr": "127.0.0.1",
+                "db_port": 3306,
+                "db_user": "user",
+                "db_pass": "pass"
+            }
+        ]
     }
+
+    domain_id1_conf = {
+        'storage': {
+            'type': 'internal',
+        },
+        'db': db_conf,
+        'use_ledger_subsystem': True,
+        'ledger_subsystem': {
+            'subsystem': 'ethereum',
+            'max_transactions': 100,
+            'max_seconds': 30,
+        },
+    }
+    domain_id2_conf = {
+        'storage': {
+            'type': 'internal',
+        },
+        'db': db_conf,
+        'use_ledger_subsystem': True,
+        'ledger_subsystem': {
+            'subsystem': 'ethereum',
+            'max_transactions': 100,
+            'max_seconds': 30,
+        },
+    }
+
+    conf['domains'][domain_id1.hex()] = domain_id1_conf
+    conf['domains'][domain_id2.hex()] = domain_id2_conf
 
     return config
 
@@ -103,17 +111,20 @@ def test_ledger_subsystem(default_config):
 
     os.chdir('..')
 
-    networking = bbc_network.BBcNetwork(core=DummyCore(), config=conf, p2p_port=6641)
+    networking = bbc_network.BBcNetwork(core=DummyCore(),
+            config=default_config, p2p_port=6641)
     networking.create_domain(domain_id=domain_id1)
 
-    ls = ledger_subsystem.LedgerSubsystem(conf, networking=networking, domain_id=domain_id1, enabled=True)
+    ls = ledger_subsystem.LedgerSubsystem(default_config,
+            networking=networking, domain_id=domain_id1, enabled=True)
 
     for i in range(150):
         ls.register_transaction(hashlib.sha256(i.to_bytes(4, 'big')).digest())
 
-        time.sleep(0.1)
-
-    time.sleep(30)
+    print("\n30-second interval for trigger Merkle tree creation.")
+    for i in range(6, 0, -1):
+        print("continuing to sleep. countdown", i)
+        time.sleep(5)
 
     i = 300
     j = ls.verify_transaction(hashlib.sha256(i.to_bytes(4, 'big')).digest())
@@ -128,7 +139,8 @@ def test_ledger_subsystem(default_config):
 
     # -- test in another domain
     networking.create_domain(domain_id=domain_id2)
-    ls = ledger_subsystem.LedgerSubsystem(conf, networking=networking, domain_id=domain_id2, enabled=True)
+    ls = ledger_subsystem.LedgerSubsystem(default_config,
+            networking=networking, domain_id=domain_id2, enabled=True)
 
     i = 100
     j = ls.verify_transaction(hashlib.sha256(i.to_bytes(4, 'big')).digest())
@@ -139,12 +151,17 @@ def test_ledger_subsystem(default_config):
     digest = hashlib.sha256(i.to_bytes(4, 'big')).digest()
     ls.register_transaction(digest)
 
-    time.sleep(31)
+    print("31-second interval for trigger Merkle tree creation.")
+    time.sleep(1)
+    for i in range(6, 0, -1):
+        print("continuing to sleep. countdown", i)
+        time.sleep(5)
 
     j = ls.verify_transaction(digest)
     assert j['result']
     assert eth.verify(digest, j['subtree']) > 0
 
+    os.chdir(prevdir)
     setup.setup_stop(default_config)
 
 

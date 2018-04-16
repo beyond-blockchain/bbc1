@@ -38,16 +38,20 @@ asset_info_definition = [
 ]
 
 topology_info_definition = [
-    ["id", "INTEGER"], ["tx_to", "BLOB"], ["tx_from", "BLOB"]
+    ["id", "INTEGER"], ["base", "BLOB"], ["point_to", "BLOB"]
+]
+
+cross_ref_tbl_definition = [
+    ["id", "INTEGER"], ["transaction_id", "BLOB"], ["outer_domain_id", "BLOB"], ["txid_having_cross_ref", "BLOB"],
 ]
 
 #--- for anchoring ethereum/bitcoin blockchain ---
 merkle_branch_db_definition = [
-    ["digest", "BLOB"], ["left", "BLOB"], ["right", "BLOB"],
+    ["digest", "BLOB"], ["leaf_left", "BLOB"], ["leaf_right", "BLOB"],
 ]
 
 merkle_leaf_db_definition = [
-    ["digest", "BLOB"], ["left", "BLOB"], ["right", "BLOB"], ["prev", "BLOB"],
+    ["digest", "BLOB"], ["leaf_left", "BLOB"], ["leaf_right", "BLOB"], ["prev", "BLOB"],
 ]
 
 merkle_root_db_definition = [
@@ -67,14 +71,13 @@ class DataHandler:
     REQUEST_SEARCH = to_2byte(2)
     RESPONSE_SEARCH = to_2byte(3)
     NOTIFY_INSERTED = to_2byte(4)
+    REPAIR_TRANSACTION_DATA = to_2byte(5)
+    REPLICATION_CROSS_REF = to_2byte(6)
 
-    def __init__(self, network=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
-        if network is not None:
-            self.network = network
-            self.core = network.core
-            self.stats = network.core.stats
-        else:
-            self.stats = BBcStats()
+    def __init__(self, networking=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
+        self.networking = networking
+        self.core = networking.core
+        self.stats = networking.core.stats
         self.logger = logger.get_logger(key="data_handler", level=loglevel, logname=logname)
         self.domain_id = domain_id
         self.domain_id_str = bbclib.convert_id_to_string(domain_id)
@@ -121,6 +124,7 @@ class DataHandler:
             db.create_table('transaction_table', transaction_tbl_definition, primary_key=0, indices=[0])
             db.create_table('asset_info_table', asset_info_definition, primary_key=0, indices=[0, 1, 2, 3, 4])
             db.create_table('topology_table', topology_info_definition, primary_key=0, indices=[0, 1, 2])
+            db.create_table('cross_ref_table', cross_ref_tbl_definition, primary_key=0, indices=[1])
             db.create_table('merkle_branch_table', merkle_branch_db_definition, primary_key=0, indices=[1, 2])
             db.create_table('merkle_leaf_table', merkle_leaf_db_definition, primary_key=0, indices=[1, 2])
             db.create_table('merkle_root_table', merkle_root_db_definition, primary_key=0, indices=[0])
@@ -143,12 +147,14 @@ class DataHandler:
             d.db_cur.close()
             d.db.close()
 
-    def exec_sql(self, db_num=0, sql=None, args=()):
+    def exec_sql(self, db_num=0, sql=None, args=(), commit=False, fetch_one=False):
         """
         Execute sql sentence
         :param db_num:
         :param sql:
         :param args:
+        :param commit:
+        :param fetch_one:
         :return:
         """
         self.stats.update_stats_increment("data_handler", "exec_sql", 1)
@@ -158,10 +164,17 @@ class DataHandler:
         try:
             db_num = 0 if db_num >= len(self.db_adaptors) else db_num
             if len(args) > 0:
-                ret = self.db_adaptors[db_num].db_cur.execute(sql, args)
+                self.db_adaptors[db_num].db_cur.execute(sql, args)
             else:
-                ret = self.db_adaptors[db_num].db_cur.execute(sql)
-            self.db_adaptors[db_num].db.commit()
+                self.db_adaptors[db_num].db_cur.execute(sql)
+            if commit:
+                self.db_adaptors[db_num].db.commit()
+                ret = None
+            else:
+                if fetch_one:
+                    ret = self.db_adaptors[db_num].db_cur.fetchone()
+                else:
+                    ret = self.db_adaptors[db_num].db_cur.fetchall()
         except:
             self.logger.error(traceback.format_exc())
             traceback.print_exc()
@@ -171,32 +184,6 @@ class DataHandler:
             return []
         else:
             return list(ret)
-
-    def exec_sql_fetchall(self, db_num=0, sql=None, args=()):
-        """
-        Execute sql sentence
-        :param db_num:
-        :param sql:
-        :param args:
-        :return:
-        """
-        self.stats.update_stats_increment("data_handler", "exec_sql", 1)
-        #print("sql=", sql)
-        try:
-            db_num = 0 if db_num >= len(self.db_adaptors) else db_num
-            if len(args) > 0:
-                self.db_adaptors[db_num].db_cur.execute(sql, args)
-            else:
-                self.db_adaptors[db_num].db_cur.execute(sql)
-            ret = self.db_adaptors[db_num].db_cur.fetchall()
-        except:
-            self.logger.error(traceback.format_exc())
-            traceback.print_exc()
-            self.stats.update_stats_increment("data_handler", "fail_exec_sql", 1)
-            return None
-        if ret is not None:
-            ret = list(ret)
-        return ret
 
     def get_asset_info(self, txobj):
         """
@@ -225,10 +212,10 @@ class DataHandler:
         """
         info = list()
         for reference in txobj.references:
-            info.append((txobj.transaction_id, reference.transaction_id))
+            info.append((txobj.transaction_id, reference.transaction_id))  # (base, point_to)
         for idx, rtn in enumerate(txobj.relations):
             for pt in rtn.pointers:
-                info.append((txobj.transaction_id, pt.transaction_id))
+                info.append((txobj.transaction_id, pt.transaction_id))  # (base, point_to)
         return info
 
     def insert_transaction(self, txdata, txobj=None, asset_files=None, no_replication=False):
@@ -237,6 +224,7 @@ class DataHandler:
         :param txdata:
         :param txobj:
         :param asset_files:
+        :param no_replication:
         :return:
         """
         self.stats.update_stats_increment("data_handler", "insert_transaction", 1)
@@ -247,39 +235,101 @@ class DataHandler:
 
         inserted_count = 0
         for i in range(len(self.db_adaptors)):
-            ret = self.exec_sql(db_num=i,
-                                sql="INSERT INTO transaction_table VALUES (%s,%s)" % (self.db_adaptors[0].placeholder,
-                                                                                      self.db_adaptors[0].placeholder),
-                                args=(txobj.transaction_id, txdata))
-            if ret is None:
-                continue
-            inserted_count += 1
-
-            for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
-                self.exec_sql(db_num=i,
-                              sql="INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id) "
-                                "VALUES (%s, %s, %s, %s)" % (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
-                                                             self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
-                                args=(txobj.transaction_id, asset_group_id, asset_id, user_id))
-            for tx_to, tx_from in self.get_topology_info(txobj):
-                self.exec_sql(db_num=i,
-                              sql="INSERT INTO topology_table(tx_to, tx_from) VALUES (%s, %s)" %
-                                (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
-                              args=(tx_to, tx_from))
-
+            if self.insert_transaction_into_a_db(i, txobj):
+                inserted_count += 1
         if inserted_count == 0:
             return None
 
+        asset_group_ids = self.store_asset_files(txobj, asset_files)
+
+        if not no_replication and self.replication_strategy != DataHandler.REPLICATION_EXT:
+            self.send_replication_to_other_cores(txdata, asset_files)
+
+        if self.networking.domain0manager is not None:
+            self.networking.domain0manager.distribute_cross_ref_in_domain0(domain_id=self.domain_id,
+                                                                           transaction_id=txobj.transaction_id)
+            if txobj.cross_ref is not None:
+                self.networking.domain0manager.cross_ref_registered(domain_id=self.domain_id,
+                                                                    transaction_id=txobj.transaction_id,
+                                                                    cross_ref=(txobj.cross_ref.domain_id,
+                                                                               txobj.cross_ref.transaction_id))
+
+        return asset_group_ids
+
+    def insert_transaction_into_a_db(self, db_num, txobj):
+        """
+        Insert transaction data into the specified DB
+        :param db_num:
+        :param txobj:
+        :return:
+        """
+        if txobj.transaction_data is None:
+            txobj.serialize()
+        ret = self.exec_sql(db_num=db_num,
+                            sql="INSERT INTO transaction_table VALUES (%s,%s)" % (self.db_adaptors[0].placeholder,
+                                                                                  self.db_adaptors[0].placeholder),
+                            args=(txobj.transaction_id, txobj.transaction_data), commit=True)
+        if ret is None:
+            return False
+
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
+            self.exec_sql(db_num=db_num,
+                          sql="INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id) "
+                              "VALUES (%s, %s, %s, %s)" % (
+                              self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
+                              self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
+                          args=(txobj.transaction_id, asset_group_id, asset_id, user_id), commit=True)
+        for base, point_to in self.get_topology_info(txobj):
+            self.exec_sql(db_num=db_num,
+                          sql="INSERT INTO topology_table(base, point_to) VALUES (%s, %s)" %
+                              (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
+                          args=(base, point_to), commit=True)
+            #print("topology: base:%s, point_to:%s" % (base.hex(), point_to.hex()))
+        return True
+
+    def insert_cross_ref(self, transaction_id, outer_domain_id, txid_having_cross_ref, no_replication=False):
+        self.stats.update_stats_increment("data_handler", "insert_cross_ref", 1)
+        sql = "INSERT INTO cross_ref_table (transaction_id, outer_domain_id, txid_having_cross_ref) " + \
+              "VALUES (%s, %s, %s)" % (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
+                                       self.db_adaptors[0].placeholder)
+        for i in range(len(self.db_adaptors)):
+            self.exec_sql(db_num=i, sql=sql, args=(transaction_id, outer_domain_id, txid_having_cross_ref), commit=True)
+
+        if not no_replication:
+            self.send_cross_ref_replication_to_other_cores(transaction_id, outer_domain_id, txid_having_cross_ref)
+
+    def count_domain_in_cross_ref(self, outer_domain_id):
+        # TODO: need to consider registered_time
+        sql = "SELECT count(*) FROM cross_ref_table WHERE outer_domain = %s" % self.db_adaptors[0].placeholder
+        ret = self.exec_sql(sql=sql, args=(outer_domain_id,))
+        return ret
+
+    def search_domain_having_cross_ref(self, transaction_id=None):
+        if transaction_id is not None:
+            sql = "SELECT * FROM cross_ref_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder
+            return self.exec_sql(sql=sql, args=(transaction_id,))
+        else:
+            return self.exec_sql(sql="SELECT * FROM cross_ref_table")
+
+    def store_asset_files(self, txobj, asset_files):
+        """
+        Store all asset_files related to the transaction_object
+        :param txobj:
+        :param asset_files:
+        :return: asset_group_ids to be stored
+        """
         asset_group_ids = set()
         for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
             asset_group_ids.add(asset_group_id)
             if not self.use_external_storage and asset_files is not None and asset_id in asset_files:
                 self.store_in_storage(asset_group_id, asset_id, asset_files[asset_id])
-
-        if not no_replication and self.replication_strategy != DataHandler.REPLICATION_EXT:
-            self.send_replication_to_other_cores(txdata, asset_files)
-
         return asset_group_ids
+
+    def restore_data(self, db_num, transaction_id, txobj, asset_files):
+        self.remove(transaction_id, txobj=txobj, db_num=db_num)
+        self.insert_transaction_into_a_db(db_num=db_num, txobj=txobj)
+        self.remove_asset_files(txobj, asset_files)
+        self.store_asset_files(txobj, asset_files)
 
     def send_replication_to_other_cores(self, txdata, asset_files=None):
         """
@@ -296,44 +346,94 @@ class DataHandler:
         if asset_files is not None:
             msg[KeyType.all_asset_files] = asset_files
         if self.replication_strategy == DataHandler.REPLICATION_ALL:
-            self.network.broadcast_message_in_network(domain_id=self.domain_id,
-                                                      payload_type=PayloadType.Type_msgpack, msg=msg)
+            self.networking.broadcast_message_in_network(domain_id=self.domain_id,
+                                                         payload_type=PayloadType.Type_any, msg=msg)
         elif self.replication_strategy == DataHandler.REPLICATION_P2P:
             pass  # TODO: implement (destinations determined by TopologyManager)
 
-    def remove(self, transaction_id):
+    def send_cross_ref_replication_to_other_cores(self, transaction_id, outer_domain_id, txid_having_cross_ref):
         """
-        Delete data
+        Send replication of cross_ref
         :param transaction_id:
+        :param outer_domain_id:
+        :param txid_having_cross_ref:
+        :return:
+        """
+        msg = {
+            KeyType.domain_id: self.domain_id,
+            KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_DATA,
+            KeyType.infra_command: DataHandler.REPLICATION_CROSS_REF,
+            KeyType.transaction_id: transaction_id,
+            KeyType.outer_domain_id: outer_domain_id,
+            KeyType.txid_having_cross_ref: txid_having_cross_ref,
+        }
+        if self.replication_strategy == DataHandler.REPLICATION_ALL:
+            self.networking.broadcast_message_in_network(domain_id=self.domain_id,
+                                                         payload_type=PayloadType.Type_any, msg=msg)
+        elif self.replication_strategy == DataHandler.REPLICATION_P2P:
+            pass  # TODO: implement (destinations determined by TopologyManager)
+
+    def remove(self, transaction_id, txobj=None, db_num=-1):
+        """
+        Delete all data regarding the specified transaction_id
+        :param transaction_id:
+        :param txobj:
+        :param db_num:
         :return:
         """
         if transaction_id is None:
             return
-        txdata = self.exec_sql_fetchall(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
-                                            self.db_adaptors[0].placeholder, args=(transaction_id,))
-        txobj = bbclib.BBcTransaction(deserialize=txdata[0][1])
+        if txobj is None:
+            txdata = self.exec_sql(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
+                                   self.db_adaptors[0].placeholder, args=(transaction_id,))
+            txobj = bbclib.BBcTransaction(deserialize=txdata[0][1])
+        elif txobj.transaction_id != transaction_id:
+            return
 
-        for i in range(len(self.db_adaptors)):
+        if db_num == -1 or db_num >= len(self.db_adaptors):
+            for i in range(len(self.db_adaptors)):
+                self._remove_transaction(txobj, i)
+        else:
+            self._remove_transaction(txobj, db_num)
+
+        self.remove_asset_files(txobj)
+
+    def _remove_transaction(self, txobj, db_num):
+        self.exec_sql(
+            db_num=db_num,
+            sql="DELETE FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
+            args=(txobj.transaction_id,), commit=True)
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
             self.exec_sql(
-                db_num=i,
-                sql="DELETE FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
-                args=(transaction_id,))
-            for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
-                self.exec_sql(
-                    db_num=i,
-                    sql="DELETE FROM asset_info_table WHERE asset_group_id = %s AND asset_id = %s AND user_id = %s" %
-                        (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
-                    args=(asset_group_id, asset_id, user_id))
-                if fileflag:
-                    self.remove_in_storage(asset_group_id, asset_id)
-            for tx_to, tx_from in self.get_topology_info(txobj):
-                self.exec_sql(
-                    db_num=i,
-                    sql="DELETE FROM topology_table WHERE tx_to = %s AND tx_from = %s" %
-                        (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
-                    args=(tx_to, tx_from))
+                db_num=db_num,
+                sql="DELETE FROM asset_info_table WHERE asset_group_id = %s AND asset_id = %s AND user_id = %s" %
+                    (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
+                args=(asset_group_id, asset_id, user_id), commit=True)
+            if fileflag:
+                self.remove_in_storage(asset_group_id, asset_id)
+        for base, point_to in self.get_topology_info(txobj):
+            self.exec_sql(
+                db_num=db_num,
+                sql="DELETE FROM topology_table WHERE base = %s AND point_to = %s" %
+                    (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
+                args=(base, point_to), commit=True)
 
-    def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None, count=1):
+    def remove_asset_files(self, txobj, asset_files=None):
+        """
+        Remove all asset files related to the transaction
+        :param asset_files:
+        :return:
+        """
+        if self.use_external_storage:
+            return
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
+            if asset_files is not None:
+                if asset_id in asset_files:
+                    self.remove_in_storage(asset_group_id, asset_id)
+            else:
+                self.remove_in_storage(asset_group_id, asset_id)
+
+    def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None, count=1, db_num=0):
         """
         Search transaction data
         :param transaction_id:
@@ -341,11 +441,14 @@ class DataHandler:
         :param asset_id:
         :param user_id:
         :param count:
+        :param idx:
         :return:
         """
         if transaction_id is not None:
-            txinfo = self.exec_sql_fetchall(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
-                                                self.db_adaptors[0].placeholder, args=(transaction_id,))
+            txinfo = self.exec_sql(
+                db_num=db_num,
+                sql="SELECT * FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
+                args=(transaction_id,))
             if len(txinfo) == 0:
                 return None, None
         else:
@@ -364,57 +467,42 @@ class DataHandler:
                 sql += " limit %d" % count
             sql += ";"
             args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id)))
-            ret = self.exec_sql_fetchall(sql=sql, args=args)
+            ret = self.exec_sql(db_num=db_num, sql=sql, args=args)
             txinfo = list()
             for record in ret:
-                tx = self.exec_sql_fetchall(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
-                                                self.db_adaptors[0].placeholder, args=(record[1],))
+                tx = self.exec_sql(
+                    db_num=db_num,
+                    sql="SELECT * FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
+                    args=(record[1],))
                 if tx is not None and len(tx) == 1:
                     txinfo.append(tx[0])
 
-        result_txobj = list()
-        txid_list = dict()
+        result_txobj = dict()
         result_asset_files = dict()
-        compromised_tx = list()
-        compromised_asset_files = list()
         for txid, txdata in txinfo:
-            if txid in txid_list:
-                continue
-            txid_list[txid] = True
-            txobj = bbclib.BBcTransaction()
-            txobj.deserialize(txdata)
-            for sig in txobj.signatures:
-                if not sig.verify(txid):
-                    compromised_tx.append(txid)
-            result_txobj.append(txobj)
+            txobj = bbclib.BBcTransaction(deserialize=txdata)
+            result_txobj[txid] = txobj
             for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
                 if fileflag:
-                    assetfile = self.get_in_storage(asset_group_id, asset_id)
-                    if hashlib.sha256(assetfile).digest() == filedigest:
-                        result_asset_files[asset_id] = assetfile
-                    else:
-                        compromised_asset_files.append(asset_id)
-        if len(compromised_tx) == 0 and len(compromised_asset_files) == 0:
-            return result_txobj, result_asset_files
-        # TODO: implement finding correct transaction data and asset file
-        print(len(compromised_tx), len(compromised_asset_files))
-        return None, None
+                    result_asset_files[asset_id] = self.get_in_storage(asset_group_id, asset_id)
+        return result_txobj, result_asset_files
 
-    def search_transaction_topology(self, transaction_id, reverse_link=False):
+    def search_transaction_topology(self, transaction_id, traverse_to_past=True):
         """
         Search in topology info
         :param transaction_id:
+        :param traverse_to_past:
         :return:
         """
         if transaction_id is None:
             return None
-        if reverse_link:
-            return self.exec_sql_fetchall(sql="SELECT * FROM topology_table WHERE tx_from = %s" %
-                                              self.db_adaptors[0].placeholder, args=(transaction_id,))
+        if traverse_to_past:
+            return self.exec_sql(sql="SELECT * FROM topology_table WHERE base = %s" %
+                                 self.db_adaptors[0].placeholder, args=(transaction_id,))
 
         else:
-            return self.exec_sql_fetchall(sql="SELECT * FROM topology_table WHERE tx_to = %s" %
-                                              self.db_adaptors[0].placeholder, args=(transaction_id,))
+            return self.exec_sql(sql="SELECT * FROM topology_table WHERE point_to = %s" %
+                                 self.db_adaptors[0].placeholder, args=(transaction_id,))
 
     def store_in_storage(self, asset_group_id, asset_id, content):
         """
@@ -477,6 +565,16 @@ class DataHandler:
             return
         os.remove(path)
 
+    def add_cross_ref_into_list(self, cross_ref):
+        """
+        (internal use) register cross_ref info in the list
+
+        :param cross_ref:  tuple(domain_id, transaction_id)
+        :return:
+        """
+        self.stats.update_stats_increment("cross_ref", "total_num", 1)
+        self.cross_ref_list.append(cross_ref)
+
     def process_message(self, msg):
         """
         (internal use) process received message
@@ -505,8 +603,8 @@ class DataHandler:
             else:
                 msg[KeyType.result] = True
                 msg[KeyType.transaction_data] = ret[0][1]
-            self.network.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_msgpack,
-                                                 domain_id=self.domain_id, msg=msg)
+            self.networking.send_message_in_network(nodeinfo=None, payload_type=PayloadType.Type_any,
+                                                    domain_id=self.domain_id, msg=msg)
 
         elif msg[KeyType.infra_command] == DataHandler.RESPONSE_SEARCH:
             self.stats.update_stats_increment("data_handler", "RESPONSE_SEARCH", 1)
@@ -522,9 +620,18 @@ class DataHandler:
             self.core.send_inserted_notification(self.domain_id, asset_group_ids, transaction_id,
                                                  only_registered_user=True)
 
+        elif msg[KeyType.infra_command] == DataHandler.REPAIR_TRANSACTION_DATA:
+            self.networking.domains[self.domain_id]['repair'].put_message(msg)
+
+        elif msg[KeyType.infra_command] == DataHandler.REPLICATION_CROSS_REF:
+            transaction_id = msg[KeyType.transaction_id]
+            outer_domain_id = msg[KeyType.outer_domain_id]
+            txid_having_cross_ref = msg[KeyType.txid_having_cross_ref]
+            self.insert_cross_ref(transaction_id, outer_domain_id, txid_having_cross_ref, no_replication=True)
+
 
 class DataHandlerDomain0(DataHandler):
-    def __init__(self, network=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
+    def __init__(self, networking=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
         pass
 
     def close_db(self):
@@ -605,12 +712,13 @@ class SqliteAdaptor(DbAdaptor):
         sql += ", ".join(["%s %s" % (d[0],d[1]) for d in tbl_definition])
         sql += ", PRIMARY KEY ("+tbl_definition[primary_key][0]+")"
         sql += ");"
-        self.handler.exec_sql(sql=sql)
+        self.handler.exec_sql(sql=sql, commit=True)
         for idx in indices:
-            self.handler.exec_sql(sql="CREATE INDEX %s_idx_%d ON %s (%s);" % (tbl, idx, tbl, tbl_definition[idx][0]))
+            self.handler.exec_sql(sql="CREATE INDEX %s_idx_%d ON %s (%s);" % (tbl, idx, tbl, tbl_definition[idx][0]),
+                                  commit=True)
 
     def check_table_existence(self, tblname):
-        return self.handler.exec_sql_fetchall(sql="SELECT * FROM sqlite_master WHERE type='table' AND name=?", args=(tblname,))
+        return self.handler.exec_sql(sql="SELECT * FROM sqlite_master WHERE type='table' AND name=?", args=(tblname,))
 
 
 class MysqlAdaptor(DbAdaptor):
@@ -651,13 +759,15 @@ class MysqlAdaptor(DbAdaptor):
         else:
             sql += ", PRIMARY KEY (%s)" % tbl_definition[primary_key][0]
         sql += ") CHARSET=utf8;"
-        self.handler.exec_sql(db_num=self.db_num, sql=sql)
+        self.handler.exec_sql(db_num=self.db_num, sql=sql, commit=True)
         for idx in indices:
             if tbl_definition[idx][1] in ["BLOB", "TEXT"]:
-                self.handler.exec_sql(db_num=self.db_num, sql="ALTER TABLE %s ADD INDEX (%s(32));" % (tbl, tbl_definition[idx][0]))
+                self.handler.exec_sql(db_num=self.db_num, sql="ALTER TABLE %s ADD INDEX (%s(32));"
+                                                              % (tbl, tbl_definition[idx][0]), commit=True)
             else:
-                self.handler.exec_sql(db_num=self.db_num, sql="ALTER TABLE %s ADD INDEX (%s);" % (tbl, tbl_definition[idx][0]))
+                self.handler.exec_sql(db_num=self.db_num, sql="ALTER TABLE %s ADD INDEX (%s);"
+                                                              % (tbl, tbl_definition[idx][0]), commit=True)
 
     def check_table_existence(self, tblname):
         sql = "show tables from %s like '%s';" % (self.db_name, tblname)
-        return self.handler.exec_sql_fetchall(db_num=self.db_num, sql=sql)
+        return self.handler.exec_sql(db_num=self.db_num, sql=sql)

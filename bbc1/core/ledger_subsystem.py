@@ -24,21 +24,7 @@ import threading
 import sys
 sys.path.extend(["../../"])
 from bbc1.common import logger
-from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.core.ethereum import bbc_ethereum
-
-
-merkle_branch_db_definition = [
-    ["digest", "BLOB"], ["left", "BLOB"], ["right", "BLOB"],
-]
-
-merkle_leaf_db_definition = [
-    ["digest", "BLOB"], ["left", "BLOB"], ["right", "BLOB"], ["prev", "BLOB"],
-]
-
-merkle_root_db_definition = [
-    ["root", "BLOB"], ["spec", "BLOB"],
-]
 
 temp_json = {
     "digest": None,
@@ -48,13 +34,12 @@ temp_json = {
     "count": 0,
 }
 
-DB_NAME = 'merkle_db'
-
 
 class Queue:
     def __init__(self):
         self.queue = []
         self.event = threading.Event()
+
 
     def wait_msg(self, flash_others=False):
         ret = None
@@ -71,6 +56,7 @@ class Queue:
             return ret
         return ret
 
+
     def append_msg(self, msg):
         self.queue.append(msg)
         self.event.set()
@@ -80,10 +66,11 @@ class LedgerSubsystem:
     """
     Abstraction of an underlying ledger subsystem that is typically a
     blockchain. This takes one transaction each to record and verifies its
-    existence. It forms some Merkle trees of transaction IDs, and writes their
-    root digests only to the underlying ledger.
+    existence. It forms some Merkle trees of transaction IDs, and only writes
+    their root digests to the underlying ledger.
     """
-    def __init__(self, config, networking=None, domain_id=None, enabled=False, loglevel="all", logname=None):
+    def __init__(self, config, networking=None, domain_id=None, enabled=False,
+            loglevel="all", logname=None):
         """
         Constructs a ledger subsystem. Just supports sqlite3.
 
@@ -99,18 +86,24 @@ class LedgerSubsystem:
         self.domain_id = domain_id
         if domain_id is None:
             return
-        self.data_handler = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
-        self.logger = logger.get_logger(key="ledger_subsystem", level=loglevel, logname=logname)
+        self.data_handler = self.networking.domains[domain_id]['data']
+        self.logger = logger.get_logger(key="ledger_subsystem",
+                level=loglevel, logname=logname)
         self.queue = Queue()
         self.enabled = enabled
         self.config = config.get_domain_config(self.domain_id)
-        conf = config.get_config()
-        self.eth_config = None if "ethereum" not in conf else conf["ethereum"]
+        if 'ethereum' in self.config:
+            self.eth_config = self.config['ethereum']
+        else:
+            conf = config.get_config()
+            self.eth_config = \
+                    None if 'ethereum' not in conf else conf['ethereum']
         self.eth = None
         self.capacity = self.config['ledger_subsystem']['max_transactions']
         self.interval = self.config['ledger_subsystem']['max_seconds']
         self.timer = None
-        self.temp_file_dic = os.path.join(self.data_handler.storage_root, 'ledger_subsystem.json')
+        self.temp_file_dic = os.path.join(self.data_handler.storage_root,
+                 'ledger_subsystem.json')
 
         if self.enabled:
             self.enable()
@@ -118,8 +111,10 @@ class LedgerSubsystem:
         thread_loop.setDaemon(True)
         thread_loop.start()
 
+
     def append_msg(self, msg):
         self.queue.append_msg(msg=msg)
+
 
     def close_merkle_tree(self, jTemp):
         self.logger.debug("closing a merkle tree")
@@ -128,7 +123,7 @@ class LedgerSubsystem:
         self.timer.start()
         digest = None
         if jTemp['left'] is not None:
-            jTemp['right'] == jTemp['left']
+            jTemp['right'] = jTemp['left']
             msg = binascii.a2b_hex(jTemp['left'])
             digest = hashlib.sha256(msg + msg).digest()
             jTemp['digest'] = str(binascii.b2a_hex(digest), 'utf-8')
@@ -167,6 +162,7 @@ class LedgerSubsystem:
         if self.config['ledger_subsystem']['subsystem'] == 'ethereum':
             self.write_merkle_root(lBase[0])
 
+
     def enable(self):
         """
         Enables communication with the underlying ledger.
@@ -177,9 +173,9 @@ class LedgerSubsystem:
             prevdir = os.getcwd()
             os.chdir('ethereum')
             self.eth = bbc_ethereum.BBcEthereum(
-                self.config['ethereum']['account'],
-                self.config['ethereum']['passphrase'],
-                self.config['ethereum']['contract_address']
+                self.eth_config['account'],
+                self.eth_config['passphrase'],
+                self.eth_config['contract_address']
             )
             os.chdir(prevdir)
         else:
@@ -188,6 +184,7 @@ class LedgerSubsystem:
         self.timer = threading.Timer(self.interval, self.subsystem_timer)
         self.timer.start()
         self.enabled = True
+
 
     def disable(self):
         """
@@ -198,18 +195,21 @@ class LedgerSubsystem:
         self.timer.cancel()
         self.enabled = False
 
+
     def get_merkle_base(self, digest):
         lBase = list()
+        ph = self.data_handler.db_adaptors[0].placeholder
         while True:
-            row = self.data_handler.exec_sql_fetchall(
-                sql="select * from merkle_leaf_table where digest=%s" % self.data_handler.db_adaptors[0].placeholder,
+            row = self.data_handler.exec_sql(
+                sql="select * from merkle_leaf_table where digest=%s" % ph,
                 args=(digest,)
             )
-            if row is None:
+            if len(row) <= 0:
                 break
             lBase.insert(0, row[0][0])
             digest = row[0][3]
         return lBase
+
 
     def register_transaction(self, transaction_id):
         """
@@ -223,9 +223,10 @@ class LedgerSubsystem:
         else:
             self.logger.warning("ledger subsystem not enabled")
 
+
     def subsystem_loop(self):
-        self.logger.debug("Start subsystem_loop for domain:%s" % self.domain_id.hex())
-        self.domain_id = None
+        self.logger.debug("Start subsystem_loop for domain:%s" %
+                self.domain_id.hex())
         while True:
             msg = self.queue.wait_msg()
             if os.path.exists(self.temp_file_dic):
@@ -260,8 +261,10 @@ class LedgerSubsystem:
                 if jTemp['count'] >= self.capacity:
                     self.close_merkle_tree(jTemp)
 
+
     def subsystem_timer(self):
         self.append_msg(('timer',))
+
 
     def verify_transaction(self, transaction_id):
         """
@@ -279,13 +282,15 @@ class LedgerSubsystem:
             self.logger.warning("ledger subsystem not enabled")
         return dic
 
+
     def verify_digest(self, digest, dic):
-        row = self.data_handler.exec_sql_fetchall(
-            sql="select * from merkle_leaf_table where left=%s or right=%s" %
-                (self.data_handler.db_adaptors[0].placeholder, self.data_handler.db_adaptors[0].placeholder),
-            args=(digest,digest)
+        ph = self.data_handler.db_adaptors[0].placeholder
+        row = self.data_handler.exec_sql(
+            sql="select * from merkle_leaf_table where " \
+                    "leaf_left=%s or leaf_right=%s" % (ph, ph),
+            args=(digest, digest)
         )
-        if row is None:
+        if len(row) <= 0:
             self.logger.debug("transaction not found")
             dic['result'] = False
             return
@@ -294,26 +299,26 @@ class LedgerSubsystem:
             subtree.append({
                 'position': 'left' if row[0][2] == digest else 'right',
                 'digest': str(binascii.b2a_hex(
-                    row[1] if row[2] == digest else row[0][2]
+                    row[0][1] if row[0][2] == digest else row[0][2]
                 ), 'utf-8')
             })
             digest = row[0][0]
-            row = self.data_handler.exec_sql_fetchall(
-                sql="select * from merkle_branch_table where left=%s or right=%s" %
-                    (self.data_handler.db_adaptors[0].placeholder, self.data_handler.db_adaptors[0].placeholder),
-                args=(digest,digest)
+            row = self.data_handler.exec_sql(
+                sql="select * from merkle_branch_table where " \
+                        "leaf_left=%s or leaf_right=%s" % (ph , ph),
+                args=(digest, digest)
             )
-            if row is None:
+            if len(row) <= 0:
                 break
-        row = self.data_handler.exec_sql_fetchall(
-            sql="select * from merkle_root_table where root=%s" % self.data_handler.db_adaptors[0].placeholder,
+        row = self.data_handler.exec_sql(
+            sql="select * from merkle_root_table where root=%s" % ph,
             args=(digest,)
         )
-        if row is None:
+        if len(row) <= 0:
             self.logger.warning("merkle root not found")
             dic['result'] = False
             return
-        specList = row[1].split(':')
+        specList = row[0][1].split(':')
         block = self.eth.test(digest)
         if block <= 0:
             self.logger.warning("merkle root not anchored")
@@ -330,44 +335,49 @@ class LedgerSubsystem:
         dic['spec'] = spec
         dic['subtree'] = subtree
 
+
     def write_branch(self, digest=None, left=None, right=None):
-        row = self.data_handler.exec_sql_fetchall(
-            sql="select * from merkle_branch_table where digest=%s" % self.data_handler.db_adaptors[0].placeholder,
+        ph = self.data_handler.db_adaptors[0].placeholder
+        row = self.data_handler.exec_sql(
+            sql="select * from merkle_branch_table where digest=%s" % ph,
             args=(digest,)
         )
-        if row is not None:
+        if len(row) > 0:
             self.logger.warning("collision of digests detected")
         else:
             self.data_handler.exec_sql(
                 sql="insert into merkle_branch_table values (%s, %s, %s)" %
-                    (self.data_handler.db_adaptors[0].placeholder,
-                     self.data_handler.db_adaptors[0].placeholder,
-                     self.data_handler.db_adaptors[0].placeholder),
-                args=(digest,left, right)
+                        (ph, ph, ph),
+                args=(digest, left, right),
+                commit=True
             )
 
+
     def write_leaf(self, jTemp, digest=None, left=None, right=None):
+        ph = self.data_handler.db_adaptors[0].placeholder
         if digest is None:
             digest = binascii.a2b_hex(jTemp['digest'])
         if jTemp['prev'] is None:
             prev = bytes()
         else:
             prev = binascii.a2b_hex(jTemp['prev'])
-        row = self.data_handler.exec_sql_fetchall(
-            sql="select * from merkle_leaf_table where digest=%s" % self.data_handler.db_adaptors[0].placeholder,
+        row = self.data_handler.exec_sql(
+            sql="select * from merkle_leaf_table where digest=%s" % ph,
             args=(digest,)
         )
-        if row is not None:
+        if len(row) > 0:
             self.logger.warning("collision of digests detected")
         else:
             self.data_handler.exec_sql(
                 sql="insert into merkle_leaf_table values (%s, %s, %s, %s)" %
-                    (self.data_handler.db_adaptors[0].placeholder, self.data_handler.db_adaptors[0].placeholder,
-                     self.data_handler.db_adaptors[0].placeholder,self.data_handler.db_adaptors[0].placeholder),
+                        (ph, ph, ph, ph),
                 args=(digest,
-                      left if left is not None else binascii.a2b_hex(jTemp['left']),
-                      right if right is not None else binascii.a2b_hex(jTemp['right']),
-                      prev)
+                      left if left is not None \
+                            else binascii.a2b_hex(jTemp['left']),
+                      right if right is not None \
+                            else binascii.a2b_hex(jTemp['right']),
+                      prev),
+                commit=True
             )
         jTemp['prev'] = jTemp['digest']
         jTemp['digest'] = None
@@ -378,6 +388,7 @@ class LedgerSubsystem:
         json.dump(jTemp, f, indent=2)
         f.close()
 
+
     def write_merkle_root(self, root):
         self.write_root(
             root=root,
@@ -387,18 +398,21 @@ class LedgerSubsystem:
         )
         self.eth.blockingSet(root)
 
+
     def write_root(self, root=None, spec=None):
-        root = self.data_handler.exec_sql_fetchall(
-            sql="select * from merkle_root_table where root=%s" % self.data_handler.db_adaptors[0].placeholder,
+        ph = self.data_handler.db_adaptors[0].placeholder
+        row = self.data_handler.exec_sql(
+            sql="select * from merkle_root_table where root=%s" % ph,
             args=(root,)
         )
-        if root is not None:
+        if len(row) > 0:
             self.logger.warning("collision of digests detected")
         else:
             self.data_handler.exec_sql(
-                sql="insert into merkle_root_table values (%s, %s)" %
-                    (self.data_handler.db_adaptors[0].placeholder, self.data_handler.db_adaptors[0].placeholder),
-                args=(root, spec)
+                sql="insert into merkle_root_table values (%s, %s)" % (ph, ph),
+                args=(root, spec),
+                commit=True
             )
+
 
 # end of core/ledger_subsystem.py

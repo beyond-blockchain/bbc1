@@ -17,11 +17,11 @@ limitations under the License.
 import os
 import json
 import copy
+from collections import Mapping
 
 import sys
 sys.path.extend(["../../"])
 from bbc1.common import bbclib
-from bbc1.common.bbclib import StorageType
 
 
 DEFAULT_WORKING_DIR = '.bbc1'
@@ -74,10 +74,23 @@ current_config = {
 }
 
 
+def update_deep(d, u):
+    for k, v in u.items():
+        # this condition handles the problem
+        if not isinstance(d, Mapping):
+            d = u
+        elif isinstance(v, Mapping):
+            r = update_deep(d.get(k, {}), v)
+            d[k] = r
+        else:
+            d[k] = u[k]
+
+    return d
+
+
 class BBcConfig:
     def __init__(self, directory=None, file=None):
         self.config = copy.deepcopy(current_config)
-        self.config_file = DEFAULT_CONFIG_FILE
         if directory is not None:
             self.working_dir = directory
             self.config['workingdir'] = self.working_dir
@@ -85,14 +98,16 @@ class BBcConfig:
             self.working_dir = self.config['workingdir']
         if file is not None:
             self.config_file = file
+        else:
+            self.config_file = os.path.join(self.working_dir, DEFAULT_CONFIG_FILE)
 
         if not os.path.exists(self.working_dir):
             os.mkdir(self.working_dir)
 
-        if os.path.isfile(os.path.join(self.working_dir, self.config_file)):
-            with open(os.path.join(self.working_dir, self.config_file), "r") as f:
+        if os.path.isfile(self.config_file):
+            with open(self.config_file, "r") as f:
                 try:
-                    self.config.update(json.load(f))
+                    update_deep(self.config, json.load(f))
                 except:
                     print("config file must be in JSON format")
                     os._exit(1)
@@ -100,7 +115,7 @@ class BBcConfig:
 
     def update_config(self):
         try:
-            with open(os.path.join(self.working_dir, self.config_file), "w") as f:
+            with open(self.config_file, "w") as f:
                 json.dump(self.config, f, indent=4)
             return True
         except:

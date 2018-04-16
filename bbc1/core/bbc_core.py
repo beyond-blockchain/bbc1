@@ -32,13 +32,15 @@ import hashlib
 import binascii
 import traceback
 import json
+import copy
 
 import sys
 sys.path.extend(["../../"])
 from bbc1.common import bbclib, message_key_types, logger
 from bbc1.common.message_key_types import KeyType, to_2byte
 from bbc1.common.bbclib import BBcTransaction, MsgType
-from bbc1.core import bbc_network, user_message_routing, data_handler, query_management, bbc_stats
+from bbc1.core import bbc_network, user_message_routing, data_handler, repair_manager
+from bbc1.core import domain0_manager, query_management, bbc_stats
 from bbc1.core.bbc_config import BBcConfig
 from bbc1.core.data_handler import InfraMessageCategory
 from bbc1.core import command
@@ -51,6 +53,8 @@ POOL_SIZE = 1000
 DURATION_GIVEUP_GET = 10
 GET_RETRY_COUNT = 3
 INTERVAL_RETRY = 3
+DEFAULT_ANYCAST_TTL = 5
+TX_TRAVERSAL_MAX = 30
 
 ticker = query_management.get_ticker()
 core_service = None
@@ -85,6 +89,29 @@ def check_transaction_if_having_asset_file(txdata, asid):
     return False
 
 
+def create_search_result(txobj_dict, asset_files_dict):
+    response_info = dict()
+    for txid, txobj in txobj_dict.items():
+        if txid != txobj.transaction_id:
+            response_info.setdefault(KeyType.compromised_transactions, list()).append(txobj.transaction_data)
+            continue
+        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asset_files_dict)
+        if txobj_is_valid:
+            response_info.setdefault(KeyType.transactions, list()).append(txobj.transaction_data)
+        else:
+            response_info.setdefault(KeyType.compromised_transactions, list()).append(txobj.transaction_data)
+
+        if len(valid_assets) > 0:
+            response_info.setdefault(KeyType.all_asset_files, dict())
+            for asid in valid_assets:
+                response_info[KeyType.all_asset_files][asid] = asset_files_dict[asid]
+        if len(invalid_assets) > 0:
+            response_info.setdefault(KeyType.compromised_asset_files, dict())
+            for asid in invalid_assets:
+                response_info[KeyType.compromised_asset_files][asid] = asset_files_dict[asid]
+    return response_info
+
+
 class BBcCoreService:
     def __init__(self, p2p_port=None, core_port=None, use_domain0=False, ip4addr=None, ip6addr=None,
                  workingdir=".bbc1", configfile=None, use_nodekey=False, use_ledger_subsystem=False,
@@ -103,7 +130,6 @@ class BBcCoreService:
         self.logger.debug("config = %s" % conf)
         self.test_tx_obj = BBcTransaction()
         self.insert_notification_user_list = dict()
-        self.cross_ref_list = []
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port,
                                                  external_ip4addr=ip4addr, external_ip6addr=ip6addr,
                                                  loglevel=loglevel, logname=logname)
@@ -148,7 +174,7 @@ class BBcCoreService:
         msg[KeyType.reason] = txt
         domain_id = msg[KeyType.domain_id]
         if domain_id in self.networking.domains:
-            self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER].send_message_to_user(msg)
+            self.networking.domains[domain_id]['user'].send_message_to_user(msg)
             return True
         else:
             return False
@@ -186,7 +212,7 @@ class BBcCoreService:
             traceback.print_exc()
         self.logger.debug("closing socket")
         if user_info is not None:
-            self.networking.domains[user_info[0]][InfraMessageCategory.CATEGORY_USER].unregister_user(user_info[1],
+            self.networking.domains[user_info[0]]['user'].unregister_user(user_info[1],
                                                                                                       socket)
         try:
             socket.shutdown(py_socket.SHUT_RDWR)
@@ -275,9 +301,9 @@ class BBcCoreService:
         umr = None
         if domain_id is not None:
             if domain_id in self.networking.domains:
-                umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+                umr = self.networking.domains[domain_id]['user']
             else:
-                umr = user_message_routing.UserMessageRoutingDummy(network=self.networking, domain_id=domain_id)
+                umr = user_message_routing.UserMessageRoutingDummy(networking=self.networking, domain_id=domain_id)
 
         cmd = dat[KeyType.command]
         if cmd == MsgType.REQUEST_SEARCH_TRANSACTION:
@@ -290,9 +316,11 @@ class BBcCoreService:
             if txinfo is None:
                 if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
                     user_message_routing.direct_send_to_user(socket, retmsg)
-            else:
-                retmsg.update(txinfo)
-                umr.send_message_to_user(retmsg)
+                return False, None
+            if KeyType.compromised_transaction_data in txinfo or KeyType.compromised_asset_files in txinfo:
+                retmsg[KeyType.status] = EBADTRANSACTION
+            retmsg.update(txinfo)
+            umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_SEARCH_WITH_CONDITIONS:
             if not self.param_check([KeyType.domain_id], dat):
@@ -305,44 +333,31 @@ class BBcCoreService:
                                                             asset_id=dat.get(KeyType.asset_id, None),
                                                             user_id=dat.get(KeyType.user_id, None),
                                                             count=dat.get(KeyType.count, 1))
-            if txinfo is None:
+            if txinfo is None or KeyType.transactions not in txinfo:
                 if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
                     user_message_routing.direct_send_to_user(socket, retmsg)
             else:
                 retmsg.update(txinfo)
                 umr.send_message_to_user(retmsg)
 
-        # --- TODO: will be obsoleted in v0.10
-        elif cmd == MsgType.REQUEST_SEARCH_USERID:
-            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.user_id], dat):
-                self.logger.debug("REQUEST_SEARCH_USERID: bad format")
+        elif cmd == MsgType.REQUEST_TRAVERSE_TRANSACTIONS:
+            if not self.param_check([KeyType.domain_id, KeyType.transaction_id,
+                                     KeyType.direction, KeyType.hop_count], dat):
+                self.logger.debug("REQUEST_TRAVERSE_TRANSACTIONS: bad format")
                 return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_SEARCH_USERID,
+            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_TRAVERSE_TRANSACTIONS,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
-            txinfo = self.search_transaction_with_condition(domain_id, asset_group_id=dat[KeyType.asset_group_id],
-                                                            user_id=dat[KeyType.user_id])
-            if txinfo is None:
+            retmsg[KeyType.transaction_id] = dat[KeyType.transaction_id]
+            all_included, txtree, asset_files = self.traverse_transactions(domain_id, dat[KeyType.transaction_id],
+                                                                           dat[KeyType.direction], dat[KeyType.hop_count])
+            if txtree is None or len(txtree) == 0:
                 if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
                     user_message_routing.direct_send_to_user(socket, retmsg)
             else:
-                retmsg.update(txinfo)
-                umr.send_message_to_user(retmsg)
-
-        # --- TODO: will be obsoleted in v0.10
-        elif cmd == MsgType.REQUEST_SEARCH_ASSET:
-            if not self.param_check([KeyType.domain_id, KeyType.asset_group_id, KeyType.asset_id], dat):
-                self.logger.debug("REQUEST_SEARCH_ASSET: bad format")
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_SEARCH_ASSET,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
-            retmsg[KeyType.asset_group_id] = dat[KeyType.asset_group_id]
-            txinfo = self.search_transaction_with_condition(domain_id, asset_group_id=dat[KeyType.asset_group_id],
-                                                            asset_id=dat[KeyType.asset_id])
-            if txinfo is None:
-                if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
-                    user_message_routing.direct_send_to_user(socket, retmsg)
-            else:
-                retmsg.update(txinfo)
+                retmsg[KeyType.transaction_tree] = txtree
+                retmsg[KeyType.all_included] = all_included
+                if len(asset_files) > 0:
+                    retmsg[KeyType.all_asset_files] = asset_files
                 umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_GATHER_SIGNATURE:
@@ -389,22 +404,31 @@ class BBcCoreService:
             retmsg[KeyType.source_user_id] = dat[KeyType.source_user_id]
             umr.send_message_to_user(retmsg)
 
-        elif cmd == MsgType.REQUEST_CROSS_REF:
-            if KeyType.count in dat:
-                num = dat[KeyType.count]
-            else:
-                num = 1
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_CROSS_REF,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
-            retmsg[KeyType.cross_refs] = self.pop_cross_refs(num=num)
-            umr.send_message_to_user(retmsg)
-
         elif cmd == MsgType.MESSAGE:
-            if not self.param_check([KeyType.domain_id, KeyType.source_user_id,
-                                     KeyType.destination_user_id], dat):
+            if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.destination_user_id], dat):
                 self.logger.debug("MESSAGE: bad format")
                 return False, None
+            if KeyType.is_anycast in dat:
+                dat[KeyType.anycast_ttl] = DEFAULT_ANYCAST_TTL
             umr.send_message_to_user(dat)
+
+        elif cmd == MsgType.REQUEST_CROSS_REF_VERIFY:
+            if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.transaction_id], dat):
+                self.logger.debug("REQUEST_CROSS_REF_VERIFY: bad format")
+                return False, None
+            dat[KeyType.command] = domain0_manager.Domain0Manager.REQUEST_VERIFY
+            self.networking.send_message_to_a_domain0_manager(domain_id, dat)
+
+        elif cmd == MsgType.REQUEST_CROSS_REF_LIST:
+            if not self.param_check([KeyType.domain_id, KeyType.source_user_id], dat):
+                self.logger.debug("REQUEST_CROSS_REF_LIST: bad format")
+                return False, None
+            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_CROSS_REF_LIST,
+                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            domain_list = self.networking.domains[domain_id]['data'].search_domain_having_cross_ref()
+            # domain_list = list of ["id", "transaction_id", "outer_domain_id", "txid_having_cross_ref"]
+            retmsg[KeyType.transaction_id_list] = [row[1] for row in domain_list]
+            umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_REGISTER_HASH_IN_SUBSYS:
             if not self.param_check([KeyType.transaction_id], dat):
@@ -438,7 +462,7 @@ class BBcCoreService:
             user_id = dat[KeyType.source_user_id]
             self.logger.debug("[%s] register_user: %s" % (binascii.b2a_hex(domain_id[:2]),
                                                           binascii.b2a_hex(user_id[:4])))
-            umr.register_user(user_id, socket)
+            umr.register_user(user_id, socket, on_multiple_nodes=dat.get(KeyType.on_multinodes, False))
             return False, (domain_id, user_id)
 
         elif cmd == MsgType.UNREGISTER:
@@ -458,11 +482,18 @@ class BBcCoreService:
                 return False, None
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_STATS,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
-            retmsg[KeyType.stats] = self.stats.get_stats()
+            retmsg[KeyType.stats] = copy.deepcopy(self.stats.get_stats())
             user_message_routing.direct_send_to_user(socket, retmsg)
 
-        # --- TODO: REQUEST_GET_PEERLIST will be obsoleted in v0.10
-        elif cmd == MsgType.REQUEST_GET_NEIGHBORLIST or cmd == MsgType.REQUEST_GET_PEERLIST:
+        elif cmd == MsgType.REQUEST_REPAIR:
+            if not self.param_check([KeyType.transaction_id], dat):
+                self.logger.debug("REQUEST_REPAIR: bad format")
+                return False, None
+            dat[KeyType.command] = repair_manager.RepairManager.REQUEST_REPAIR_TRANSACTION
+            self.networking.domains[domain_id]['repair'].put_message(dat)
+            return False, None
+
+        elif cmd == MsgType.REQUEST_GET_NEIGHBORLIST:
             if not self.networking.check_admin_signature(domain_id, dat):
                 self.logger.error("Illegal access to domain %s" % domain_id.hex())
                 return False, None
@@ -471,7 +502,7 @@ class BBcCoreService:
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             if domain_id in self.networking.domains:
                 retmsg[KeyType.domain_id] = domain_id
-                retmsg[KeyType.neighbor_list] = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].make_neighbor_list()
+                retmsg[KeyType.neighbor_list] = self.networking.domains[domain_id]['topology'].make_neighbor_list()
             else:
                 retmsg[KeyType.status] = False
                 retmsg[KeyType.reason] = "No such domain"
@@ -536,7 +567,7 @@ class BBcCoreService:
             retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_NODEID,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             data = bytearray()
-            data.extend(self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_TOPOLOGY].my_node_id)
+            data.extend(self.networking.domains[domain_id]['topology'].my_node_id)
             retmsg[KeyType.node_id] = bytes(data)
             user_message_routing.direct_send_to_user(socket, retmsg)
 
@@ -659,7 +690,7 @@ class BBcCoreService:
         self.insert_notification_user_list.setdefault(domain_id, dict())
         self.insert_notification_user_list[domain_id].setdefault(asset_group_id, set())
         self.insert_notification_user_list[domain_id][asset_group_id].add(user_id)
-        umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+        umr = self.networking.domains[domain_id]['user']
         umr.send_multicast_join(asset_group_id, permanent=True)
 
     def remove_from_notification_list(self, domain_id, asset_group_id, user_id):
@@ -683,7 +714,7 @@ class BBcCoreService:
         self.insert_notification_user_list[domain_id][asset_group_id].remove(user_id)
         if len(self.insert_notification_user_list[domain_id][asset_group_id]) == 0:
             self.insert_notification_user_list[domain_id].pop(asset_group_id, None)
-            umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+            umr = self.networking.domains[domain_id]['user']
             umr.send_multicast_leave(asset_group_id)
         if len(self.insert_notification_user_list[domain_id]) == 0:
             self.insert_notification_user_list.pop(domain_id, None)
@@ -695,47 +726,25 @@ class BBcCoreService:
         :param txid:          transaction_id
         :param txdata:        BBcTransaction data
         :param asset_files:   dictionary of { asid=>asset_content,,, }
+        :rtype: BBcTransaction or None
         """
         txobj = BBcTransaction()
         if not txobj.deserialize(txdata):
             self.stats.update_stats_increment("transaction", "invalid", 1)
             self.logger.error("Fail to deserialize transaction data")
             return None
-        digest = txobj.digest()
+        txobj.digest()
 
-        for i, sig in enumerate(txobj.signatures):
-            try:
-                if not sig.verify(digest):
-                    self.stats.update_stats_increment("transaction", "invalid", 1)
-                    self.logger.error("Bad signature [%i]" % i)
-                    return None
-            except:
-                self.stats.update_stats_increment("transaction", "invalid", 1)
-                self.logger.error("Bad signature [%i]" % i)
-                return None
-        if asset_files is None:
+        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asset_files)
+        if not txobj_is_valid:
+            self.stats.update_stats_increment("transaction", "invalid", 1)
+        if len(invalid_assets) > 0:
+            self.stats.update_stats_increment("asset_file", "invalid", 1)
+
+        if txobj_is_valid and len(invalid_assets) == 0:
             return txobj
-
-        # -- if asset_files is given, check them.
-        for idx, evt in enumerate(txobj.events):
-            if evt.asset is None:
-                continue
-            asid = evt.asset.asset_id
-            if asid in asset_files.keys():
-                if evt.asset.asset_file_digest != hashlib.sha256(asset_files[asid]).digest():
-                    self.stats.update_stats_increment("transaction", "invalid", 1)
-                    self.logger.error("Bad asset_id for event[%d]" % idx)
-                    return None
-        for idx, rtn in enumerate(txobj.relations):
-            if rtn.asset is None:
-                continue
-            asid = rtn.asset.asset_id
-            if asid in asset_files.keys():
-                if rtn.asset.asset_file_digest != hashlib.sha256(asset_files[asid]).digest():
-                    self.stats.update_stats_increment("transaction", "invalid", 1)
-                    self.logger.error("Bad asset_id for event[%d]" % idx)
-                    return None
-        return txobj
+        else:
+            return None
 
     def insert_transaction(self, domain_id, txdata, asset_files):
         """
@@ -744,6 +753,7 @@ class BBcCoreService:
         :param domain_id:     domain_id where the transaction is inserted
         :param txdata:        BBcTransaction data
         :param asset_files:   dictionary of { asid=>asset_content,,, }
+        :rtype: **result or str
         """
         self.stats.update_stats_increment("transaction", "insert_count", 1)
         if domain_id is None:
@@ -762,8 +772,8 @@ class BBcCoreService:
         self.logger.debug("[node:%s] insert_transaction %s" %
                           (self.networking.domains[domain_id]['name'], binascii.b2a_hex(txobj.transaction_id[:4])))
 
-        asset_group_ids = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA].insert_transaction(
-                                txdata, txobj=txobj, asset_files=asset_files)
+        asset_group_ids = self.networking.domains[domain_id]['data'].insert_transaction(txdata, txobj=txobj,
+                                                                                        asset_files=asset_files)
         if asset_group_ids is None:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("[%s] Fail to insert a transaction into the ledger" % self.networking.domains[domain_id]['name'])
@@ -782,7 +792,7 @@ class BBcCoreService:
         :param only_registered_user:  If True, notification is not sent to other nodes
         :return:
         """
-        umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+        umr = self.networking.domains[domain_id]['user']
         destination_users = set()
         destination_nodes = set()
         for asset_group_id in asset_group_ids:
@@ -820,12 +830,13 @@ class BBcCoreService:
 
         :param domain_id:
         :param dat:
+        :rtype: bool
         :return:
         """
         destinations = dat[KeyType.destination_user_ids]
         msg = make_message_structure(domain_id, MsgType.REQUEST_SIGNATURE, None, dat[KeyType.query_id])
         msg[KeyType.source_user_id] = dat[KeyType.source_user_id]
-        umr = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+        umr = self.networking.domains[domain_id]['user']
         for dst in destinations:
             if dst == dat[KeyType.source_user_id]:
                 continue
@@ -846,7 +857,8 @@ class BBcCoreService:
 
         :param domain_id:        domain_id where the transaction is inserted
         :param txid:  transaction_id
-        :return: transaction_data and asset_files
+        :rtype: **response_info
+        :return: {transaction_id, transaction_data, asset_files}
         """
         self.stats.update_stats_increment("transaction", "search_count", 1)
         if domain_id is None:
@@ -856,16 +868,19 @@ class BBcCoreService:
             self.logger.error("Transaction_id must not be None")
             return None
 
-        dh = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
+        dh = self.networking.domains[domain_id]['data']
         ret_txobj, ret_asset_files = dh.search_transaction(transaction_id=txid)
         if ret_txobj is None or len(ret_txobj) == 0:
             return None
 
-        response_info = dict()
-        response_info[KeyType.transaction_data] = ret_txobj[0].transaction_data
+        response_info = create_search_result(ret_txobj, ret_asset_files)
         response_info[KeyType.transaction_id] = txid
-        if len(ret_asset_files) > 0:
-            response_info[KeyType.all_asset_files] = ret_asset_files
+        if KeyType.transactions in response_info:
+            response_info[KeyType.transaction_data] = response_info[KeyType.transactions][0]
+            del response_info[KeyType.transactions]
+        elif KeyType.compromised_transactions in response_info:
+            response_info[KeyType.compromised_transaction_data] = response_info[KeyType.compromised_transactions][0]
+            del response_info[KeyType.compromised_transactions]
         return response_info
 
     def search_transaction_with_condition(self, domain_id, asset_group_id=None, asset_id=None, user_id=None, count=1):
@@ -875,46 +890,100 @@ class BBcCoreService:
         :param asset_group_id:
         :param asset_group_id:
         :param user_id:
-        :return: response data including transaction_data, if a transaction is not found in the local DB, None is returned.
+        :rtype: **response_info
+        :return: {transactions, all_asset_files, compromised_transactions, compromised_asset, compromised_asset_files}
         """
         if domain_id is None:
             self.logger.error("No such domain")
             return None
 
-        dh = self.networking.domains[domain_id][InfraMessageCategory.CATEGORY_DATA]
-        ret_txobj, ret_asset_files = dh.search_transaction(asset_group_id=asset_group_id, asset_id=asset_id,
-                                                           user_id=user_id, count=count)
+        dh = self.networking.domains[domain_id]['data']
+        ret_txobj, ret_asset_files = dh.search_transaction(asset_group_id=asset_group_id,
+                                                           asset_id=asset_id, user_id=user_id, count=count)
         if ret_txobj is None or len(ret_txobj) == 0:
             return None
 
-        response_info = dict()
-        response_info[KeyType.transactions] = [t.transaction_data for t in ret_txobj]
-        if len(ret_asset_files) > 0:
-            response_info[KeyType.all_asset_files] = ret_asset_files
-        return response_info
+        return create_search_result(ret_txobj, ret_asset_files)
 
-    def add_cross_ref_into_list(self, domain_id, txid):
+    def traverse_transactions(self, domain_id, transaction_id, direction=1, hop_count=3):
         """
-        (internal use) register cross_ref info in the list
-
+        Get transaction tree from a base txid
         :param domain_id:
-        :param txid:
+        :param transaction_id:
+        :param direction: 1:backward, non-1:forward
+        :param hop_count:
         :return:
         """
-        self.stats.update_stats_increment("cross_ref", "total_num", 1)
-        self.cross_ref_list.append([domain_id, txid])
+        self.stats.update_stats_increment("transaction", "search_count", 1)
+        if domain_id is None:
+            self.logger.error("No such domain")
+            return None
+        if transaction_id is None:
+            self.logger.error("Transaction_id must not be None")
+            return None
 
-    def pop_cross_refs(self, num=1):
+        dh = self.networking.domains[domain_id]['data']
+        txtree = list()
+        asset_files = dict()
+
+        traverse_to_past = True if direction == 1 else False
+        tx_count = 0
+        txids = dict()
+        current_txids = [transaction_id]
+        include_all_flag = True
+        if hop_count > TX_TRAVERSAL_MAX * 2:
+            hop_count = TX_TRAVERSAL_MAX * 2
+            include_all_flag = False
+        for i in range(hop_count):
+            tx_brothers = list()
+            next_txids = list()
+            #print("### txcount=%d, len(current_txids)=%d" % (tx_count, len(current_txids)))
+            if tx_count + len(current_txids) > TX_TRAVERSAL_MAX:  # up to 30 entries
+                include_all_flag = False
+                break
+            #print("[%d] current_txids:%s" % (i, [d.hex() for d in current_txids]))
+            for txid in current_txids:
+                if txid in txids:
+                    continue
+                tx_count += 1
+                txids[txid] = True
+                ret_txobj, ret_asset_files = dh.search_transaction(transaction_id=txid)
+                if ret_txobj is None or len(ret_txobj) == 0:
+                    continue
+                tx_brothers.append(ret_txobj[txid].transaction_data)
+                if len(ret_asset_files) > 0:
+                    asset_files.update(ret_asset_files)
+
+                ret = dh.search_transaction_topology(transaction_id=txid, traverse_to_past=traverse_to_past)
+                #print("txid=%s: (%d) ret=%s" % (txid.hex(), len(ret), ret))
+                if ret is not None:
+                    for topology in ret:
+                        if traverse_to_past:
+                            next_txid = topology[2]
+                        else:
+                            next_txid = topology[1]
+                        if next_txid not in txids:
+                            next_txids.append(next_txid)
+            if len(tx_brothers) > 0:
+                txtree.append(tx_brothers)
+            current_txids = next_txids
+
+        return include_all_flag, txtree, asset_files
+
+    def pop_cross_refs(self, domain_id, num=1):
         """
         Return TxIDs for cross_refs
-
+        :param domain_id:
         :param num: The number of set of (txid, domain_id) to return
         :return:
         """
         refs = []
+        if domain_id is None:
+            self.logger.error("No such domain")
+            return refs
         for i in range(num):
-            if len(self.cross_ref_list) > 0:
-                refs.append(self.cross_ref_list.pop(0))
+            if len(self.networking.domains[domain_id]['data'].cross_ref_list) > 0:
+                refs.append(self.networking.domains[domain_id]['user'].cross_ref_list.pop(0))
                 self.stats.update_stats_decrement("cross_ref", "total_num", 1)
             else:
                 break

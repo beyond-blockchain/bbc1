@@ -29,7 +29,7 @@ import sys
 sys.path.append("../../")
 
 from bbc1.common import bbclib, message_key_types
-from bbc1.common.bbclib import MsgType, StorageType
+from bbc1.common.bbclib import MsgType
 from bbc1.common.message_key_types import KeyType, PayloadType
 from bbc1.common.bbc_error import *
 from bbc1.common import logger
@@ -153,7 +153,7 @@ class BBcAppClient:
         self.logger = logger.get_logger(key="bbc_app", level=loglevel, logname=logname)
         self.connection = socket.create_connection((host, port))
         self.callback = Callback(log=self.logger)
-        self.set_client = self
+        self.callback.set_client(self)
         self.domain_keypair = None
         self.default_node_keypair = None
         self.use_query_id_based_message_wait = False
@@ -163,6 +163,7 @@ class BBcAppClient:
         self.privatekey_for_ecdh = None
         self.aes_key_name = None
         self.is_secure_connection = False
+        self.cross_ref_list = list()
         self.start_receiver_loop()
 
     def set_callback(self, callback_obj):
@@ -345,18 +346,6 @@ class BBcAppClient:
         self.include_admin_info(dat, admin_info, self.domain_keypair)
         return self.send_msg(dat)
 
-    def get_domain_peerlist(self, domain_id):
-        """
-        TODO: will be obsoleted in v0.10
-        Get peer list of the domain from the core node (maybe used by a system administrator)
-
-        :param domain_id:
-        :return:
-        """
-        dat = self.make_message_structure(MsgType.REQUEST_GET_PEERLIST)
-        dat[KeyType.domain_id] = domain_id
-        return self.send_msg(dat)
-
     def set_domain_static_node(self, domain_id, node_id, ipv4, ipv6, port):
         """
         Set static node to the core node (maybe used by a system administrator)
@@ -482,13 +471,15 @@ class BBcAppClient:
         self.include_admin_info(dat, admin_info, self.domain_keypair)
         return self.send_msg(dat)
 
-    def register_to_core(self):
+    def register_to_core(self, on_multiple_nodes=False):
         """
         Register the client (user_id) to the core node. After that, the client can communicate with the core node
-
+        :param on_multiple_nodes:
         :return:
         """
         dat = self.make_message_structure(MsgType.REGISTER)
+        if on_multiple_nodes:
+            dat[KeyType.on_multinodes] = True
         self.send_msg(dat)
         return True
 
@@ -527,19 +518,7 @@ class BBcAppClient:
         dat[KeyType.asset_group_id] = asset_group_id
         return self.send_msg(dat)
 
-    def get_cross_refs(self, asset_group_id=None, number=1):
-        """
-        Get cross_refs
-
-        :param asset_group_id:  TODO: will be obsoleted in v0.10
-        :param number:
-        :return:
-        """
-        dat = self.make_message_structure(MsgType.REQUEST_CROSS_REF)
-        dat[KeyType.count] = number
-        return self.send_msg(dat)
-
-    def gather_signatures(self, tx_obj, reference_obj=None, destinations=None, asset_files=None):
+    def gather_signatures(self, tx_obj, reference_obj=None, destinations=None, asset_files=None, anycast=False):
         """
         Request to gather signatures from the specified user_ids
 
@@ -547,12 +526,16 @@ class BBcAppClient:
         :param reference_obj: BBcReference object
         :param destinations: list of destination user_ids
         :param asset_files: dictionary of {asset_id: file_content}
+        :param anycast: True if this message is for anycasting
         :return:
         """
         if reference_obj is None and destinations is None:
             return False
         dat = self.make_message_structure(MsgType.REQUEST_GATHER_SIGNATURE)
         dat[KeyType.transaction_data] = tx_obj.serialize()
+        dat[KeyType.transaction_id] = tx_obj.transaction_id
+        if anycast:
+            dat[KeyType.is_anycast] = True
         if reference_obj is not None:
             dat[KeyType.destination_user_ids] = reference_obj.get_destinations()
             referred_transactions = dict()
@@ -565,11 +548,12 @@ class BBcAppClient:
             dat[KeyType.all_asset_files] = asset_files
         return self.send_msg(dat)
 
-    def sendback_signature(self, dst, ref_index, sig, query_id=None):
+    def sendback_signature(self, dst, transaction_id, ref_index, sig, query_id=None):
         """
         Send back the signed transaction to the source
 
         :param dst:
+        :param transaction_id:
         :param ref_index: Which reference in transaction the signature is for
         :param sig:
         :param query_id:
@@ -577,23 +561,26 @@ class BBcAppClient:
         """
         dat = self.make_message_structure(MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dst
+        dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.ref_index] = ref_index
         dat[KeyType.signature] = sig.serialize()
         if query_id is not None:
             dat[KeyType.query_id] = query_id
         return self.send_msg(dat)
 
-    def sendback_denial_of_sign(self, dst, reason_text, query_id=None):
+    def sendback_denial_of_sign(self, dst, transaction_id, reason_text, query_id=None):
         """
         Send back the denial of sign the transaction
 
         :param dst:
+        :param transaction_id:
         :param reason_text:
         :param query_id:
         :return:
         """
         dat = self.make_message_structure(MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dst
+        dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.status] = EOTHER
         dat[KeyType.reason] = reason_text
         if query_id is not None:
@@ -641,20 +628,6 @@ class BBcAppClient:
         dat[KeyType.count] = count
         return self.send_msg(dat)
 
-    def search_asset(self, asset_group_id, asset_id):
-        """
-        TODO: will be obsoleted in v0.10
-        Search request for the specified asset. This would return transaction_data (and asset_file file content)
-
-        :param asset_group_id:
-        :param asset_id:
-        :return:
-        """
-        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_WITH_CONDITIONS)
-        dat[KeyType.asset_group_id] = asset_group_id
-        dat[KeyType.asset_id] = asset_id
-        return self.send_msg(dat)
-
     def search_transaction(self, transaction_id):
         """
         Search request for transaction_data
@@ -666,17 +639,48 @@ class BBcAppClient:
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
-    def search_transaction_by_userid(self, asset_group_id, user_id):
+    def traverse_transactions(self, transaction_id, direction=1, hop_count=3):
         """
-        Search request for transaction_data by user_id
-        TODO: will be obsoleted in v0.10
-        :param asset_group_id:
-        :param user_id: user_id of the asset owner
-        :return: The transaction_data that includes asset with the specified user_id
+        Search request for transaction_data
+
+        :param transaction_id:
+        :param direction: 1:backforward, non-1:forward
+        :param hop_count:
+        :return:
         """
-        dat = self.make_message_structure(MsgType.REQUEST_SEARCH_WITH_CONDITIONS)
-        dat[KeyType.asset_group_id] = asset_group_id
-        dat[KeyType.user_id] = user_id
+        dat = self.make_message_structure(MsgType.REQUEST_TRAVERSE_TRANSACTIONS)
+        dat[KeyType.transaction_id] = transaction_id
+        dat[KeyType.direction] = direction
+        dat[KeyType.hop_count] = hop_count
+        return self.send_msg(dat)
+
+    def request_to_repair_transaction(self, transaction_id):
+        """
+        Request to repair compromised transaction data
+        :param transaction_id:
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_REPAIR)
+        dat[KeyType.transaction_id] = transaction_id
+        return self.send_msg(dat)
+
+    def request_verify_by_cross_ref(self, transaction_id):
+        """
+        Request to verify the transaction by Cross_ref in transaction of outer domain
+        :param transaction_id:
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_CROSS_REF_VERIFY)
+        dat[KeyType.transaction_id] = transaction_id
+        return self.send_msg(dat)
+
+    def request_cross_ref_holders_list(self):
+        """
+        Request the list of transaction_ids that are registered as cross_ref in outer domains
+        :return:
+        """
+        dat = self.make_message_structure(MsgType.REQUEST_CROSS_REF_LIST)
+        # TODO: need to limit the number of entries??
         return self.send_msg(dat)
 
     def register_in_ledger_subsystem(self, asset_group_id, transaction_id):
@@ -717,17 +721,20 @@ class BBcAppClient:
         self.include_admin_info(dat, admin_info, self.default_node_keypair)
         return self.send_msg(dat)
 
-    def send_message(self, msg, dst_user_id):
+    def send_message(self, msg, dst_user_id, is_anycast=False):
         """
         Send peer-to-peer message to the specified user_id
 
         :param msg:
         :param dst_user_id:
+        :param is_anycast:
         :return:
         """
         dat = self.make_message_structure(MsgType.MESSAGE)
         dat[KeyType.destination_user_id] = dst_user_id
         dat[KeyType.message] = msg
+        if is_anycast:
+            dat[KeyType.is_anycast] = True
         return self.send_msg(dat)
 
     def start_receiver_loop(self):
@@ -751,6 +758,15 @@ class BBcAppClient:
             self.logger.info("TCP disconnect: %s" % e)
             print(traceback.format_exc())
         self.connection.close()
+
+    def include_cross_ref(self, txobj):
+        """
+        Include BBcCrossRef if cross_ref has been assigned to the client from other domains
+        :param txobj:
+        :return:
+        """
+        if len(self.cross_ref_list) > 0:
+            txobj.add(cross_ref=self.cross_ref_list.pop(0))
 
 
 class Callback:
@@ -788,10 +804,8 @@ class Callback:
             self.proc_resp_search_transaction(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_WITH_CONDITIONS:
             self.proc_resp_search_with_condition(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_ASSET:  # TODO: will be obsoleted in v0.10
-            self.proc_resp_search_with_condition(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_USERID: # TODO: will be obsoleted in v0.10
-            self.proc_resp_search_with_condition(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_TRAVERSE_TRANSACTIONS:
+            self.proc_resp_travarse_transactions(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GATHER_SIGNATURE:
             self.proc_resp_gather_signature(dat)
         elif dat[KeyType.command] == MsgType.REQUEST_SIGNATURE:
@@ -802,18 +816,20 @@ class Callback:
             self.proc_resp_insert(dat)
         elif dat[KeyType.command] == MsgType.NOTIFY_INSERTED:
             self.proc_notify_inserted(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_CROSS_REF:
-            self.proc_resp_cross_ref(dat)
+        elif dat[KeyType.command] == MsgType.NOTIFY_CROSS_REF:
+            self.proc_notify_cross_ref(dat)
         elif dat[KeyType.command] == MsgType.MESSAGE:
             self.proc_user_message(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_CROSS_REF_VERIFY:
+            self.proc_resp_verify_cross_ref(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_CROSS_REF_LIST:
+            self.proc_resp_cross_ref_list(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_REGISTER_HASH_IN_SUBSYS:
             self.proc_resp_register_hash(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS:
             self.proc_resp_verify_hash(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GET_STATS:
             self.proc_resp_get_stats(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_GET_PEERLIST: # TODO: will be obsoleted in v0.10
-            self.proc_resp_get_neighborlist(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GET_NEIGHBORLIST:
             self.proc_resp_get_neighborlist(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GET_DOMAINLIST:
@@ -838,6 +854,8 @@ class Callback:
             self.proc_resp_domain_close(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_ECDH_KEY_EXCHANGE:
             self.proc_resp_ecdh_key_exchange(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_REPAIR:
+            self.proc_resp_repair(dat)
         else:
             self.logger.warn("No method to process for command=%d" % dat[KeyType.command])
 
@@ -868,12 +886,9 @@ class Callback:
         except:
             return None
 
-    def proc_resp_cross_ref(self, dat):
-        cross_refs = []
-        for cross_ref in dat[KeyType.cross_refs]:
-            cross = bbclib.BBcCrossRef(cross_ref[0], cross_ref[1])
-            cross_refs.append(cross)
-        self.queue.put(cross_refs)
+    def proc_notify_cross_ref(self, dat):
+        cross_ref = bbclib.BBcCrossRef(dat[KeyType.cross_ref][0], dat[KeyType.cross_ref][1])
+        self.client.cross_ref_list.append(cross_ref)
 
     def proc_cmd_sign_request(self, dat):
         self.queue.put(dat)
@@ -898,18 +913,18 @@ class Callback:
         self.queue.put(dat)
 
     def proc_resp_search_transaction(self, dat):
-        if KeyType.transaction_data in dat:
-            tx_obj = bbclib.recover_transaction_object_from_rawdata(dat[KeyType.transaction_data])
-            tx_obj.digest()
-            digest = tx_obj.digest()
-            for i in range(len(tx_obj.signatures)):
-                result = tx_obj.signatures[i].verify(digest)
-                if not result:
-                    dat = {KeyType.status: EBADTXSIGNATURE, KeyType.reason: "Verify failure", KeyType.transaction_data: tx_obj}
-                    break
+        self.queue.put(dat)
+
+    def proc_resp_travarse_transactions(self, dat):
         self.queue.put(dat)
 
     def proc_user_message(self, dat):
+        self.queue.put(dat)
+
+    def proc_resp_verify_cross_ref(self, dat):
+        self.queue.put(dat)
+
+    def proc_resp_cross_ref_list(self, dat):
         self.queue.put(dat)
 
     def proc_resp_ledger_subsystem(self, dat):
@@ -947,13 +962,14 @@ class Callback:
         results = []
         count = int.from_bytes(neighbor_list[:4], 'big')
         for i in range(count):
-            base = 4 + i*(32+4+16+2+8)
+            base = 4 + i*(32+4+16+2+1+8)
             node_id = neighbor_list[base:base+32]
             ipv4 = socket.inet_ntop(socket.AF_INET, neighbor_list[base + 32:base + 36])
             ipv6 = socket.inet_ntop(socket.AF_INET6, neighbor_list[base + 36:base + 52])
             port = socket.ntohs(int.from_bytes(neighbor_list[base + 52:base + 54], 'big'))
-            updated_at = neighbor_list[base+54:base+62]
-            results.append([node_id, ipv4, ipv6, port])
+            domain0 = True if neighbor_list[base + 54] == 0x01 else False
+            updated_at = neighbor_list[base+55:base+63]
+            results.append([node_id, ipv4, ipv6, port, domain0])
         self.queue.put(results)
 
     def proc_resp_get_domainlist(self, dat):
@@ -1005,4 +1021,7 @@ class Callback:
                                                          dat[KeyType.ecdh], dat[KeyType.random])
         message_key_types.set_cipher(shared_key, dat[KeyType.nonce], self.client.aes_key_name, dat[KeyType.hint])
         self.client.is_secure_connection = False
+        self.queue.put(True)
+
+    def proc_resp_repair(self, dat):
         self.queue.put(True)

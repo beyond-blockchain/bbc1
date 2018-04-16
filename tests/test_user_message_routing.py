@@ -21,7 +21,6 @@ sys.path.extend(["../"])
 from bbc1.common import bbclib, message_key_types
 from bbc1.common.message_key_types import KeyType
 from bbc1.core import bbc_network, user_message_routing, bbc_config, query_management, bbc_stats
-from bbc1.core.bbc_types import InfraMessageCategory
 
 
 LOGLEVEL = 'debug'
@@ -117,7 +116,7 @@ class TestBBcNetwork(object):
             networkings[i] = bbc_network.BBcNetwork(core=dummy_cores[i], config=config, p2p_port=6641+i, loglevel=LOGLEVEL)
             dummy_cores[i].networking = networkings[i]
             networkings[i].create_domain(domain_id=domain_id)
-            user_routings[i] = networkings[i].domains[domain_id][InfraMessageCategory.CATEGORY_USER]
+            user_routings[i] = networkings[i].domains[domain_id]['user']
             nodes[i] = networkings[i].domains[domain_id]['neighbor'].my_node_id
             assert nodes[i] is not None
             assert networkings[i].ip_address != ''

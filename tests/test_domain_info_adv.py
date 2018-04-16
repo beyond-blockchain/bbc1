@@ -92,7 +92,7 @@ class TestBBcAppClient(object):
             clients[base_client_index]['app'].get_domain_neighborlist(domain_id=domain_ids[i])
             dat = msg_processor[base_client_index].synchronize()
             print("[%d] nodeinfo = %s" % (i * core_per_domain, dat[0]))
-            node_id, ipv4, ipv6, port = dat[0]
+            node_id, ipv4, ipv6, port, domain0 = dat[0]
             for j in range(core_per_domain):
                 c_index = base_client_index + j * client_per_core
                 clients[c_index]['app'].send_domain_ping(domain_ids[i], ipv4, ipv6, port)
@@ -131,6 +131,7 @@ class TestBBcAppClient(object):
             dm = cores[i].networking.domain0manager.domain_list
             show_domain_list(dm)
         print("-- sleep 10 sec")
+
         time.sleep(10)
         for i in range(core_num):
             print("****** [%d] %s ******" % (i, cores[i].networking.domain0manager.my_node_id.hex()))
@@ -193,7 +194,6 @@ class TestBBcAppClient(object):
             dm = cores[i].networking.domain0manager.domain_list
             show_domain_list(dm)
 
-    """
     def test_16_wait(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         print("-- sleep 10 sec")
@@ -209,7 +209,7 @@ class TestBBcAppClient(object):
             dm = cores[i].networking.domain0manager.domain_list
             show_domain_list(dm)
             for d in core_domains:
-                assert len(dm[d]) == 0
+                assert d not in dm or len(dm[d]) == 0
 
     def test_98_unregister(self):
         for cl in clients:
@@ -220,7 +220,6 @@ class TestBBcAppClient(object):
         for core in cores:
             core.networking.save_all_static_node_list()
             core.config.update_config()
-    """
 
 
 if __name__ == '__main__':
