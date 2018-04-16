@@ -59,11 +59,15 @@ def setup_bbc_client():
 
 def get_txid_from_asid(asset_group, asid):
     bbc_app_client = setup_bbc_client()
-    ret = bbc_app_client.search_asset(asset_group, binascii.unhexlify(asid))
+    asid = binascii.unhexlify(asid)
+    ret = bbc_app_client.search_transaction_with_condition(asset_group_id, asid)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
+    if response_data[KeyType.status] < ESUCCESS:
+        print("ERROR: ", response_data[KeyType.reason].decode())
+        sys.exit(0)
     get_transaction = bbclib.BBcTransaction()
-    get_transaction.deserialize(response_data[KeyType.transaction_data])
+    get_transaction.deserialize(response_data[KeyType.transactions][0])
     transaction_id = get_transaction.transaction_id
     return transaction_id
 
@@ -87,15 +91,17 @@ def add_ref_tx(asset_group,transaction,ref_tx,ref_index):
     return transaction
 
 
-def get_data(asset_group,asid):
+def get_data(asset_group_id, asid):
     bbc_app_client = setup_bbc_client()
     asid = binascii.unhexlify(asid)
-    ret = bbc_app_client.search_asset(asset_group, asid)
+    ret = bbc_app_client.search_transaction_with_condition(asset_group_id, asid)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
-
+    if response_data[KeyType.status] < ESUCCESS:
+        print("ERROR: ", response_data[KeyType.reason].decode())
+        sys.exit(0)
     get_transaction = bbclib.BBcTransaction()
-    get_transaction.deserialize(response_data[KeyType.transaction_data])
+    get_transaction.deserialize(response_data[KeyType.transactions][0])
     retdata = get_transaction.events[0].asset.asset_body
     refdata = get_transaction.references
     return retdata
