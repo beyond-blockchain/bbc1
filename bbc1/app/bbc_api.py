@@ -103,6 +103,12 @@ def rpc_proccess(req):
             reslut = response_data[KeyType.reason].decode()
         else:
             result = bbclib.bin2str_base64(response_data[KeyType.transaction_id])
+    elif req["method"] == "bbc1_SendMessage":
+        source_id = binascii.a2b_base64(req["params"]["user_id"])
+        dist_id = binascii.a2b_base64(req["params"]["dst_user_id"])
+        msg = binascii.a2b_base64(req["params"]["msg"])
+        bbcapp = setup_bbc_client(source_id)
+        result =  bbclib.bin2str_base64(bbcapp.send_message(msg, dist_id))
     else:
         result = {"code": -32601,"message":"Method '"+req["method"]+"' not found"}
         return False, result

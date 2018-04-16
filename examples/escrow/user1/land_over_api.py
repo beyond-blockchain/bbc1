@@ -86,7 +86,8 @@ def store_proc(data, approver_id, txid=None):
     response = json_post(obj)
     print("TXID: %s" % response["result"])
     print("ASID: %s" % jsontx["Event"][0]["Asset"]["asset_id"])
-    return True
+    return response["result"]
+
 '''
 def store_proc(data, approver_id,txid=None):
     bbc_app_client = setup_bbc_client()
@@ -183,6 +184,22 @@ def registration(place):
     store_proc(data=jsondata, approver_id=user_id ,txid=None)
     print("Land registration is done!: %s" % jsondata)
 
+def send_message(dst_id, msg):
+    obj = {"jsonrpc": "2.0",
+           "method": "bbc1_SendMessage",
+           "params":{
+               "user_id": bbclib.bin2str_base64(user_id),
+               "dst_user_id": dst_id,
+               "msg": msg
+               },
+           "id": 114514
+          }
+    print(obj)
+    response = json_post(obj)
+    res = response["result"]
+    print(res)
+    return True
+
 def chown(new_owner,asid):
     prevtx = json.loads(get_landdata(asid))
     asset = json.loads(prevtx["Event"][0]["Asset"]["body"])
@@ -195,8 +212,8 @@ def chown(new_owner,asid):
 
     land = json.loads(get_landdata(asid))
     transaction_id = land["transaction_id"]
-    transaction_info = store_proc(data, approver_id=binascii.a2b_base64(new_owner), txid=transaction_id)
-
+    new_tx_id = store_proc(data, approver_id=binascii.a2b_base64(new_owner), txid=transaction_id)
+    send_message(new_owner, new_tx_id)
 
 if __name__ == '__main__':
     if(not os.path.exists(PRIVATE_KEY) and not os.path.exists(PUBLIC_KEY)):

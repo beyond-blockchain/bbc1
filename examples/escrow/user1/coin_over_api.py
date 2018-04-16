@@ -87,7 +87,7 @@ def store_proc(data, approver_id, txid=None):
     response = json_post(obj)
     print("TXID: %s" % response["result"])
     print("ASID: %s" % jsontx["Event"][0]["Asset"]["asset_id"])
-    return True
+    return response["result"]
 
 def json_post(obj):
     url = "http://localhost:3000"
@@ -113,6 +113,22 @@ def get_coindata(asid):
     response = json_post(obj)
     tx = response["result"]
     return tx
+
+def send_message(dst_id, msg):
+    obj = {"jsonrpc": "2.0",
+           "method": "bbc1_SendMessage",
+           "params":{
+               "user_id": bbclib.bin2str_base64(user_id),
+               "dst_user_id": dst_id,
+               "msg": msg
+               },
+           "id": 114514
+          }
+    print(obj)
+    response = json_post(obj)
+    res = response["result"]
+    print(res)
+    return True
 
 def create_keypair():
     keypair = bbclib.KeyPair()
@@ -141,7 +157,8 @@ def chown(new_owner, asid):
 
     coin = json.loads(get_coindata(asid))
     transaction_id = coin["transaction_id"]
-    transaction_info = store_proc(data, approver_id=binascii.a2b_base64(new_owner), txid=transaction_id)
+    new_tx_id = store_proc(data, approver_id=binascii.a2b_base64(new_owner), txid=transaction_id)
+    send_message(new_owner, new_tx_id)
 
 if __name__ == '__main__':
     if(not os.path.exists(PRIVATE_KEY) and not os.path.exists(PUBLIC_KEY)):
