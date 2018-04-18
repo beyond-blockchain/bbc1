@@ -18,10 +18,8 @@ import gevent
 from gevent import monkey
 monkey.patch_all()
 from gevent import socket
-import json
 import traceback
 import queue
-import binascii
 import hashlib
 import os
 
@@ -36,10 +34,10 @@ from bbc1.core.bbc_error import *
 
 DEFAULT_CORE_PORT = 9000
 DEFAULT_P2P_PORT = 6641
-MAPPING_FILE = ".bbc_id_mappings"
 
 MESSAGE_WITH_NO_RESPONSE = (MsgType.MESSAGE, MsgType.REGISTER, MsgType.UNREGISTER, MsgType.DOMAIN_PING,
-                            MsgType.REQUEST_INSERT_NOTIFICATION, MsgType.CANCEL_INSERT_NOTIFICATION)
+                            MsgType.REQUEST_INSERT_NOTIFICATION, MsgType.CANCEL_INSERT_NOTIFICATION,
+                            MsgType.REQUEST_REPAIR)
 
 
 def _parse_one_level_list(dat):
@@ -69,14 +67,14 @@ def _parse_two_level_dict(dat):
 
 
 class BBcAppClient:
-    def __init__(self, host='127.0.0.1', port=DEFAULT_CORE_PORT, logname="-", loglevel="none"):
+    def __init__(self, host='127.0.0.1', port=DEFAULT_CORE_PORT, multiq=True, logname="-", loglevel="none"):
         self.logger = logger.get_logger(key="bbc_app", level=loglevel, logname=logname)
         self.connection = socket.create_connection((host, port))
         self.callback = Callback(log=self.logger)
         self.callback.set_client(self)
         self.domain_keypair = None
         self.default_node_keypair = None
-        self.use_query_id_based_message_wait = False
+        self.use_query_id_based_message_wait = multiq
         self.user_id = None
         self.domain_id = None
         self.query_id = (0).to_bytes(2, 'little')
@@ -182,7 +180,6 @@ class BBcAppClient:
         """
         if KeyType.domain_id not in dat or KeyType.source_user_id not in dat:
             self.logger.warn("Message must include domain_id and source_id")
-            print(">>>>>1")
             return None
         try:
             if self.is_secure_connection:
@@ -192,7 +189,6 @@ class BBcAppClient:
             self.connection.sendall(msg)
         except Exception as e:
             self.logger.error(traceback.format_exc())
-            print(">>>>>2",traceback.format_exc())
             return None
         return self.query_id
 
@@ -714,8 +710,10 @@ class Callback:
     def create_queue(self, query_id):
         self.query_queue.setdefault(query_id, queue.Queue())
 
-    def destroy_queue(self, query_id):
-        self.query_queue.pop(query_id, None)
+    def get_from_queue(self, query_id, timeout=None):
+        msg = self.query_queue[query_id].get(timeout=timeout)
+        del self.query_queue[query_id]
+        return msg
 
     def dispatch(self, dat, payload_type):
         #self.logger.debug("Received: %s" % dat)
@@ -780,8 +778,6 @@ class Callback:
             self.proc_resp_domain_close(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_ECDH_KEY_EXCHANGE:
             self.proc_resp_ecdh_key_exchange(dat)
-        elif dat[KeyType.command] == MsgType.RESPONSE_REPAIR:
-            self.proc_resp_repair(dat)
         else:
             self.logger.warn("No method to process for command=%d" % dat[KeyType.command])
 
@@ -808,7 +804,7 @@ class Callback:
         try:
             if query_id not in self.query_queue:
                 self.create_queue(query_id)
-            return self.query_queue[query_id].get(timeout=timeout)
+            return self.get_from_queue(query_id, timeout=timeout)
         except:
             return None
 
@@ -947,7 +943,4 @@ class Callback:
                                                          dat[KeyType.ecdh], dat[KeyType.random])
         message_key_types.set_cipher(shared_key, dat[KeyType.nonce], self.client.aes_key_name, dat[KeyType.hint])
         self.client.is_secure_connection = False
-        self.queue.put(True)
-
-    def proc_resp_repair(self, dat):
         self.queue.put(True)

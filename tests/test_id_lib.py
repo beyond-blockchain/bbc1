@@ -14,7 +14,7 @@ from bbc1.core.bbc_config import DEFAULT_CORE_PORT
 def default_domain_id():
     domain_id = bbclib.get_new_id("test_id_lib", include_timestamp=False)
 
-    tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
+    tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, multiq=False, loglevel="all")
     tmpclient.domain_setup(domain_id, "simple_cluster")
     tmpclient.callback.synchronize()
     tmpclient.unregister_from_core()

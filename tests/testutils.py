@@ -58,8 +58,8 @@ def start_core(index, core_port, p2p_port, use_nodekey=False, use_domain0=False,
     cores[index]._start_server(port=core_port)
 
 
-def domain_setup_utility(core_port_increment, dom_id, network_module=None):
-    cl = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT + core_port_increment)
+def domain_setup_utility(core_port_increment, dom_id):
+    cl = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT + core_port_increment, multiq=False)
     cl.domain_setup(dom_id)
     global common_domain_id
     common_domain_id = dom_id
@@ -76,11 +76,13 @@ def make_client(index, core_port_increment, callback=None, connect_to_core=True,
         if domain_id is None:
             global common_domain_id
             domain_id = common_domain_id
-        clients[index]['app'] = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT + core_port_increment, loglevel=loglv)
+        clients[index]['app'] = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT + core_port_increment,
+                                                     multiq=False, loglevel=loglv)
         clients[index]['app'].set_user_id(clients[index]['user_id'])
         clients[index]['app'].set_domain_id(domain_id)
     if callback is not None:
         clients[index]['app'].set_callback(callback)
+    time.sleep(1)
     print("[%i] user_id = %s" % (index, binascii.b2a_hex(clients[index]['user_id'])))
 
 

@@ -36,7 +36,7 @@ large_data = b"aaaaaaaaaa" * 200
 
 
 def setup_bbc_client(port_increase=0, user_id=None):
-    bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT + port_increase, loglevel="all")
+    bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT + port_increase, multiq=False, loglevel="all")
     bbc_app_client.set_user_id(user_id)
     bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_callback(bbc_app.Callback())
