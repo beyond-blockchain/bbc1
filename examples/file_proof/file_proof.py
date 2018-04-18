@@ -66,7 +66,7 @@ def setup_bbc_client():
 
 def require_receiver_info_for(filename):
     print("Your name is [", user_name, "] and user_id is [", binascii.b2a_hex(user_id).decode(), "]")
-    print("Please enter the receiver user_id for file %s." % filename)
+    print("Please enter the receiver user name for file %s." % filename)
     receiver_name = input('>> ')
     receiver_user_id = bbclib.get_new_id(receiver_name, include_timestamp=False)
     return receiver_name, receiver_user_id
@@ -260,18 +260,19 @@ def get_file(file):
         sys.exit(1)
 
     bbc_app_client = setup_bbc_client()
-    ret = bbc_app_client.search_asset(asset_group_id, fileinfo["asset_id"])
+    ret = bbc_app_client.search_transaction_with_condition(asset_group_id,
+                                                           asset_id=fileinfo["asset_id"])
     assert ret
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
         print("ERROR: ", response_data[KeyType.reason].decode())
         sys.exit(0)
 
-    get_transaction = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
+    get_transaction = bbclib.BBcTransaction(deserialize=response_data[KeyType.transactions][0])
     if KeyType.all_asset_files in response_data:
-        asset_file_dict = response_data[KeyType.asset_file]
+        asset_files_dict = response_data[KeyType.all_asset_files]
         asset_id = get_transaction.events[0].asset.asset_id
-        data = asset_file_dict[asset_id]
+        data = asset_files_dict[asset_id]
     else:
         data = get_transaction.events[0].asset.asset_body
     out_file_name = file
@@ -319,14 +320,15 @@ def verify_file(file):
         sys.exit(1)
 
     bbc_app_client = setup_bbc_client()
-    ret = bbc_app_client.search_asset(asset_group_id, fileinfo["asset_id"])
+    ret = bbc_app_client.search_transaction_with_condition(asset_group_id,
+                                                           asset_id=fileinfo["asset_id"])
     assert ret
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
         print("ERROR: ", response_data[KeyType.reason].decode())
         sys.exit(0)
 
-    transaction = bbclib.recover_transaction_object_from_rawdata(response_data[KeyType.transaction_data])
+    transaction = bbclib.BBcTransaction(deserialize=response_data[KeyType.transactions][0])
     digest = transaction.digest()
     ret = transaction.signatures[0].verify(digest)
     if not ret:
