@@ -33,7 +33,7 @@ msg_processor = [None for i in range(client_num)]
 large_data = "aaaaaaaaaa" * 200
 
 config_file_content = {
-    'domain_auth_key': {
+    'node_key': {
         'use': True,
         'obsolete_timeout': 300,
     },

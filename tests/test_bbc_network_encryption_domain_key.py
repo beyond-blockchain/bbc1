@@ -85,7 +85,7 @@ class TestBBcNetwork(object):
                 shutil.rmtree(".bbc1-%d"%i)
             config = bbc_config.BBcConfig(directory=".bbc1-%d"%i)
             conf = config.get_config()
-            conf["domain_auth_key"].update(keyconfig)
+            conf["node_key"].update(keyconfig)
             networkings[i] = bbc_network.BBcNetwork(core=dummycore, config=config, p2p_port=6641+i, loglevel=LOGLEVEL)
             networkings[i].create_domain(domain_id=domain_id)
             nodes[i] = networkings[i].domains[domain_id]['neighbor'].my_node_id

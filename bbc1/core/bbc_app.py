@@ -131,7 +131,7 @@ class BBcAppClient:
 
     def set_domain_key(self, pem_file=None):
         """
-        Set domain_auth_key to this client
+        Set node_key to this client
         :param pem_file:
         :return:
         """

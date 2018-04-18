@@ -43,7 +43,7 @@ current_config = {
         'p2p_port': DEFAULT_P2P_PORT,
         'max_connections': 100,
     },
-    'domain_auth_key': {
+    'node_key': {
         'use': False,
         'directory': DEFAULT_WORKING_DIR,
         'obsolete_timeout': 300,

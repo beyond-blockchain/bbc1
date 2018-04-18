@@ -345,7 +345,7 @@ class BBcNetwork:
         :param domain_id:
         :return:
         """
-        keyconfig = self.config.get_config().get('domain_auth_key', None)
+        keyconfig = self.config.get_config().get('node_key', None)
         if keyconfig is None:
             self.domains[domain_id]['keypair'] = None
             return

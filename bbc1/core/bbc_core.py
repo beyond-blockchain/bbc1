@@ -216,7 +216,7 @@ class BBcCoreService:
         Get or create default node key for creating a domain by bbc_app
         :return:
         """
-        keyconfig = self.config.get_config().get('domain_auth_key', None)
+        keyconfig = self.config.get_config().get('node_key', None)
         if keyconfig is None or 'directory' not in keyconfig:
             return
         if not os.path.exists(keyconfig['directory']):
