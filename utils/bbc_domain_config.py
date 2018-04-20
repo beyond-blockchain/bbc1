@@ -45,20 +45,17 @@ DEFAULT_JSON = '\
 
 
 def parser():
-    usage = 'python -t <put|delete> -d <DOMAIN_HEX> -k1 <K1NAME> -v1 <K1VALUE> [-k2 <K2NAME>] [-v2 <K2VALUE>] -w <WORKINGDIR>'
+    usage = 'python -t <generate|write|delete> -d <DOMAIN_HEX> -k1 <K1NAME> -v <K1VALUE> [-k2 <K2NAME>] [-v2 ' \
+            '<K2VALUE>] -w <WORKINGDIR>'
     argparser = ArgumentParser(usage=usage)
-    argparser.add_argument('-t', '--type', type=str, choices=['put', 'delete'],
+    argparser.add_argument('-t', '--type', type=str, choices=['generate', 'write', 'delete'],
                            default=None, help='operation type', required=True)
-    argparser.add_argument('-d', '--domainhex', type=str, default=None, help='domain hex', required=True)
+    argparser.add_argument('-d', '--domainhex', type=str, default=None, help='domain hex', required=False)
     argparser.add_argument('-k1', '--key1name', type=str, default=None, help='key1 name', required=False)
-    argparser.add_argument('-v', '--value', type=str, default=None, help='value', required=True)
+    argparser.add_argument('-v', '--value', type=str, default=None, help='value', required=False)
     argparser.add_argument('-k2', '--key2name', type=str, default=None, help='key2 name', required=False)
     argparser.add_argument('-w', '--workingdir', type=str, default=DEFAULT_WORKING_DIR, help='working directory', required=False)
     args = argparser.parse_args()
-
-    if not os.path.exists(args.workingdir):
-        print("dir not found : %s" % args.workingdir)
-        raise ValueError("dir not found")
 
     return args
 
@@ -88,11 +85,11 @@ def convertValue(str):
         dictobj = json.loads(str)
         return dictobj
     else:
-        if (str is None):
+        if str is None:
             return None
-        elif (str.upper() == 'TRUE'):
+        elif str.upper() == 'TRUE':
             return True
-        elif (str.upper() == 'FALSE'):
+        elif str.upper() == 'FALSE':
             return False
         else:
             return str
@@ -143,13 +140,13 @@ def file_output(filepath, targetobj):
     return True
 
 
-def put_proc(targetobj, domainhex, k1obj, k2obj, filepath):
+def write_proc(targetobj, domainhex, k1obj, k2obj, filepath):
     print(targetobj)
     print("------")
-    if k1obj['value'] == None and k2obj['value'] == None:
+    if k1obj['value'] is None and k2obj['value'] is None:
         print("-v is None")
         return False
-    if k2obj['key'] is not None and k1obj['key'] == None:
+    if k2obj['key'] is not None and k1obj['key'] is None:
         print("k2 is not None and k1 is None")
         return False
     if domainhex is not None:
@@ -207,23 +204,32 @@ if __name__ == '__main__':
         print("failed to parse")
         sys.exit(1)
 
+    if not os.path.exists(argresult.workingdir):
+        os.makedirs(argresult.workingdir)
+
+    domainhex = argresult.domainhex
+    fpath = getTargetFile(argresult)
+    outputfpath = getOutputFilepath(argresult)
+    targetobj = fetchTargetObj(fpath)
+
+    if argresult.type == 'generate':
+        file_output(outputfpath, targetobj)
+        sys.exit(0)
+
     if argresult.key2name is None:
         k1obj = convertKeyValue(argresult.key1name, argresult.value)
         k2obj = convertKeyValue(None, None)
     else:
         k1obj = convertKeyValue(argresult.key1name, None)
         k2obj = convertKeyValue(argresult.key2name, argresult.value)
-    domainhex = argresult.domainhex
-    fpath = getTargetFile(argresult)
-    outputfpath = getOutputFilepath(argresult)
-    targetobj = fetchTargetObj(fpath)
 
-    if argresult.type == 'put':
-        ret = put_proc(targetobj, domainhex, k1obj, k2obj, outputfpath)
+    if argresult.type == 'write':
+        if not write_proc(targetobj, domainhex, k1obj, k2obj, outputfpath):
+            print("Failed to write the entry...")
+            sys.exit(1)
     elif argresult.type == 'delete':
-        ret = delete_proc(targetobj, domainhex, k1obj, k2obj, outputfpath)
-    if ret == False:
-        print("failed to proc")
-        sys.exit(1)
+        if not delete_proc(targetobj, domainhex, k1obj, k2obj, outputfpath):
+            print("Failed to delete the entry...")
+            sys.exit(1)
 
     sys.exit(0)
