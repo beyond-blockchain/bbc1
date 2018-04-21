@@ -33,7 +33,8 @@ from bbc1.core.bbc_error import *
 PRIVATE_KEY = ".private_key"
 PUBLIC_KEY = ".public_key"
 
-domain_id = bbclib.get_new_id("landdomain", include_timestamp=False)
+land_domain_id = bbclib.get_new_id("landdomain", include_timestamp=False)
+coin_domain_id = bbclib.get_new_id("coindomain", include_timestamp=False)
 land_asset_group = bbclib.get_new_id("land_asset_group", include_timestamp=False)
 
 coin_asset_group = bbclib.get_new_id("coin_asset_group", include_timestamp=False)
@@ -47,7 +48,7 @@ key_pair = None
 bbc_app_client = None
 
 
-def setup_bbc_client():
+def setup_bbc_client(domain_id):
     bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
     bbc_app_client.set_user_id(user_id)
     bbc_app_client.set_domain_id(domain_id)
@@ -58,18 +59,28 @@ def setup_bbc_client():
 
 
 def get_txid_from_asid(asset_group, asid):
-    bbc_app_client = setup_bbc_client()
-    ret = bbc_app_client.search_asset(asset_group, binascii.unhexlify(asid))
+    if asset_group == land_asset_group:
+        bbc_app_client = setup_bbc_client(land_domain_id)
+    elif asset_group == coin_asset_group:
+        bbc_app_client = setup_bbc_client(coin_domain_id)
+    asid = binascii.unhexlify(asid)
+    ret = bbc_app_client.search_transaction_with_condition(asset_group, asid)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
+    if response_data[KeyType.status] < ESUCCESS:
+        print("ERROR: ", response_data[KeyType.reason].decode())
+        sys.exit(0)
     get_transaction = bbclib.BBcTransaction()
-    get_transaction.deserialize(response_data[KeyType.transaction_data])
+    get_transaction.deserialize(response_data[KeyType.transactions][0])
     transaction_id = get_transaction.transaction_id
     return transaction_id
 
 
 def add_ref_tx(asset_group,transaction,ref_tx,ref_index):
-    bbc_app_client = setup_bbc_client()
+    if asset_group == land_asset_group:
+        bbc_app_client = setup_bbc_client(land_domain_id)
+    elif asset_group == coin_asset_group:
+        bbc_app_client = setup_bbc_client(coin_domain_id)
     bbc_app_client.search_transaction(ref_tx)
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
@@ -87,15 +98,20 @@ def add_ref_tx(asset_group,transaction,ref_tx,ref_index):
     return transaction
 
 
-def get_data(asset_group,asid):
-    bbc_app_client = setup_bbc_client()
+def get_data(asset_group, asid):
+    if asset_group == land_asset_group:
+        bbc_app_client = setup_bbc_client(land_domain_id)
+    elif asset_group == coin_asset_group:
+        bbc_app_client = setup_bbc_client(coin_domain_id)
     asid = binascii.unhexlify(asid)
-    ret = bbc_app_client.search_asset(asset_group, asid)
+    ret = bbc_app_client.search_transaction_with_condition(asset_group, asid)
     assert ret
     response_data = bbc_app_client.callback.synchronize()
-
+    if response_data[KeyType.status] < ESUCCESS:
+        print("ERROR: ", response_data[KeyType.reason].decode())
+        sys.exit(0)
     get_transaction = bbclib.BBcTransaction()
-    get_transaction.deserialize(response_data[KeyType.transaction_data])
+    get_transaction.deserialize(response_data[KeyType.transactions][0])
     retdata = get_transaction.events[0].asset.asset_body
     refdata = get_transaction.references
     return retdata
@@ -240,8 +256,12 @@ def execute_escrow():
 
 
 def recive(asset_group):
+    if asset_group == land_asset_group:
+        bbc_app_client = setup_bbc_client(land_domain_id)
+    elif asset_group == coin_asset_group:
+        bbc_app_client = setup_bbc_client(coin_domain_id)
+
     while(True):
-        bbc_app_client = setup_bbc_client()
         print("Waiting for the message...")
         recvdat = bbc_app_client.callback.synchronize()
         if KeyType.message not in recvdat:

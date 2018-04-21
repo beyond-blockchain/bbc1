@@ -149,7 +149,7 @@ def setup_bbc_client():
 
 def require_receiver_info_for(filename):
     print("Your name is [", user_name, "] and user_id is [", binascii.b2a_hex(user_id).decode(), "]")
-    print("Please enter the receiver user_id for file %s." % filename)
+    print("Please enter the receiver user name for file %s." % filename)
     receiver_name = input('>> ')
     receiver_user_id = bbclib.get_new_id(receiver_name, include_timestamp=False)
     return receiver_name, receiver_user_id
