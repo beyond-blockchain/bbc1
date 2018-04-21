@@ -342,7 +342,7 @@ class BBcNetwork:
 
     def get_domain_keypair(self, domain_id):
         """
-        (internal use) Get domain_keys (private key and public key)
+        Get domain_keys (private key and public key)
         :param domain_id:
         :return:
         """

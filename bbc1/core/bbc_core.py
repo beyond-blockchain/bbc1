@@ -291,6 +291,7 @@ class BBcCoreService:
                                     MsgType.REQUEST_GET_FORWARDING_LIST, MsgType.REQUEST_GET_USERS,
                                     MsgType.REQUEST_GET_NODEID, MsgType.REQUEST_GET_NOTIFICATION_LIST,
                                     MsgType.REQUEST_SETUP_DOMAIN, MsgType.REQUEST_CLOSE_DOMAIN,
+                                    MsgType.NOTIFY_DOMAIN_KEY_UPDATE,
                                     MsgType.DOMAIN_PING, MsgType.REQUEST_SET_STATIC_NODE,
                                     MsgType.REQUEST_MANIP_LEDGER_SUBSYS]:
             if not self._check_signature_by_nodekey(dat):
@@ -481,6 +482,10 @@ class BBcCoreService:
                                              dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.stats] = copy.deepcopy(self.stats.get_stats())
             user_message_routing.direct_send_to_user(socket, retmsg)
+
+        elif cmd == MsgType.NOTIFY_DOMAIN_KEY_UPDATE:
+            if domain_id is not None:
+                self.networking.get_domain_keypair(domain_id)
 
         elif cmd == MsgType.REQUEST_REPAIR:
             if not self._param_check([KeyType.transaction_id], dat):

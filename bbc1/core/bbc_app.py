@@ -308,6 +308,18 @@ class BBcAppClient:
         self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
+    def notify_domain_key_update(self):
+        """
+        Notify update of bbc_core
+        :return:
+        """
+        dat = self._make_message_structure(MsgType.NOTIFY_DOMAIN_KEY_UPDATE)
+        admin_info = {
+            KeyType.random: bbclib.get_random_value(32)
+        }
+        self.include_admin_info(dat, admin_info, self.node_keypair)
+        return self.send_msg(dat)
+
     def get_domain_list(self):
         """
         Get domain_id list in bbc_core (maybe used by a system administrator)

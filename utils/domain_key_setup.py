@@ -88,11 +88,5 @@ if __name__ == '__main__':
     bbcclient = bbc_app.BBcAppClient(host=addr, port=port, multiq=False, loglevel="all")
     if os.path.exists(parsed_args.node_key):
         bbcclient.set_node_key(parsed_args.node_key)
-    keyname = os.path.join(parsed_args.directory, parsed_args.domain_id + ".pem")
-    bbcclient.notify_domain_key_update(keyname)
-    dat = wait_check_result_msg_type(bbcclient.callback, bbclib.MsgType.RESPONSE_SETUP_DOMAIN)
-    if KeyType.reason in dat:
-        print("Result:", dat[KeyType.reason])
-    else:
-        print("Result: success")
+    bbcclient.notify_domain_key_update()
     sys.exit(0)
