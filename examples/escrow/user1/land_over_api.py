@@ -20,6 +20,7 @@ import datetime
 import binascii
 import json
 from datetime import datetime
+import urllib.request, json
 
 sys.path.extend(["../../../"])
 from bbc1.common import bbclib
@@ -38,26 +39,56 @@ user_id = None
 key_pair = None
 bbc_app_client = None
 
+def store_proc(data, approver_id, txid=None):
+    # make transaction object
+    transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
+    transaction.events[0].add(mandatory_approver=approver_id, asset_group_id=asset_group_id)
+    transaction.events[0].asset.add(user_id=user_id, asset_body=data)
+    if txid:
+        obj = {"jsonrpc": "2.0",
+               "method": "bbc1_GetTransaction",
+               "params":{
+                    "asset_group_id": bbclib.bin2str_base64(asset_group_id),
+                    "tx_id": txid,
+                    "user_id": bbclib.bin2str_base64(user_id),
+                   },
+               "id": 114514
+              }
+        response = json_post(obj)
+        prevtx = response["result"]
+        prevtx = bbclib.BBcTransaction(jsonload=prevtx)
+        bbclib.add_reference_to_transaction(asset_group_id, transaction, prevtx, 0)
 
-def domain_setup():
-    tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
-    tmpclient.domain_setup(domain_id, "simple_cluster")
-    tmpclient.callback.synchronize()
-    tmpclient.unregister_from_core()
-    print("Domain %s is created." % (binascii.b2a_hex(domain_id[:4]).decode()))
-    print("Setup is done.")
+    # get transaction digest
+    jsontx = transaction.jsondump()
+    obj = {"jsonrpc": "2.0",
+           "method": "bbc1_GetTransactionDigest",
+           "params":jsontx,
+           "id": 114514
+          }
+    response = json_post(obj)
 
+    # add sign to transaction json
+    sig = bbclib.bin2str_base64(key_pair.sign(binascii.a2b_base64(response["result"]["digest"].encode("utf-8"))))
+    jsontx = json.loads(response["result"]["tx"])
+    sig = {
+        "type":1,
+        "signature": sig,
+        "pubkey": bbclib.bin2str_base64(key_pair.public_key)
+        }
+    jsontx["Signature"].append(sig)
+    # Insert Transaction
+    obj = {"jsonrpc": "2.0",
+           "method": "bbc1_InsertTransaction",
+           "params":json.dumps(jsontx),
+           "id": 114514
+          }
+    response = json_post(obj)
+    print("TXID: %s" % response["result"])
+    print("ASID: %s" % jsontx["Event"][0]["Asset"]["asset_id"])
+    return response["result"]
 
-def setup_bbc_client():
-    bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
-    bbc_app_client.set_user_id(user_id)
-    bbc_app_client.set_domain_id(domain_id)
-    bbc_app_client.set_callback(bbc_app.Callback())
-    ret = bbc_app_client.register_to_core()
-    assert ret
-    return bbc_app_client
-
-
+'''
 def store_proc(data, approver_id,txid=None):
     bbc_app_client = setup_bbc_client()
     store_transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
@@ -98,7 +129,7 @@ def store_proc(data, approver_id,txid=None):
     store_transaction.add_signature(user_id=result[1], signature=result[2])
 
     store_transaction.digest()
-    print(store_transaction)
+    store_transaction.dump()
 
     ret = bbc_app_client.insert_transaction(store_transaction)
     assert ret
@@ -111,24 +142,32 @@ def store_proc(data, approver_id,txid=None):
 
     txinfo = [store_transaction.transaction_id, store_transaction.events[0].asset.asset_id]
     return txinfo
+'''
+
+def json_post(obj):
+    url = "http://localhost:3000"
+    method = "POST"
+    headers = {"Content-Type" : "application/json"}
+    json_data = json.dumps(obj).encode("utf-8")
+    request = urllib.request.Request(url, data=json_data, method=method, headers=headers)
+    with urllib.request.urlopen(request) as response:
+        response_body = response.read().decode("utf-8")
+    response = json.loads(response_body)
+    return response
 
 def get_landdata(asid):
-    bbc_app_client = setup_bbc_client()
-    asid = binascii.unhexlify(asid)
-    ret = bbc_app_client.search_transaction_with_condition(asset_group_id, asid)
-    assert ret
-    response_data = bbc_app_client.callback.synchronize()
-    if response_data[KeyType.status] < ESUCCESS:
-        print("ERROR: ", response_data[KeyType.reason].decode())
-        sys.exit(0)
-    get_transaction = bbclib.BBcTransaction()
-    get_transaction.deserialize(response_data[KeyType.transactions][0])
-
-    retdata = get_transaction.events[0].asset.asset_body
-    refdata = get_transaction.references
-    print("get: %s" % retdata)
-    print("ref: %s" % refdata)
-    return retdata
+    obj = {"jsonrpc": "2.0",
+           "method": "bbc1_GetTransactionfromAsset",
+           "params":{
+               "asset_group_id": bbclib.bin2str_base64(asset_group_id),
+               "as_id": asid,
+               "user_id": bbclib.bin2str_base64(user_id),
+               },
+           "id": 114514
+          }
+    response = json_post(obj)
+    tx = response["result"]
+    return tx
 
 def create_keypair():
     keypair = bbclib.KeyPair()
@@ -140,35 +179,41 @@ def create_keypair():
     print("created private_key and public_key : %s, %s" % (PRIVATE_KEY, PUBLIC_KEY))
 
 def registration(place):
-    data = {"owner":binascii.b2a_hex(user_id).decode("UTF-8"),"place":place,"date":datetime.now().strftime('%s')}
+    data = {"owner":bbclib.bin2str_base64(user_id),"place":place,"date":datetime.now().strftime('%s')}
     jsondata = json.dumps(data)
     store_proc(data=jsondata, approver_id=user_id ,txid=None)
     print("Land registration is done!: %s" % jsondata)
 
+def send_message(dst_id, msg):
+    obj = {"jsonrpc": "2.0",
+           "method": "bbc1_SendMessage",
+           "params":{
+               "user_id": bbclib.bin2str_base64(user_id),
+               "dst_user_id": dst_id,
+               "msg": msg
+               },
+           "id": 114514
+          }
+    print(obj)
+    response = json_post(obj)
+    res = response["result"]
+    print(res)
+    return True
+
 def chown(new_owner,asid):
-    asset = json.loads(get_landdata(asid).decode("UTF-8"))
-    if asset["owner"] != binascii.b2a_hex(user_id).decode("UTF-8"):
-        print("Owner of this asset is not you")
+    prevtx = json.loads(get_landdata(asid))
+    asset = json.loads(prevtx["Event"][0]["Asset"]["body"])
+    if asset["owner"] != bbclib.bin2str_base64(user_id):
+        print("Owner of this land is not you")
         return 0
     asset["owner"] = new_owner
     asset["date"] = datetime.now().strftime('%s')
     data = json.dumps(asset)
 
-    bbc_app_client = setup_bbc_client()
-    asid = binascii.unhexlify(asid)
-    ret = bbc_app_client.search_transaction_with_condition(asset_group_id, asid)
-    assert ret
-    response_data = bbc_app_client.callback.synchronize()
-    if response_data[KeyType.status] < ESUCCESS:
-        print("ERROR: ", response_data[KeyType.reason].decode())
-        sys.exit(0)
-    get_transaction = bbclib.BBcTransaction()
-    get_transaction.deserialize(response_data[KeyType.transactions][0])
-    transaction_id = get_transaction.transaction_id
-    transaction_info = store_proc(data,approver_id=binascii.unhexlify(new_owner),txid=transaction_id)
-    bbc_app_client.send_message(transaction_info, binascii.unhexlify(new_owner))
-    print("Transfer is done.....")
-
+    land = json.loads(get_landdata(asid))
+    transaction_id = land["transaction_id"]
+    new_tx_id = store_proc(data, approver_id=binascii.a2b_base64(new_owner), txid=transaction_id)
+    send_message(new_owner, new_tx_id)
 
 if __name__ == '__main__':
     if(not os.path.exists(PRIVATE_KEY) and not os.path.exists(PUBLIC_KEY)):
@@ -178,12 +223,11 @@ if __name__ == '__main__':
     with open(PUBLIC_KEY, "rb") as fin:
         public_key = fin.read()
 
-    domain_setup()
 
     key_pair = bbclib.KeyPair(privkey=private_key, pubkey=public_key)
     user_id = bbclib.get_new_id(str(binascii.b2a_hex(key_pair.public_key)), include_timestamp=False)
     print("welcome to sample land manage!")
-    print("Your id: %s" % binascii.b2a_hex(user_id))
+    print("Your id: %s" % bbclib.bin2str_base64(user_id))
     print("Type command(help to see command list)")
     while(True):
         command = input('>> ')
@@ -199,15 +243,22 @@ if __name__ == '__main__':
         elif command == "get":
             print("Type AsID of land")
             asid = input('>> ')
-            get_landdata(asid)
+            tx = json.loads(get_landdata(asid))
+            print("TXID: %s" % tx["transaction_id"])
+            print("ASID: %s" % tx["Event"][0]["Asset"]["asset_id"])
+            print(tx["Event"][0]["Asset"]["body"])
         elif command == "chown":
             print("Type AsID of land")
             asid = input('>> ')
-            asset = json.loads(get_landdata(asid).decode("UTF-8"))
-            print("You want change owner of %s"% asset["place"])
+            tx = json.loads(get_landdata(asid))
+            print("TXID: %s" % tx["transaction_id"])
+            print("ASID: %s" % tx["Event"][0]["Asset"]["asset_id"])
+            print(tx["Event"][0]["Asset"]["body"])
+            print("You want send land(%s)"% asid)
             print("Type new owner ID")
             new_owner = input('>> ')
-            chown(new_owner,asid)
+            chown(new_owner, asid)
+            print("Transfer is done.....")
         elif command == "exit":
             print("bye")
             sys.exit(0)
