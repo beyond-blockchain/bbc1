@@ -68,7 +68,7 @@ if __name__ == '__main__':
         addr = parsed_args.ip6address
     port = parsed_args.port
 
-    bbcclient = bbc_app.BBcAppClient(host=addr, port=port, loglevel="all")
+    bbcclient = bbc_app.BBcAppClient(host=addr, port=port, multiq=False, loglevel="all")
 
     domain_id = bbclib.convert_idstring_to_bytes(parsed_args.domain_id)
     query_id = bbcclient.domain_setup(domain_id)

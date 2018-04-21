@@ -209,13 +209,19 @@ class BBcAppClient:
         self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
-    def domain_close(self):
+    def domain_close(self, domain_id=None):
         """
         Close domain leading to remove_domain in the core
+        :param domain_id: if None, use self.domain_id
         :return:
         """
+        if domain_id is None and self.domain_id is not None:
+            domain_id = self.domain_id
+        if domain_id is None:
+            return None
         dat = self._make_message_structure(MsgType.REQUEST_CLOSE_DOMAIN)
         admin_info = {
+            KeyType.domain_id: domain_id,
             KeyType.random: bbclib.get_random_value(32)
         }
         self.include_admin_info(dat, admin_info, self.node_keypair)
@@ -915,7 +921,7 @@ class Callback:
 
     def proc_resp_get_node_id(self, dat):
         if KeyType.node_id not in dat:
-            self.queue.put(None)
+            self.queue.put(dat)
             return
         self.queue.put(dat[KeyType.node_id])
 

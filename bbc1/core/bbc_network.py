@@ -224,7 +224,7 @@ class BBcNetwork:
         conf = self.config.get_domain_config(domain_id, create_if_new=True)
         if config is not None:
             conf.update(config)
-        if 'node_id' not in conf:
+        if 'node_id' not in conf or conf['node_id'] == "":
             node_id = bbclib.get_random_id()
             conf['node_id'] = bbclib.convert_id_to_string(node_id)
             self.config.update_config()

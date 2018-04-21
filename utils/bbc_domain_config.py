@@ -43,6 +43,27 @@ DEFAULT_JSON = '\
     }\
 }'
 
+simple_domain_conf = {
+    "storage": {
+        "type": "internal"
+    },
+    "db": {
+        "db_type": "sqlite",
+        "db_name": "bbc_ledger.sqlite",
+        "replication_strategy": "all",
+        "db_servers": [
+            {
+                "db_addr": "127.0.0.1",
+                "db_port": 3306,
+                "db_user": "user",
+                "db_pass": "pass"
+            }
+        ]
+    },
+    "static_nodes": {},
+    "node_id": ""
+}
+
 
 def parser():
     usage = 'python -t <generate|write|delete> -d <DOMAIN_HEX> -k1 <K1NAME> -v <K1VALUE> [-k2 <K2NAME>] [-v2 ' \
@@ -104,7 +125,7 @@ def convertKeyValue(name, value):
 
 def getTargetFile(argresult):
     wdir = argresult.workingdir
-    filepath = wdir + "/" + DEFAULT_CONFIG_FILE
+    filepath = os.path.join(wdir, DEFAULT_CONFIG_FILE)
     print("input filepath : %s" % filepath)
     if os.path.exists(filepath):
         return filepath
@@ -114,13 +135,12 @@ def getTargetFile(argresult):
 
 def getOutputFilepath(argresult):
     wdir = argresult.workingdir
-    filepath = wdir + "/" + DEFAULT_CONFIG_FILE
+    filepath = os.path.join(wdir, DEFAULT_CONFIG_FILE)
     return filepath
 
 
 def fetchTargetObj(filepath):
-    print("filepath : %s" % filepath)
-    if filepath and os.path.exists(filepath):
+    if filepath is not None and os.path.exists(filepath):
         with open(filepath, 'r') as f:
             print("load from %s" % filepath)
             targetObj = json.load(f)
@@ -141,11 +161,11 @@ def file_output(filepath, targetobj):
 
 
 def write_proc(targetobj, domainhex, k1obj, k2obj, filepath):
-    print(targetobj)
     print("------")
     if k1obj['value'] is None and k2obj['value'] is None:
-        print("-v is None")
-        return False
+        targetobj["domains"][domainhex] = simple_domain_conf
+        print(targetobj)
+        return file_output(filepath, targetobj)
     if k2obj['key'] is not None and k1obj['key'] is None:
         print("k2 is not None and k1 is None")
         return False
@@ -165,11 +185,11 @@ def write_proc(targetobj, domainhex, k1obj, k2obj, filepath):
     else:
         print("invalid domainhex : %s" % domainhex)
         return False
+    print(targetobj)
     return file_output(filepath, targetobj)
 
 
 def delete_proc(targetobj, domainhex, k1obj, k2obj, filepath):
-    print(targetobj)
     print("------")
     if domainhex is not None:
         if k1obj['key'] is not None:
@@ -194,6 +214,7 @@ def delete_proc(targetobj, domainhex, k1obj, k2obj, filepath):
             else:
                 print("delete domainhex, but does not have key : %s" % domainhex)
                 return False
+    print(targetobj)
     return file_output(filepath, targetobj)
 
 
@@ -216,7 +237,10 @@ if __name__ == '__main__':
         file_output(outputfpath, targetobj)
         sys.exit(0)
 
-    if argresult.key2name is None:
+    if argresult.key1name is None and argresult.key2name is None:
+        k1obj = convertKeyValue(None, None)
+        k2obj = convertKeyValue(None, None)
+    elif argresult.key2name is None:
         k1obj = convertKeyValue(argresult.key1name, argresult.value)
         k2obj = convertKeyValue(None, None)
     else:

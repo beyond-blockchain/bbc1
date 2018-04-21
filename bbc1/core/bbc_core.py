@@ -553,7 +553,7 @@ class BBcCoreService:
                 self.logger.error("Illegal access to domain %s" % domain_id.hex())
                 return False, None
             retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GET_NODEID,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             data = bytearray()
             data.extend(self.networking.domains[domain_id]['topology'].my_node_id)
             retmsg[KeyType.node_id] = bytes(data)
