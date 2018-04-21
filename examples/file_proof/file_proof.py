@@ -128,6 +128,8 @@ def get_list_from_mappings(asset_group_id):
 
 def domain_setup():
     tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
+    if os.path.exists("node_key.pem"):
+        tmpclient.set_node_key("node_key.pem")
     tmpclient.domain_setup(domain_id)
     tmpclient.callback.synchronize()
     tmpclient.unregister_from_core()

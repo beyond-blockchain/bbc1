@@ -4,6 +4,7 @@ import pytest
 import binascii
 import time
 import hashlib
+import os
 
 import sys
 sys.path.extend(["../"])
@@ -40,6 +41,8 @@ def setup_bbc_client(port_increase=0, user_id=None):
     bbc_app_client.set_user_id(user_id)
     bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_callback(bbc_app.Callback())
+    if os.path.exists(os.path.join(".bbc1-900%d" % port_increase, "node_key.pem")):
+        bbc_app_client.set_node_key(os.path.join(".bbc1-900%d" % port_increase, "node_key.pem"))
     bbc_app_client.domain_setup(domain_id)
     bbc_app_client.callback.synchronize()
     return bbc_app_client

@@ -39,7 +39,7 @@ current_config = {
     'workingdir': DEFAULT_WORKING_DIR,
     'client': {
         'port': DEFAULT_CORE_PORT,
-        'use_node_key': False,
+        'use_node_key': True,
     },
     'network': {
         'p2p_port': DEFAULT_P2P_PORT,

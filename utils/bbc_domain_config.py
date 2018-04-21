@@ -9,15 +9,16 @@ DEFAULT_JSON = '\
 {\
     "workingdir": ".bbc1",\
     "client": {\
-        "port": 9000\
+        "port": 9000,\
+        "use_node_key": True\
     },\
     "network": {\
         "p2p_port": 6641,\
         "max_connections": 100\
     },\
-    "domain_auth_key": {\
+    "domain_key": {\
         "use": false,\
-        "directory": ".bbc1",\
+        "directory": ".bbc1/domain_keys",\
         "obsolete_timeout": 300\
     },\
     "domains": {\

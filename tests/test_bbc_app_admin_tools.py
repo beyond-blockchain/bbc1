@@ -102,7 +102,7 @@ class TestBBcAppClient(object):
         global msg_processor
         prepare(core_num=core_num, client_num=client_num, loglevel=LOGLEVEL)
         for i in range(core_num):
-            start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i)
+            start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i, use_nodekey=False)
             time.sleep(0.1)
             domain_setup_utility(i, domain_id)  # system administrator
         time.sleep(1)
