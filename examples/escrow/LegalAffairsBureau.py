@@ -45,7 +45,7 @@ bbc_app_client = None
 
 def domain_setup():
     tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
-    tmpclient.domain_setup(domain_id, "simple_cluster")
+    tmpclient.domain_setup(domain_id)
     tmpclient.callback.synchronize()
     tmpclient.unregister_from_core()
     print("Domain %s is created." % (binascii.b2a_hex(domain_id[:4]).decode()))

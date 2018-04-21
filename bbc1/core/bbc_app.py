@@ -72,8 +72,7 @@ class BBcAppClient:
         self.connection = socket.create_connection((host, port))
         self.callback = Callback(log=self.logger)
         self.callback.set_client(self)
-        self.domain_keypair = None
-        self.default_node_keypair = None
+        self.node_keypair = None
         self.use_query_id_based_message_wait = multiq
         self.user_id = None
         self.domain_id = None
@@ -119,26 +118,11 @@ class BBcAppClient:
         :return:
         """
         if pem_file is None:
-            self.default_node_keypair = None
+            self.node_keypair = None
         try:
-            self.default_node_keypair = bbclib.KeyPair()
+            self.node_keypair = bbclib.KeyPair()
             with open(pem_file, "r") as f:
-                self.default_node_keypair.mk_keyobj_from_private_key_pem(f.read())
-        except:
-            return
-
-    def set_domain_key(self, pem_file=None):
-        """
-        Set node_key to this client
-        :param pem_file:
-        :return:
-        """
-        if pem_file is None:
-            self.domain_keypair = None
-        try:
-            self.domain_keypair = bbclib.KeyPair()
-            with open(pem_file, "r") as f:
-                self.domain_keypair.mk_keyobj_from_private_key_pem(f.read())
+                self.node_keypair.mk_keyobj_from_private_key_pem(f.read())
         except:
             return
 
@@ -222,7 +206,7 @@ class BBcAppClient:
         }
         if config is not None:
             admin_info[KeyType.bbc_configuration] = config
-        self.include_admin_info(dat, admin_info, self.default_node_keypair)
+        self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
     def domain_close(self):
@@ -234,7 +218,7 @@ class BBcAppClient:
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
-        self.include_admin_info(dat, admin_info, self.domain_keypair)
+        self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
     def get_node_id(self):
@@ -259,7 +243,7 @@ class BBcAppClient:
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
-        self.include_admin_info(dat, admin_info, self.domain_keypair)
+        self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
     def set_domain_static_node(self, domain_id, node_id, ipv4, ipv6, port):
@@ -278,7 +262,7 @@ class BBcAppClient:
         admin_info = {
             KeyType.node_info: [node_id, ipv4, ipv6, port]
         }
-        self.include_admin_info(dat, admin_info, self.domain_keypair)
+        self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
     def send_domain_ping(self, domain_id, ipv4=None, ipv6=None, port=DEFAULT_P2P_PORT):
@@ -302,7 +286,7 @@ class BBcAppClient:
             admin_info[KeyType.ipv6_address] = ipv6
         admin_info[KeyType.port_number] = port
         admin_info[KeyType.static_entry] = True
-        self.include_admin_info(dat, admin_info, self.domain_keypair)
+        self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
     def get_bbc_config(self):
@@ -315,7 +299,7 @@ class BBcAppClient:
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
-        self.include_admin_info(dat, admin_info, self.default_node_keypair)
+        self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
     def get_domain_list(self):
@@ -328,7 +312,7 @@ class BBcAppClient:
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
-        self.include_admin_info(dat, admin_info, self.default_node_keypair)
+        self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
     def get_user_list(self):
@@ -341,7 +325,7 @@ class BBcAppClient:
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
-        self.include_admin_info(dat, admin_info, self.domain_keypair)
+        self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
     def get_forwarding_list(self):
@@ -354,7 +338,7 @@ class BBcAppClient:
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
-        self.include_admin_info(dat, admin_info, self.domain_keypair)
+        self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
     def get_notification_list(self):
@@ -367,7 +351,7 @@ class BBcAppClient:
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
-        self.include_admin_info(dat, admin_info, self.domain_keypair)
+        self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
     def manipulate_ledger_subsystem(self, enable=False, domain_id=None):
@@ -375,7 +359,7 @@ class BBcAppClient:
         start/stop ledger_subsystem on the bbc_core (maybe used by a system administrator)
 
         :param enable: True->start, False->stop
-        :param domain_id: 
+        :param domain_id:
         :return:
         """
         dat = self._make_message_structure(MsgType.REQUEST_MANIP_LEDGER_SUBSYS)
@@ -384,7 +368,7 @@ class BBcAppClient:
             KeyType.ledger_subsys_manip: enable,
             KeyType.random: bbclib.get_random_value(32)
         }
-        self.include_admin_info(dat, admin_info, self.domain_keypair)
+        self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
     def register_to_core(self, on_multiple_nodes=False):
@@ -640,7 +624,7 @@ class BBcAppClient:
         admin_info = {
             KeyType.random: bbclib.get_random_value(32)
         }
-        self.include_admin_info(dat, admin_info, self.default_node_keypair)
+        self.include_admin_info(dat, admin_info, self.node_keypair)
         return self.send_msg(dat)
 
     def send_message(self, msg, dst_user_id, is_anycast=False):

@@ -46,11 +46,14 @@ def start_core_thread(index, core_port_increment=0, p2p_port_increment=0,
 
 def start_core(index, core_port, p2p_port, use_nodekey=False, use_domain0=False, remove_dir=True):
     print("** [%d] start: port=%i" % (index, core_port))
-    if remove_dir and os.path.exists(".bbc1-%i/" % core_port):
-        shutil.rmtree(".bbc1-%i/" % core_port)
+    working_dir = ".bbc1-%i/" % core_port
+    if remove_dir and os.path.exists(working_dir):
+        shutil.rmtree(working_dir)
+    os.makedirs(working_dir)
+    if config_file is not None:
+        shutil.copyfile(config_file, os.path.join(working_dir, "config.json"))
     cores[index] = bbc_core.BBcCoreService(p2p_port=p2p_port, core_port=core_port,
-                                           workingdir=".bbc1-%i/" % core_port,
-                                           configfile=config_file,
+                                           workingdir=working_dir,
                                            use_nodekey=use_nodekey,
                                            use_domain0=use_domain0,
                                            server_start=False,

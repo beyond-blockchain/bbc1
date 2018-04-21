@@ -17,6 +17,7 @@ limitations under the License.
 import os
 import json
 import copy
+from threading import RLock
 from collections import Mapping
 
 import sys
@@ -38,14 +39,15 @@ current_config = {
     'workingdir': DEFAULT_WORKING_DIR,
     'client': {
         'port': DEFAULT_CORE_PORT,
+        'use_node_key': False,
     },
     'network': {
         'p2p_port': DEFAULT_P2P_PORT,
         'max_connections': 100,
     },
-    'node_key': {
+    'domain_key': {
         'use': False,
-        'directory': DEFAULT_WORKING_DIR,
+        'directory': DEFAULT_WORKING_DIR+"/domain_keys",
         'obsolete_timeout': 300,
     },
     'domains': {
@@ -105,13 +107,18 @@ class BBcConfig:
             os.mkdir(self.working_dir)
 
         if os.path.isfile(self.config_file):
-            with open(self.config_file, "r") as f:
-                try:
-                    update_deep(self.config, json.load(f))
-                except:
-                    print("config file must be in JSON format")
-                    os._exit(1)
+            update_deep(self.config, self.read_config())
         self.update_config()
+
+    def read_config(self):
+        config = dict()
+        with open(self.config_file, "r") as f:
+            try:
+                config = json.load(f)
+            except:
+                print("config file must be in JSON format")
+                os._exit(1)
+        return config
 
     def update_config(self):
         try:
@@ -132,6 +139,10 @@ class BBcConfig:
 
     def get_domain_config(self, domain_id, create_if_new=False):
         domain_id_str = bbclib.convert_id_to_string(domain_id)
+        conf = self.read_config()
+        if 'domains' in conf and domain_id_str in conf['domains']:
+            self.config['domains'][domain_id_str] = conf['domains'][domain_id_str]
+
         if create_if_new and domain_id_str not in self.config['domains']:
             self.config['domains'][domain_id_str] = {
                 'storage': {
@@ -151,3 +162,10 @@ class BBcConfig:
         if domain_id_str in self.config['domains']:
             return self.config['domains'][domain_id_str]
         return None
+
+    def remove_domain_config(self, domain_id):
+        domain_id_str = bbclib.convert_id_to_string(domain_id)
+        if domain_id_str in self.config['domains']:
+            del self.config['domains'][domain_id_str]
+            self.update_config()
+

@@ -300,6 +300,7 @@ class BBcNetwork:
         del self.domains[domain_id]
         if self.domain0manager is not None:
             self.domain0manager.update_domain_belong_to()
+        self.config.remove_domain_config(domain_id)
         self.stats.update_stats_decrement("network", "num_domains", 1)
         return True
 
@@ -345,7 +346,7 @@ class BBcNetwork:
         :param domain_id:
         :return:
         """
-        keyconfig = self.config.get_config().get('node_key', None)
+        keyconfig = self.config.get_config().get('domain_key', None)
         if keyconfig is None:
             self.domains[domain_id]['keypair'] = None
             return

@@ -61,9 +61,14 @@ class TestBBcNetwork(object):
 
     def test_00_key_setup(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
+        try:
+            os.mkdir(".bbc1-domainkeys")
+        except:
+            pass
+
         keypair = bbclib.KeyPair()
         keypair.generate()
-        keyname = domain_id.hex() + ".pem"
+        keyname = os.path.join(".bbc1-domainkeys", domain_id.hex() + ".pem")
         with open(keyname, "wb") as f:
             f.write(keypair.get_private_key_in_pem())
 
@@ -76,7 +81,8 @@ class TestBBcNetwork(object):
         TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL = 15
         dummycore = DummyCore()
         keyconfig = {
-            'directory': ".",
+            'use': True,
+            'directory': ".bbc1-domainkeys",
             'obsolete_timeout': 3,
         }
         global networkings, nodes, conf
@@ -85,7 +91,7 @@ class TestBBcNetwork(object):
                 shutil.rmtree(".bbc1-%d"%i)
             config = bbc_config.BBcConfig(directory=".bbc1-%d"%i)
             conf = config.get_config()
-            conf["node_key"].update(keyconfig)
+            conf["domain_key"].update(keyconfig)
             networkings[i] = bbc_network.BBcNetwork(core=dummycore, config=config, p2p_port=6641+i, loglevel=LOGLEVEL)
             networkings[i].create_domain(domain_id=domain_id)
             nodes[i] = networkings[i].domains[domain_id]['neighbor'].my_node_id

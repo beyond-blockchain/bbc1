@@ -113,9 +113,9 @@ class BBcCoreService:
             conf['client']['port'] = core_port
         else:
             core_port = conf['client']['port']
-        self.default_node_key = None
+        self.node_key = None
         if use_nodekey:
-            self._get_default_node_key()
+            self._get_node_key()
         self.logger.debug("config = %s" % conf)
         self.test_tx_obj = BBcTransaction()
         self.insert_notification_user_list = dict()
@@ -211,29 +211,27 @@ class BBcCoreService:
         self.logger.debug("connection closed")
         self.stats.update_stats_decrement("client", "total_num", 1)
 
-    def _get_default_node_key(self):
+    def _get_node_key(self):
         """
-        Get or create default node key for creating a domain by bbc_app
+        Get or create node key for creating a domain by bbc_app
         :return:
         """
-        keyconfig = self.config.get_config().get('node_key', None)
-        if keyconfig is None or 'directory' not in keyconfig:
+        clientconfig = self.config.get_config().get('client', None)
+        if clientconfig is None or 'use_node_key' not in clientconfig or not clientconfig['use_node_key']:
             return
-        if not os.path.exists(keyconfig['directory']):
-            os.makedirs(os.path.exists(keyconfig['directory']), exist_ok=True)
-        keypath = os.path.join(keyconfig['directory'], "default_node_key.pem")
+        keypath = os.path.join(self.config.working_dir, "node_key.pem")
 
-        self.default_node_key = bbclib.KeyPair()
+        self.node_key = bbclib.KeyPair()
         if os.path.exists(keypath):
             try:
                 with open(keypath, "r") as f:
-                    self.default_node_key.mk_keyobj_from_private_key_pem(f.read())
+                    self.node_key.mk_keyobj_from_private_key_pem(f.read())
                 return
             except:
                 pass
-        self.default_node_key.generate()
+        self.node_key.generate()
         with open(keypath, "wb") as f:
-            f.write(self.default_node_key.get_private_key_in_pem())
+            f.write(self.node_key.get_private_key_in_pem())
         return
 
     def _check_signature_by_nodekey(self, dat):
@@ -242,15 +240,16 @@ class BBcCoreService:
         :param dat:
         :return:
         """
-        if self.default_node_key is None:
+        if self.node_key is None:
             return True
         if KeyType.domain_admin_info not in dat:
             return False
         digest = hashlib.sha256(dat[KeyType.domain_admin_info]).digest()
-        if not self.default_node_key.verify(digest, dat[KeyType.domain_signature]):
+        if not self.node_key.verify(digest, dat[KeyType.domain_signature]):
             return False
         admin_info = message_key_types.make_dictionary_from_TLV_format(dat[KeyType.domain_admin_info])
         dat.update(admin_info)
+        print("*** pass ***")
         return True
 
     def _param_check(self, param, dat):
@@ -483,7 +482,7 @@ class BBcCoreService:
             return False, None
 
         elif cmd == MsgType.REQUEST_GET_NEIGHBORLIST:
-            if not self.networking.check_admin_signature(domain_id, dat):
+            if not self._check_signature_by_nodekey(dat):
                 self.logger.error("Illegal access to domain %s" % domain_id.hex())
                 return False, None
             domain_id = dat[KeyType.domain_id]
@@ -521,7 +520,7 @@ class BBcCoreService:
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_FORWARDING_LIST:
-            if not self.networking.check_admin_signature(domain_id, dat):
+            if not self._check_signature_by_nodekey(dat):
                 self.logger.error("Illegal access to domain %s" % domain_id.hex())
                 return False, None
             retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GET_FORWARDING_LIST,
@@ -537,7 +536,7 @@ class BBcCoreService:
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_USERS:
-            if not self.networking.check_admin_signature(domain_id, dat):
+            if not self._check_signature_by_nodekey(dat):
                 self.logger.error("Illegal access to domain %s" % domain_id.hex())
                 return False, None
             retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GET_USERS,
@@ -550,7 +549,7 @@ class BBcCoreService:
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_NODEID:
-            if not self.networking.check_admin_signature(domain_id, dat):
+            if not self._check_signature_by_nodekey(dat):
                 self.logger.error("Illegal access to domain %s" % domain_id.hex())
                 return False, None
             retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GET_NODEID,
@@ -561,7 +560,7 @@ class BBcCoreService:
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_NOTIFICATION_LIST:
-            if not self.networking.check_admin_signature(domain_id, dat):
+            if not self._check_signature_by_nodekey(dat):
                 self.logger.error("Illegal access to domain %s" % domain_id.hex())
                 return False, None
             retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GET_NOTIFICATION_LIST,
@@ -577,32 +576,29 @@ class BBcCoreService:
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_SETUP_DOMAIN:
+            if not self._param_check([KeyType.domain_id], dat):
+                self.logger.debug("REQUEST_SETUP_DOMAIN: bad format")
+                return False, None
             if not self._check_signature_by_nodekey(dat):
                 self.logger.error("Illegal access without node_kdy")
                 return False, None
             retmsg = _make_message_structure(None, MsgType.RESPONSE_SETUP_DOMAIN,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
-            if domain_id is None:
-                retmsg[KeyType.result] = False
-            else:
-                config = None
-                if KeyType.bbc_configuration in dat:
-                    try:
-                        config = json.loads(dat[KeyType.bbc_configuration])
-                    except:
-                        config = None
-                self.networking.create_domain(domain_id=domain_id, config=config)
-                retmsg[KeyType.result] = True
-                retmsg[KeyType.domain_id] = domain_id
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg[KeyType.result] = self.networking.create_domain(domain_id=domain_id)
+            if not retmsg[KeyType.result]:
+                retmsg[KeyType.reason] = "Already exists"
+            retmsg[KeyType.domain_id] = domain_id
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_CLOSE_DOMAIN:
-            if not self.networking.check_admin_signature(domain_id, dat):
+            if not self._check_signature_by_nodekey(dat):
                 self.logger.error("Illegal access to domain %s" % domain_id.hex())
                 return False, None
             retmsg = _make_message_structure(None, MsgType.RESPONSE_CLOSE_DOMAIN,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.result] = self.networking.remove_domain(domain_id)
+            if not retmsg[KeyType.result]:
+                retmsg[KeyType.reason] = "No such domain"
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_ECDH_KEY_EXCHANGE:
@@ -623,7 +619,7 @@ class BBcCoreService:
             umr.set_aes_name(socket, my_keyname)
 
         elif cmd == MsgType.DOMAIN_PING:
-            if not self.networking.check_admin_signature(domain_id, dat):
+            if not self._check_signature_by_nodekey(dat):
                 self.logger.error("Illegal access to domain %s" % domain_id.hex())
                 return False, None
             if not self._param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.port_number], dat):
@@ -636,11 +632,11 @@ class BBcCoreService:
             self.networking.send_domain_ping(domain_id, ipv4, ipv6, port)
 
         elif cmd == MsgType.REQUEST_SET_STATIC_NODE:
-            if not self.networking.check_admin_signature(domain_id, dat):
+            if not self._check_signature_by_nodekey(dat):
                 self.logger.error("Illegal access to domain %s" % domain_id.hex())
                 return False, None
             retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_SET_STATIC_NODE,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.domain_id] = domain_id
             node_info = dat.get(KeyType.node_info, None)
             if node_info is None:
@@ -652,7 +648,7 @@ class BBcCoreService:
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_MANIP_LEDGER_SUBSYS:
-            if not self.networking.check_admin_signature(domain_id, dat):
+            if not self._check_signature_by_nodekey(dat):
                 self.logger.error("Illegal access to domain %s" % domain_id.hex())
                 return False, None
             retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_MANIP_LEDGER_SUBSYS,
