@@ -299,9 +299,13 @@ class BBcCoreService:
             self.logger.debug("message has bad format")
             return False, None
         if dat[KeyType.command] in admin_message_commands:
-            if not self._check_signature_by_nodekey(dat):
-                self.logger.error("Illegal access to core node")
-                return False, None
+            if self.node_key is None and KeyType.domain_admin_info in dat:
+                admin_info = message_key_types.make_dictionary_from_TLV_format(dat[KeyType.domain_admin_info])
+                dat.update(admin_info)
+            else:
+                if not self._check_signature_by_nodekey(dat):
+                    self.logger.error("Illegal access to core node")
+                    return False, None
 
         domain_id = dat.get(KeyType.domain_id, None)
         umr = None
