@@ -49,7 +49,7 @@ bbc_app_client = None
 
 
 def setup_bbc_client(domain_id):
-    bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
+    bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, multiq=False, loglevel="all")
     bbc_app_client.set_user_id(user_id)
     bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_callback(bbc_app.Callback())
@@ -169,7 +169,7 @@ def execute_escrow():
 
 
     # Make TX
-    land_client = setup_bbc_client()
+    land_client = setup_bbc_client(land_domain_id)
     transaction = bbclib.make_transaction(event_num=2)
 
     # Add event and asset
@@ -180,7 +180,7 @@ def execute_escrow():
     LAB_id = bbclib.get_new_id("LegalAffairsBureau", include_timestamp=False)
     transaction.events[0].add(option_approver=LAB_id)
 
-    coin_client = setup_bbc_client()
+    coin_client = setup_bbc_client(coin_domain_id)
     bbclib.add_event_asset(transaction, event_idx=1, asset_group_id=coin_asset_group,
                            user_id=user_id, asset_body=coinasset)
     transaction.events[1].add(mandatory_approver=binascii.unhexlify(escrow["owner"]))
