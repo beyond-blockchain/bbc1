@@ -17,16 +17,12 @@ limitations under the License.
 
 import traceback
 import binascii
-import hashlib
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
-from bbc1.core.bbc_types import InfraMessageCategory
-from bbc1.core.bbc_stats import BBcStats
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
-from bbc1.common import logger
-
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
+from bbc1.core import logger
 
 transaction_tbl_definition = [
     ["transaction_id", "BLOB"], ["transaction_data", "BLOB"],
@@ -86,13 +82,13 @@ class DataHandler:
         self.storage_root = os.path.join(self.working_dir, self.domain_id_str)
         if not os.path.exists(self.storage_root):
             os.makedirs(self.storage_root, exist_ok=True)
-        self.use_external_storage = self.storage_setup()
+        self.use_external_storage = self._storage_setup()
         self.replication_strategy = DataHandler.REPLICATION_ALL
         self.db_adaptors = list()
         self.dbs = list()
-        self.db_setup()
+        self._db_setup()
 
-    def db_setup(self):
+    def _db_setup(self):
         """
         Setup DB
         :return:
@@ -129,7 +125,7 @@ class DataHandler:
             db.create_table('merkle_leaf_table', merkle_leaf_db_definition, primary_key=0, indices=[1, 2])
             db.create_table('merkle_root_table', merkle_root_db_definition, primary_key=0, indices=[0])
 
-    def storage_setup(self):
+    def _storage_setup(self):
         if self.config['storage']['type'] == "external":
             return True
         if 'root' in self.config['storage'] and self.config['storage']['root'].startswith("/"):
@@ -138,14 +134,6 @@ class DataHandler:
             self.storage_root = os.path.join(self.working_dir, self.domain_id_str)
         os.makedirs(self.storage_root, exist_ok=True)
         return False
-
-    def close_db(self):
-        """
-        (internal use) close DB
-        """
-        for d in self.db_adaptors:
-            d.db_cur.close()
-            d.db.close()
 
     def exec_sql(self, db_num=0, sql=None, args=(), commit=False, fetch_one=False):
         """
@@ -185,7 +173,7 @@ class DataHandler:
         else:
             return list(ret)
 
-    def get_asset_info(self, txobj):
+    def _get_asset_info(self, txobj):
         """
         Retrieve asset information from transaction object
         :param txobj:
@@ -204,7 +192,7 @@ class DataHandler:
                              ast.asset_file_digest))
         return info
 
-    def get_topology_info(self, txobj):
+    def _get_topology_info(self, txobj):
         """
         Retrieve topology information from transaction object
         :param txobj:
@@ -235,15 +223,15 @@ class DataHandler:
 
         inserted_count = 0
         for i in range(len(self.db_adaptors)):
-            if self.insert_transaction_into_a_db(i, txobj):
+            if self._insert_transaction_into_a_db(i, txobj):
                 inserted_count += 1
         if inserted_count == 0:
             return None
 
-        asset_group_ids = self.store_asset_files(txobj, asset_files)
+        asset_group_ids = self._store_asset_files(txobj, asset_files)
 
         if not no_replication and self.replication_strategy != DataHandler.REPLICATION_EXT:
-            self.send_replication_to_other_cores(txdata, asset_files)
+            self._send_replication_to_other_cores(txdata, asset_files)
 
         if self.networking.domain0manager is not None:
             self.networking.domain0manager.distribute_cross_ref_in_domain0(domain_id=self.domain_id,
@@ -256,7 +244,7 @@ class DataHandler:
 
         return asset_group_ids
 
-    def insert_transaction_into_a_db(self, db_num, txobj):
+    def _insert_transaction_into_a_db(self, db_num, txobj):
         """
         Insert transaction data into the specified DB
         :param db_num:
@@ -272,14 +260,14 @@ class DataHandler:
         if ret is None:
             return False
 
-        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self._get_asset_info(txobj):
             self.exec_sql(db_num=db_num,
                           sql="INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id) "
                               "VALUES (%s, %s, %s, %s)" % (
                               self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
                               self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
                           args=(txobj.transaction_id, asset_group_id, asset_id, user_id), commit=True)
-        for base, point_to in self.get_topology_info(txobj):
+        for base, point_to in self._get_topology_info(txobj):
             self.exec_sql(db_num=db_num,
                           sql="INSERT INTO topology_table(base, point_to) VALUES (%s, %s)" %
                               (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
@@ -296,7 +284,7 @@ class DataHandler:
             self.exec_sql(db_num=i, sql=sql, args=(transaction_id, outer_domain_id, txid_having_cross_ref), commit=True)
 
         if not no_replication:
-            self.send_cross_ref_replication_to_other_cores(transaction_id, outer_domain_id, txid_having_cross_ref)
+            self._send_cross_ref_replication_to_other_cores(transaction_id, outer_domain_id, txid_having_cross_ref)
 
     def count_domain_in_cross_ref(self, outer_domain_id):
         # TODO: need to consider registered_time
@@ -311,7 +299,7 @@ class DataHandler:
         else:
             return self.exec_sql(sql="SELECT * FROM cross_ref_table")
 
-    def store_asset_files(self, txobj, asset_files):
+    def _store_asset_files(self, txobj, asset_files):
         """
         Store all asset_files related to the transaction_object
         :param txobj:
@@ -319,19 +307,19 @@ class DataHandler:
         :return: asset_group_ids to be stored
         """
         asset_group_ids = set()
-        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self._get_asset_info(txobj):
             asset_group_ids.add(asset_group_id)
             if not self.use_external_storage and asset_files is not None and asset_id in asset_files:
-                self.store_in_storage(asset_group_id, asset_id, asset_files[asset_id])
+                self._store_in_storage(asset_group_id, asset_id, asset_files[asset_id])
         return asset_group_ids
 
     def restore_data(self, db_num, transaction_id, txobj, asset_files):
         self.remove(transaction_id, txobj=txobj, db_num=db_num)
-        self.insert_transaction_into_a_db(db_num=db_num, txobj=txobj)
-        self.remove_asset_files(txobj, asset_files)
-        self.store_asset_files(txobj, asset_files)
+        self._insert_transaction_into_a_db(db_num=db_num, txobj=txobj)
+        self._remove_asset_files(txobj, asset_files)
+        self._store_asset_files(txobj, asset_files)
 
-    def send_replication_to_other_cores(self, txdata, asset_files=None):
+    def _send_replication_to_other_cores(self, txdata, asset_files=None):
         """
         Send replication of transaction data
         :param txdata:
@@ -351,7 +339,7 @@ class DataHandler:
         elif self.replication_strategy == DataHandler.REPLICATION_P2P:
             pass  # TODO: implement (destinations determined by TopologyManager)
 
-    def send_cross_ref_replication_to_other_cores(self, transaction_id, outer_domain_id, txid_having_cross_ref):
+    def _send_cross_ref_replication_to_other_cores(self, transaction_id, outer_domain_id, txid_having_cross_ref):
         """
         Send replication of cross_ref
         :param transaction_id:
@@ -396,29 +384,29 @@ class DataHandler:
         else:
             self._remove_transaction(txobj, db_num)
 
-        self.remove_asset_files(txobj)
+        self._remove_asset_files(txobj)
 
     def _remove_transaction(self, txobj, db_num):
         self.exec_sql(
             db_num=db_num,
             sql="DELETE FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
             args=(txobj.transaction_id,), commit=True)
-        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self._get_asset_info(txobj):
             self.exec_sql(
                 db_num=db_num,
                 sql="DELETE FROM asset_info_table WHERE asset_group_id = %s AND asset_id = %s AND user_id = %s" %
                     (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
                 args=(asset_group_id, asset_id, user_id), commit=True)
             if fileflag:
-                self.remove_in_storage(asset_group_id, asset_id)
-        for base, point_to in self.get_topology_info(txobj):
+                self._remove_in_storage(asset_group_id, asset_id)
+        for base, point_to in self._get_topology_info(txobj):
             self.exec_sql(
                 db_num=db_num,
                 sql="DELETE FROM topology_table WHERE base = %s AND point_to = %s" %
                     (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
                 args=(base, point_to), commit=True)
 
-    def remove_asset_files(self, txobj, asset_files=None):
+    def _remove_asset_files(self, txobj, asset_files=None):
         """
         Remove all asset files related to the transaction
         :param asset_files:
@@ -426,12 +414,12 @@ class DataHandler:
         """
         if self.use_external_storage:
             return
-        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self._get_asset_info(txobj):
             if asset_files is not None:
                 if asset_id in asset_files:
-                    self.remove_in_storage(asset_group_id, asset_id)
+                    self._remove_in_storage(asset_group_id, asset_id)
             else:
-                self.remove_in_storage(asset_group_id, asset_id)
+                self._remove_in_storage(asset_group_id, asset_id)
 
     def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None, count=1, db_num=0):
         """
@@ -482,9 +470,9 @@ class DataHandler:
         for txid, txdata in txinfo:
             txobj = bbclib.BBcTransaction(deserialize=txdata)
             result_txobj[txid] = txobj
-            for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
+            for asset_group_id, asset_id, user_id, fileflag, filedigest in self._get_asset_info(txobj):
                 if fileflag:
-                    result_asset_files[asset_id] = self.get_in_storage(asset_group_id, asset_id)
+                    result_asset_files[asset_id] = self._get_in_storage(asset_group_id, asset_id)
         return result_txobj, result_asset_files
 
     def search_transaction_topology(self, transaction_id, traverse_to_past=True):
@@ -504,7 +492,7 @@ class DataHandler:
             return self.exec_sql(sql="SELECT * FROM topology_table WHERE point_to = %s" %
                                  self.db_adaptors[0].placeholder, args=(transaction_id,))
 
-    def store_in_storage(self, asset_group_id, asset_id, content):
+    def _store_in_storage(self, asset_group_id, asset_id, content):
         """
         Store data in local storage
         :param asset_group_id
@@ -527,7 +515,7 @@ class DataHandler:
                 return False
         return os.path.exists(path)
 
-    def get_in_storage(self, asset_group_id, asset_id):
+    def _get_in_storage(self, asset_group_id, asset_id):
         """
         Get the file with the asset_id from local storage
         :param asset_group_id
@@ -549,7 +537,7 @@ class DataHandler:
             self.logger.error(traceback.format_exc())
             return None
 
-    def remove_in_storage(self, asset_group_id, asset_id):
+    def _remove_in_storage(self, asset_group_id, asset_id):
         """
         Delete asset file
         :param asset_group_id:
@@ -564,16 +552,6 @@ class DataHandler:
         if not os.path.exists(path):
             return
         os.remove(path)
-
-    def add_cross_ref_into_list(self, cross_ref):
-        """
-        (internal use) register cross_ref info in the list
-
-        :param cross_ref:  tuple(domain_id, transaction_id)
-        :return:
-        """
-        self.stats.update_stats_increment("cross_ref", "total_num", 1)
-        self.cross_ref_list.append(cross_ref)
 
     def process_message(self, msg):
         """
@@ -634,22 +612,19 @@ class DataHandlerDomain0(DataHandler):
     def __init__(self, networking=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
         pass
 
-    def close_db(self):
-        pass
-
     def exec_sql(self, sql, *args):
         pass
 
-    def get_asset_info(self, txobj):
+    def _get_asset_info(self, txobj):
         pass
 
-    def get_topology_info(self, txobj):
+    def _get_topology_info(self, txobj):
         pass
 
     def insert_transaction(self, txdata, txobj=None, asset_files=None, no_replication=False):
         return True
 
-    def send_replication_to_other_cores(self, txdata, asset_files=None):
+    def _send_replication_to_other_cores(self, txdata, asset_files=None):
         pass
 
     def remove(self, transaction_id):
@@ -661,13 +636,13 @@ class DataHandlerDomain0(DataHandler):
     def search_transaction_topology(self, transaction_id, reverse_link=False):
         return None
 
-    def store_in_storage(self, asset_group_id, asset_id, content):
+    def _store_in_storage(self, asset_group_id, asset_id, content):
         return True
 
-    def get_in_storage(self, asset_group_id, asset_id):
+    def _get_in_storage(self, asset_group_id, asset_id):
         return None
 
-    def remove_in_storage(self, asset_group_id, asset_id):
+    def _remove_in_storage(self, asset_group_id, asset_id):
         pass
 
     def process_message(self, msg):

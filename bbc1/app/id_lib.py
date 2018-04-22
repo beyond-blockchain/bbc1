@@ -14,17 +14,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-import binascii
 import hashlib
 import sys
 import time
 
 sys.path.append("../../")
 
-from bbc1.app import bbc_app, app_support_lib
-from bbc1.common import bbclib, logger
-from bbc1.common.bbc_error import *
-from bbc1.common.message_key_types import KeyType
+from bbc1.app import app_support_lib
+from bbc1.core import bbclib
+from bbc1.core import logger, bbc_app
+from bbc1.core.bbc_error import *
+from bbc1.core.message_key_types import KeyType
 from bbc1.core.bbc_config import DEFAULT_CORE_PORT
 
 
@@ -98,11 +98,11 @@ class BBcIdPublickeyMap:
     def __init__(self, domain_id, namespace_id=default_namespace_id,
             port=DEFAULT_CORE_PORT, logname="-", loglevel="none"):
         self.logger = logger.get_logger(key="id_lib", level=loglevel,
-                logname=logname) # FIXME: use the logger
+                                        logname=logname) # FIXME: use the logger
         self.domain_id = domain_id
         self.namespace_id = namespace_id
         self.__app = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT,
-                loglevel=loglevel)
+                                          loglevel=loglevel)
         self.__app.set_user_id(id_publickey_map_user_id)
         self.__app.set_domain_id(domain_id)
         self.__app.set_callback(bbc_app.Callback())
@@ -132,17 +132,13 @@ class BBcIdPublickeyMap:
 
         directive = Directive(Directive.CMD_REPLACE, public_keys)
 
-        tx = bbclib.make_transaction_for_base_asset(
-                asset_group_id=self.namespace_id, event_num=1)
-
-        tx.events[0].asset.add(user_id=user_id,
-                asset_body=directive.serialize())
+        tx = bbclib.make_transaction(event_num=1, witness=True)
+        bbclib.add_event_asset(tx, event_idx=0, asset_group_id=self.namespace_id,
+                               user_id=user_id, asset_body=directive.serialize())
         tx.events[0].add(mandatory_approver=user_id)
-        tx.add(witness=bbclib.BBcWitness())
         tx.witness.add_witness(user_id)
         self.sign_and_insert(tx, user_id, keypair)
         return (user_id, initial_keypairs)
-
 
     def get_mapped_public_keys(self, user_id, eval_time=None):
         tx = self.__update_local_database(user_id)
@@ -230,17 +226,16 @@ class BBcIdPublickeyMap:
             dat.extend(Directive(Directive.CMD_REPLACE,
                     public_keys_to_replace).serialize())
 
-        tx = bbclib.make_transaction_for_base_asset(
-                asset_group_id=self.namespace_id, event_num=1)
-        tx.events[0].asset.add(user_id=user_id, asset_body=dat)
+        tx = bbclib.make_transaction(event_num=1)
+        bbclib.add_event_asset(tx, event_idx=0, asset_group_id=self.namespace_id,
+                               user_id=user_id, asset_body=dat)
         tx.events[0].add(mandatory_approver=user_id)
-        bbclib.add_reference_to_transaction(self.namespace_id, tx, reftx, 0)
+        bbclib.add_reference_to_transaction(tx, self.namespace_id, reftx, 0)
 
         if keypair is None:
             return tx
 
         return self.sign_and_insert(tx, user_id, keypair)
-
 
     def verify_signers(self, transaction, asset_group_id, user_id=None,
             id_mapping=False):
@@ -355,7 +350,7 @@ class BBcIdPublickeyMap:
         res = self.__app.callback.sync_by_queryid(ret)
         if res[KeyType.status] < ESUCCESS:
             raise RuntimeError(res[KeyType.reason].decode())
-        return bbclib.recover_transaction_object_from_rawdata(
+        return bbclib.BBcTransaction(deserialize=
                 res[KeyType.transaction_data])
 
 

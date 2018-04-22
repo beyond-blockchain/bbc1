@@ -22,12 +22,11 @@ import queue
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
-from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.core.data_handler import DataHandler
 from bbc1.core.bbc_stats import BBcStats
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
-from bbc1.common import logger
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import PayloadType, KeyType, InfraMessageCategory
+from bbc1.core import logger
 
 
 class RepairManager:
@@ -52,11 +51,11 @@ class RepairManager:
         self.queue = queue.Queue()
         self.requesting_list = dict()
         self.loop_flag = True
-        th_nw_loop = threading.Thread(target=self.manager_loop)
+        th_nw_loop = threading.Thread(target=self._manager_loop)
         th_nw_loop.setDaemon(True)
         th_nw_loop.start()
 
-    def output_log(self, repair_info):
+    def _output_log(self, repair_info):
         with open(self.repair_log, "a") as f:
             f.write(json.dumps(repair_info)+"\n")
 
@@ -64,29 +63,29 @@ class RepairManager:
         self.loop_flag = False
         self.put_message()
 
-    def manager_loop(self):
+    def _manager_loop(self):
         while self.loop_flag:
             msg = self.queue.get()
             if msg is None:
                 continue
             if msg[KeyType.command] == RepairManager.REQUEST_REPAIR_TRANSACTION:
-                self.repair_transaction_data(msg[KeyType.transaction_id])
+                self._repair_transaction_data(msg[KeyType.transaction_id])
             elif msg[KeyType.command] == RepairManager.REQUEST_TO_SEND_TRANSACTION_DATA:
-                self.send_transaction_data(msg)
+                self._send_transaction_data(msg)
             elif msg[KeyType.command] == RepairManager.RESPONSE_TRANSACTION_DATA:
-                self.receive_transaction_data_from_others(msg)
+                self._receive_transaction_data_from_others(msg)
 
     def put_message(self, msg=None):
         self.queue.put(msg)
 
-    def repair_transaction_data(self, transaction_id):
+    def _repair_transaction_data(self, transaction_id):
         """
         Repair forged transaction_data or asset_file by getting legitimate one from other nodes
         :param domain_id:
         :param transaction_id:
         :return:
         """
-        #print("repair_transaction_data:")
+        #print("_repair_transaction_data:")
         self.stats.update_stats_increment("transaction", "repair_request", 1)
         if len(self.data_handler.db_adaptors) > 1:
             valid_txobj = None
@@ -110,7 +109,7 @@ class RepairManager:
                 for i in db_nums_with_invalid_data:
                     self.data_handler.restore_data(db_num=i, transaction_id=transaction_id, txobj=valid_txobj, asset_files=valid_assets)
                 self.stats.update_stats_increment("transaction", "success_repair", 1)
-            self.output_log({"transaction_id": transaction_id.hex(), "request_at": int(time.time()),
+            self._output_log({"transaction_id": transaction_id.hex(), "request_at": int(time.time()),
                              "repaired_by": "locally", "repaired_at": int(time.time())})
 
             if self.data_handler.replication_strategy == DataHandler.REPLICATION_EXT:
@@ -135,13 +134,13 @@ class RepairManager:
                                                   payload_type=PayloadType.Type_any, msg=msg)
         return
 
-    def send_transaction_data(self, dat):
+    def _send_transaction_data(self, dat):
         """
         Send transaction data if having valid one
         :param dat:
         :return:
         """
-        #print("send_transaction_data::")
+        #print("_send_transaction_data::")
         transaction_id = dat[KeyType.transaction_id]
         for idx in range(len(self.data_handler.db_adaptors)):
             result_txobj, result_asset_files = self.data_handler.search_transaction(transaction_id=transaction_id, db_num=idx)
@@ -159,13 +158,13 @@ class RepairManager:
                 self.network.send_message_in_network(None, domain_id=self.domain_id, msg=dat)
                 return
 
-    def receive_transaction_data_from_others(self, dat):
+    def _receive_transaction_data_from_others(self, dat):
         """
         Receive transaction data from other core_nodes and check its validity
         :param dat:
         :return:
         """
-        #print("receive_transaction_data_from_others:")
+        #print("_receive_transaction_data_from_others:")
         if KeyType.transaction_data not in dat or KeyType.transaction_id not in dat or KeyType.nonce not in dat:
             return
         if dat[KeyType.nonce] not in self.requesting_list:
@@ -187,6 +186,6 @@ class RepairManager:
                 "repaired_at": int(time.time())
             }
             self.requesting_list[dat[KeyType.nonce]].update(add_info)
-            self.output_log(self.requesting_list[dat[KeyType.nonce]])
+            self._output_log(self.requesting_list[dat[KeyType.nonce]])
             del self.requesting_list[dat[KeyType.nonce]]
 

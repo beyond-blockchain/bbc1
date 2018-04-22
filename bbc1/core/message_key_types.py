@@ -312,3 +312,10 @@ class KeyType:
     merkle_tree = to_4byte(3, 0xA0)
 
 
+class InfraMessageCategory:
+    CATEGORY_NETWORK = to_2byte(0)
+    CATEGORY_TOPOLOGY = to_2byte(1)
+    CATEGORY_USER = to_2byte(2)
+    CATEGORY_DATA = to_2byte(3)
+    CATEGORY_DOMAIN0 = to_2byte(4)
+

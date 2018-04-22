@@ -36,7 +36,7 @@ bbc1_requires = [
                  'eth-utils==0.7.4',
                 ]
 
-bbc1_packages = ['bbc1', 'bbc1.core', 'bbc1.core.ethereum', 'bbc1.common', 'bbc1.common.libbbcsig', 'bbc1.app']
+bbc1_packages = ['bbc1', 'bbc1.core', 'bbc1.core.ethereum', 'bbc1.core.libbbcsig']
 
 bbc1_commands = [
                  'bbc1/core/bbc_core.py',

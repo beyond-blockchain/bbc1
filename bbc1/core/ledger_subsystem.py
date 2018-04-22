@@ -23,7 +23,7 @@ import threading
 
 import sys
 sys.path.extend(["../../"])
-from bbc1.common import logger
+from bbc1.core import logger
 from bbc1.core.ethereum import bbc_ethereum
 
 temp_json = {

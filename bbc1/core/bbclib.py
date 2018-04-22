@@ -24,7 +24,7 @@ import traceback
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(os.path.join(current_dir, "../.."))
-from bbc1.common.bbc_error import *
+from bbc1.core.bbc_error import *
 
 directory, filename = os.path.split(os.path.realpath(__file__))
 from ctypes import *
@@ -97,6 +97,47 @@ def convert_idstring_to_bytes(datastr, bytelen=32):
     return bytes(res)
 
 
+def make_transaction(event_num=0, relation_num=0, witness=False):
+    transaction = BBcTransaction()
+    if event_num > 0:
+        for i in range(event_num):
+            evt = BBcEvent()
+            ast = BBcAsset()
+            evt.add(asset=ast)
+            transaction.add(event=evt)
+    if relation_num > 0:
+        for i in range(relation_num):
+            transaction.add(relation=BBcRelation())
+    if witness:
+        transaction.add(witness=BBcWitness())
+    return transaction
+
+
+def add_relation_asset(transaction, relation_idx, asset_group_id, user_id, asset_body=None, asset_file=None):
+    ast = BBcAsset(user_id=user_id, asset_file=asset_file, asset_body=asset_body)
+    transaction.relations[relation_idx].add(asset_group_id=asset_group_id, asset=ast)
+
+
+def add_relation_pointer(transaction, relation_idx, ref_transaction_id=None, ref_asset_id=None):
+    pointer = BBcPointer(transaction_id=ref_transaction_id, asset_id=ref_asset_id)
+    transaction.relations[relation_idx].add(pointer=pointer)
+
+
+def add_reference_to_transaction(transaction, asset_group_id, ref_transaction_obj, event_index_in_ref):
+    ref = BBcReference(asset_group_id=asset_group_id,
+                       transaction=transaction, ref_transaction=ref_transaction_obj, event_index_in_ref=event_index_in_ref)
+    if ref.transaction_id is None:
+        return None
+    transaction.add(reference=ref)
+    return ref
+
+
+def add_event_asset(transaction, event_idx, asset_group_id, user_id, asset_body=None, asset_file=None):
+    ast = BBcAsset(user_id=user_id, asset_file=asset_file, asset_body=asset_body)
+    transaction.events[event_idx].add(asset_group_id=asset_group_id, asset=ast)
+
+
+# =================== Methods below will be obsoleted in v1.0 =================
 def make_transaction_for_base_asset(asset_group_id=None, event_num=1, witness=False):
     transaction = BBcTransaction()
     for i in range(event_num):
@@ -107,61 +148,8 @@ def make_transaction_for_base_asset(asset_group_id=None, event_num=1, witness=Fa
     if witness:
         transaction.add(witness=BBcWitness())
     return transaction
+# =====================================================
 
-
-def add_reference_to_transaction(asset_group_id, transaction, ref_transaction_obj, event_index_in_ref):
-    ref = BBcReference(asset_group_id=asset_group_id,
-                       transaction=transaction, ref_transaction=ref_transaction_obj, event_index_in_ref=event_index_in_ref)
-    if ref.transaction_id is None:
-        return None
-    transaction.add(reference=ref)
-    return ref
-
-
-def make_transaction_with_relation(asset_group_id=None, asset=None, base_transaction=None):
-    if base_transaction is None:
-        base_transaction = BBcTransaction()
-    rtn = BBcRelation(asset_group_id=asset_group_id)
-    if asset is None:
-        asset = BBcAsset()
-    rtn.add(asset=asset)
-    base_transaction.add(relation=rtn)
-    return base_transaction
-
-
-def add_relation_pointer(relation, transaction_id, asset_id):
-    pointer = BBcPointer(transaction_id=transaction_id, asset_id=asset_id)
-    relation.add(pointer=pointer)
-
-
-def get_relation_with_asset_group_id(txobj, asset_group_id):
-    ret = list()
-    for r in txobj.relations:
-        if r.asset_group_id == asset_group_id:
-            ret.append(r)
-    return ret
-
-
-def get_relation_with_asset_id(txobj, asset_id):
-    ret = list()
-    for r in txobj.relations:
-        if r.asset is not None and r.asset.asset_id == asset_id:
-            ret.append(r)
-    return ret
-
-
-def make_transaction_with_witness(base_transaction=None):
-    if base_transaction is None:
-        base_transaction = BBcTransaction()
-    wit = BBcWitness()
-    base_transaction.add(witness=wit)
-    return base_transaction
-
-
-def recover_transaction_object_from_rawdata(data):
-    transaction = BBcTransaction()
-    transaction.deserialize(data)
-    return transaction
 
 
 def recover_signature_object(data):
@@ -233,7 +221,7 @@ def validate_transaction_object(txobj, asset_files=None):
         if evt.asset is None:
             continue
         asid = evt.asset.asset_id
-        if asid in asset_files.keys():
+        if asid in asset_files:
             if evt.asset.asset_file_digest != hashlib.sha256(asset_files[asid]).digest():
                 invalid_asset.append(asid)
             else:
@@ -242,7 +230,7 @@ def validate_transaction_object(txobj, asset_files=None):
         if rtn.asset is None:
             continue
         asid = rtn.asset.asset_id
-        if asid in asset_files.keys():
+        if asid in asset_files:
             if rtn.asset.asset_file_digest != hashlib.sha256(asset_files[asid]).digest():
                 invalid_asset.append(asid)
             else:
@@ -461,8 +449,14 @@ class BBcTransaction:
         for i, rtn in enumerate(self.relations):
             ret += " [%d]\n" % i
             ret += str(rtn)
-        ret += str(self.witness)
-        ret += str(self.cross_ref)
+        if self.witness is None:
+            ret += "Witness: None\n"
+        else:
+            ret += str(self.witness)
+        if self.cross_ref is None:
+            ret += "Cross_Ref: None\n"
+        else:
+            ret += str(self.cross_ref)
         ret += "Signature[]: %d\n" % len(self.signatures)
         for i, sig in enumerate(self.signatures):
             ret += " [%d]\n" % i
@@ -1395,8 +1389,9 @@ class BBcWitness:
         return ret
 
     def add_witness(self, user_id):
-        self.user_ids.append(user_id)
-        self.sig_indices.append(self.transaction.get_sig_index(user_id))
+        if user_id not in self.user_ids:
+            self.user_ids.append(user_id)
+            self.sig_indices.append(self.transaction.get_sig_index(user_id))
 
     def add_signature(self, user_id=None, signature=None):
         self.transaction.add_signature(user_id=user_id, signature=signature)
@@ -1428,15 +1423,17 @@ class BBcWitness:
 
 
 class BBcAsset:
-    def __init__(self):
+    def __init__(self, user_id=None, asset_file=None, asset_body=None):
         self.asset_id = None
-        self.user_id = None
+        self.user_id = user_id
         self.nonce = get_random_value()
         self.asset_file_size = 0
         self.asset_file = None
         self.asset_file_digest = None
         self.asset_body_size = 0
-        self.asset_body = []
+        self.asset_body = None
+        if user_id is not None:
+            self.add(user_id, asset_file, asset_body)
 
     def __str__(self):
         ret =  "  Asset:\n"
@@ -1571,6 +1568,7 @@ class MsgType:
     CANCEL_INSERT_NOTIFICATION = 16
     REQUEST_GET_STATS = 17
     RESPONSE_GET_STATS = 18
+    NOTIFY_DOMAIN_KEY_UPDATE = 19
     REQUEST_GET_NEIGHBORLIST = 21
     RESPONSE_GET_NEIGHBORLIST = 22
     REQUEST_GET_USERS = 23
@@ -1610,7 +1608,6 @@ class MsgType:
     REQUEST_CROSS_REF_LIST = 92
     RESPONSE_CROSS_REF_LIST = 93
     REQUEST_REPAIR = 94
-    RESPONSE_REPAIR = 95
 
     REQUEST_REGISTER_HASH_IN_SUBSYS = 128
     RESPONSE_REGISTER_HASH_IN_SUBSYS = 129

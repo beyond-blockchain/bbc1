@@ -20,8 +20,7 @@ import binascii
 
 import sys
 sys.path.extend(["../../"])
-from bbc1.common import logger
-
+from bbc1.core import logger
 
 DIR_APP_SUPPORT = '.bbc1_app_support/'
 
@@ -38,7 +37,7 @@ class Database:
 
     def __init__(self, dbtype="sqlite", loglevel="all", logname=None):
         self.logger = logger.get_logger(key="app_support_db", level=loglevel,
-                        logname=logname)
+                                        logname=logname)
         self.dbtype = dbtype
         self.db_name = dict()
         self.db = dict()

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-import binascii
 import pytest
 import sys
 import time
 
 sys.path.extend(["../"])
-from bbc1.app import bbc_app, id_lib
-from bbc1.common import bbclib
+from bbc1.app import id_lib
+from bbc1.core import bbc_app
+from bbc1.core import bbclib
 from bbc1.core.bbc_config import DEFAULT_CORE_PORT
 
 
@@ -14,8 +14,8 @@ from bbc1.core.bbc_config import DEFAULT_CORE_PORT
 def default_domain_id():
     domain_id = bbclib.get_new_id("test_id_lib", include_timestamp=False)
 
-    tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
-    tmpclient.domain_setup(domain_id, "simple_cluster")
+    tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, multiq=False, loglevel="all")
+    tmpclient.domain_setup(domain_id)
     tmpclient.callback.synchronize()
     tmpclient.unregister_from_core()
     return domain_id

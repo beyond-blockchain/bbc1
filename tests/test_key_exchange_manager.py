@@ -6,10 +6,9 @@ import queue
 
 import sys
 sys.path.extend(["../"])
-from bbc1.core import query_management
+from bbc1.core import query_management, message_key_types
 from bbc1.core import key_exchange_manager
-from bbc1.common import message_key_types
-from bbc1.common import bbclib
+from bbc1.core import bbclib
 
 ticker = query_management.get_ticker()
 msg_queue = queue.Queue()

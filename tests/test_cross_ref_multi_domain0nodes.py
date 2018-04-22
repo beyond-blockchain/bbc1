@@ -6,10 +6,10 @@ import time
 
 import sys
 sys.path.extend(["../"])
-from bbc1.common import bbclib
+from bbc1.core import bbclib
 from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 from bbc1.core import domain0_manager, user_message_routing
-from bbc1.common.message_key_types import KeyType
+from bbc1.core.message_key_types import KeyType
 
 
 LOGLEVEL = 'info'

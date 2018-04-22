@@ -19,7 +19,7 @@ The next update will be a major version up to v1.0. However, the basic feature w
 # Environment
 
 * Python
-    - Python 3.6.0 or later
+    - Python 3.5.0 or later
 
 * tools for macOS by Homebrew
     ```

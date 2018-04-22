@@ -22,11 +22,8 @@ import binascii
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
-from bbc1.core.bbc_types import InfraMessageCategory
-from bbc1.core import query_management
-from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
-from bbc1.common import logger
-
+from bbc1.core import query_management, logger
+from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
 
 ticker = query_management.get_ticker()
 
@@ -67,18 +64,6 @@ class TopologyManagerBase:
         if self.neighbor_refresh_timer_entry is not None:
             self.neighbor_refresh_timer_entry.deactivate()
 
-    def resolve_next_hop(self, destination_id):
-        """
-        Determine next hop node to forward message
-        :param destination_id:
-        :return:
-        """
-        if destination_id in self.neighbors.nodeinfo_list:
-            return destination_id
-        else:
-            return None
-        pass
-
     def notify_neighbor_update(self, node_id, is_new=True):
         """
         Notified when neighbor node info is updated
@@ -95,7 +80,7 @@ class TopologyManagerBase:
         rand_time = random.uniform(0.5, 1) * 5 / (len(self.neighbors.nodeinfo_list) + 1)
         if self.advertise_wait_entry is None:
             self.advertise_wait_entry = query_management.QueryEntry(expire_after=rand_time,
-                                                                    callback_expire=self.advertise_neighbor_info,
+                                                                    callback_expire=self._advertise_neighbor_info,
                                                                     retry_count=0)
         else:
             self.advertise_wait_entry.update_expiration_time(rand_time)
@@ -110,16 +95,16 @@ class TopologyManagerBase:
         if new_entry:
             self.neighbor_refresh_timer_entry = query_management.QueryEntry(
                 expire_after=rand_interval, data={"is_refresh": True},
-                callback_expire=self.advertise_neighbor_info, retry_count=0)
+                callback_expire=self._advertise_neighbor_info, retry_count=0)
         else:
             self.neighbor_refresh_timer_entry.update_expiration_time(rand_interval)
 
-    def advertise_neighbor_info(self, query_entry):
+    def _advertise_neighbor_info(self, query_entry):
         """
         Broadcast nodeinfo list
         :return:
         """
-        #print("[%s]: advertise_neighbor_info" % self.my_node_id.hex()[:4])
+        #print("[%s]: _advertise_neighbor_info" % self.my_node_id.hex()[:4])
         self.advertise_wait_entry = None
         msg = {
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_TOPOLOGY,
@@ -158,7 +143,7 @@ class TopologyManagerBase:
         nodes.extend(nodeinfo)
         return bytes(nodes)
 
-    def update_neighbor_list(self, binary_data):
+    def _update_neighbor_list(self, binary_data):
         """
         Parse binary data and update neighbors
         :param binary_data:
@@ -205,7 +190,7 @@ class TopologyManagerBase:
         if msg[KeyType.command] == TopologyManagerBase.NOTIFY_NEIGHBOR_LIST:
             self.stats.update_stats_increment("topology_manager", "NOTIFY_NEIGHBOR_LIST", 1)
             self.update_refresh_timer_entry(new_entry=False)
-            diff_flag = self.update_neighbor_list(msg[KeyType.neighbor_list])
+            diff_flag = self._update_neighbor_list(msg[KeyType.neighbor_list])
             if diff_flag:
                 if self.advertise_wait_entry is None:
                     self.notify_neighbor_update(None)

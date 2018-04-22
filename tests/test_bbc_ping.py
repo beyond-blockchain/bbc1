@@ -7,9 +7,9 @@ import pprint
 
 import sys
 sys.path.extend(["../", "../utils"])
-from bbc1.common import bbclib
-from bbc1.app import bbc_app
-from testutils import prepare, get_core_client, start_core_thread, make_client, wait_check_result_msg_type, domain_setup_utility
+from bbc1.core import bbclib
+from bbc1.core import bbc_app
+from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 
 
 LOGLEVEL = 'debug'

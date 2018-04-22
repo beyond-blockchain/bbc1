@@ -8,10 +8,10 @@ import random
 import os
 import sys
 sys.path.extend(["../"])
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import KeyType
-from bbc1.common.bbc_error import *
-from bbc1.app import bbc_app
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType
+from bbc1.core.bbc_error import *
+from bbc1.core import bbc_app
 from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 
 
@@ -63,7 +63,7 @@ class MessageProcessor(bbc_app.Callback):
     def proc_resp_search_asset(self, dat):
         if KeyType.transaction_data in dat:
             self.logger.debug("OK: Asset [%s] is found." % binascii.b2a_hex(dat[KeyType.asset_id]))
-            tx_obj = bbclib.recover_transaction_object_from_rawdata(dat[KeyType.transaction_data])
+            tx_obj = bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data])
             for evt in tx_obj.events:
                 if evt.asset.asset_body_size > 0:
                     self.logger.debug(" [%s] asset_body --> %s" % (binascii.b2a_hex(evt.asset.asset_id[:4]),
@@ -136,12 +136,14 @@ class TestBBcAppClient(object):
     def test_13_insert_first_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         user = clients[0]['user_id']
-        transactions[0] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
-        transactions[0].events[0].asset.add(user_id=user, asset_body=b'123456')
-        transactions[0].events[1].asset.add(user_id=user, asset_file=b'abcdefg')
+        transactions[0] = bbclib.make_transaction(event_num=2, witness=True)
         transactions[0].events[0].add(reference_index=0, mandatory_approver=user)
+        bbclib.add_event_asset(transactions[0], event_idx=0, asset_group_id=asset_group_id,
+                               user_id=user, asset_body=b'123456')
+        bbclib.add_event_asset(transactions[0], event_idx=1, asset_group_id=asset_group_id,
+                               user_id=user, asset_body=b'abcdefg')
 
-        transactions[0].get_sig_index(user)
+        transactions[0].witness.add_witness(user)
         sig = transactions[0].sign(keypair=clients[0]['keypair'])
         assert sig is not None
         if sig is None:
@@ -164,10 +166,11 @@ class TestBBcAppClient(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         prev_tx = transactions[0]
         user = clients[1]['user_id']
-        transactions[1] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
-        transactions[1].events[0].asset.add(user_id=user, asset_body=b'123456')
+        transactions[1] = bbclib.make_transaction(event_num=1)
+        bbclib.add_event_asset(transactions[1], event_idx=0, asset_group_id=asset_group_id,
+                               user_id=user, asset_body=b'123456')
 
-        reference = bbclib.add_reference_to_transaction(asset_group_id, transactions[1], prev_tx, 0)
+        reference = bbclib.add_reference_to_transaction(transactions[1], asset_group_id, prev_tx, 0)
         clients[1]['app'].gather_signatures(transactions[1], reference_obj=reference)
         dat = msg_processor[1].synchronize()
         assert dat[KeyType.status] == ESUCCESS

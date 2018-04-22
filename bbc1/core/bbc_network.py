@@ -32,17 +32,15 @@ import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core.bbc_config import DEFAULT_P2P_PORT
 from bbc1.core.key_exchange_manager import KeyExchangeManager
-from bbc1.core.bbc_types import InfraMessageCategory
 from bbc1.core.topology_manager import TopologyManagerBase
 from bbc1.core.user_message_routing import UserMessageRouting
 from bbc1.core.data_handler import DataHandler, DataHandlerDomain0
 from bbc1.core.repair_manager import RepairManager
 from bbc1.core.domain0_manager import Domain0Manager
-from bbc1.core import query_management
-from bbc1.common import bbclib, message_key_types
-from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
-from bbc1.common import logger
-from bbc1.common.bbc_error import *
+from bbc1.core import query_management, message_key_types, logger
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
+from bbc1.core.bbc_error import *
 
 TCP_THRESHOLD_SIZE = 1300
 ZEROS = bytes([0] * 32)
@@ -58,7 +56,7 @@ ALIVE_CHECK_PING_WAIT = 2
 ticker = query_management.get_ticker()
 
 
-def check_my_IPaddresses(target4='8.8.8.8', target6='2001:4860:4860::8888', port=80):
+def _check_my_IPaddresses(target4='8.8.8.8', target6='2001:4860:4860::8888', port=80):
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect((target4, port))
@@ -77,7 +75,7 @@ def check_my_IPaddresses(target4='8.8.8.8', target6='2001:4860:4860::8888', port
     return ip4, ip6
 
 
-def send_data_by_tcp(ipv4=None, ipv6=None, port=DEFAULT_P2P_PORT, msg=None):
+def _send_data_by_tcp(ipv4=None, ipv6=None, port=DEFAULT_P2P_PORT, msg=None):
     def worker():
         if ipv6 is not None and ipv6 != "::":
             conn = socket.create_connection((ipv6, port))
@@ -90,7 +88,7 @@ def send_data_by_tcp(ipv4=None, ipv6=None, port=DEFAULT_P2P_PORT, msg=None):
     gevent.spawn(worker)
 
 
-def convert_to_string(array):
+def _convert_to_string(array):
     for i in range(len(array)):
         if isinstance(array[i], bytes):
             array[i] = array[i].decode()
@@ -135,7 +133,7 @@ class BBcNetwork:
         self.domain0manager = None
         conf = self.config.get_config()
         self.domains = dict()
-        self.ip_address, self.ip6_address = check_my_IPaddresses()
+        self.ip_address, self.ip6_address = _check_my_IPaddresses()
         if external_ip4addr is not None:
             self.external_ip4addr = external_ip4addr
         else:
@@ -226,7 +224,7 @@ class BBcNetwork:
         conf = self.config.get_domain_config(domain_id, create_if_new=True)
         if config is not None:
             conf.update(config)
-        if 'node_id' not in conf:
+        if 'node_id' not in conf or conf['node_id'] == "":
             node_id = bbclib.get_random_id()
             conf['node_id'] = bbclib.convert_id_to_string(node_id)
             self.config.update_config()
@@ -302,6 +300,7 @@ class BBcNetwork:
         del self.domains[domain_id]
         if self.domain0manager is not None:
             self.domain0manager.update_domain_belong_to()
+        self.config.remove_domain_config(domain_id)
         self.stats.update_stats_decrement("network", "num_domains", 1)
         return True
 
@@ -318,7 +317,7 @@ class BBcNetwork:
             for node_id, nodeinfo in self.domains[domain_id]['neighbor'].nodeinfo_list.items():
                 if nodeinfo.is_static:
                     nid = bbclib.convert_id_to_string(node_id)
-                    info = convert_to_string([nodeinfo.ipv4, nodeinfo.ipv6, nodeinfo.port])
+                    info = _convert_to_string([nodeinfo.ipv4, nodeinfo.ipv6, nodeinfo.port])
                     conf['static_node'][nid] = info
         self.config.update_config()
         self.logger.info("Done...")
@@ -343,11 +342,11 @@ class BBcNetwork:
 
     def get_domain_keypair(self, domain_id):
         """
-        (internal use) Get domain_keys (private key and public key)
+        Get domain_keys (private key and public key)
         :param domain_id:
         :return:
         """
-        keyconfig = self.config.get_config().get('domain_auth_key', None)
+        keyconfig = self.config.get_config().get('domain_key', None)
         if keyconfig is None:
             self.domains[domain_id]['keypair'] = None
             return
@@ -548,7 +547,7 @@ class BBcNetwork:
             return False
 
         if len(data_to_send) > TCP_THRESHOLD_SIZE:
-            send_data_by_tcp(ipv4=nodeinfo.ipv4, ipv6=nodeinfo.ipv6, port=nodeinfo.port, msg=data_to_send)
+            _send_data_by_tcp(ipv4=nodeinfo.ipv4, ipv6=nodeinfo.ipv6, port=nodeinfo.port, msg=data_to_send)
             self.stats.update_stats_increment("network", "send_msg_by_tcp", 1)
             self.stats.update_stats_increment("network", "sent_data_size", len(data_to_send))
             return True

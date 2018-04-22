@@ -4,7 +4,7 @@ import pytest
 import pprint
 import sys
 sys.path.extend(["../"])
-from bbc1.common import bbclib
+from bbc1.core import bbclib
 from bbc1.core import bbc_stats
 from bbc1.core.data_handler import DataHandler
 
