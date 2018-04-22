@@ -59,6 +59,17 @@ TX_TRAVERSAL_MAX = 30
 ticker = query_management.get_ticker()
 core_service = None
 
+admin_message_commands = (
+    MsgType.REQUEST_GET_STATS, MsgType.REQUEST_GET_NEIGHBORLIST,
+    MsgType.REQUEST_GET_CONFIG, MsgType.REQUEST_GET_DOMAINLIST,
+    MsgType.REQUEST_GET_FORWARDING_LIST, MsgType.REQUEST_GET_USERS,
+    MsgType.REQUEST_GET_NODEID, MsgType.REQUEST_GET_NOTIFICATION_LIST,
+    MsgType.REQUEST_SETUP_DOMAIN, MsgType.REQUEST_CLOSE_DOMAIN,
+    MsgType.NOTIFY_DOMAIN_KEY_UPDATE,
+    MsgType.DOMAIN_PING, MsgType.REQUEST_SET_STATIC_NODE,
+    MsgType.REQUEST_MANIP_LEDGER_SUBSYS
+)
+
 
 def _make_message_structure(domain_id, cmd, dstid, qid):
     """
@@ -221,6 +232,7 @@ class BBcCoreService:
         Get or create node key for creating a domain by bbc_app
         :return:
         """
+        self.logger.info("The core use node_key to check signature on admin command message")
         keypath = os.path.join(self.config.working_dir, "node_key.pem")
 
         self.node_key = bbclib.KeyPair()
@@ -286,14 +298,7 @@ class BBcCoreService:
         if not self._param_check([KeyType.command, KeyType.source_user_id], dat):
             self.logger.debug("message has bad format")
             return False, None
-        if dat[KeyType.command] in [MsgType.REQUEST_GET_STATS, MsgType.REQUEST_GET_NEIGHBORLIST,
-                                    MsgType.REQUEST_GET_CONFIG, MsgType.REQUEST_GET_DOMAINLIST,
-                                    MsgType.REQUEST_GET_FORWARDING_LIST, MsgType.REQUEST_GET_USERS,
-                                    MsgType.REQUEST_GET_NODEID, MsgType.REQUEST_GET_NOTIFICATION_LIST,
-                                    MsgType.REQUEST_SETUP_DOMAIN, MsgType.REQUEST_CLOSE_DOMAIN,
-                                    MsgType.NOTIFY_DOMAIN_KEY_UPDATE,
-                                    MsgType.DOMAIN_PING, MsgType.REQUEST_SET_STATIC_NODE,
-                                    MsgType.REQUEST_MANIP_LEDGER_SUBSYS]:
+        if dat[KeyType.command] in admin_message_commands:
             if not self._check_signature_by_nodekey(dat):
                 self.logger.error("Illegal access to core node")
                 return False, None

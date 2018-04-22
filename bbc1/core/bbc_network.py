@@ -262,6 +262,7 @@ class BBcNetwork:
                     self.domains[dm]['neighbor'].my_info.update(domain0=True)
             self.domains[domain_id]['topology'].update_refresh_timer_entry(1)
         self.stats.update_stats_increment("network", "num_domains", 1)
+        self.logger.info("Domain %s is created" % (domain_id.hex()))
         return True
 
     def remove_domain(self, domain_id=ZEROS):
@@ -302,6 +303,7 @@ class BBcNetwork:
             self.domain0manager.update_domain_belong_to()
         self.config.remove_domain_config(domain_id)
         self.stats.update_stats_decrement("network", "num_domains", 1)
+        self.logger.info("Domain %s is removed" % (domain_id.hex()))
         return True
 
     def save_all_static_node_list(self):

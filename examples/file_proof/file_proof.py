@@ -127,7 +127,7 @@ def get_list_from_mappings(asset_group_id):
 
 
 def domain_setup():
-    tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
+    tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, multiq=False, loglevel="all")
     if os.path.exists("node_key.pem"):
         tmpclient.set_node_key("node_key.pem")
     tmpclient.domain_setup(domain_id)
@@ -138,7 +138,7 @@ def domain_setup():
 
 
 def setup_bbc_client():
-    bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
+    bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, multiq=False, loglevel="all")
     bbc_app_client.set_user_id(user_id)
     bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_callback(bbc_app.Callback())
