@@ -49,7 +49,7 @@ bbc_app_client = None
 
 
 def setup_bbc_client(domain_id):
-    bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
+    bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, multiq=False, loglevel="all")
     bbc_app_client.set_user_id(user_id)
     bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_callback(bbc_app.Callback())
@@ -169,13 +169,8 @@ def execute_escrow():
 
 
     # Make TX
-<<<<<<< HEAD
     land_client = setup_bbc_client(land_domain_id)
-    transaction = bbclib.make_transaction_for_base_asset(asset_group_id=land_asset_group, event_num=2)
-=======
-    land_client = setup_bbc_client()
     transaction = bbclib.make_transaction(event_num=2)
->>>>>>> upstream/1.0-pre
 
     # Add event and asset
     print("Add event and asset")
