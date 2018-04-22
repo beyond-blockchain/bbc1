@@ -63,7 +63,7 @@ def prepare_transaction(asset_group, client, datnum, txid_pointer=None, no_cross
     wit = bbclib.BBcWitness()
     txobj.add(relation=rtn, witness=wit)
     wit.add_witness(user_id)
-    if not  no_cross_ref:
+    if not no_cross_ref:
         client['app'].include_cross_ref(txobj)
     sig = txobj.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1, keypair=kp)
     txobj.add_signature(user_id=user_id, signature=sig)

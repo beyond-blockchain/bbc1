@@ -107,7 +107,7 @@ class TestBBcAppClient(object):
 
     def test_04_search_transaction_direction_backward(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        clients[0]['app']._traverse_transactions(transactions1[1].transaction_id, direction=1, hop_count=3)
+        clients[0]['app'].traverse_transactions(transactions1[1].transaction_id, direction=1, hop_count=3)
         dat = clients[0]['app'].callback.synchronize()
         assert dat[KeyType.status] == 0
         assert KeyType.transaction_tree in dat
@@ -124,7 +124,7 @@ class TestBBcAppClient(object):
 
     def test_05_search_transaction_direction_forward(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        clients[0]['app']._traverse_transactions(transactions1[1].transaction_id, direction=0, hop_count=3)
+        clients[0]['app'].traverse_transactions(transactions1[1].transaction_id, direction=0, hop_count=3)
         dat = clients[0]['app'].callback.synchronize()
         assert dat[KeyType.status] == 0
         assert KeyType.transaction_tree in dat
@@ -142,7 +142,7 @@ class TestBBcAppClient(object):
 
     def test_06_search_transaction_direction_backward(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        clients[0]['app']._traverse_transactions(transactions2[4].transaction_id, direction=1, hop_count=3)
+        clients[0]['app'].traverse_transactions(transactions2[4].transaction_id, direction=1, hop_count=3)
         dat = clients[0]['app'].callback.synchronize()
         assert dat[KeyType.status] == 0
         assert KeyType.transaction_tree in dat
@@ -160,7 +160,7 @@ class TestBBcAppClient(object):
 
     def test_07_search_transaction_direction_forward(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        clients[0]['app']._traverse_transactions(transactions2[4].transaction_id, direction=0, hop_count=10)
+        clients[0]['app'].traverse_transactions(transactions2[4].transaction_id, direction=0, hop_count=10)
         dat = clients[0]['app'].callback.synchronize()
         assert dat[KeyType.status] == 0
         assert KeyType.transaction_tree in dat

@@ -72,6 +72,7 @@ class BBcAppClient:
         self.connection = socket.create_connection((host, port))
         self.callback = Callback(log=self.logger)
         self.callback.set_client(self)
+        self.keypair = None
         self.node_keypair = None
         self.use_query_id_based_message_wait = multiq
         self.user_id = None
@@ -92,6 +93,7 @@ class BBcAppClient:
         """
         self.callback = callback_obj
         self.callback.set_logger(self.logger)
+        self.callback.set_client(self)
 
     def set_domain_id(self, domain_id):
         """
@@ -110,6 +112,15 @@ class BBcAppClient:
         :return:
         """
         self.user_id = identifier
+
+    def set_keypair(self, keypair):
+        """
+        Set keypair for the user
+
+        :param keypair:
+        :return:
+        """
+        self.keypair = keypair
 
     def set_node_key(self, pem_file=None):
         """
@@ -392,7 +403,7 @@ class BBcAppClient:
     def register_to_core(self, on_multiple_nodes=False):
         """
         Register the client (user_id) to the core node. After that, the client can communicate with the core node
-        :param on_multiple_nodes:
+        :param on_multiple_nodes: True if this user_id is for multicast address
         :return:
         """
         dat = self._make_message_structure(MsgType.REGISTER)
@@ -436,14 +447,14 @@ class BBcAppClient:
         dat[KeyType.asset_group_id] = asset_group_id
         return self.send_msg(dat)
 
-    def gather_signatures(self, tx_obj, reference_obj=None, destinations=None, asset_files=None, anycast=False):
+    def gather_signatures(self, tx_obj, reference_obj=None, asset_files=None, destinations=None, anycast=False):
         """
         Request to gather signatures from the specified user_ids
 
         :param tx_obj:
         :param reference_obj: BBcReference object
-        :param destinations: list of destination user_ids
         :param asset_files: dictionary of {asset_id: file_content}
+        :param destinations: list of destination user_ids
         :param anycast: True if this message is for anycasting
         :return:
         """
@@ -466,38 +477,38 @@ class BBcAppClient:
             dat[KeyType.all_asset_files] = asset_files
         return self.send_msg(dat)
 
-    def sendback_signature(self, dst, transaction_id, ref_index, sig, query_id=None):
+    def sendback_signature(self, dest_user_id=None, transaction_id=None, ref_index=-1, signature=None, query_id=None):
         """
         Send back the signed transaction to the source
 
-        :param dst:
+        :param dest_user_id:
         :param transaction_id:
         :param ref_index: Which reference in transaction the signature is for
-        :param sig:
+        :param signature: BBcSignature object
         :param query_id:
         :return:
         """
         dat = self._make_message_structure(MsgType.RESPONSE_SIGNATURE)
-        dat[KeyType.destination_user_id] = dst
+        dat[KeyType.destination_user_id] = dest_user_id
         dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.ref_index] = ref_index
-        dat[KeyType.signature] = sig.serialize()
+        dat[KeyType.signature] = signature.serialize()
         if query_id is not None:
             dat[KeyType.query_id] = query_id
         return self.send_msg(dat)
 
-    def sendback_denial_of_sign(self, dst, transaction_id, reason_text, query_id=None):
+    def sendback_denial_of_sign(self, dest_user_id=None, transaction_id=None, reason_text=None, query_id=None):
         """
         Send back the denial of sign the transaction
 
-        :param dst:
+        :param dest_user_id:
         :param transaction_id:
         :param reason_text:
         :param query_id:
         :return:
         """
         dat = self._make_message_structure(MsgType.RESPONSE_SIGNATURE)
-        dat[KeyType.destination_user_id] = dst
+        dat[KeyType.destination_user_id] = dest_user_id
         dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.status] = EOTHER
         dat[KeyType.reason] = reason_text
@@ -563,7 +574,7 @@ class BBcAppClient:
         dat[KeyType.transaction_id] = transaction_id
         return self.send_msg(dat)
 
-    def _traverse_transactions(self, transaction_id, direction=1, hop_count=3):
+    def traverse_transactions(self, transaction_id, direction=1, hop_count=3):
         """
         Search request for transaction_data
 
@@ -712,9 +723,10 @@ class Callback:
     def create_queue(self, query_id):
         self.query_queue.setdefault(query_id, queue.Queue())
 
-    def get_from_queue(self, query_id, timeout=None):
+    def get_from_queue(self, query_id, timeout=None, no_delete=False):
         msg = self.query_queue[query_id].get(timeout=timeout)
-        del self.query_queue[query_id]
+        if not no_delete:
+            del self.query_queue[query_id]
         return msg
 
     def dispatch(self, dat, payload_type):
@@ -795,12 +807,13 @@ class Callback:
         except:
             return None
 
-    def sync_by_queryid(self, query_id, timeout=None):
+    def sync_by_queryid(self, query_id, timeout=None, no_delete_q=False):
         """
         Wait for message with specified query_id
 
         :param query_id:
         :param timeout: timeout second for waiting
+        :param no_delete_q: if true, queue for the query_id remains after popping a message
         :return:
         """
         try:
