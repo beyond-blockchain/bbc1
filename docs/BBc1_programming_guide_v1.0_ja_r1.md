@@ -529,9 +529,10 @@ traverse\_transactionsメソッドには、起点となるトランザクショ�
 ```
 1番目のリスト\[txdata1\_1, txdata1\_2, txdata1\_3,,,,\]は1ホップ前後のトランザクション群であり、2番目のリストはそのさらに1ホップ離れたトランザクション群である。traverse\_transactionsメソッドにhop\_countを指定しているのは、取得する情報が多くなりすぎてcore nodeに負荷をかけすぎないようにするためである。なお、KeyType.transaction\_treeに含まれるトランザクション数が規定値(bbc\_core.pyに指定されているTX_TRAVERSAL_MAX=30)よりも多くなると、オーバーする部分およびそれが発生したホップ数のリスト全体を削除して返答される。さらに辿りたい場合は、transaction\_idを指定し直して再度traverse\_transactionsメソッドを呼べば良い。
 
-# 履歴交差(Cross\_Ref)
+# 履歴交差(BBcCrossRefオブジェクト)
 履歴交差とは、全く無関係なドメインのトランザクションのtransaction\_idをトランザクションに含めることである。関係のないドメイン間でtransaction\_idを持ち合うことで、「辻褄を合わせた完全な改ざん」が非常に困難になる。履歴交差がない場合は、ドメイン内に保存されている全てのトランザクションを差し替えられると、改ざんが行われたかどうかの事実すらわからなくなるが、外部ドメインにtransaction\_idを通知しておけば、それをチェックすることで確実にそのtransaction\_idが存在していたことを証明できる。逆に言えば、そのtransaction\_idが存在しなくなっているということは、トランザクション全体が差し替えられたといえる。
 
+## BBcCrossRefオブジェクトのトランザクションへの付加
 この履歴交差は、他者のトランザクションを保持しなければならないため、ドメイン間での相互協力が不可欠である。履歴交差情報は具体的には、BBcCrossRefオブジェクトとしてdomain0でやり取りされる。そしていずれかのトランザクションにそのBBcCrossRefオブジェクトが取り込まれて登録される。BBcCrossRefオブジェクトはアプリケーションには何の影響も与えないため、含めても含めなくてもよいが、他のドメインで発生したtransaction\_idを数多くトランザクションに含めれば、それだけ他のトランザクションで自ドメインのtransaction\_idを含めてもらいやすくなる(core nodeがその制御を行う)。BBcCrossRefオブジェクトの含め方は以下のとおりである。
 ```
 txobj = bbclib.make_transaction(relation_num=, witness=True)
@@ -547,6 +548,24 @@ txobj.witness.add_signature(user_id=user_id, signature=sig)
 print(txobj)
 ```
 include\_cross\_refメソッドを呼ぶことで、BBcCrossRefオブジェクトが付加される。付加すべきBBcCrossRefオブジェクトはcore nodeとclient間で自動的にやり取りされている。このinclude\_cross\_ref()を呼び出した時点では、付加すべきBBcCrossRefオブジェクトが割り当てられていないこともあるため、もし割当がなければこのメソッドを呼んでも何も起こらない。
-なお、BBcCrossRefオブジェクトとして他ドメインに通知されるか、またどのドメインに通知されるかはcore nodeによって確率的に選択され、通知アルゴリズムは発展途上である。
+なお、外部ドメインに通知されるのは、自ドメインのdomain\_idとtransaction\_idだけであるため、機密情報が外部に漏れることはない。またBBcCrossRefオブジェクトとして他ドメインに通知されるか、またどのドメインに通知されるかはcore nodeによって確率的に選択され、通知アルゴリズムは発展途上である。
 
+## 他ドメインへの存在確認
+他のドメインのトランザクションにtranaction\_idが保存されているかどうか、またそれが改ざんされていないかどうかを確認することで、自ドメインのトランザクションが不正なものと差し替えられていないことを確認できる。
+```
+client.request_cross_ref_holders_list()
+response_data = client.callback.synchronize()
+
+for txid_to_verify in dat[KeyType.transaction_id_list]:
+    client.request_verify_by_cross_ref(txid_to_verify)
+    response_data2 = client.callback.synchronize()
+    if KeyType.cross_ref_verification_info in dat
+        transaction_base_digest, cross_ref_data, sigdata = dat[KeyType.cross_ref_verification_info]
+        result = bbclib.verify_using_cross_ref(dm, txid_to_verify, transaction_base_digest, cross_ref_data, sigdata)
+        if result:
+            print("transaction_id %s had registered in another domain")
+        else:
+            print("Something wrong in another domain....")
+```
+まずは、どのtransaction\_idが他ドメインに登録されているかを知るために、request\_cross\_ref\_holders\_listメソッドを呼び、BBcCrossRefオブジェクトに入れてもらっているtransaction\_idのリストを取得する。上記の例では、cross\_ref\_verification\_infoメソッドで問い合わせる。どのドメイン当てなのかはクライアントが意識する必要はなく、core nodeが適宜外部ドメインに問い合わせる。bbclib.verify_using_cross_refメソッドは、得られた応答メッセージを検証するユーティリティである。例のようにKeyType.cross_ref_verification_infoの内容を与えれば良い。結果はTrue/Falseであり、TrueであればそのBBcCrossRefオブジェクトは正しいものである(Falseなら、外部ドメインで何らかの改ざんが行われている)。つまり結果がTrueとなったtransaction\_idは、確実に外部ドメインに保存されており、過去にそのtransaction\_idを持つトランザクションが登録されたことを示している。
 
