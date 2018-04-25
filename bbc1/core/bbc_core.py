@@ -256,12 +256,12 @@ class BBcCoreService:
         """
         if self.node_key is None:
             return True
-        if KeyType.domain_admin_info not in dat:
+        if KeyType.admin_info not in dat:
             return False
-        digest = hashlib.sha256(dat[KeyType.domain_admin_info]).digest()
-        if not self.node_key.verify(digest, dat[KeyType.domain_signature]):
+        digest = hashlib.sha256(dat[KeyType.admin_info]).digest()
+        if not self.node_key.verify(digest, dat[KeyType.nodekey_signature]):
             return False
-        admin_info = message_key_types.make_dictionary_from_TLV_format(dat[KeyType.domain_admin_info])
+        admin_info = message_key_types.make_dictionary_from_TLV_format(dat[KeyType.admin_info])
         dat.update(admin_info)
         return True
 
@@ -299,8 +299,8 @@ class BBcCoreService:
             self.logger.debug("message has bad format")
             return False, None
         if dat[KeyType.command] in admin_message_commands:
-            if self.node_key is None and KeyType.domain_admin_info in dat:
-                admin_info = message_key_types.make_dictionary_from_TLV_format(dat[KeyType.domain_admin_info])
+            if self.node_key is None and KeyType.admin_info in dat:
+                admin_info = message_key_types.make_dictionary_from_TLV_format(dat[KeyType.admin_info])
                 dat.update(admin_info)
             else:
                 if not self._check_signature_by_nodekey(dat):

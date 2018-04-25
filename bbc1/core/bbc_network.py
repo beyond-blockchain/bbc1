@@ -181,9 +181,9 @@ class BBcNetwork:
         admin_info[KeyType.message_seq] = self.domains[domain_id]["neighbor"].admin_sequence_number + 1
         self.domains[domain_id]["neighbor"].admin_sequence_number += 1
         if "keypair" in self.domains[domain_id] and self.domains[domain_id]["keypair"] is not None:
-            msg[KeyType.domain_admin_info] = message_key_types.make_TLV_formatted_message(admin_info)
-            digest = hashlib.sha256(msg[KeyType.domain_admin_info]).digest()
-            msg[KeyType.domain_signature] = self.domains[domain_id]["keypair"]['keys'][0].sign(digest)
+            msg[KeyType.admin_info] = message_key_types.make_TLV_formatted_message(admin_info)
+            digest = hashlib.sha256(msg[KeyType.admin_info]).digest()
+            msg[KeyType.nodekey_signature] = self.domains[domain_id]["keypair"]['keys'][0].sign(digest)
         else:
             msg.update(admin_info)
 
@@ -606,17 +606,17 @@ class BBcNetwork:
             return False
         if "keypair" not in self.domains[domain_id] or self.domains[domain_id]["keypair"] is None:
             return True
-        if KeyType.domain_signature not in msg or KeyType.domain_admin_info not in msg:
+        if KeyType.nodekey_signature not in msg or KeyType.admin_info not in msg:
             return False
-        digest = hashlib.sha256(msg[KeyType.domain_admin_info]).digest()
+        digest = hashlib.sha256(msg[KeyType.admin_info]).digest()
         flag = False
         for key in self.domains[domain_id]["keypair"]['keys']:
-            if key.verify(digest, msg[KeyType.domain_signature]):
+            if key.verify(digest, msg[KeyType.nodekey_signature]):
                 flag = True
                 break
         if not flag:
             return False
-        admin_info = message_key_types.make_dictionary_from_TLV_format(msg[KeyType.domain_admin_info])
+        admin_info = message_key_types.make_dictionary_from_TLV_format(msg[KeyType.admin_info])
         msg.update(admin_info)
         return True
 

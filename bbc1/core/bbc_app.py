@@ -139,9 +139,9 @@ class BBcAppClient:
 
     def include_admin_info(self, dat, admin_info, keypair):
         if keypair is not None:
-            dat[KeyType.domain_admin_info] = message_key_types.make_TLV_formatted_message(admin_info)
-            digest = hashlib.sha256(dat[KeyType.domain_admin_info]).digest()
-            dat[KeyType.domain_signature] = keypair.sign(digest)
+            dat[KeyType.admin_info] = message_key_types.make_TLV_formatted_message(admin_info)
+            digest = hashlib.sha256(dat[KeyType.admin_info]).digest()
+            dat[KeyType.nodekey_signature] = keypair.sign(digest)
         else:
             dat.update(admin_info)
 

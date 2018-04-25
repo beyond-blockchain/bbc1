@@ -250,8 +250,8 @@ class KeyType:
     retry_timer = to_4byte(19)
     message_seq = to_4byte(20)
     domain_ping = to_4byte(21)   # send directly to bbc_network without node_id in the domain
-    domain_signature = to_4byte(22)
-    domain_admin_info = to_4byte(23)
+    nodekey_signature = to_4byte(22)
+    admin_info = to_4byte(23)
     on_multinodes = to_4byte(24)
     is_anycast = to_4byte(25)
     anycast_ttl = to_4byte(26)
