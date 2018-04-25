@@ -58,6 +58,7 @@ TX_TRAVERSAL_MAX = 30
 
 ticker = query_management.get_ticker()
 core_service = None
+ledger_subsystem_module = None
 
 admin_message_commands = (
     MsgType.REQUEST_GET_STATS, MsgType.REQUEST_GET_NEIGHBORLIST,
@@ -69,6 +70,11 @@ admin_message_commands = (
     MsgType.DOMAIN_PING, MsgType.REQUEST_SET_STATIC_NODE,
     MsgType.REQUEST_MANIP_LEDGER_SUBSYS
 )
+
+
+def activate_ledgersubsystem():
+    if ledger_subsystem_module is None:
+        ledger_subsystem_module = __import__("ledger_subsystem")
 
 
 def _make_message_structure(domain_id, cmd, dstid, qid):
@@ -149,11 +155,13 @@ class BBcCoreService:
                 node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
                 self.networking.add_neighbor(domain_id, node_id, ipv4, ipv6, port, is_static=True)
             if ('use_ledger_subsystem' in conf and conf['use_ledger_subsystem']) or use_ledger_subsystem:
-                from bbc1.core import ledger_subsystem
-                self.ledger_subsystems[domain_id] = ledger_subsystem.LedgerSubsystem(self.config,
-                                                                                     networking=self.networking,
-                                                                                     domain_id=domain_id,
-                                                                                     loglevel=loglevel, logname=logname)
+                activate_ledgersubsystem()
+                if ledger_subsystem_module is not None:
+                    self.ledger_subsystems[domain_id] = ledger_subsystem_module.LedgerSubsystem(self.config,
+                                                                                                networking=self.networking,
+                                                                                                domain_id=domain_id,
+                                                                                                loglevel=loglevel,
+                                                                                                logname=logname)
         gevent.signal(signal.SIGINT, self.quit_program)
         if server_start:
             self._start_server(core_port)
@@ -444,24 +452,28 @@ class BBcCoreService:
             if not self._param_check([KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_REGISTER_HASH_IN_SUBSYS: bad format")
                 return False, None
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_REGISTER_HASH_IN_SUBSYS,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             if domain_id in self.ledger_subsystems:
                 transaction_id = dat[KeyType.transaction_id]
                 self.ledger_subsystems[domain_id].register_transaction(transaction_id=transaction_id)
-                retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_REGISTER_HASH_IN_SUBSYS,
-                                                dat[KeyType.source_user_id], dat[KeyType.query_id])
                 umr.send_message_to_user(retmsg)
+            else:
+                self._error_reply(msg=retmsg, err_code=ENOSUBSYSTEM, txt="Ledger_subsystem is not activated")
 
         elif cmd == MsgType.REQUEST_VERIFY_HASH_IN_SUBSYS:
             if not self._param_check([KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_REGISTER_HASH_IN_SUBSYS: bad format")
                 return False, None
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             if domain_id in self.ledger_subsystems:
                 transaction_id = dat[KeyType.transaction_id]
-                retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS,
-                                                dat[KeyType.source_user_id], dat[KeyType.query_id])
                 result = self.ledger_subsystems[domain_id].verify_transaction(transaction_id=transaction_id)
                 retmsg[KeyType.merkle_tree] = result
                 umr.send_message_to_user(retmsg)
+            else:
+                self._error_reply(msg=retmsg, err_code=ENOSUBSYSTEM, txt="Ledger_subsystem is not activated")
 
         elif cmd == MsgType.REGISTER:
             if domain_id is None:
@@ -645,6 +657,8 @@ class BBcCoreService:
                 else:
                     self.ledger_subsystems[domain_id].disable()
                 user_message_routing.direct_send_to_user(socket, retmsg)
+            else:
+                self._error_reply(msg=retmsg, err_code=ENOSUBSYSTEM, txt="Ledger_subsystem is not installed")
 
         else:
             self.logger.error("Bad command/response: %s" % cmd)
