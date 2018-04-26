@@ -73,6 +73,7 @@ admin_message_commands = (
 
 
 def activate_ledgersubsystem():
+    global ledger_subsystem_module
     if ledger_subsystem_module is None:
         ledger_subsystem_module = __import__("ledger_subsystem")
 

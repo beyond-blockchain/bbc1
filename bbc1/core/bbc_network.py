@@ -401,7 +401,7 @@ class BBcNetwork:
         nodeinfo = NodeInfo(ipv4=ipv4, ipv6=ipv6, port=port, is_static=is_static)
         query_entry = query_management.QueryEntry(expire_after=10,
                                                   callback_error=self.domain_ping,
-                                                  callback_expire=self.invalidate_neighbor,
+                                                  callback_expire=self._invalidate_neighbor,
                                                   data={KeyType.domain_id: domain_id,
                                                         KeyType.node_id: node_id,
                                                         KeyType.node_info: nodeinfo},
@@ -499,7 +499,7 @@ class BBcNetwork:
             nodeinfo = NodeInfo(ipv4=ipv4, ipv6=ipv6, port=port)
             self.send_message_in_network(nodeinfo, PayloadType.Type_msgpack, domain_id, msg)
 
-    def invalidate_neighbor(self, query_entry):
+    def _invalidate_neighbor(self, query_entry):
         """
         Set the flag of the nodeinfo false
         :param query_entry:
@@ -857,6 +857,7 @@ class NeighborInfo:
     Manage info of neighbor nodes
     """
     PURGE_INTERVAL_SEC = 300
+    NODEINFO_LIFETIME = 900
 
     def __init__(self, network=None, domain_id=None, node_id=None, my_info=None):
         self.networking = network
@@ -870,7 +871,8 @@ class NeighborInfo:
 
     def purge(self, query_entry):
         for node_id in list(self.nodeinfo_list.keys()):
-            if not self.nodeinfo_list[node_id].is_alive:
+            if not self.nodeinfo_list[node_id].is_alive or self.nodeinfo_list[node_id].updated_at + \
+                    NeighborInfo.NODEINFO_LIFETIME < time.time():
                 self.nodeinfo_list.pop(node_id, None)
         self.purge_timer = query_management.QueryEntry(expire_after=NeighborInfo.PURGE_INTERVAL_SEC,
                                                        callback_expire=self.purge, retry_count=3)
@@ -968,10 +970,6 @@ class NodeInfo:
     def touch(self):
         self.updated_at = time.time()
         self.is_alive = True
-
-    def detect_disconnect(self):
-        self.disconnect_at = time.time()
-        self.is_alive = False
 
     def update(self, ipv4=None, ipv6=None, port=None, seq=None, domain0=None):
         change_flag = None
