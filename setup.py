@@ -30,19 +30,19 @@ bbc1_requires = [
                  'requests>=2.12.4',
                  'pytest>=3.0.5',
                  'gevent>=1.2.1',
-                 'populus',
-                 'msgpack-python>=0.4.8',
-                 'populus==2.1.0',
-                 'eth-utils==0.7.4',
+                 'msgpack-python>=0.4.8'
                 ]
 
-bbc1_packages = ['bbc1', 'bbc1.core', 'bbc1.core.ethereum', 'bbc1.core.libbbcsig']
+bbc1_packages = ['bbc1', 'bbc1.core', 'bbc1.core.libbbcsig']
 
 bbc1_commands = [
                  'bbc1/core/bbc_core.py',
+                 'utils/bbc_domain_config.py',
+                 'utils/bbc_domain_update.py',
+                 'utils/bbc_info.py',
                  'utils/bbc_ping.py',
-                 'utils/bbc_system_conf.py',
-                 'utils/subsystem_tool.py',
+                 'utils/domain_key_setup.py',
+                 'utils/id_create.py',
                  'examples/file_proof/file_proof.py']
 
 bbc1_classifiers = [
