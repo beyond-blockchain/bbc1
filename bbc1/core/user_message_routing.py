@@ -329,7 +329,7 @@ class UserMessageRouting:
         self.stats.update_stats_increment("multicast", "leave", 1)
         self.networking.broadcast_message_in_network(domain_id=self.domain_id, msg=msg)
 
-    def _distribute_cross_refs_to_nodes(self):
+    def _distribute_cross_refs_to_clients(self):
         if len(self.registered_users) == 0:
             return
         try:
@@ -395,7 +395,7 @@ class UserMessageRouting:
                 if KeyType.cross_ref in msg:
                     self.cross_ref_list.append(msg[KeyType.cross_ref])
                     if len(self.cross_ref_list) > UserMessageRouting.MAX_CROSS_REF_STOCK:
-                        self._distribute_cross_refs_to_nodes()
+                        self._distribute_cross_refs_to_clients()
 
             return
 

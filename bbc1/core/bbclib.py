@@ -151,7 +151,6 @@ def make_transaction_for_base_asset(asset_group_id=None, event_num=1, witness=Fa
 # =====================================================
 
 
-
 def recover_signature_object(data):
     sig = BBcSignature()
     sig.deserialize(data)
@@ -191,6 +190,7 @@ def get_n_byte_int(ptr, n, dat):
 def get_bigint(ptr, dat):
     size = int.from_bytes(dat[ptr:ptr+2], 'little')
     return ptr+2+size, dat[ptr+2:ptr+2+size]
+
 
 def bin2str_base64(dat):
     import binascii
@@ -1079,6 +1079,7 @@ class BBcTransaction:
                     sig.pubkey = binascii.a2b_base64(signature["pubkey"])
                 self.signatures.append(sig)
         return True
+
 
 class BBcEvent:
     def __init__(self, asset_group_id=None):
