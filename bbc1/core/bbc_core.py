@@ -712,7 +712,7 @@ class BBcCoreService:
         :param txid:          transaction_id
         :param txdata:        BBcTransaction data
         :param asset_files:   dictionary of { asid=>asset_content,,, }
-        :rtype: BBcTransaction or None
+        :return: BBcTransaction or None
         """
         txobj = BBcTransaction()
         if not txobj.deserialize(txdata):
@@ -735,11 +735,10 @@ class BBcCoreService:
     def insert_transaction(self, domain_id, txdata, asset_files):
         """
         Insert transaction into ledger
-
         :param domain_id:     domain_id where the transaction is inserted
         :param txdata:        BBcTransaction data
         :param asset_files:   dictionary of { asid=>asset_content,,, }
-        :rtype: **result or str
+        :return: result or str
         """
         self.stats.update_stats_increment("transaction", "insert_count", 1)
         if domain_id is None:
@@ -876,7 +875,7 @@ class BBcCoreService:
         :param asset_group_id:
         :param asset_group_id:
         :param user_id:
-        :rtype: **response_info
+        :rtype: response_info
         :return: {transactions, all_asset_files, compromised_transactions, compromised_asset, compromised_asset_files}
         """
         if domain_id is None:
