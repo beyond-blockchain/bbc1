@@ -21,13 +21,22 @@ print("private_key:", binascii.b2a_hex(privkey), ", len=", privkey_len)
 print("public_key:", binascii.b2a_hex(pubkey), ", len=", pubkey_len)
 
 print("# -- sign()")
-print(lib.sign(privkey_len, privkey, privkey_len, test_digest, signature))
+sig_r = (c_byte * 32)()
+sig_s = (c_byte * 32)()
+sig_r_len = (c_byte * 4)()  # Adjust size according to the expected size of sig_r and sig_s. Default:uint32.
+sig_s_len = (c_byte * 4)()
+print(lib.sign(privkey_len, privkey, privkey_len, test_digest, sig_r, sig_s, sig_r_len, sig_s_len))
+sig_r_len = int.from_bytes(bytes(sig_r_len), "little")
+sig_s_len = int.from_bytes(bytes(sig_s_len), "little")
+sig_r = binascii.a2b_hex("00" * (32 - sig_r_len) + bytes(sig_r)[:sig_r_len].hex())
+sig_s = binascii.a2b_hex("00" * (32 - sig_s_len) + bytes(sig_s)[:sig_s_len].hex())
+signature = bytes(bytearray(sig_r)+bytearray(sig_s))
 print(binascii.b2a_hex(signature))
 
 print("# -- output_der()")
 der_data = (c_byte * 512)()     # 256 -> 512
 der_len = lib.output_der(privkey_len, privkey, byref(der_data))
-print("DER: len=",der_len, "  dat=", binascii.b2a_hex(bytearray(der_data)[:der_len]))
+print("DER: len=", der_len, "  dat=", binascii.b2a_hex(bytearray(der_data)[:der_len]))
 
 print("# -- clear private key")
 privkey = (c_byte * privkey_len.value)()
@@ -39,7 +48,16 @@ print("private_key:", binascii.b2a_hex(privkey), ", len=", privkey_len)
 print("public_key:", binascii.b2a_hex(pubkey), ", len=", pubkey_len)
 
 print("# -- sign()")
-print(lib.sign(privkey_len, privkey, privkey_len, test_digest, signature))
+sig_r = (c_byte * 32)()
+sig_s = (c_byte * 32)()
+sig_r_len = (c_byte * 4)()  # Adjust size according to the expected size of sig_r and sig_s. Default:uint32.
+sig_s_len = (c_byte * 4)()
+print(lib.sign(privkey_len, privkey, privkey_len, test_digest, sig_r, sig_s, sig_r_len, sig_s_len))
+sig_r_len = int.from_bytes(bytes(sig_r_len), "little")
+sig_s_len = int.from_bytes(bytes(sig_s_len), "little")
+sig_r = binascii.a2b_hex("00" * (32 - sig_r_len) + bytes(sig_r)[:sig_r_len].hex())
+sig_s = binascii.a2b_hex("00" * (32 - sig_s_len) + bytes(sig_s)[:sig_s_len].hex())
+signature = bytes(bytearray(sig_r)+bytearray(sig_s))
 print(binascii.b2a_hex(signature))
 
 print("# -- get compressed pubkey")
