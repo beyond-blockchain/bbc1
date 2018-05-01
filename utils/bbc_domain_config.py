@@ -5,44 +5,43 @@ from argparse import ArgumentParser
 sys.path.append("../")
 from bbc1.core.bbc_config import DEFAULT_WORKING_DIR, DEFAULT_CONFIG_FILE
 
-DEFAULT_JSON = '\
-{\
-    "workingdir": ".bbc1",\
-    "client": {\
-        "port": 9000,\
-        "use_node_key": True\
-    },\
-    "network": {\
-        "p2p_port": 6641,\
-        "max_connections": 100\
-    },\
-    "domain_key": {\
-        "use": false,\
-        "directory": ".bbc1/domain_keys",\
-        "obsolete_timeout": 300\
-    },\
-    "domains": {\
-        "0000000000000000000000000000000000000000000000000000000000000000": {\
-            "module": "p2p_domain0",\
-            "static_nodes": {},\
-            "use_ledger_subsystem": false,\
-            "ledger_subsystem": {\
-                "subsystem": "ethereum",\
-                "max_transactions": 4096,\
-                "max_seconds": 3600\
-            }\
-        }\
-    },\
-    "ethereum": {\
-        "chain_id": 15,\
-        "port": 30303,\
-        "log": "geth.log",\
-        "account": "",\
-        "passphrase": "",\
-        "contract": "BBcAnchor",\
-        "contract_address": ""\
-    }\
-}'
+default_config = {
+    "workingdir": ".bbc1",
+    "client": {
+        "port": 9000,
+        "use_node_key": True,
+    },
+    "network": {
+        "p2p_port": 6641,
+        "max_connections": 100,
+    },
+    "domain_key": {
+        "use": False,
+        "directory": ".bbc1/domain_keys",
+        "obsolete_timeout": 300,
+    },
+    "domains": {
+        "0000000000000000000000000000000000000000000000000000000000000000": {
+            "module": "p2p_domain0",
+            "static_nodes": {},
+            "use_ledger_subsystem": False,
+            "ledger_subsystem": {
+                "subsystem": "ethereum",
+                "max_transactions": 4096,
+                "max_seconds": 3600,
+            }
+        }
+    },
+    "ethereum": {
+        "chain_id": 15,
+        "port": 30303,
+        "log": "geth.log",
+        "account": "",
+        "passphrase": "",
+        "contract": "BBcAnchor",
+        "contract_address": "",
+    }
+}
 
 simple_domain_conf = {
     "storage": {
@@ -124,9 +123,8 @@ def convertKeyValue(name, value):
     return obj
 
 
-def getTargetFile(argresult):
-    wdir = argresult.workingdir
-    filepath = os.path.join(wdir, DEFAULT_CONFIG_FILE)
+def getTargetFile(working_dir):
+    filepath = os.path.join(working_dir, DEFAULT_CONFIG_FILE)
     print("input filepath : %s" % filepath)
     if os.path.exists(filepath):
         return filepath
@@ -134,9 +132,8 @@ def getTargetFile(argresult):
         return None
 
 
-def getOutputFilepath(argresult):
-    wdir = argresult.workingdir
-    filepath = os.path.join(wdir, DEFAULT_CONFIG_FILE)
+def getOutputFilepath(working_dir):
+    filepath = os.path.join(working_dir, DEFAULT_CONFIG_FILE)
     return filepath
 
 
@@ -147,7 +144,7 @@ def fetchTargetObj(filepath):
             targetObj = json.load(f)
     else:
         print("load from default")
-        targetObj = json.loads(DEFAULT_JSON)
+        targetObj = default_config
     return targetObj
 
 
@@ -230,8 +227,10 @@ if __name__ == '__main__':
         os.makedirs(argresult.workingdir)
 
     domainhex = argresult.domainhex
-    fpath = getTargetFile(argresult)
-    outputfpath = getOutputFilepath(argresult)
+    fpath = getTargetFile(argresult.workingdir)
+    print("fpath:", fpath)
+    outputfpath = getOutputFilepath(argresult.workingdir)
+    print("outputfpath:", fpath)
     targetobj = fetchTargetObj(fpath)
 
     if argresult.type == 'generate':

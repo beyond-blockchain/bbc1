@@ -75,7 +75,10 @@ admin_message_commands = (
 def activate_ledgersubsystem():
     global ledger_subsystem_module
     if ledger_subsystem_module is None:
-        ledger_subsystem_module = __import__("ledger_subsystem")
+        try:
+            ledger_subsystem_module = __import__("ledger_subsystem")
+        except:
+            ledger_subsystem_module = None
 
 
 def _make_message_structure(domain_id, cmd, dstid, qid):
@@ -110,11 +113,11 @@ def _create_search_result(txobj_dict, asset_files_dict):
 
         if len(valid_assets) > 0:
             response_info.setdefault(KeyType.all_asset_files, dict())
-            for asid in valid_assets:
+            for asgid, asid in valid_assets:
                 response_info[KeyType.all_asset_files][asid] = asset_files_dict[asid]
         if len(invalid_assets) > 0:
             response_info.setdefault(KeyType.compromised_asset_files, dict())
-            for asid in invalid_assets:
+            for asgid, asid in invalid_assets:
                 response_info[KeyType.compromised_asset_files][asid] = asset_files_dict[asid]
     return response_info
 
@@ -163,6 +166,9 @@ class BBcCoreService:
                                                                                                 domain_id=domain_id,
                                                                                                 loglevel=loglevel,
                                                                                                 logname=logname)
+                else:
+                    self.logger.info("Failed to load ledger_subsystem module")
+
         gevent.signal(signal.SIGINT, self.quit_program)
         if server_start:
             self._start_server(core_port)
@@ -510,11 +516,14 @@ class BBcCoreService:
                 self.networking.get_domain_keypair(domain_id)
 
         elif cmd == MsgType.REQUEST_REPAIR:
-            if not self._param_check([KeyType.transaction_id], dat):
+            if KeyType.transaction_id in dat:
+                dat[KeyType.command] = repair_manager.RepairManager.REQUEST_REPAIR_TRANSACTION
+                self.networking.domains[domain_id]['repair'].put_message(dat)
+            elif KeyType.asset_group_id in dat and KeyType.asset_id in dat:
+                dat[KeyType.command] = repair_manager.RepairManager.REQUEST_REPAIR_ASSET_FILE
+                self.networking.domains[domain_id]['repair'].put_message(dat)
+            else:
                 self.logger.debug("REQUEST_REPAIR: bad format")
-                return False, None
-            dat[KeyType.command] = repair_manager.RepairManager.REQUEST_REPAIR_TRANSACTION
-            self.networking.domains[domain_id]['repair'].put_message(dat)
             return False, None
 
         elif cmd == MsgType.REQUEST_GET_NEIGHBORLIST:
