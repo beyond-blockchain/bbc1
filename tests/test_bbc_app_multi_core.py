@@ -251,6 +251,7 @@ class TestBBcAppClient(object):
             ret = clients[0]['app'].send_message(msg, clients[i]['user_id'])
             assert ret
         for i in range(1, client_num):
+            print("sync:", i)
             dat = msg_processor[i].synchronize()
             assert KeyType.message in dat
             assert len(dat[KeyType.message]) == len(msg)

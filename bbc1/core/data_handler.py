@@ -251,6 +251,7 @@ class DataHandler:
         :param txobj:
         :return:
         """
+        #print("_insert_transaction_into_a_db: for txid =", txobj.transaction_id.hex())
         if txobj.transaction_data is None:
             txobj.serialize()
         ret = self.exec_sql(db_num=db_num,
@@ -306,18 +307,18 @@ class DataHandler:
         :param asset_files:
         :return: asset_group_ids to be stored
         """
+        #print("_store_asset_files: for txid =", txobj.transaction_id.hex())
         asset_group_ids = set()
         for asset_group_id, asset_id, user_id, fileflag, filedigest in self._get_asset_info(txobj):
             asset_group_ids.add(asset_group_id)
             if not self.use_external_storage and asset_files is not None and asset_id in asset_files:
-                self._store_in_storage(asset_group_id, asset_id, asset_files[asset_id])
+                self.store_in_storage(asset_group_id, asset_id, asset_files[asset_id])
         return asset_group_ids
 
-    def restore_data(self, db_num, transaction_id, txobj, asset_files):
-        self.remove(transaction_id, txobj=txobj, db_num=db_num)
-        self._insert_transaction_into_a_db(db_num=db_num, txobj=txobj)
-        self._remove_asset_files(txobj, asset_files)
-        self._store_asset_files(txobj, asset_files)
+    def restore_transaction_data(self, db_num, transaction_id, txobj):
+        if txobj is not None:
+            self.remove(transaction_id, txobj=txobj, db_num=db_num)
+            self._insert_transaction_into_a_db(db_num=db_num, txobj=txobj)
 
     def _send_replication_to_other_cores(self, txdata, asset_files=None):
         """
@@ -384,21 +385,12 @@ class DataHandler:
         else:
             self._remove_transaction(txobj, db_num)
 
-        self._remove_asset_files(txobj)
-
     def _remove_transaction(self, txobj, db_num):
+        #print("_remove_transaction: for txid =", txobj.transaction_id.hex())
         self.exec_sql(
             db_num=db_num,
             sql="DELETE FROM transaction_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder,
             args=(txobj.transaction_id,), commit=True)
-        for asset_group_id, asset_id, user_id, fileflag, filedigest in self._get_asset_info(txobj):
-            self.exec_sql(
-                db_num=db_num,
-                sql="DELETE FROM asset_info_table WHERE asset_group_id = %s AND asset_id = %s AND user_id = %s" %
-                    (self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder,self.db_adaptors[0].placeholder),
-                args=(asset_group_id, asset_id, user_id), commit=True)
-            if fileflag:
-                self._remove_in_storage(asset_group_id, asset_id)
         for base, point_to in self._get_topology_info(txobj):
             self.exec_sql(
                 db_num=db_num,
@@ -412,6 +404,7 @@ class DataHandler:
         :param asset_files:
         :return:
         """
+        #print("_remove_asset_files: for txid =", txobj.transaction_id.hex())
         if self.use_external_storage:
             return
         for asset_group_id, asset_id, user_id, fileflag, filedigest in self._get_asset_info(txobj):
@@ -472,7 +465,7 @@ class DataHandler:
             result_txobj[txid] = txobj
             for asset_group_id, asset_id, user_id, fileflag, filedigest in self._get_asset_info(txobj):
                 if fileflag:
-                    result_asset_files[asset_id] = self._get_in_storage(asset_group_id, asset_id)
+                    result_asset_files[asset_id] = self.get_in_storage(asset_group_id, asset_id)
         return result_txobj, result_asset_files
 
     def search_transaction_topology(self, transaction_id, traverse_to_past=True):
@@ -492,21 +485,23 @@ class DataHandler:
             return self.exec_sql(sql="SELECT * FROM topology_table WHERE point_to = %s" %
                                  self.db_adaptors[0].placeholder, args=(transaction_id,))
 
-    def _store_in_storage(self, asset_group_id, asset_id, content):
+    def store_in_storage(self, asset_group_id, asset_id, content, do_overwrite=False):
         """
         Store data in local storage
         :param asset_group_id
-        :param asid:
+        :param asset_id:
         :param content:
+        :param do_overwrite: If True, file is overwritten.
         :return:
         """
+        #print("store_in_storage: for asset_id =", asset_id.hex())
         self.stats.update_stats_increment("data_handler", "store_in_storage", 1)
         asset_group_id_str = binascii.b2a_hex(asset_group_id).decode('utf-8')
         storage_path = os.path.join(self.storage_root, asset_group_id_str)
         if not os.path.exists(storage_path):
             os.makedirs(storage_path, exist_ok=True)
         path = os.path.join(storage_path, binascii.b2a_hex(asset_id).decode('utf-8'))
-        if os.path.exists(path):
+        if not do_overwrite and os.path.exists(path):
             return False
         with open(path, 'wb') as f:
             try:
@@ -515,11 +510,11 @@ class DataHandler:
                 return False
         return os.path.exists(path)
 
-    def _get_in_storage(self, asset_group_id, asset_id):
+    def get_in_storage(self, asset_group_id, asset_id):
         """
         Get the file with the asset_id from local storage
-        :param asset_group_id
-        :param asid:   file name
+        :param asset_group_id:
+        :param asset_id:   file name
         :return:       the file content (None if not found)
         """
         asset_group_id_str = binascii.b2a_hex(asset_group_id).decode('utf-8')
@@ -544,6 +539,7 @@ class DataHandler:
         :param asset_id:
         :return:
         """
+        #print("_remove_in_storage: for asset_id =", asset_id.hex())
         asset_group_id_str = binascii.b2a_hex(asset_group_id).decode('utf-8')
         storage_path = os.path.join(self.storage_root, asset_group_id_str)
         if not os.path.exists(storage_path):
@@ -555,7 +551,7 @@ class DataHandler:
 
     def process_message(self, msg):
         """
-        (internal use) process received message
+        Process received message
         :param msg:       the message body (already deserialized)
         :return:
         """
@@ -636,10 +632,10 @@ class DataHandlerDomain0(DataHandler):
     def search_transaction_topology(self, transaction_id, reverse_link=False):
         return None
 
-    def _store_in_storage(self, asset_group_id, asset_id, content):
+    def store_in_storage(self, asset_group_id, asset_id, content):
         return True
 
-    def _get_in_storage(self, asset_group_id, asset_id):
+    def get_in_storage(self, asset_group_id, asset_id):
         return None
 
     def _remove_in_storage(self, asset_group_id, asset_id):

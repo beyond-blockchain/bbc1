@@ -1,6 +1,7 @@
-# -*- coding: utf-8 -*-
+
 import pytest
 
+import os
 import binascii
 import time
 import random
@@ -26,11 +27,16 @@ asset_group_id = bbclib.get_new_id("asset_group_1")
 transactions = list()
 msg_processor = [None for i in range(client_num)]
 
+asset_file_content = b"AAAAAAAAAAAAAAAAAAAAAAAAA"
+
+asset_id_0 = None
+
 
 def make_transaction(user_id, keypair):
     txobj = bbclib.make_transaction(relation_num=1, witness=True)
-    bbclib.add_relation_asset(txobj, relation_idx=0, asset_group_id=asset_group_id,
-                              user_id=user_id, asset_body="data=%d" % random.randint(1, 10000))
+    bbclib.add_relation_asset(txobj, relation_idx=0, asset_group_id=asset_group_id, user_id=user_id,
+                              asset_body="data=%d" % random.randint(1, 10000),
+                              asset_file=asset_file_content)
     txobj.witness.add_witness(user_id)
     sig = txobj.sign(keypair)
     txobj.add_signature(user_id, sig)
@@ -101,8 +107,30 @@ class TestBBcAppClient(object):
             assert KeyType.transaction_id in dat
             assert dat[KeyType.transaction_id] == transaction.transaction_id
             transactions.append(transaction)
+            if i == 0:
+                global asset_id_0
+                asset_id_0 = transaction.relations[0].asset.asset_id
+        time.sleep(2)
 
-    def test_13_forge_transaction(self):
+    def test_13_search_transaction(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        print("find txid=", binascii.b2a_hex(transactions[0].transaction_id))
+        clients[0]['app'].search_transaction(transactions[0].transaction_id)
+        dat = msg_processor[0].synchronize()
+        assert dat[KeyType.status] == 0
+        #assert len(dat[KeyType.compromised_transaction_data]) > 0
+        txobj = bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data])
+        print(txobj)
+
+        print("find txid=", binascii.b2a_hex(transactions[1].transaction_id))
+        clients[1]['app'].search_transaction(transactions[1].transaction_id)
+        dat = msg_processor[1].synchronize()
+        assert dat[KeyType.status] == 0
+        #assert len(dat[KeyType.compromised_transaction_data]) > 0
+        txobj = bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data])
+        print(txobj)
+
+    def test_14_forge_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
 
         print("* forge transaction[0] and update the data in node 0")
@@ -122,7 +150,7 @@ class TestBBcAppClient(object):
               (data_handler.db_adaptors[0].placeholder, data_handler.db_adaptors[0].placeholder)
         data_handler.exec_sql(sql=sql, args=(bytes(txdata), txobj.transaction_id), commit=True)
 
-    def test_14_search_transaction(self):
+    def test_15_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         print("find txid=", binascii.b2a_hex(transactions[0].transaction_id))
         clients[0]['app'].search_transaction(transactions[0].transaction_id)
@@ -136,14 +164,14 @@ class TestBBcAppClient(object):
         assert dat[KeyType.status] < 0
         assert len(dat[KeyType.compromised_transaction_data]) > 0
 
-    def test_14_send_repair_request(self):
+    def test_16_send_repair_request(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         clients[0]['app'].request_to_repair_transaction(transactions[0].transaction_id)
         clients[1]['app'].request_to_repair_transaction(transactions[1].transaction_id)
         print("--- wait 5 seconds ---")
         time.sleep(5)
 
-    def test_16_search_transaction(self):
+    def test_17_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         print("find txid=", binascii.b2a_hex(transactions[0].transaction_id))
         clients[0]['app'].search_transaction(transactions[0].transaction_id)
@@ -159,6 +187,37 @@ class TestBBcAppClient(object):
         assert dat[KeyType.status] == 0
         assert KeyType.compromised_transaction_data not in dat
         assert KeyType.transaction_data in dat
+
+    def test_20_forge_asset_file(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        path = os.path.join(".bbc1-9000", domain_id.hex(), asset_group_id.hex(), asset_id_0.hex())
+        with open(path, "a") as f:
+            f.write("XXXX")
+        with open(path, "r") as f:
+            print(f.read())
+
+    def test_21_search_transaction(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        print("find txid=", binascii.b2a_hex(transactions[0].transaction_id))
+        clients[0]['app'].search_transaction(transactions[0].transaction_id)
+        dat = msg_processor[0].synchronize()
+        assert dat[KeyType.status] < 0
+        assert len(dat[KeyType.compromised_asset_files]) > 0
+        print("asset file is compromised")
+
+    def test_22_send_repair_request(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        clients[0]['app'].request_to_repair_asset(asset_group_id=asset_group_id, asset_id=asset_id_0)
+        print("--- wait 3 seconds ---")
+        time.sleep(3)
+
+    def test_23_search_transaction(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        print("find txid=", binascii.b2a_hex(transactions[0].transaction_id))
+        clients[0]['app'].search_transaction(transactions[0].transaction_id)
+        dat = msg_processor[0].synchronize()
+        assert dat[KeyType.status] == 0
+        assert KeyType.compromised_asset_files not in dat
 
     @pytest.mark.unregister
     def test_98_unregister(self):

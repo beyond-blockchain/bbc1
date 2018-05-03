@@ -221,20 +221,26 @@ def validate_transaction_object(txobj, asset_files=None):
         if evt.asset is None:
             continue
         asid = evt.asset.asset_id
+        asset_group_id = evt.asset_group_id
         if asid in asset_files:
-            if evt.asset.asset_file_digest != hashlib.sha256(asset_files[asid]).digest():
-                invalid_asset.append(asid)
+            if asset_files[asid] is None:
+                continue
+            if evt.asset.asset_file_digest != hashlib.sha256(bytes(asset_files[asid])).digest():
+                invalid_asset.append((asset_group_id, asid))
             else:
-                valid_asset.append(asid)
+                valid_asset.append((asset_group_id, asid))
     for idx, rtn in enumerate(txobj.relations):
         if rtn.asset is None:
             continue
         asid = rtn.asset.asset_id
+        asset_group_id = rtn.asset_group_id
         if asid in asset_files:
-            if rtn.asset.asset_file_digest != hashlib.sha256(asset_files[asid]).digest():
-                invalid_asset.append(asid)
+            if asset_files[asid] is None:
+                continue
+            if rtn.asset.asset_file_digest != hashlib.sha256(bytes(asset_files[asid])).digest():
+                invalid_asset.append((asset_group_id, asid))
             else:
-                valid_asset.append(asid)
+                valid_asset.append((asset_group_id, asid))
     return True, valid_asset, invalid_asset
 
 
@@ -427,6 +433,7 @@ class BBcTransaction:
         self.transaction_id = None
         self.transaction_base_digest = None
         self.transaction_data = None
+        self.asset_group_ids = dict()
         if deserialize is not None:
             self.deserialize(deserialize)
         if jsonload is not None:
@@ -577,6 +584,7 @@ class BBcTransaction:
                 self.events.append(evt)
                 if ptr >= data_size:
                     return False
+                self.asset_group_ids[evt.asset.asset_id] = evt.asset_group_id
 
             ptr, ref_num = get_n_byte_int(ptr, 2, data)
             self.references = []
@@ -601,6 +609,7 @@ class BBcTransaction:
                 self.relations.append(rtn)
                 if ptr >= data_size:
                     return False
+                self.asset_group_ids[rtn.asset.asset_id] = rtn.asset_group_id
 
             ptr, witness_num = get_n_byte_int(ptr, 2, data)
             if witness_num == 0:
@@ -1453,7 +1462,7 @@ class BBcAsset:
         if asset_file is not None:
             self.asset_file = asset_file
             self.asset_file_size = len(asset_file)
-            self.asset_file_digest = hashlib.sha256(asset_file).digest()
+            self.asset_file_digest = hashlib.sha256(bytes(asset_file)).digest()
         if asset_body is not None:
             self.asset_body = asset_body
             if isinstance(asset_body, str):

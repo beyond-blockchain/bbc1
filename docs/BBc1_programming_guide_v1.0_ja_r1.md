@@ -172,8 +172,9 @@ response_data = client.callback.synchronize()
 BBc-1では、改ざんが行われた事実そのものにも情報があると考え、改ざんデータの復旧のトリガはクライアントから与えるよう設計した。つまり、上述のように、KeyType.compromised\_transactionsおよびKeyType.compromised\_asset\_filesのvalueが存在する場合、次に示すメソッドを呼んで、core nodeに対して改ざんからの復旧を指示する。
 ```
 client.request_to_repair_transaction(txid)
+client.request_to_repair_asset(asset_group_id, asset_id)
 ```
-上記のtxidは復旧したいトランザクションのtransaction\_idである。なお、request\_to\_repair\_transaction()には一切の応答メッセージはないため、再度searchメソッドを呼んで復旧が完了したかを確認する必要がある。
+トランザクションとアセットファイルはそれぞれ別々に復旧させる必要がある。上記のtxidは復旧したいトランザクションのtransaction\_idであり、asset\_group\_idとasset\_idも復旧したいアセットファイルに関するものである。なお、request\_to\_repair\_transaction()とrequest\_to\_repair\_asset()には一切の応答メッセージはないため、再度searchメソッドを呼んで復旧が完了したかを確認する必要がある。
 
 
 ## トランザクション登録完了通知
