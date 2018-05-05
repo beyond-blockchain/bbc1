@@ -158,7 +158,7 @@ class BBcCoreService:
             for nd, info in c['static_nodes'].items():
                 node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
                 self.networking.add_neighbor(domain_id, node_id, ipv4, ipv6, port, is_static=True)
-            if ('use_ledger_subsystem' in conf and conf['use_ledger_subsystem']) or use_ledger_subsystem:
+            if ('use_ledger_subsystem' in c and c['use_ledger_subsystem']) or use_ledger_subsystem:
                 activate_ledgersubsystem()
                 if ledger_subsystem_module is not None:
                     self.ledger_subsystems[domain_id] = ledger_subsystem_module.LedgerSubsystem(self.config,
