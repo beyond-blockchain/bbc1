@@ -6,8 +6,9 @@ sys.path.extend(["../"])
 import pprint
 
 #import unittest
-from bbc1.common import message_key_types, bbclib
-from bbc1.common.message_key_types import KeyType
+from bbc1.core import bbclib
+from bbc1.core import message_key_types
+from bbc1.core.message_key_types import KeyType
 
 msg_data = None
 

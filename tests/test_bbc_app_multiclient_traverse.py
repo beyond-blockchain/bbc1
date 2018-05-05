@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-import binascii
 import time
 
 import sys
 sys.path.extend(["../"])
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import KeyType
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType
 from bbc1.core import bbc_core
-from bbc1.app import bbc_app
-from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility, wait_check_result_msg_type
-
+from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 
 LOGLEVEL = 'debug'
 LOGLEVEL = 'info'
@@ -56,36 +53,43 @@ class TestBBcAppClient(object):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         user = clients[0]['user_id']
         kp = clients[0]['keypair']
-        transactions1[0] = bbclib.make_transaction_with_relation(asset_group_id=asset_group_id)
-        transactions1[0].relations[0].asset.add(user_id=user, asset_body=b'transaction1_0')
-        transactions1[0] = bbclib.make_transaction_with_witness(transactions1[0])
+
+        transactions1[0] = bbclib.make_transaction(relation_num=1, witness=True)
+        bbclib.add_relation_asset(transactions1[0], relation_idx=0, asset_group_id=asset_group_id,
+                                  user_id=user, asset_body=b'transaction1_0')
         transactions1[0].witness.add_witness(user)
         sig = transactions1[0].sign(keypair=kp)
         transactions1[0].witness.add_signature(user, sig)
 
-        transactions2[0] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
-        transactions2[0].events[0].asset.add(user_id=user, asset_body=b'transaction2_0')
+        transactions2[0] = bbclib.make_transaction(event_num=1, witness=True)
         transactions2[0].events[0].add(mandatory_approver=user)
+        bbclib.add_event_asset(transactions2[0], event_idx=0, asset_group_id=asset_group_id,
+                               user_id=user, asset_body=b'transaction2_0')
+        transactions2[0].witness.add_witness(user)
         sig = transactions2[0].sign(keypair=kp)
-        transactions2[0].add_signature(user_id=user, signature=sig)
+        transactions2[0].witness.add_signature(user_id=user, signature=sig)
 
         for i in range(1, 20):
             k = i - 1
-            transactions1[i] = bbclib.make_transaction_with_relation(asset_group_id=asset_group_id)
-            transactions1[i].relations[0].asset.add(user_id=user, asset_body=b'transaction1_%d' % i)
-            bbclib.add_relation_pointer(transactions1[i].relations[0], transaction_id=transactions1[k].transaction_id,
-                                        asset_id=transactions1[k].relations[0].asset.asset_id)
-            transactions1[i] = bbclib.make_transaction_with_witness(transactions1[i])
+            transactions1[i] = bbclib.make_transaction(relation_num=1, witness=True)
+            bbclib.add_relation_asset(transactions1[i], 0, asset_group_id=asset_group_id, user_id=user,
+                                      asset_body=b'transaction1_%d' % i)
+            bbclib.add_relation_pointer(transactions1[i], 0, ref_transaction_id=transactions1[k].transaction_id,
+                                        ref_asset_id=transactions1[k].relations[0].asset.asset_id)
             transactions1[i].witness.add_witness(user)
             sig = transactions1[i].sign(keypair=kp)
             transactions1[i].witness.add_signature(user, sig)
 
-            transactions2[i] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=1)
-            transactions2[i].events[0].asset.add(user_id=user, asset_body=b'transaction2_%d' % i)
+            transactions2[i] = bbclib.make_transaction(event_num=1, witness=True)
             transactions2[i].events[0].add(mandatory_approver=user)
-            bbclib.add_reference_to_transaction(asset_group_id, transactions2[i], transactions2[k], 0)
+            bbclib.add_event_asset(transactions2[i], event_idx=0, asset_group_id=asset_group_id,
+                                   user_id=user, asset_body=b'transaction2_%d' % i)
+            transactions2[i].witness.add_witness(user)
+            bbclib.add_reference_to_transaction(transactions2[i], asset_group_id, transactions2[k], 0)
+            sig = transactions2[i].sign(keypair=kp)
+            transactions2[i].witness.add_signature(user_id=user, signature=sig)
             if i == 9:
-                bbclib.add_reference_to_transaction(asset_group_id, transactions2[i], transactions2[5], 0)
+                bbclib.add_reference_to_transaction(transactions2[i], asset_group_id, transactions2[5], 0)
             sig = transactions2[i].sign(keypair=kp)
             transactions2[i].references[0].add_signature(user_id=user, signature=sig)
 

@@ -18,17 +18,14 @@ import sys
 import os
 import binascii
 import json
-import time
-import threading
-from datetime import datetime
 import sqlite3
 
 sys.path.extend(["../../"])
-from bbc1.common import bbclib
-from bbc1.app import bbc_app
+from bbc1.core import bbclib
+from bbc1.core import bbc_app
 from bbc1.core.bbc_config import DEFAULT_CORE_PORT
-from bbc1.common.message_key_types import KeyType
-from bbc1.common.bbc_error import *
+from bbc1.core.message_key_types import KeyType
+from bbc1.core.bbc_error import *
 
 
 PRIVATE_KEY = ".private_key"
@@ -47,8 +44,8 @@ bbc_app_client = None
 
 
 def domain_setup():
-    tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
-    tmpclient.domain_setup(domain_id, "simple_cluster")
+    tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, multiq=False, loglevel="all")
+    tmpclient.domain_setup(domain_id)
     tmpclient.callback.synchronize()
     tmpclient.unregister_from_core()
     print("Domain %s is created." % (binascii.b2a_hex(domain_id[:4]).decode()))
@@ -56,7 +53,7 @@ def domain_setup():
 
 
 def setup_bbc_client():
-    bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
+    bbc_app_client = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, multiq=False, loglevel="all")
     bbc_app_client.set_user_id(user_id)
     bbc_app_client.set_domain_id(domain_id)
     bbc_app_client.set_callback(bbc_app.Callback())

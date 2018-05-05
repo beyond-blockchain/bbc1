@@ -5,5 +5,5 @@ git submodule update
 cd third_party/openssl
 ./config && make
 
-cd ../../bbc1/common/libbbcsig/
+cd ../libbbcsig
 make

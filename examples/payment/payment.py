@@ -16,18 +16,15 @@ limitations under the License.
 """
 import argparse
 import binascii
-import datetime
-import hashlib
 import json
-import os
 
 import sys
 sys.path.extend(["../../"])
-from bbc1.app import bbc_app, app_support_lib, id_lib, token_lib
+from bbc1.app import app_support_lib, id_lib, token_lib
+from bbc1.core import bbc_app
 from bbc1.core.bbc_config import DEFAULT_CORE_PORT
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import KeyType
-from bbc1.common.bbc_error import *
+from bbc1.core import bbclib
+from bbc1.core.bbc_error import *
 
 
 F_JSON_CURRENCIES = 'payment_currencies.json'
@@ -248,7 +245,7 @@ def select_user(name, dic, file_name):
 
 def setup():
     tmpclient = bbc_app.BBcAppClient(port=DEFAULT_CORE_PORT, loglevel="all")
-    tmpclient.domain_setup(domain_id, "simple_cluster")
+    tmpclient.domain_setup(domain_id)
     tmpclient.callback.synchronize()
     tmpclient.unregister_from_core()
     print("domain %s is created." % (binascii.b2a_hex(domain_id[:4]).decode()))

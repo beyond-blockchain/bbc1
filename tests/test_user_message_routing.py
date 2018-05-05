@@ -18,10 +18,9 @@ import os
 import sys
 sys.path.extend(["../"])
 
-from bbc1.common import bbclib, message_key_types
-from bbc1.common.message_key_types import KeyType
-from bbc1.core import bbc_network, user_message_routing, bbc_config, query_management, bbc_stats
-
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType
+from bbc1.core import bbc_network, user_message_routing, bbc_config, query_management, bbc_stats, message_key_types
 
 LOGLEVEL = 'debug'
 LOGLEVEL = 'info'
@@ -299,7 +298,7 @@ class TestBBcNetwork(object):
             KeyType.destination_user_id: users[4],
             KeyType.message: 600,
         }
-        user_routings[5].resolve_accommodating_core_node(dst_user_id=users[4], src_user_id=users[10])
+        user_routings[5]._resolve_accommodating_core_node(dst_user_id=users[4], src_user_id=users[10])
         time.sleep(1)
         assert len(user_routings[5].forwarding_entries[users[4]]['nodes']) == 2
         # cores[2] and cores[4]

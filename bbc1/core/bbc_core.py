@@ -36,15 +36,15 @@ import copy
 
 import sys
 sys.path.extend(["../../"])
-from bbc1.common import bbclib, message_key_types, logger
-from bbc1.common.message_key_types import KeyType, to_2byte
-from bbc1.common.bbclib import BBcTransaction, MsgType
-from bbc1.core import bbc_network, user_message_routing, data_handler, repair_manager
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType, to_2byte
+from bbc1.core.bbclib import BBcTransaction, MsgType
+from bbc1.core import bbc_network, user_message_routing, data_handler, repair_manager, message_key_types, logger
 from bbc1.core import domain0_manager, query_management, bbc_stats
 from bbc1.core.bbc_config import BBcConfig
 from bbc1.core.data_handler import InfraMessageCategory
 from bbc1.core import command
-from bbc1.common.bbc_error import *
+from bbc1.core.bbc_error import *
 
 VERSION = "core version 0.9"
 
@@ -58,9 +58,30 @@ TX_TRAVERSAL_MAX = 30
 
 ticker = query_management.get_ticker()
 core_service = None
+ledger_subsystem_module = None
+
+admin_message_commands = (
+    MsgType.REQUEST_GET_STATS, MsgType.REQUEST_GET_NEIGHBORLIST,
+    MsgType.REQUEST_GET_CONFIG, MsgType.REQUEST_GET_DOMAINLIST,
+    MsgType.REQUEST_GET_FORWARDING_LIST, MsgType.REQUEST_GET_USERS,
+    MsgType.REQUEST_GET_NODEID, MsgType.REQUEST_GET_NOTIFICATION_LIST,
+    MsgType.REQUEST_SETUP_DOMAIN, MsgType.REQUEST_CLOSE_DOMAIN,
+    MsgType.NOTIFY_DOMAIN_KEY_UPDATE,
+    MsgType.DOMAIN_PING, MsgType.REQUEST_SET_STATIC_NODE,
+    MsgType.REQUEST_MANIP_LEDGER_SUBSYS
+)
 
 
-def make_message_structure(domain_id, cmd, dstid, qid):
+def activate_ledgersubsystem():
+    global ledger_subsystem_module
+    if ledger_subsystem_module is None:
+        try:
+            ledger_subsystem_module = __import__("ledger_subsystem")
+        except:
+            ledger_subsystem_module = None
+
+
+def _make_message_structure(domain_id, cmd, dstid, qid):
     """
     (internal use) Create a base structure of message
 
@@ -78,18 +99,7 @@ def make_message_structure(domain_id, cmd, dstid, qid):
     }
 
 
-def check_transaction_if_having_asset_file(txdata, asid):
-    tx_obj = BBcTransaction()
-    tx_obj.deserialize(txdata)
-    for evt in tx_obj.events:
-        if evt.asset.asset_id != asid:
-            continue
-        if evt.asset.asset_file_size > 0:
-            return True
-    return False
-
-
-def create_search_result(txobj_dict, asset_files_dict):
+def _create_search_result(txobj_dict, asset_files_dict):
     response_info = dict()
     for txid, txobj in txobj_dict.items():
         if txid != txobj.transaction_id:
@@ -103,18 +113,18 @@ def create_search_result(txobj_dict, asset_files_dict):
 
         if len(valid_assets) > 0:
             response_info.setdefault(KeyType.all_asset_files, dict())
-            for asid in valid_assets:
+            for asgid, asid in valid_assets:
                 response_info[KeyType.all_asset_files][asid] = asset_files_dict[asid]
         if len(invalid_assets) > 0:
             response_info.setdefault(KeyType.compromised_asset_files, dict())
-            for asid in invalid_assets:
+            for asgid, asid in invalid_assets:
                 response_info[KeyType.compromised_asset_files][asid] = asset_files_dict[asid]
     return response_info
 
 
 class BBcCoreService:
     def __init__(self, p2p_port=None, core_port=None, use_domain0=False, ip4addr=None, ip6addr=None,
-                 workingdir=".bbc1", configfile=None, use_nodekey=False, use_ledger_subsystem=False,
+                 workingdir=".bbc1", configfile=None, use_nodekey=None, use_ledger_subsystem=False,
                  loglevel="all", logname="-", server_start=True):
         self.logger = logger.get_logger(key="core", level=loglevel, logname=logname)
         self.stats = bbc_stats.BBcStats()
@@ -124,9 +134,14 @@ class BBcCoreService:
             conf['client']['port'] = core_port
         else:
             core_port = conf['client']['port']
-        self.default_node_key = None
-        if use_nodekey:
-            self.get_default_node_key()
+        self.node_key = None
+        if use_nodekey is not None:
+            if use_nodekey:
+                conf['client']['use_node_key'] = True
+            elif not use_nodekey:
+                conf['client']['use_node_key'] = False
+        if 'use_node_key' in conf['client'] and conf['client']['use_node_key']:
+            self._get_node_key()
         self.logger.debug("config = %s" % conf)
         self.test_tx_obj = BBcTransaction()
         self.insert_notification_user_list = dict()
@@ -143,33 +158,38 @@ class BBcCoreService:
             for nd, info in c['static_nodes'].items():
                 node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
                 self.networking.add_neighbor(domain_id, node_id, ipv4, ipv6, port, is_static=True)
-            if ('use_ledger_subsystem' in conf and conf['use_ledger_subsystem']) or use_ledger_subsystem:
-                from bbc1.core import ledger_subsystem
-                self.ledger_subsystems[domain_id] = ledger_subsystem.LedgerSubsystem(self.config,
-                                                                                     networking=self.networking,
-                                                                                     domain_id=domain_id,
-                                                                                     loglevel=loglevel, logname=logname)
+            if ('use_ledger_subsystem' in c and c['use_ledger_subsystem']) or use_ledger_subsystem:
+                activate_ledgersubsystem()
+                if ledger_subsystem_module is not None:
+                    self.ledger_subsystems[domain_id] = ledger_subsystem_module.LedgerSubsystem(self.config,
+                                                                                                networking=self.networking,
+                                                                                                domain_id=domain_id,
+                                                                                                loglevel=loglevel,
+                                                                                                logname=logname)
+                else:
+                    self.logger.info("Failed to load ledger_subsystem module")
+
         gevent.signal(signal.SIGINT, self.quit_program)
         if server_start:
-            self.start_server(core_port)
+            self._start_server(core_port)
 
     def quit_program(self):
         self.networking.save_all_static_node_list()
         self.config.update_config()
         os._exit(0)
 
-    def start_server(self, port):
+    def _start_server(self, port):
         pool = Pool(POOL_SIZE)
         if self.networking.ip6_address == "::":
-            server = StreamServer(("0.0.0.0", port), self.handler, spawn=pool)
+            server = StreamServer(("0.0.0.0", port), self._handler, spawn=pool)
         else:
-            server = StreamServer(("::", port), self.handler, spawn=pool)
+            server = StreamServer(("::", port), self._handler, spawn=pool)
         try:
             server.serve_forever()
         except KeyboardInterrupt:
             pass
 
-    def error_reply(self, msg=None, err_code=EINVALID_COMMAND, txt=""):
+    def _error_reply(self, msg=None, err_code=EINVALID_COMMAND, txt=""):
         msg[KeyType.status] = err_code
         msg[KeyType.reason] = txt
         domain_id = msg[KeyType.domain_id]
@@ -179,7 +199,7 @@ class BBcCoreService:
         else:
             return False
 
-    def handler(self, socket, address):
+    def _handler(self, socket, address):
         """
         Message wait loop
 
@@ -202,7 +222,7 @@ class BBcCoreService:
                     msg = msg_parser.parse()
                     if msg is None:
                         break
-                    disconnection, new_info = self.process(socket, msg, msg_parser.payload_type)
+                    disconnection, new_info = self._process(socket, msg, msg_parser.payload_type)
                     if disconnection:
                         break
                     if new_info is not None:
@@ -222,49 +242,45 @@ class BBcCoreService:
         self.logger.debug("connection closed")
         self.stats.update_stats_decrement("client", "total_num", 1)
 
-    def get_default_node_key(self):
+    def _get_node_key(self):
         """
-        Get or create default node key for creating a domain by bbc_app
+        Get or create node key for creating a domain by bbc_app
         :return:
         """
-        keyconfig = self.config.get_config().get('domain_auth_key', None)
-        if keyconfig is None or 'directory' not in keyconfig:
-            return
-        if not os.path.exists(keyconfig['directory']):
-            os.makedirs(os.path.exists(keyconfig['directory']), exist_ok=True)
-        keypath = os.path.join(keyconfig['directory'], "default_node_key.pem")
+        self.logger.info("The core use node_key to check signature on admin command message")
+        keypath = os.path.join(self.config.working_dir, "node_key.pem")
 
-        self.default_node_key = bbclib.KeyPair()
+        self.node_key = bbclib.KeyPair()
         if os.path.exists(keypath):
             try:
                 with open(keypath, "r") as f:
-                    self.default_node_key.mk_keyobj_from_private_key_pem(f.read())
+                    self.node_key.mk_keyobj_from_private_key_pem(f.read())
                 return
             except:
                 pass
-        self.default_node_key.generate()
+        self.node_key.generate()
         with open(keypath, "wb") as f:
-            f.write(self.default_node_key.get_private_key_in_pem())
+            f.write(self.node_key.get_private_key_in_pem())
         return
 
-    def check_signature_by_nodekey(self, dat):
+    def _check_signature_by_nodekey(self, dat):
         """
         Verify signature in the message
         :param dat:
         :return:
         """
-        if self.default_node_key is None:
+        if self.node_key is None:
             return True
-        if KeyType.domain_admin_info not in dat:
+        if KeyType.admin_info not in dat:
             return False
-        digest = hashlib.sha256(dat[KeyType.domain_admin_info]).digest()
-        if not self.default_node_key.verify(digest, dat[KeyType.domain_signature]):
+        digest = hashlib.sha256(dat[KeyType.admin_info]).digest()
+        if not self.node_key.verify(digest, dat[KeyType.nodekey_signature]):
             return False
-        admin_info = message_key_types.make_dictionary_from_TLV_format(dat[KeyType.domain_admin_info])
+        admin_info = message_key_types.make_dictionary_from_TLV_format(dat[KeyType.admin_info])
         dat.update(admin_info)
         return True
 
-    def param_check(self, param, dat):
+    def _param_check(self, param, dat):
         """
         Check if the param is included
 
@@ -275,15 +291,15 @@ class BBcCoreService:
         if isinstance(param, list):
             for p in param:
                 if p not in dat:
-                    self.error_reply(msg=dat, err_code=EINVALID_COMMAND, txt="lack of mandatory params")
+                    self._error_reply(msg=dat, err_code=EINVALID_COMMAND, txt="lack of mandatory params")
                     return False
         else:
             if param not in dat:
-                self.error_reply(msg=dat, err_code=EINVALID_COMMAND, txt="lack of mandatory params")
+                self._error_reply(msg=dat, err_code=EINVALID_COMMAND, txt="lack of mandatory params")
                 return False
         return True
 
-    def process(self, socket, dat, payload_type):
+    def _process(self, socket, dat, payload_type):
         """
         Process received message
 
@@ -294,9 +310,18 @@ class BBcCoreService:
         """
         self.stats.update_stats_increment("client", "num_message_receive", 1)
         #self.logger.debug("process message from %s: %s" % (binascii.b2a_hex(dat[KeyType.source_user_id]), dat))
-        if not self.param_check([KeyType.command, KeyType.source_user_id], dat):
+        if not self._param_check([KeyType.command, KeyType.source_user_id], dat):
             self.logger.debug("message has bad format")
             return False, None
+        if dat[KeyType.command] in admin_message_commands:
+            if self.node_key is None and KeyType.admin_info in dat:
+                admin_info = message_key_types.make_dictionary_from_TLV_format(dat[KeyType.admin_info])
+                dat.update(admin_info)
+            else:
+                if not self._check_signature_by_nodekey(dat):
+                    self.logger.error("Illegal access to core node")
+                    return False, None
+
         domain_id = dat.get(KeyType.domain_id, None)
         umr = None
         if domain_id is not None:
@@ -307,14 +332,14 @@ class BBcCoreService:
 
         cmd = dat[KeyType.command]
         if cmd == MsgType.REQUEST_SEARCH_TRANSACTION:
-            if not self.param_check([KeyType.domain_id, KeyType.transaction_id], dat):
+            if not self._param_check([KeyType.domain_id, KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_SEARCH_TRANSACTION: bad format")
                 return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_SEARCH_TRANSACTION,
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_SEARCH_TRANSACTION,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
-            txinfo = self.search_transaction_by_txid(domain_id, dat[KeyType.transaction_id])
+            txinfo = self._search_transaction_by_txid(domain_id, dat[KeyType.transaction_id])
             if txinfo is None:
-                if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
+                if not self._error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
                     user_message_routing.direct_send_to_user(socket, retmsg)
                 return False, None
             if KeyType.compromised_transaction_data in txinfo or KeyType.compromised_asset_files in txinfo:
@@ -323,10 +348,10 @@ class BBcCoreService:
             umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_SEARCH_WITH_CONDITIONS:
-            if not self.param_check([KeyType.domain_id], dat):
+            if not self._param_check([KeyType.domain_id], dat):
                 self.logger.debug("REQUEST_SEARCH_WITH_CONDITIONS: bad format")
                 return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_SEARCH_WITH_CONDITIONS,
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_SEARCH_WITH_CONDITIONS,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             txinfo = self.search_transaction_with_condition(domain_id,
                                                             asset_group_id=dat.get(KeyType.asset_group_id, None),
@@ -334,24 +359,24 @@ class BBcCoreService:
                                                             user_id=dat.get(KeyType.user_id, None),
                                                             count=dat.get(KeyType.count, 1))
             if txinfo is None or KeyType.transactions not in txinfo:
-                if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
+                if not self._error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
                     user_message_routing.direct_send_to_user(socket, retmsg)
             else:
                 retmsg.update(txinfo)
                 umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_TRAVERSE_TRANSACTIONS:
-            if not self.param_check([KeyType.domain_id, KeyType.transaction_id,
+            if not self._param_check([KeyType.domain_id, KeyType.transaction_id,
                                      KeyType.direction, KeyType.hop_count], dat):
                 self.logger.debug("REQUEST_TRAVERSE_TRANSACTIONS: bad format")
                 return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_TRAVERSE_TRANSACTIONS,
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_TRAVERSE_TRANSACTIONS,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.transaction_id] = dat[KeyType.transaction_id]
-            all_included, txtree, asset_files = self.traverse_transactions(domain_id, dat[KeyType.transaction_id],
+            all_included, txtree, asset_files = self._traverse_transactions(domain_id, dat[KeyType.transaction_id],
                                                                            dat[KeyType.direction], dat[KeyType.hop_count])
             if txtree is None or len(txtree) == 0:
-                if not self.error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
+                if not self._error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
                     user_message_routing.direct_send_to_user(socket, retmsg)
             else:
                 retmsg[KeyType.transaction_tree] = txtree
@@ -361,36 +386,36 @@ class BBcCoreService:
                 umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_GATHER_SIGNATURE:
-            if not self.param_check([KeyType.domain_id, KeyType.transaction_data], dat):
+            if not self._param_check([KeyType.domain_id, KeyType.transaction_data], dat):
                 self.logger.debug("REQUEST_GATHER_SIGNATURE: bad format")
                 return False, None
-            if not self.distribute_transaction_to_gather_signatures(dat[KeyType.domain_id], dat):
-                retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GATHER_SIGNATURE,
+            if not self._distribute_transaction_to_gather_signatures(dat[KeyType.domain_id], dat):
+                retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GATHER_SIGNATURE,
                                                 dat[KeyType.source_user_id], dat[KeyType.query_id])
-                if not self.error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt="Fail to forward transaction"):
+                if not self._error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt="Fail to forward transaction"):
                     user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_INSERT:
-            if not self.param_check([KeyType.domain_id, KeyType.transaction_data, KeyType.all_asset_files], dat):
+            if not self._param_check([KeyType.domain_id, KeyType.transaction_data, KeyType.all_asset_files], dat):
                 self.logger.debug("REQUEST_INSERT: bad format")
                 return False, None
             transaction_data = dat[KeyType.transaction_data]
             asset_files = dat[KeyType.all_asset_files]
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_INSERT,
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_INSERT,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             ret = self.insert_transaction(dat[KeyType.domain_id], transaction_data, asset_files)
             if isinstance(ret, str):
-                if not self.error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt=ret):
+                if not self._error_reply(msg=retmsg, err_code=EINVALID_COMMAND, txt=ret):
                     user_message_routing.direct_send_to_user(socket, retmsg)
             else:
                 retmsg.update(ret)
                 umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.RESPONSE_SIGNATURE:
-            if not self.param_check([KeyType.domain_id, KeyType.destination_user_id, KeyType.source_user_id], dat):
+            if not self._param_check([KeyType.domain_id, KeyType.destination_user_id, KeyType.source_user_id], dat):
                 self.logger.debug("RESPONSE_SIGNATURE: bad format")
                 return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GATHER_SIGNATURE,
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GATHER_SIGNATURE,
                                             dat[KeyType.destination_user_id], dat[KeyType.query_id])
             if KeyType.signature in dat:
                 retmsg[KeyType.signature] = dat[KeyType.signature]
@@ -405,7 +430,7 @@ class BBcCoreService:
             umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.MESSAGE:
-            if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.destination_user_id], dat):
+            if not self._param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.destination_user_id], dat):
                 self.logger.debug("MESSAGE: bad format")
                 return False, None
             if KeyType.is_anycast in dat:
@@ -413,17 +438,17 @@ class BBcCoreService:
             umr.send_message_to_user(dat)
 
         elif cmd == MsgType.REQUEST_CROSS_REF_VERIFY:
-            if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.transaction_id], dat):
+            if not self._param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_CROSS_REF_VERIFY: bad format")
                 return False, None
             dat[KeyType.command] = domain0_manager.Domain0Manager.REQUEST_VERIFY
             self.networking.send_message_to_a_domain0_manager(domain_id, dat)
 
         elif cmd == MsgType.REQUEST_CROSS_REF_LIST:
-            if not self.param_check([KeyType.domain_id, KeyType.source_user_id], dat):
+            if not self._param_check([KeyType.domain_id, KeyType.source_user_id], dat):
                 self.logger.debug("REQUEST_CROSS_REF_LIST: bad format")
                 return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_CROSS_REF_LIST,
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_CROSS_REF_LIST,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             domain_list = self.networking.domains[domain_id]['data'].search_domain_having_cross_ref()
             # domain_list = list of ["id", "transaction_id", "outer_domain_id", "txid_having_cross_ref"]
@@ -431,32 +456,36 @@ class BBcCoreService:
             umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_REGISTER_HASH_IN_SUBSYS:
-            if not self.param_check([KeyType.transaction_id], dat):
+            if not self._param_check([KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_REGISTER_HASH_IN_SUBSYS: bad format")
                 return False, None
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_REGISTER_HASH_IN_SUBSYS,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             if domain_id in self.ledger_subsystems:
                 transaction_id = dat[KeyType.transaction_id]
                 self.ledger_subsystems[domain_id].register_transaction(transaction_id=transaction_id)
-                retmsg = make_message_structure(domain_id, MsgType.RESPONSE_REGISTER_HASH_IN_SUBSYS,
-                                                dat[KeyType.source_user_id], dat[KeyType.query_id])
                 umr.send_message_to_user(retmsg)
+            else:
+                self._error_reply(msg=retmsg, err_code=ENOSUBSYSTEM, txt="Ledger_subsystem is not activated")
 
         elif cmd == MsgType.REQUEST_VERIFY_HASH_IN_SUBSYS:
-            if not self.param_check([KeyType.transaction_id], dat):
+            if not self._param_check([KeyType.transaction_id], dat):
                 self.logger.debug("REQUEST_REGISTER_HASH_IN_SUBSYS: bad format")
                 return False, None
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             if domain_id in self.ledger_subsystems:
                 transaction_id = dat[KeyType.transaction_id]
-                retmsg = make_message_structure(domain_id, MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS,
-                                                dat[KeyType.source_user_id], dat[KeyType.query_id])
                 result = self.ledger_subsystems[domain_id].verify_transaction(transaction_id=transaction_id)
                 retmsg[KeyType.merkle_tree] = result
                 umr.send_message_to_user(retmsg)
+            else:
+                self._error_reply(msg=retmsg, err_code=ENOSUBSYSTEM, txt="Ledger_subsystem is not activated")
 
         elif cmd == MsgType.REGISTER:
             if domain_id is None:
                 return False, None
-            if not self.param_check([KeyType.domain_id, KeyType.source_user_id], dat):
+            if not self._param_check([KeyType.domain_id, KeyType.source_user_id], dat):
                 self.logger.debug("REGISTER: bad format")
                 return False, None
             user_id = dat[KeyType.source_user_id]
@@ -471,35 +500,35 @@ class BBcCoreService:
             return True, None
 
         elif cmd == MsgType.REQUEST_INSERT_NOTIFICATION:
-            self.register_to_notification_list(domain_id, dat[KeyType.asset_group_id], dat[KeyType.source_user_id])
+            self._register_to_notification_list(domain_id, dat[KeyType.asset_group_id], dat[KeyType.source_user_id])
 
         elif cmd == MsgType.CANCEL_INSERT_NOTIFICATION:
             self.remove_from_notification_list(domain_id, dat[KeyType.asset_group_id], dat[KeyType.source_user_id])
 
         elif cmd == MsgType.REQUEST_GET_STATS:
-            if not self.check_signature_by_nodekey(dat):
-                self.logger.error("Illegal access without node_key")
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_STATS,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GET_STATS,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.stats] = copy.deepcopy(self.stats.get_stats())
             user_message_routing.direct_send_to_user(socket, retmsg)
 
+        elif cmd == MsgType.NOTIFY_DOMAIN_KEY_UPDATE:
+            if domain_id is not None:
+                self.networking.get_domain_keypair(domain_id)
+
         elif cmd == MsgType.REQUEST_REPAIR:
-            if not self.param_check([KeyType.transaction_id], dat):
+            if KeyType.transaction_id in dat:
+                dat[KeyType.command] = repair_manager.RepairManager.REQUEST_REPAIR_TRANSACTION
+                self.networking.domains[domain_id]['repair'].put_message(dat)
+            elif KeyType.asset_group_id in dat and KeyType.asset_id in dat:
+                dat[KeyType.command] = repair_manager.RepairManager.REQUEST_REPAIR_ASSET_FILE
+                self.networking.domains[domain_id]['repair'].put_message(dat)
+            else:
                 self.logger.debug("REQUEST_REPAIR: bad format")
-                return False, None
-            dat[KeyType.command] = repair_manager.RepairManager.REQUEST_REPAIR_TRANSACTION
-            self.networking.domains[domain_id]['repair'].put_message(dat)
             return False, None
 
         elif cmd == MsgType.REQUEST_GET_NEIGHBORLIST:
-            if not self.networking.check_admin_signature(domain_id, dat):
-                self.logger.error("Illegal access to domain %s" % domain_id.hex())
-                return False, None
-            domain_id = dat[KeyType.domain_id]
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_NEIGHBORLIST,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GET_NEIGHBORLIST,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             if domain_id in self.networking.domains:
                 retmsg[KeyType.domain_id] = domain_id
                 retmsg[KeyType.neighbor_list] = self.networking.domains[domain_id]['topology'].make_neighbor_list()
@@ -509,21 +538,15 @@ class BBcCoreService:
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_CONFIG:
-            if not self.check_signature_by_nodekey(dat):
-                self.logger.error("Illegal access without node_kdy")
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_CONFIG,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GET_CONFIG,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             jsondat = self.config.get_json_config()
             retmsg[KeyType.bbc_configuration] = jsondat
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_DOMAINLIST:
-            if not self.check_signature_by_nodekey(dat):
-                self.logger.error("Illegal access without node_kdy")
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_DOMAINLIST,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GET_DOMAINLIST,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             data = bytearray()
             data.extend(to_2byte(len(self.networking.domains)))
             for domain_id in self.networking.domains:
@@ -532,11 +555,8 @@ class BBcCoreService:
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_FORWARDING_LIST:
-            if not self.networking.check_admin_signature(domain_id, dat):
-                self.logger.error("Illegal access to domain %s" % domain_id.hex())
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_FORWARDING_LIST,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GET_FORWARDING_LIST,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             data = bytearray()
             data.extend(to_2byte(len(umr.forwarding_entries)))
             for user_id in umr.forwarding_entries:
@@ -548,11 +568,8 @@ class BBcCoreService:
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_USERS:
-            if not self.networking.check_admin_signature(domain_id, dat):
-                self.logger.error("Illegal access to domain %s" % domain_id.hex())
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_USERS,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GET_USERS,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             data = bytearray()
             data.extend(to_2byte(len(umr.registered_users)))
             for user_id in umr.registered_users.keys():
@@ -561,22 +578,16 @@ class BBcCoreService:
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_NODEID:
-            if not self.networking.check_admin_signature(domain_id, dat):
-                self.logger.error("Illegal access to domain %s" % domain_id.hex())
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_NODEID,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GET_NODEID,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             data = bytearray()
             data.extend(self.networking.domains[domain_id]['topology'].my_node_id)
             retmsg[KeyType.node_id] = bytes(data)
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_GET_NOTIFICATION_LIST:
-            if not self.networking.check_admin_signature(domain_id, dat):
-                self.logger.error("Illegal access to domain %s" % domain_id.hex())
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_GET_NOTIFICATION_LIST,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GET_NOTIFICATION_LIST,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             data = bytearray()
             data.extend(to_2byte(len(self.insert_notification_user_list[domain_id])))
             for asset_group_id in self.insert_notification_user_list[domain_id].keys():
@@ -588,36 +599,27 @@ class BBcCoreService:
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_SETUP_DOMAIN:
-            if not self.check_signature_by_nodekey(dat):
-                self.logger.error("Illegal access without node_kdy")
+            if not self._param_check([KeyType.domain_id], dat):
+                self.logger.debug("REQUEST_SETUP_DOMAIN: bad format")
                 return False, None
-            retmsg = make_message_structure(None, MsgType.RESPONSE_SETUP_DOMAIN,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
-            if domain_id is None:
-                retmsg[KeyType.result] = False
-            else:
-                config = None
-                if KeyType.bbc_configuration in dat:
-                    try:
-                        config = json.loads(dat[KeyType.bbc_configuration])
-                    except:
-                        config = None
-                self.networking.create_domain(domain_id=domain_id, config=config)
-                retmsg[KeyType.result] = True
-                retmsg[KeyType.domain_id] = domain_id
+            retmsg = _make_message_structure(None, MsgType.RESPONSE_SETUP_DOMAIN,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg[KeyType.result] = self.networking.create_domain(domain_id=domain_id)
+            if not retmsg[KeyType.result]:
+                retmsg[KeyType.reason] = "Already exists"
+            retmsg[KeyType.domain_id] = domain_id
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_CLOSE_DOMAIN:
-            if not self.networking.check_admin_signature(domain_id, dat):
-                self.logger.error("Illegal access to domain %s" % domain_id.hex())
-                return False, None
-            retmsg = make_message_structure(None, MsgType.RESPONSE_CLOSE_DOMAIN,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg = _make_message_structure(None, MsgType.RESPONSE_CLOSE_DOMAIN,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.result] = self.networking.remove_domain(domain_id)
+            if not retmsg[KeyType.result]:
+                retmsg[KeyType.reason] = "No such domain"
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_ECDH_KEY_EXCHANGE:
-            retmsg = make_message_structure(None, MsgType.RESPONSE_ECDH_KEY_EXCHANGE,
+            retmsg = _make_message_structure(None, MsgType.RESPONSE_ECDH_KEY_EXCHANGE,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             privatekey_for_ecdh, peer_pub_key_to_send, my_keyname = message_key_types.get_ECDH_parameters()
             if privatekey_for_ecdh is None:
@@ -634,10 +636,7 @@ class BBcCoreService:
             umr.set_aes_name(socket, my_keyname)
 
         elif cmd == MsgType.DOMAIN_PING:
-            if not self.networking.check_admin_signature(domain_id, dat):
-                self.logger.error("Illegal access to domain %s" % domain_id.hex())
-                return False, None
-            if not self.param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.port_number], dat):
+            if not self._param_check([KeyType.domain_id, KeyType.source_user_id, KeyType.port_number], dat):
                 return False, None
             ipv4 = dat.get(KeyType.ipv4_address, None)
             ipv6 = dat.get(KeyType.ipv6_address, None)
@@ -647,11 +646,8 @@ class BBcCoreService:
             self.networking.send_domain_ping(domain_id, ipv4, ipv6, port)
 
         elif cmd == MsgType.REQUEST_SET_STATIC_NODE:
-            if not self.networking.check_admin_signature(domain_id, dat):
-                self.logger.error("Illegal access to domain %s" % domain_id.hex())
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_SET_STATIC_NODE,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_SET_STATIC_NODE,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.domain_id] = domain_id
             node_info = dat.get(KeyType.node_info, None)
             if node_info is None:
@@ -663,23 +659,22 @@ class BBcCoreService:
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_MANIP_LEDGER_SUBSYS:
-            if not self.networking.check_admin_signature(domain_id, dat):
-                self.logger.error("Illegal access to domain %s" % domain_id.hex())
-                return False, None
-            retmsg = make_message_structure(domain_id, MsgType.RESPONSE_MANIP_LEDGER_SUBSYS,
-                                            dat[KeyType.source_user_id], dat[KeyType.query_id])
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_MANIP_LEDGER_SUBSYS,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             if self.ledger_subsystems[domain_id] is not None:
                 if dat[KeyType.ledger_subsys_manip]:
                     self.ledger_subsystems[domain_id].enable()
                 else:
                     self.ledger_subsystems[domain_id].disable()
                 user_message_routing.direct_send_to_user(socket, retmsg)
+            else:
+                self._error_reply(msg=retmsg, err_code=ENOSUBSYSTEM, txt="Ledger_subsystem is not installed")
 
         else:
             self.logger.error("Bad command/response: %s" % cmd)
         return False, None
 
-    def register_to_notification_list(self, domain_id, asset_group_id, user_id):
+    def _register_to_notification_list(self, domain_id, asset_group_id, user_id):
         """
         Register user_id in notification_list
         :param domain_id:
@@ -726,7 +721,7 @@ class BBcCoreService:
         :param txid:          transaction_id
         :param txdata:        BBcTransaction data
         :param asset_files:   dictionary of { asid=>asset_content,,, }
-        :rtype: BBcTransaction or None
+        :return: BBcTransaction or None
         """
         txobj = BBcTransaction()
         if not txobj.deserialize(txdata):
@@ -749,11 +744,10 @@ class BBcCoreService:
     def insert_transaction(self, domain_id, txdata, asset_files):
         """
         Insert transaction into ledger
-
         :param domain_id:     domain_id where the transaction is inserted
         :param txdata:        BBcTransaction data
         :param asset_files:   dictionary of { asid=>asset_content,,, }
-        :rtype: **result or str
+        :return: result or str
         """
         self.stats.update_stats_increment("transaction", "insert_count", 1)
         if domain_id is None:
@@ -824,7 +818,7 @@ class BBcCoreService:
             msg[KeyType.destination_node_id] = node_id
             self.networking.send_message_in_network(domain_id=domain_id, msg=msg)
 
-    def distribute_transaction_to_gather_signatures(self, domain_id, dat):
+    def _distribute_transaction_to_gather_signatures(self, domain_id, dat):
         """
         Request to distribute sign_request to users
 
@@ -834,7 +828,7 @@ class BBcCoreService:
         :return:
         """
         destinations = dat[KeyType.destination_user_ids]
-        msg = make_message_structure(domain_id, MsgType.REQUEST_SIGNATURE, None, dat[KeyType.query_id])
+        msg = _make_message_structure(domain_id, MsgType.REQUEST_SIGNATURE, None, dat[KeyType.query_id])
         msg[KeyType.source_user_id] = dat[KeyType.source_user_id]
         umr = self.networking.domains[domain_id]['user']
         for dst in destinations:
@@ -851,7 +845,7 @@ class BBcCoreService:
             umr.send_message_to_user(msg)
         return True
 
-    def search_transaction_by_txid(self, domain_id, txid):
+    def _search_transaction_by_txid(self, domain_id, txid):
         """
         Search transaction_data by transaction_id
 
@@ -873,7 +867,7 @@ class BBcCoreService:
         if ret_txobj is None or len(ret_txobj) == 0:
             return None
 
-        response_info = create_search_result(ret_txobj, ret_asset_files)
+        response_info = _create_search_result(ret_txobj, ret_asset_files)
         response_info[KeyType.transaction_id] = txid
         if KeyType.transactions in response_info:
             response_info[KeyType.transaction_data] = response_info[KeyType.transactions][0]
@@ -890,7 +884,7 @@ class BBcCoreService:
         :param asset_group_id:
         :param asset_group_id:
         :param user_id:
-        :rtype: **response_info
+        :rtype: response_info
         :return: {transactions, all_asset_files, compromised_transactions, compromised_asset, compromised_asset_files}
         """
         if domain_id is None:
@@ -903,9 +897,9 @@ class BBcCoreService:
         if ret_txobj is None or len(ret_txobj) == 0:
             return None
 
-        return create_search_result(ret_txobj, ret_asset_files)
+        return _create_search_result(ret_txobj, ret_asset_files)
 
-    def traverse_transactions(self, domain_id, transaction_id, direction=1, hop_count=3):
+    def _traverse_transactions(self, domain_id, transaction_id, direction=1, hop_count=3):
         """
         Get transaction tree from a base txid
         :param domain_id:
@@ -970,25 +964,6 @@ class BBcCoreService:
 
         return include_all_flag, txtree, asset_files
 
-    def pop_cross_refs(self, domain_id, num=1):
-        """
-        Return TxIDs for cross_refs
-        :param domain_id:
-        :param num: The number of set of (txid, domain_id) to return
-        :return:
-        """
-        refs = []
-        if domain_id is None:
-            self.logger.error("No such domain")
-            return refs
-        for i in range(num):
-            if len(self.networking.domains[domain_id]['data'].cross_ref_list) > 0:
-                refs.append(self.networking.domains[domain_id]['user'].cross_ref_list.pop(0))
-                self.stats.update_stats_decrement("cross_ref", "total_num", 1)
-            else:
-                break
-        return refs
-
 
 def daemonize(pidfile=PID_FILE):
     pid = os.fork()
@@ -1014,12 +989,17 @@ if __name__ == '__main__':
         sys.exit(0)
     if argresult.daemon:
         daemonize()
+    use_nodekey = None
+    if argresult.no_nodekey:
+        use_nodekey = False
+    elif argresult.nodekey:
+        use_nodekey = True
     BBcCoreService(
         p2p_port=argresult.p2pport,
         core_port=argresult.coreport,
         workingdir=argresult.workingdir,
         configfile=argresult.config,
-        use_nodekey=argresult.nodekey,
+        use_nodekey=use_nodekey,
         use_domain0=argresult.domain0,
         use_ledger_subsystem=argresult.ledgersubsystem,
         ip4addr=argresult.ip4addr,
