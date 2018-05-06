@@ -174,76 +174,112 @@
 <dt id="bbc1.core.bbc_core.BBcCoreService">
 <em class="property">class </em><code class="descclassname">bbc1.core.bbc_core.</code><code class="descname">BBcCoreService</code><span class="sig-paren">(</span><em>p2p_port=None</em>, <em>core_port=None</em>, <em>use_domain0=False</em>, <em>ip4addr=None</em>, <em>ip6addr=None</em>, <em>workingdir='.bbc1'</em>, <em>configfile=None</em>, <em>use_nodekey=None</em>, <em>use_ledger_subsystem=False</em>, <em>loglevel='all'</em>, <em>logname='-'</em>, <em>server_start=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base service object of BBc-1</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.insert_transaction">
 <code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>domain_id</em>, <em>txdata</em>, <em>asset_files</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.insert_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert transaction into ledger
-:param domain_id:     domain_id where the transaction is inserted
-:param txdata:        BBcTransaction data
-:param asset_files:   dictionary of { asid=&gt;asset_content,,, }
-:return: result or str</p>
+:param domain_id: target domain_id
+:type domain_id: bytes
+:param txdata: serialized transaction data
+:type txdata: bytes
+:param asset_files: dictionary of {asset_id: content} for the transaction
+:type asset_files: dict</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">inserted transaction_id or error message</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict|str</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.quit_program">
 <code class="descname">quit_program</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.quit_program"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.quit_program" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Processes when quiting program</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.remove_from_notification_list">
 <code class="descname">remove_from_notification_list</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.remove_from_notification_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.remove_from_notification_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove entry from insert completion notification list
-:param domain_id:
-:param asset_group_id:
-:param user_id:
-:return:</p>
+<dd><p>Remove entry from insert completion notification list</p>
+<p>This method checks validation only.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – target asset_group_id of which you want to get notification about the insertion</li>
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id that registers in the list</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.bbc_core.BBcCoreService.remove_notification_entry">
-<code class="descname">remove_notification_entry</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.remove_notification_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.remove_notification_entry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition">
 <code class="descname">search_transaction_with_condition</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>count=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.search_transaction_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition" title="Permalink to this definition">¶</a></dt>
-<dd><p>Search transactions that match given conditions
-:param domain_id:
-:param asset_group_id:
-:param asset_group_id:
-:param user_id:
-:rtype: response_info
-:return: {transactions, all_asset_files, compromised_transactions, compromised_asset, compromised_asset_files}</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.bbc_core.BBcCoreService.send_inserted_notification">
-<code class="descname">send_inserted_notification</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_ids</em>, <em>transaction_id</em>, <em>only_registered_user=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.send_inserted_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.send_inserted_notification" title="Permalink to this definition">¶</a></dt>
-<dd><p>broadcast NOTIFY_INSERTED
-:param domain_id:
-:param asset_group_ids:
-:param transaction_id:
-:param only_registered_user:  If True, notification is not sent to other nodes
-:return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.bbc_core.BBcCoreService.validate_transaction">
-<code class="descname">validate_transaction</code><span class="sig-paren">(</span><em>txdata</em>, <em>asset_files=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.validate_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.validate_transaction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validate transaction by verifying signature</p>
+<dd><p>Search transactions that match given conditions</p>
+<p>When Multiple conditions are given, they are considered as AND condition.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>txid</strong> – transaction_id</li>
-<li><strong>txdata</strong> – BBcTransaction data</li>
-<li><strong>asset_files</strong> – dictionary of { asid=&gt;asset_content,,, }</li>
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</li>
+<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</li>
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</li>
+<li><strong>count</strong> (<em>int</em>) – The maximum number of transactions to retrieve</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">BBcTransaction or None</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dictionary having transaction_id, serialized transaction data, asset files</p>
 </td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_core.BBcCoreService.send_inserted_notification">
+<code class="descname">send_inserted_notification</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_ids</em>, <em>transaction_id</em>, <em>only_registered_user=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.send_inserted_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.send_inserted_notification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Broadcast NOTIFY_INSERTED
+:param domain_id: target domain_id
+:type domain_id: bytes
+:param asset_group_ids: list of asset_group_ids
+:type asset_group_ids: list
+:param transaction_id: transaction_id that has just inserted
+:type transaction_id: bytes
+:param only_registered_user: If True, notification is not sent to other nodes
+:type only_registered_user: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_core.BBcCoreService.validate_transaction">
+<code class="descname">validate_transaction</code><span class="sig-paren">(</span><em>txdata</em>, <em>asset_files=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.validate_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.validate_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate transaction by verifying signature
+:param txdata: serialized transaction data
+:type txdata: bytes
+:param asset_files: dictionary of {asset_id: content} for the transaction
+:type asset_files: dict</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">if validation fails, None returns.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction">BBcTransaction</a></td>
 </tr>
 </tbody>
 </table>
@@ -254,12 +290,14 @@
 <dl class="function">
 <dt id="bbc1.core.bbc_core.activate_ledgersubsystem">
 <code class="descclassname">bbc1.core.bbc_core.</code><code class="descname">activate_ledgersubsystem</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#activate_ledgersubsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.activate_ledgersubsystem" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Load module of ledger_subsystem if installed</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.bbc_core.daemonize">
 <code class="descclassname">bbc1.core.bbc_core.</code><code class="descname">daemonize</code><span class="sig-paren">(</span><em>pidfile='/tmp/bbc1.pid'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#daemonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.daemonize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Run in background</p>
+</dd></dl>
 
 </div>
 
@@ -326,9 +364,7 @@
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

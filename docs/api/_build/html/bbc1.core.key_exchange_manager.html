@@ -183,6 +183,7 @@ limitations under the License.</p>
 <dt id="bbc1.core.key_exchange_manager.KeyExchangeManager">
 <em class="property">class </em><code class="descclassname">bbc1.core.key_exchange_manager.</code><code class="descname">KeyExchangeManager</code><span class="sig-paren">(</span><em>networking</em>, <em>domain_id</em>, <em>counter_node_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>ECDH (Elliptic Curve Diffie-Hellman) key exchange manager</p>
 <dl class="attribute">
 <dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.KEY_EXCHANGE_INVOKE_MAX_BACKOFF">
 <code class="descname">KEY_EXCHANGE_INVOKE_MAX_BACKOFF</code><em class="property"> = 6</em><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.KEY_EXCHANGE_INVOKE_MAX_BACKOFF" title="Permalink to this definition">¶</a></dt>
@@ -226,47 +227,50 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.receive_confirmation">
 <code class="descname">receive_confirmation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.receive_confirmation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_confirmation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Confirm that the key has been agreed</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_request">
 <code class="descname">receive_exchange_request</code><span class="sig-paren">(</span><em>pubkey</em>, <em>nonce</em>, <em>random_val</em>, <em>hint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.receive_exchange_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_request" title="Permalink to this definition">¶</a></dt>
 <dd><p>Procedure when receiving message with BBcNetwork.REQUEST_KEY_EXCHANGE
-:param pubkey:
-:param nonce:
-:param random_val:
-:return:</p>
+:param pubkey: public key
+:type pubkey: bytes
+:param nonce: nonce value
+:type nonce: bytes
+:param random_val: random value in calculating key
+:type random_val: bytes</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_response">
 <code class="descname">receive_exchange_response</code><span class="sig-paren">(</span><em>pubkey</em>, <em>random_val</em>, <em>hint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.receive_exchange_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_response" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Process ECDH procedure (receiving response)</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.set_cipher">
 <code class="descname">set_cipher</code><span class="sig-paren">(</span><em>key_name</em>, <em>hint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.set_cipher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.set_cipher" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set key to the encryptor and decryptor</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.set_invoke_timer">
 <code class="descname">set_invoke_timer</code><span class="sig-paren">(</span><em>timeout</em>, <em>retry_entry=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.set_invoke_timer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.set_invoke_timer" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.set_state">
-<code class="descname">set_state</code><span class="sig-paren">(</span><em>state</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.set_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.set_state" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set timer for key refreshment</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.stop_all_timers">
 <code class="descname">stop_all_timers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.stop_all_timers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.stop_all_timers" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Stop all timers</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.unset_cipher">
 <code class="descname">unset_cipher</code><span class="sig-paren">(</span><em>key_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.unset_cipher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.unset_cipher" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Unset key from the encryptor and decryptor</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -340,9 +344,7 @@ limitations under the License.</p>
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

@@ -29,6 +29,7 @@ def remove_old_key(query_entry):
 
 
 class KeyExchangeManager:
+    """ECDH (Elliptic Curve Diffie-Hellman) key exchange manager"""
     KEY_EXCHANGE_INVOKE_MAX_BACKOFF = 6
     KEY_EXCHANGE_RETRY_INTERVAL = 5
     KEY_REFRESH_INTERVAL = 604800
@@ -53,14 +54,17 @@ class KeyExchangeManager:
         self.shared_key = None
         self.timer_entry = None
 
-    def set_state(self, state):
+    def _set_state(self, state):
+        """Set state of key exchange process"""
         #print("** set state from %d to %d" % (self.state, state))
         self.state = state
 
     def set_cipher(self, key_name, hint):
+        """Set key to the encryptor and decryptor"""
         message_key_types.set_cipher(self.shared_key, self.nonce, key_name, hint)
 
     def unset_cipher(self, key_name=None):
+        """Unset key from the encryptor and decryptor"""
         if key_name is None:
             if self.key_name is not None:
                 message_key_types.unset_cipher(self.key_name)
@@ -70,10 +74,12 @@ class KeyExchangeManager:
             message_key_types.unset_cipher(key_name)
 
     def stop_all_timers(self):
+        """Stop all timers"""
         if self.timer_entry is not None and self.timer_entry.active:
             self.timer_entry.deactivate()
 
     def set_invoke_timer(self, timeout, retry_entry=False):
+        """Set timer for key refreshment"""
         if self.timer_entry is not None and self.timer_entry.active:
             self.timer_entry.deactivate()
         #print("(%d) set_invoke_timer:" % int(time.time()), timeout)
@@ -84,21 +90,18 @@ class KeyExchangeManager:
             self.timer_entry.data[KeyType.retry_timer] = True
 
     def _set_delete_timer(self, key_name, timeout):
+        """Set timer for key revocation"""
         if key_name is not None:
             #print("(%d) _set_delete_timer:" % int(time.time()), key_name.hex()[:10], timeout)
             query_management.QueryEntry(expire_after=timeout, callback_expire=remove_old_key,
                                         data={KeyType.hint: key_name}, retry_count=0)
 
     def _perform_key_exchange(self, query_entry):
-        """
-        Perform ECDH key exhange to establish secure channel to the node
-        :param query_entry:
-        :return:
-        """
+        """Perform ECDH key exhange to establish secure channel to the node"""
         if KeyType.retry_timer in query_entry.data and query_entry.data[KeyType.retry_timer]:
             message_key_types.unset_cipher(self.pending_key_name)
             self.pending_key_name = None
-        self.set_state(KeyExchangeManager.STATE_REQUESTING)
+        self._set_state(KeyExchangeManager.STATE_REQUESTING)
         #print("# (%d) _perform_key_exchange: to" % int(time.time()), self.counter_node_id.hex())
         self.secret_key, self.peer_public_key, self.pending_key_name = message_key_types.get_ECDH_parameters()
         self.nonce = os.urandom(16)
@@ -107,7 +110,7 @@ class KeyExchangeManager:
                                                         self.peer_public_key, self.nonce, self.random,
                                                         self.pending_key_name)
         if not ret:
-            self.set_state(KeyExchangeManager.STATE_NONE)
+            self._set_state(KeyExchangeManager.STATE_NONE)
             message_key_types.unset_cipher(self.pending_key_name)
             message_key_types.unset_cipher(self.key_name)
             self.secret_key = None
@@ -120,12 +123,12 @@ class KeyExchangeManager:
         self.set_invoke_timer(rand_time, retry_entry=True)
 
     def receive_exchange_request(self, pubkey, nonce, random_val, hint):
-        """
-        Procedure when receiving message with BBcNetwork.REQUEST_KEY_EXCHANGE
-        :param pubkey:
-        :param nonce:
-        :param random_val:
-        :return:
+        """Procedure when receiving message with BBcNetwork.REQUEST_KEY_EXCHANGE
+
+        Args:
+            pubkey (bytes): public key
+            nonce (bytes): nonce value
+            random_val (bytes): random value in calculating key
         """
         if self.state != KeyExchangeManager.STATE_REQUESTING:
             #print("(%d) receive_exchange_request: processing" % int(time.time()))
@@ -134,7 +137,7 @@ class KeyExchangeManager:
             self.random = random_val
             self.secret_key, self.peer_public_key, self.pending_key_name = message_key_types.get_ECDH_parameters()
             self.shared_key = message_key_types.derive_shared_key(self.secret_key, pubkey, random_val)
-            self.set_state(KeyExchangeManager.STATE_CONFIRMING)
+            self._set_state(KeyExchangeManager.STATE_CONFIRMING)
             self.networking.send_key_exchange_message(self.domain_id, self.counter_node_id, "response",
                                                      self.peer_public_key, self.nonce, self.random,
                                                      self.pending_key_name)
@@ -144,9 +147,9 @@ class KeyExchangeManager:
             message_key_types.unset_cipher(self.pending_key_name)
             self.pending_key_name = None
             if self.key_name is None:
-                self.set_state(KeyExchangeManager.STATE_NONE)
+                self._set_state(KeyExchangeManager.STATE_NONE)
             else:
-                self.set_state(KeyExchangeManager.STATE_ESTABLISHED)
+                self._set_state(KeyExchangeManager.STATE_ESTABLISHED)
         rand_time = KeyExchangeManager.KEY_EXCHANGE_RETRY_INTERVAL * random.uniform(0.5, 1.5)
         if self.timer_entry is not None and self.timer_entry.active:
             self.timer_entry.update_expiration_time(rand_time)
@@ -155,6 +158,7 @@ class KeyExchangeManager:
             self.set_invoke_timer(rand_time, retry_entry=True)
 
     def receive_exchange_response(self, pubkey, random_val, hint):
+        """Process ECDH procedure (receiving response)"""
         #print("(%d) receive_exchange_response:" % int(time.time()))
         #print(" **> state:", self.state)
         if self.state != KeyExchangeManager.STATE_REQUESTING:
@@ -167,10 +171,11 @@ class KeyExchangeManager:
                                                  self.nonce, self.random, self.pending_key_name)
         self.key_name = self.pending_key_name
         self.set_cipher(self.key_name, hint)
-        self.set_state(KeyExchangeManager.STATE_ESTABLISHED)
+        self._set_state(KeyExchangeManager.STATE_ESTABLISHED)
         #print("*STATE_ESTABLISHED")
 
     def receive_confirmation(self):
+        """Confirm that the key has been agreed"""
         #print("(%d) receive_confirmation:" % int(time.time()))
         #print(" **> state:", self.state)
         if self.state != KeyExchangeManager.STATE_CONFIRMING:
@@ -179,5 +184,5 @@ class KeyExchangeManager:
         self.set_invoke_timer(rand_time)
         self._set_delete_timer(self.key_name, KeyExchangeManager.KEY_OBSOLETE_TIMER)
         self.key_name = self.pending_key_name
-        self.set_state(KeyExchangeManager.STATE_ESTABLISHED)
+        self._set_state(KeyExchangeManager.STATE_ESTABLISHED)
         #print("*STATE_ESTABLISHED")

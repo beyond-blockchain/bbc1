@@ -34,9 +34,7 @@ def direct_send_to_user(sock, msg, name=None):
 
 
 class UserMessageRouting:
-    """
-    Handle message for user
-    """
+    """Handle message for clients"""
     REFRESH_FORWARDING_LIST_INTERVAL = 300
     RESOLVE_TIMEOUT = 5
     MAX_CROSS_REF_STOCK = 10
@@ -59,10 +57,7 @@ class UserMessageRouting:
         self.on_going_timers = set()
 
     def stop_all_timers(self):
-        """
-        Cancel all callback of query_entries
-        :return:
-        """
+        """Cancel all running timers"""
         for user_id in self.forwarding_entries.keys():
             if self.forwarding_entries[user_id]['refresh'] is not None:
                 self.forwarding_entries[user_id]['refresh'].deactivate()
@@ -70,21 +65,21 @@ class UserMessageRouting:
             ticker.get_entry(q).deactivate()
 
     def set_aes_name(self, socket, name):
-        """
-        Set name for specifying AES key for message encryption
-        :param socket:
-        :param name:
-        :return:
+        """Set name for specifying AES key for message encryption
+
+        Args:
+            socket (Socket): socket for the client
+            name (bytes): name of the client (4-byte random value generated in message_key_types.get_ECDH_parameters)
         """
         self.aes_name_list[socket] = name
 
     def register_user(self, user_id, socket, on_multiple_nodes=False):
-        """
-        Register user to forward message
-        :param user_id:
-        :param socket:
-        :param on_multiple_nodes:
-        :return:
+        """Register user to forward message
+
+        Args:
+            user_id (bytes): user_id of the client
+            socket (Socket): socket for the client
+            on_multiple_nodes (bool): If True, the user_id is also registered in other nodes, meaning multicasting.
         """
         self.registered_users.setdefault(user_id, set())
         self.registered_users[user_id].add(socket)
@@ -92,11 +87,11 @@ class UserMessageRouting:
             self.send_multicast_join(user_id)
 
     def unregister_user(self, user_id, socket):
-        """
-        Unregister user from the list and delete AES key if exists
-        :param user_id:
-        :param socket:
-        :return:
+        """Unregister user from the list and delete AES key if exists
+
+        Args:
+            user_id (bytes): user_id of the client
+            socket (Socket): socket for the client
         """
         if user_id not in self.registered_users:
             return
@@ -109,12 +104,12 @@ class UserMessageRouting:
         self.send_multicast_leave(user_id=user_id)
 
     def _add_user_for_forwarding(self, user_id, node_id, permanent=False):
-        """
-        Register user to forwarding list
-        :param user_id:
-        :param node_id:
-        :param permanent: If True, the entry won't expire
-        :return:
+        """Register user to forwarding list
+
+        Args:
+            user_id (bytes): target user_id
+            node_id (bytes): node_id which the client with the user_id connects to
+            parmanent (bool): If True, the entry won't expire
         """
         self.forwarding_entries.setdefault(user_id, dict())
         if not permanent:
@@ -132,13 +127,7 @@ class UserMessageRouting:
         self.stats.update_stats("user_message", "registered_users_in_forwarding_list", len(self.forwarding_entries))
 
     def _remove_user_from_forwarding(self, query_entry=None, user_id=None, node_id=None):
-        """
-        Unregister user to forwarding list
-        :param query_entry:
-        :param user_id:
-        :param node_id:
-        :return:
-        """
+        """Unregister user to forwarding list"""
         if query_entry is not None:
             user_id = query_entry.data[KeyType.user_id]
             self.forwarding_entries.pop(user_id, None)
@@ -153,11 +142,11 @@ class UserMessageRouting:
         self.stats.update_stats("user_message", "registered_users_in_forwarding_list", len(self.forwarding_entries))
 
     def send_message_to_user(self, msg, direct_only=False):
-        """
-        Forward message to connecting user
-        :param msg:
-        :param direct_only: If true, _forward_message_to_another_node is not called.
-        :return:
+        """Forward message to connecting user
+
+        Args:
+            msg (dict): message to send
+            direct_only (bool): If True, _forward_message_to_another_node is not called.
         """
         if KeyType.destination_user_id not in msg:
             return True
@@ -179,6 +168,7 @@ class UserMessageRouting:
         return count > 0
 
     def _send(self, sock, msg):
+        """Raw function to send a message"""
         try:
             if sock in self.aes_name_list:
                 direct_send_to_user(sock, msg, name=self.aes_name_list[sock])
@@ -190,11 +180,7 @@ class UserMessageRouting:
         return True
 
     def _send_anycast_message(self, msg):
-        """
-        Send message as anycast
-        :param msg:
-        :return:
-        """
+        """Send message as anycast"""
         dst_user_id = msg[KeyType.destination_user_id]
         if dst_user_id not in self.forwarding_entries:
             return False
@@ -226,11 +212,7 @@ class UserMessageRouting:
         return False
 
     def _forward_message_to_another_node(self, msg):
-        """
-        Try to forward message to another node
-        :param msg:
-        :return:
-        """
+        """Try to forward message to another node"""
         dst_user_id = msg[KeyType.destination_user_id]
         if dst_user_id in self.forwarding_entries:
             for dst_node_id in self.forwarding_entries[dst_user_id]['nodes']:
@@ -247,12 +229,14 @@ class UserMessageRouting:
         self._resolve_accommodating_core_node(dst_user_id, src_user_id, msg)
 
     def _resolve_accommodating_core_node(self, dst_user_id, src_user_id, orig_msg=None):
-        """
-        Resolve which node the user connects to
-        :param dst_user_id:
-        :param src_user_id:
-        :param orig_msg:
-        :return:
+        """Resolve which node the user connects to
+
+        Find the node that accommodates the user_id first, and then, send the message to the node.
+
+        Args:
+            dst_user_id (bytes): destination user_id
+            src_user_id (bytes): source user_id
+            orig_msg (dict): message to send
         """
         if orig_msg is not None:
             query_entry = query_management.QueryEntry(expire_after=UserMessageRouting.RESOLVE_TIMEOUT,
@@ -276,21 +260,13 @@ class UserMessageRouting:
         self.networking.broadcast_message_in_network(domain_id=self.domain_id, msg=msg)
 
     def _resolve_success(self, query_entry):
-        """
-        Called if succeeded to resolve the location
-        :param query_entry:
-        :return:
-        """
+        """Callback for successful of resolving the location"""
         self.on_going_timers.remove(query_entry.nonce)
         msg = query_entry.data[KeyType.message]
         self._forward_message_to_another_node(msg=msg)
 
     def _resolve_failure(self, query_entry):
-        """
-        Called if failed to resolve the location
-        :param query_entry:
-        :return:
-        """
+        """Callback for failure of resolving the location"""
         self.on_going_timers.remove(query_entry.nonce)
         msg = query_entry.data[KeyType.message]
         msg[KeyType.destination_user_id] = msg[KeyType.source_user_id]
@@ -299,11 +275,7 @@ class UserMessageRouting:
         self.send_message_to_user(msg)
 
     def send_multicast_join(self, user_id, permanent=False):
-        """
-        Broadcast JOIN_MULTICAST_RECEIVER
-        :param user_id:
-        :return:
-        """
+        """Broadcast JOIN_MULTICAST_RECEIVER"""
         msg = {
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_USER,
             KeyType.domain_id: self.domain_id,
@@ -315,11 +287,7 @@ class UserMessageRouting:
         self.networking.broadcast_message_in_network(domain_id=self.domain_id, msg=msg)
 
     def send_multicast_leave(self, user_id):
-        """
-        Broadcast LEAVE_MULTICAST_RECEIVER
-        :param user_id:
-        :return:
-        """
+        """Broadcast LEAVE_MULTICAST_RECEIVER"""
         msg = {
             KeyType.domain_id: self.domain_id,
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_USER,
@@ -330,6 +298,7 @@ class UserMessageRouting:
         self.networking.broadcast_message_in_network(domain_id=self.domain_id, msg=msg)
 
     def _distribute_cross_refs_to_clients(self):
+        """Distribute cross ref assined by the domain0_manager to client"""
         if len(self.registered_users) == 0:
             return
         try:
@@ -347,10 +316,10 @@ class UserMessageRouting:
             return
 
     def process_message(self, msg):
-        """
-        (internal use) process received message
-        :param msg:       the message body (already deserialized)
-        :return:
+        """Process received message
+
+        Args:
+            msg (dict): received message
         """
         if KeyType.infra_command in msg:
             if msg[KeyType.infra_command] == UserMessageRouting.RESOLVE_USER_LOCATION:
@@ -382,7 +351,7 @@ class UserMessageRouting:
             elif msg[KeyType.infra_command] == UserMessageRouting.JOIN_MULTICAST_RECEIVER:
                 self.stats.update_stats_increment("user_message", "JOIN_MULTICAST_RECEIVER", 1)
                 self._add_user_for_forwarding(msg[KeyType.user_id], msg[KeyType.source_node_id],
-                                             permanent=msg.get(KeyType.static_entry, False))
+                                              permanent=msg.get(KeyType.static_entry, False))
 
             elif msg[KeyType.infra_command] == UserMessageRouting.LEAVE_MULTICAST_RECEIVER:
                 self.stats.update_stats_increment("user_message", "LEAVE_MULTICAST_RECEIVER", 1)
@@ -426,6 +395,7 @@ class UserMessageRouting:
 
 
 class UserMessageRoutingDummy(UserMessageRouting):
+    """Dummy class for bbc_core.py"""
     def stop_all_timers(self):
         pass
 

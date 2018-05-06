@@ -183,9 +183,7 @@
 
 
 <div class="viewcode-block" id="Domain0Manager"><a class="viewcode-back" href="../../../bbc1.core.domain0_manager.html#bbc1.core.domain0_manager.Domain0Manager">[docs]</a><span class="k">class</span> <span class="nc">Domain0Manager</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Management for inter-domain collaboration over domain_0</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Management for inter-domain collaboration over domain_global_0&quot;&quot;&quot;</span>
     <span class="n">DOMAIN_INFO_ADVERTISE_INTERVAL</span> <span class="o">=</span> <span class="mi">1800</span>  <span class="c1"># seconds</span>
     <span class="n">DOMAIN_INFO_LIFETIME</span> <span class="o">=</span> <span class="mi">3600</span>
     <span class="n">INITIAL_ACCEPT_LIMIT</span> <span class="o">=</span> <span class="mi">10</span>
@@ -214,30 +212,31 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">advertise_timer_entry</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_advertise_timer_entry</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cross_ref_timer_entry</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_purge_cross_ref_timer_entry</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_cross_ref_timer_entry</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Domain0Manager.stop_all_timers"><a class="viewcode-back" href="../../../bbc1.core.domain0_manager.html#bbc1.core.domain0_manager.Domain0Manager.stop_all_timers">[docs]</a>    <span class="k">def</span> <span class="nf">stop_all_timers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Invalidate all running timers</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Invalidate all running timers&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">advertise_timer_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">advertise_timer_entry</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_ref_timer_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cross_ref_timer_entry</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_register_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Register node of other domain</span>
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id</span>
+<span class="sd">            node_id (bytes): target node_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">domain_list</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">node_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_list</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">domain_list</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_domain_list</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())[</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
 
     <span class="k">def</span> <span class="nf">_remove_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Remove node from the lists</span>
-<span class="sd">        :param domain_id:</span>
-<span class="sd">        :param node_id:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Remove node from the lists</span>
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id</span>
+<span class="sd">            node_id (bytes): target node_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#print(&quot;*** _remove_node at %s:&quot; % self.my_node_id.hex(), node_id.hex(), &quot;in domain&quot;, domain_id.hex())</span>
         <span class="c1">#print(&quot; ==&gt; before: len(node_domain_list)=%d&quot; % len(self.node_domain_list.keys()))</span>
@@ -257,20 +256,21 @@
         <span class="c1">#print(&quot; ==&gt; after: len(node_domain_list)=%d&quot; % len(self.node_domain_list.keys()))</span>
 
 <div class="viewcode-block" id="Domain0Manager.update_domain_belong_to"><a class="viewcode-back" href="../../../bbc1.core.domain0_manager.html#bbc1.core.domain0_manager.Domain0Manager.update_domain_belong_to">[docs]</a>    <span class="k">def</span> <span class="nf">update_domain_belong_to</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Update the list domain_belong_to</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Update the list domain_belong_to</span>
+<span class="sd">        domain_belong_to holds all domain_ids that this node belongs to</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">domains_belong_to</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
     <span class="k">def</span> <span class="nf">_update_advertise_timer_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update advertisement timer&quot;&quot;&quot;</span>
         <span class="n">rand_interval</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">Domain0Manager</span><span class="o">.</span><span class="n">DOMAIN_INFO_ADVERTISE_INTERVAL</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">6</span><span class="p">),</span>
                                        <span class="nb">int</span><span class="p">(</span><span class="n">Domain0Manager</span><span class="o">.</span><span class="n">DOMAIN_INFO_ADVERTISE_INTERVAL</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">/</span> <span class="mi">6</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;_update_advertise_timer_entry: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rand_interval</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">advertise_timer_entry</span> <span class="o">=</span> <span class="n">query_management</span><span class="o">.</span><span class="n">QueryEntry</span><span class="p">(</span>
                 <span class="n">expire_after</span><span class="o">=</span><span class="n">rand_interval</span><span class="p">,</span> <span class="n">callback_expire</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_advertise_domain_info</span><span class="p">,</span> <span class="n">retry_count</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_purge_cross_ref_timer_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_update_cross_ref_timer_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update cross_ref timer&quot;&quot;&quot;</span>
         <span class="n">rand_interval</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">Domain0Manager</span><span class="o">.</span><span class="n">DOMAIN_ACCEPTANCE_RECOVER_INTERVAL</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">6</span><span class="p">),</span>
                                        <span class="nb">int</span><span class="p">(</span><span class="n">Domain0Manager</span><span class="o">.</span><span class="n">DOMAIN_ACCEPTANCE_RECOVER_INTERVAL</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">/</span> <span class="mi">6</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;update_cross_ref_timer_entry: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rand_interval</span><span class="p">)</span>
@@ -278,10 +278,7 @@
                 <span class="n">expire_after</span><span class="o">=</span><span class="n">rand_interval</span><span class="p">,</span> <span class="n">callback_expire</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_purge_left_cross_ref</span><span class="p">,</span> <span class="n">retry_count</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_eliminate_obsoleted_entries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check expiration of the node_domain_list</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Check expiration of the node_domain_list&quot;&quot;&quot;</span>
         <span class="c1">#print(&quot;_eliminate_obsoleted_entries at %s: len(node_domain_list)=%d&quot; % (self.my_node_id.hex(),</span>
         <span class="c1">#                                                                       len(self.node_domain_list.keys())))</span>
         <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_domain_list</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
@@ -292,10 +289,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_remove_node</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_advertise_domain_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_entry</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Advertise domain list in the domain 0 network</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Advertise domain list in the domain_global_0 network&quot;&quot;&quot;</span>
         <span class="c1">#print(&quot;[%s]: _advertise_domain_info&quot; % self.my_node_id.hex()[:4])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_eliminate_obsoleted_entries</span><span class="p">()</span>
         <span class="n">domain_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span> <span class="o">!=</span> <span class="n">domain_global_0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
@@ -313,10 +307,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_advertise_timer_entry</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_update_domain_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parse binary data and update domain_list</span>
-<span class="sd">        :param msg:</span>
-<span class="sd">        :return: True/False:  True if the received nodeinfo and that the node has is different</span>
+        <span class="sd">&quot;&quot;&quot;Parse binary data and update domain_list</span>
+<span class="sd">        Args:</span>
+<span class="sd">            msg (dict): received message</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">src_node_id</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">source_node_id</span><span class="p">]</span>
         <span class="n">new_domains</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains_belong_to</span><span class="p">,</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_list</span><span class="p">]))</span>
@@ -334,11 +327,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_register_node</span><span class="p">(</span><span class="n">dm</span><span class="p">,</span> <span class="n">src_node_id</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Domain0Manager.distribute_cross_ref_in_domain0"><a class="viewcode-back" href="../../../bbc1.core.domain0_manager.html#bbc1.core.domain0_manager.Domain0Manager.distribute_cross_ref_in_domain0">[docs]</a>    <span class="k">def</span> <span class="nf">distribute_cross_ref_in_domain0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Determine if the node distributes the cross_ref (into domain0)</span>
-<span class="sd">        :param domain_id:</span>
-<span class="sd">        :param transaction_id:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Determine if the node distributes the cross_ref (into domain_global_0)</span>
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id</span>
+<span class="sd">            transaction_id (bytes): target transaction_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO: probability calculation needs to be modified</span>
         <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">Domain0Manager</span><span class="o">.</span><span class="n">CROSS_REF_PROBABILITY</span><span class="p">:</span>
@@ -364,6 +356,7 @@
                                                     <span class="n">domain_id</span><span class="o">=</span><span class="n">domain_global_0</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_assign_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cross_ref</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Assign cross_ref to core nodes in domains this node belongs to&quot;&quot;&quot;</span>
         <span class="n">now</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">cross_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_accept_margin</span><span class="p">:</span>
             <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_acceptance_margin</span><span class="p">(</span><span class="n">cross_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -410,6 +403,10 @@
             <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">_get_acceptance_margin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check how many cross ref will be accepted</span>
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">1</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count_domain_in_cross_ref</span><span class="p">(</span><span class="n">domain_id</span><span class="p">)</span>
@@ -419,6 +416,7 @@
         <span class="k">return</span> <span class="n">ret</span><span class="o">+</span><span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">_purge_left_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_entry</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Purge expired cross_ref entries of requested_cross_refs&quot;&quot;&quot;</span>
         <span class="n">now</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">dm</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requested_cross_refs</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
             <span class="k">for</span> <span class="n">txid</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requested_cross_refs</span><span class="p">[</span><span class="n">dm</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
@@ -426,12 +424,11 @@
                     <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">requested_cross_refs</span><span class="p">[</span><span class="n">dm</span><span class="p">][</span><span class="n">txid</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Domain0Manager.cross_ref_registered"><a class="viewcode-back" href="../../../bbc1.core.domain0_manager.html#bbc1.core.domain0_manager.Domain0Manager.cross_ref_registered">[docs]</a>    <span class="k">def</span> <span class="nf">cross_ref_registered</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">cross_ref</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Notify cross_ref inclusion in a transaction of the outer domain and insert the info into DB</span>
-<span class="sd">        :param domain_id:</span>
-<span class="sd">        :param transaction_id:</span>
-<span class="sd">        :param cross_ref:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Notify cross_ref inclusion in a transaction of the outer domain and insert the info into DB</span>
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): domain_id where the cross_ref is from</span>
+<span class="sd">            transaction_id (bytes): transaction_id that the cross_ref proves</span>
+<span class="sd">            cross_ref (bytes): the registered cross_ref in other domain</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cross_ref_domain_id</span> <span class="o">=</span> <span class="n">cross_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">cross_ref_txid</span> <span class="o">=</span> <span class="n">cross_ref</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -457,6 +454,7 @@
             <span class="k">return</span></div>
 
     <span class="k">def</span> <span class="nf">_get_transaction_data_for_verification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get transaction object and verify it&quot;&quot;&quot;</span>
         <span class="n">txobjs</span><span class="p">,</span> <span class="n">asts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">search_transaction</span><span class="p">(</span><span class="n">transaction_id</span><span class="o">=</span><span class="n">transaction_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">transaction_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">txobjs</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -473,10 +471,9 @@
         <span class="k">return</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_base_digest</span><span class="p">,</span> <span class="n">txobj</span><span class="o">.</span><span class="n">cross_ref</span><span class="o">.</span><span class="n">serialize</span><span class="p">(),</span> <span class="n">txobj</span><span class="o">.</span><span class="n">signatures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Domain0Manager.process_message"><a class="viewcode-back" href="../../../bbc1.core.domain0_manager.html#bbc1.core.domain0_manager.Domain0Manager.process_message">[docs]</a>    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        (internal use) process received message</span>
-<span class="sd">        :param msg:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Process received message</span>
+<span class="sd">        Args:</span>
+<span class="sd">            msg (dict): received message</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">command</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
             <span class="k">return</span>
@@ -613,9 +610,7 @@
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

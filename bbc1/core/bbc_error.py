@@ -15,11 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-ESUCCESS        = 0
+ESUCCESS         = 0
 EINVALID_COMMAND = -1
-ENODESTINATION  = -2
+ENODESTINATION   = -2
 EUNAUTHORIZED_COMMAND = -3
-ENOSUBSYSTEM = -4
+ENOSUBSYSTEM     = -4
 
 ENOASSET        = -11
 EBADASSETDIGEST = -12
@@ -32,8 +32,8 @@ ELEDGER_INSERT  = -18
 ESTORAGE_PUT    = -19
 ENOTINSTORAGE   = -20
 
-EBADKEYPAIR    = -30
-EBADSIGNNUMBER = -31
+EBADKEYPAIR     = -30
+EBADSIGNNUMBER  = -31
 
 
 

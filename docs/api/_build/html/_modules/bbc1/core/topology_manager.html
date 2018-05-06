@@ -178,8 +178,7 @@
 
 
 <div class="viewcode-block" id="TopologyManagerBase"><a class="viewcode-back" href="../../../bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase">[docs]</a><span class="k">class</span> <span class="nc">TopologyManagerBase</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Network topology management for a domain</span>
+    <span class="sd">&quot;&quot;&quot;Network topology management for a domain</span>
 
 <span class="sd">    This class defines how to create topology, meaning that who should be neighbors and provides very simple topology</span>
 <span class="sd">    management, that is full mesh topology. If P2P routing algorithm is needed, you should override this class</span>
@@ -204,21 +203,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">update_refresh_timer_entry</span><span class="p">()</span>
 
 <div class="viewcode-block" id="TopologyManagerBase.stop_all_timers"><a class="viewcode-back" href="../../../bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.stop_all_timers">[docs]</a>    <span class="k">def</span> <span class="nf">stop_all_timers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Invalidate all running timers</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Invalidate all running timers&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_refresh_timer_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_refresh_timer_entry</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TopologyManagerBase.notify_neighbor_update"><a class="viewcode-back" href="../../../bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.notify_neighbor_update">[docs]</a>    <span class="k">def</span> <span class="nf">notify_neighbor_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">is_new</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Notified when neighbor node info is updated</span>
-<span class="sd">        :param node_id:</span>
-<span class="sd">        :param is_new:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Update expiration timer for the notified node_id</span>
+<span class="sd">        Args:</span>
+<span class="sd">            node_id (bytes): target node_id</span>
+<span class="sd">            is_new (bool): If True, this node is a new comer node</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">node_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] notify_neighbor_update: node_id=</span><span class="si">%s</span><span class="s2">, is_new=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_node_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()[:</span><span class="mi">4</span><span class="p">],</span>
@@ -235,6 +230,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span><span class="o">.</span><span class="n">update_expiration_time</span><span class="p">(</span><span class="n">rand_time</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TopologyManagerBase.update_refresh_timer_entry"><a class="viewcode-back" href="../../../bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.update_refresh_timer_entry">[docs]</a>    <span class="k">def</span> <span class="nf">update_refresh_timer_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_entry</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">force_refresh_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update expiration timer&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">force_refresh_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">rand_interval</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">TopologyManagerBase</span><span class="o">.</span><span class="n">NEIGHBOR_LIST_REFRESH_INTERVAL</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">),</span>
                                            <span class="nb">int</span><span class="p">(</span><span class="n">TopologyManagerBase</span><span class="o">.</span><span class="n">NEIGHBOR_LIST_REFRESH_INTERVAL</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span><span class="p">))</span>
@@ -249,10 +245,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_refresh_timer_entry</span><span class="o">.</span><span class="n">update_expiration_time</span><span class="p">(</span><span class="n">rand_interval</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_advertise_neighbor_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_entry</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Broadcast nodeinfo list</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Broadcast nodeinfo list&quot;&quot;&quot;</span>
         <span class="c1">#print(&quot;[%s]: _advertise_neighbor_info&quot; % self.my_node_id.hex()[:4])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span>
@@ -270,10 +263,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">update_refresh_timer_entry</span><span class="p">()</span>
 
 <div class="viewcode-block" id="TopologyManagerBase.make_neighbor_list"><a class="viewcode-back" href="../../../bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.make_neighbor_list">[docs]</a>    <span class="k">def</span> <span class="nf">make_neighbor_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        make nodelist binary for advertising</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;make nodelist binary for advertising&quot;&quot;&quot;</span>
         <span class="n">nodeinfo</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
 
         <span class="c1"># the node itself</span>
@@ -293,10 +283,11 @@
         <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_update_neighbor_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">binary_data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parse binary data and update neighbors</span>
-<span class="sd">        :param binary_data:</span>
-<span class="sd">        :return: True/False:  True if the received nodeinfo and that the node has is different</span>
+        <span class="sd">&quot;&quot;&quot;Parse binary data and update neighbors</span>
+<span class="sd">        Args:</span>
+<span class="sd">            binary_data (bytes): received data</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the received nodeinfo has changed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">count_originally</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">nd</span><span class="p">:</span> <span class="n">nd</span><span class="o">.</span><span class="n">is_alive</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>
         <span class="n">count_unchanged</span> <span class="o">=</span> <span class="mi">0</span>
@@ -320,14 +311,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 
-<div class="viewcode-block" id="TopologyManagerBase.process_message"><a class="viewcode-back" href="../../../bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.process_message">[docs]</a>    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        (internal use) process received message</span>
-<span class="sd">        :param ipv4:      sender ipv4 address</span>
-<span class="sd">        :param ipv6:      sender ipv6 address</span>
-<span class="sd">        :param port:      sender address and port (None if TCP)</span>
-<span class="sd">        :param msg:</span>
-<span class="sd">        :return:</span>
+<div class="viewcode-block" id="TopologyManagerBase.process_message"><a class="viewcode-back" href="../../../bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.process_message">[docs]</a>    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Process received message</span>
+<span class="sd">        Args:</span>
+<span class="sd">            msg (dict): received message</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">destination_node_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">command</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
             <span class="k">return</span>
@@ -403,9 +390,7 @@
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

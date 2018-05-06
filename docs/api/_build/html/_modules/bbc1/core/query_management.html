@@ -183,14 +183,11 @@
 
 
 <div class="viewcode-block" id="Ticker"><a class="viewcode-back" href="../../../bbc1.core.query_management.html#bbc1.core.query_management.Ticker">[docs]</a><span class="k">class</span> <span class="nc">Ticker</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Clock ticker for query timers</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Clock ticker for query timers&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tick_interval</span><span class="o">=</span><span class="n">TICK_INTERVAL</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create Ticker object. schedule_final array is for the fail safe to avoid zombie entry.</span>
-
-<span class="sd">        :param tick_interval:</span>
+        <span class="sd">&quot;&quot;&quot;Create Ticker object</span>
+<span class="sd">        Args:</span>
+<span class="sd">            tick_interval (float): tick interval in second</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tick_interval</span> <span class="o">=</span> <span class="n">tick_interval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span> <span class="o">=</span> <span class="p">[]</span>
@@ -221,6 +218,7 @@
             <span class="c1">#print(&quot;.&quot;)</span>
 
     <span class="k">def</span> <span class="nf">_add_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add an event to the scheduler&quot;&quot;&quot;</span>
         <span class="n">nonce</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0xFFFFFFFF</span><span class="p">)</span>  <span class="c1"># 4-byte</span>
         <span class="k">while</span> <span class="n">nonce</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">queries</span><span class="p">:</span>
             <span class="n">nonce</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0xFFFFFFFF</span><span class="p">)</span>  <span class="c1"># 4-byte</span>
@@ -234,13 +232,16 @@
         <span class="k">return</span> <span class="n">nonce</span>
 
 <div class="viewcode-block" id="Ticker.get_entry"><a class="viewcode-back" href="../../../bbc1.core.query_management.html#bbc1.core.query_management.Ticker.get_entry">[docs]</a>    <span class="k">def</span> <span class="nf">get_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonce</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get an entry identified by nonce&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">queries</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">nonce</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ticker.del_entry"><a class="viewcode-back" href="../../../bbc1.core.query_management.html#bbc1.core.query_management.Ticker.del_entry">[docs]</a>    <span class="k">def</span> <span class="nf">del_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonce</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete an entry from the scheduler identified by nonce&quot;&quot;&quot;</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queries</span><span class="p">[</span><span class="n">nonce</span><span class="p">]</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">queries</span><span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">nonce</span><span class="p">]</span></div>
 
     <span class="k">def</span> <span class="nf">_update_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">append_new_flag</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sort the list of scheduler&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">nonce</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">queries</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queries</span><span class="p">[</span><span class="n">nonce</span><span class="p">]</span>
@@ -250,23 +251,24 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_refresh_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sort the list of scheduler triggered by the refresh timer&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="QueryEntry"><a class="viewcode-back" href="../../../bbc1.core.query_management.html#bbc1.core.query_management.QueryEntry">[docs]</a><span class="k">class</span> <span class="nc">QueryEntry</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Querying entry</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Callback manager&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expire_after</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">callback_expire</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callback_error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">interval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{},</span> <span class="n">retry_count</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create entry. expire_after and callback_expire ensures that this entry expires eventually.</span>
-
-<span class="sd">        :param expire_after:</span>
-<span class="sd">        :param callback_expire:</span>
-<span class="sd">        :param data:</span>
-<span class="sd">        :param retry_count: retry count until calling callback_expire (if retry_count==-1, no limit)</span>
+        <span class="sd">&quot;&quot;&quot;Create an entry. expire_after and callback_expire ensures that this entry expires eventually.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            expire_after (float): expiration time in seconds</span>
+<span class="sd">            callback_expire (obj): callback method that will be called when expire</span>
+<span class="sd">            callback (obj): callback method that will be called periodically or when successful</span>
+<span class="sd">            callback_error (obj): callback method that will be called when error happens</span>
+<span class="sd">            interval (float): interval for periodical callback</span>
+<span class="sd">            data (dict): arbitrary parameters for callback methods</span>
+<span class="sd">            retry_count (int): the number of retry before expiration</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">created_at</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="kc">True</span>
@@ -286,19 +288,13 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fire_at</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">fire_at</span>
 
 <div class="viewcode-block" id="QueryEntry.deactivate"><a class="viewcode-back" href="../../../bbc1.core.query_management.html#bbc1.core.query_management.QueryEntry.deactivate">[docs]</a>    <span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Deactivate the entry</span>
-
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Deactivate the entry&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="QueryEntry.update_expiration_time"><a class="viewcode-back" href="../../../bbc1.core.query_management.html#bbc1.core.query_management.QueryEntry.update_expiration_time">[docs]</a>    <span class="k">def</span> <span class="nf">update_expiration_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expire_after</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Update the expire timer</span>
-
-<span class="sd">        :param expire_after:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Update the expire timer</span>
+<span class="sd">        Args:</span>
+<span class="sd">            expire_after (float): new expiration time in second</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expire_at</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">expire_after</span>
         <span class="c1">#print(&quot; -&gt; update_expiration_time:&quot;, self.expire_at)</span>
@@ -308,10 +304,9 @@
                 <span class="n">ticker</span><span class="o">.</span><span class="n">_refresh_timer</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_fire</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Fire the entry</span>
-
-<span class="sd">        :return: True if expire</span>
+        <span class="sd">&quot;&quot;&quot;Fire the entry</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if this fire is triggered by expiration</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">expire_at</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">entry_exists_in_ticker_scheduler</span> <span class="o">=</span> <span class="kc">False</span>
@@ -333,15 +328,13 @@
             <span class="k">return</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="QueryEntry.update"><a class="viewcode-back" href="../../../bbc1.core.query_management.html#bbc1.core.query_management.QueryEntry.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fire_after</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expire_after</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callback_error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Update the entry information</span>
-
-<span class="sd">        :param fire_after:</span>
-<span class="sd">        :param expire_after:</span>
-<span class="sd">        :param callback:</span>
-<span class="sd">        :param callback_error:</span>
-<span class="sd">        :param init:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Update the entry information</span>
+<span class="sd">        Args:</span>
+<span class="sd">            fire_after (float): set callback (periodical) to fire after given time (in second)</span>
+<span class="sd">            expire_after (float): set expiration timer to given time (in second)</span>
+<span class="sd">            callback (obj): callback method that will be called periodically</span>
+<span class="sd">            callback_error (obj): callback method that will be called when error happens</span>
+<span class="sd">            init (bool): If True, the scheduler is sorted again</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">expire_after</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -363,21 +356,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">entry_exists_in_ticker_scheduler</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="QueryEntry.callback"><a class="viewcode-back" href="../../../bbc1.core.query_management.html#bbc1.core.query_management.QueryEntry.callback">[docs]</a>    <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Call a callback function for successful case</span>
-
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Call a callback function for successful case&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback_success</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">callback_success</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="QueryEntry.callback_error"><a class="viewcode-back" href="../../../bbc1.core.query_management.html#bbc1.core.query_management.QueryEntry.callback_error">[docs]</a>    <span class="k">def</span> <span class="nf">callback_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Call a callback function for failure case</span>
-
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Call a callback function for failure case&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retry_count</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fire</span><span class="p">()</span>
@@ -438,9 +423,7 @@
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

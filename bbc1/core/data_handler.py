@@ -56,9 +56,7 @@ merkle_root_db_definition = [
 
 
 class DataHandler:
-    """
-    Handle message for data
-    """
+    """DB and storage handler"""
     REPLICATION_ALL = 0
     REPLICATION_P2P = 1
     REPLICATION_EXT = 2
@@ -89,10 +87,7 @@ class DataHandler:
         self._db_setup()
 
     def _db_setup(self):
-        """
-        Setup DB
-        :return:
-        """
+        """Setup DB"""
         dbconf = self.config['db']
         if dbconf['replication_strategy'] == 'all':
             self.replication_strategy = DataHandler.REPLICATION_ALL
@@ -126,6 +121,7 @@ class DataHandler:
             db.create_table('merkle_root_table', merkle_root_db_definition, primary_key=0, indices=[0])
 
     def _storage_setup(self):
+        """Setup storage"""
         if self.config['storage']['type'] == "external":
             return True
         if 'root' in self.config['storage'] and self.config['storage']['root'].startswith("/"):
@@ -136,14 +132,16 @@ class DataHandler:
         return False
 
     def exec_sql(self, db_num=0, sql=None, args=(), commit=False, fetch_one=False):
-        """
-        Execute sql sentence
-        :param db_num:
-        :param sql:
-        :param args:
-        :param commit:
-        :param fetch_one:
-        :return:
+        """Execute sql sentence
+
+        Args:
+            db_num (int): index of DB if multiple DBs are used
+            sql (str): SQL string
+            args (list): Args for the SQL
+            commit (bool): If True, commit is performed
+            fetch_one (bool): If True, fetch just one record
+        Returns:
+            list: list of records
         """
         self.stats.update_stats_increment("data_handler", "exec_sql", 1)
         #print("sql=", sql)
@@ -174,10 +172,12 @@ class DataHandler:
             return list(ret)
 
     def _get_asset_info(self, txobj):
-        """
-        Retrieve asset information from transaction object
-        :param txobj:
-        :return:
+        """Retrieve asset information from transaction object
+
+        Args:
+            txobj (BBcTransaction): transaction object to analyze
+        Returns:
+            list: list of list [asset_group_id, asset_id, user_id, file_size, file_digest]
         """
         info = list()
         for idx, evt in enumerate(txobj.events):
@@ -193,10 +193,14 @@ class DataHandler:
         return info
 
     def _get_topology_info(self, txobj):
-        """
-        Retrieve topology information from transaction object
-        :param txobj:
-        :return:
+        """Retrieve topology information from transaction object
+
+        This method returns (from, to) list that describe the topology of transactions
+
+        Args:
+            txobj (BBcTransaction): transaction object to analyze
+        Returns:
+            list: list of tuple (base transaction_id, pointing transaction_id)
         """
         info = list()
         for reference in txobj.references:
@@ -207,13 +211,16 @@ class DataHandler:
         return info
 
     def insert_transaction(self, txdata, txobj=None, asset_files=None, no_replication=False):
-        """
-        Insert transaction data and its asset files
-        :param txdata:
-        :param txobj:
-        :param asset_files:
-        :param no_replication:
-        :return:
+        """Insert transaction data and its asset files
+
+        Either txdata or txobj must be given to insert the transaction.
+
+        Args:
+            txdata (bytes): serialized transaction data
+            txobj (BBcTransaction): transaction object to insert
+            asset_files (dict): asset files in the transaction
+        Returns:
+            set: set of asset_group_ids in the transaction
         """
         self.stats.update_stats_increment("data_handler", "insert_transaction", 1)
         if txobj is None:
@@ -245,11 +252,13 @@ class DataHandler:
         return asset_group_ids
 
     def _insert_transaction_into_a_db(self, db_num, txobj):
-        """
-        Insert transaction data into the specified DB
-        :param db_num:
-        :param txobj:
-        :return:
+        """Insert transaction data into the transaction table of the specified DB
+
+        Args:
+            db_num (int): index of DB if multiple DBs are used
+            txobj (BBcTransaction): transaction object to insert
+        Returns:
+            bool: True if successful
         """
         #print("_insert_transaction_into_a_db: for txid =", txobj.transaction_id.hex())
         if txobj.transaction_data is None:
@@ -277,6 +286,14 @@ class DataHandler:
         return True
 
     def insert_cross_ref(self, transaction_id, outer_domain_id, txid_having_cross_ref, no_replication=False):
+        """Insert cross_ref information into cross_ref_table
+
+        Args:
+            transaction_id (bytes): target transaction_id
+            outer_domain_id (bytes): domain_id that holds cross_ref about the transaction_id
+            txid_having_cross_ref (bytes): transaction_id in the outer_domain that includes the cross_ref
+            no_replication (bool): If False, the replication is sent to other nodes in the domain
+        """
         self.stats.update_stats_increment("data_handler", "insert_cross_ref", 1)
         sql = "INSERT INTO cross_ref_table (transaction_id, outer_domain_id, txid_having_cross_ref) " + \
               "VALUES (%s, %s, %s)" % (self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
@@ -288,12 +305,20 @@ class DataHandler:
             self._send_cross_ref_replication_to_other_cores(transaction_id, outer_domain_id, txid_having_cross_ref)
 
     def count_domain_in_cross_ref(self, outer_domain_id):
+        """Count the number of domains in the cross_ref table"""
         # TODO: need to consider registered_time
         sql = "SELECT count(*) FROM cross_ref_table WHERE outer_domain = %s" % self.db_adaptors[0].placeholder
         ret = self.exec_sql(sql=sql, args=(outer_domain_id,))
         return ret
 
     def search_domain_having_cross_ref(self, transaction_id=None):
+        """Search domain_id that holds cross_ref about the specified transaction_id
+
+        Args:
+            transaction_id (bytes): target transaction_id
+        Returns:
+            list: records of cross_ref_tables ["id","transaction_id", "outer_domain_id", "txid_having_cross_ref"]
+        """
         if transaction_id is not None:
             sql = "SELECT * FROM cross_ref_table WHERE transaction_id = %s" % self.db_adaptors[0].placeholder
             return self.exec_sql(sql=sql, args=(transaction_id,))
@@ -301,11 +326,13 @@ class DataHandler:
             return self.exec_sql(sql="SELECT * FROM cross_ref_table")
 
     def _store_asset_files(self, txobj, asset_files):
-        """
-        Store all asset_files related to the transaction_object
-        :param txobj:
-        :param asset_files:
-        :return: asset_group_ids to be stored
+        """Store all asset_files related to the transaction_object
+
+        Args:
+            txobj (BBcTransaction): transaction object to insert
+            asset_files (dict): dictionary of {asset_id: content} for the transaction
+        Returns:
+            set: set of asset_group_ids in the transaction
         """
         #print("_store_asset_files: for txid =", txobj.transaction_id.hex())
         asset_group_ids = set()
@@ -316,16 +343,13 @@ class DataHandler:
         return asset_group_ids
 
     def restore_transaction_data(self, db_num, transaction_id, txobj):
+        """Remove and insert a transaction"""
         if txobj is not None:
             self.remove(transaction_id, txobj=txobj, db_num=db_num)
             self._insert_transaction_into_a_db(db_num=db_num, txobj=txobj)
 
     def _send_replication_to_other_cores(self, txdata, asset_files=None):
-        """
-        Send replication of transaction data
-        :param txdata:
-        :return:
-        """
+        """Broadcast replication of transaction data"""
         msg = {
             KeyType.domain_id: self.domain_id,
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_DATA,
@@ -341,12 +365,12 @@ class DataHandler:
             pass  # TODO: implement (destinations determined by TopologyManager)
 
     def _send_cross_ref_replication_to_other_cores(self, transaction_id, outer_domain_id, txid_having_cross_ref):
-        """
-        Send replication of cross_ref
-        :param transaction_id:
-        :param outer_domain_id:
-        :param txid_having_cross_ref:
-        :return:
+        """Broadcast replication of cross_ref
+
+        Args:
+            transaction_id (bytes): target transaction_id
+            outer_domain_id (bytes): domain_id that holds cross_ref about the transaction_id
+            txid_having_cross_ref (bytes): transaction_id in the outer_domain that includes the cross_ref
         """
         msg = {
             KeyType.domain_id: self.domain_id,
@@ -363,12 +387,14 @@ class DataHandler:
             pass  # TODO: implement (destinations determined by TopologyManager)
 
     def remove(self, transaction_id, txobj=None, db_num=-1):
-        """
-        Delete all data regarding the specified transaction_id
-        :param transaction_id:
-        :param txobj:
-        :param db_num:
-        :return:
+        """Delete all data regarding the specified transaction_id
+
+        This method requires either transaction_id or txobj.
+
+        Args:
+            transaction_id (bytes): target transaction_id
+            txobj (BBcTransaction): transaction object to remove
+            db_num (int): index of DB if multiple DBs are used
         """
         if transaction_id is None:
             return
@@ -386,6 +412,7 @@ class DataHandler:
             self._remove_transaction(txobj, db_num)
 
     def _remove_transaction(self, txobj, db_num):
+        """Remove transaction from DB"""
         #print("_remove_transaction: for txid =", txobj.transaction_id.hex())
         self.exec_sql(
             db_num=db_num,
@@ -399,10 +426,13 @@ class DataHandler:
                 args=(base, point_to), commit=True)
 
     def _remove_asset_files(self, txobj, asset_files=None):
-        """
-        Remove all asset files related to the transaction
-        :param asset_files:
-        :return:
+        """Remove all asset files related to the transaction
+
+        If asset_files is given, only asset files in given param are removed
+
+        Args:
+            txobj (BBcTransaction): transaction object that includes the asset to be removed
+            asset_files (dict): dictionary of {asset_id: content} for the transaction
         """
         #print("_remove_asset_files: for txid =", txobj.transaction_id.hex())
         if self.use_external_storage:
@@ -415,15 +445,20 @@ class DataHandler:
                 self._remove_in_storage(asset_group_id, asset_id)
 
     def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None, count=1, db_num=0):
-        """
-        Search transaction data
-        :param transaction_id:
-        :param asset_group_id:
-        :param asset_id:
-        :param user_id:
-        :param count:
-        :param idx:
-        :return:
+        """Search transaction data
+
+        When Multiple conditions are given, they are considered as AND condition.
+
+        Args:
+            transaction_id (bytes): target transaction_id
+            asset_group_id (bytes): asset_group_id that target transactions should have
+            asset_id (bytes): asset_id that target transactions should have
+            user_id (bytes): user_id that target transactions should have
+            count (int): The maximum number of transactions to retrieve
+            db_num (int): index of DB if multiple DBs are used
+        Returns:
+            dict: mapping from transaction_id to serialized transaction data
+            dict: dictionary of {asset_id: content} for the transaction
         """
         if transaction_id is not None:
             txinfo = self.exec_sql(
@@ -469,11 +504,13 @@ class DataHandler:
         return result_txobj, result_asset_files
 
     def search_transaction_topology(self, transaction_id, traverse_to_past=True):
-        """
-        Search in topology info
-        :param transaction_id:
-        :param traverse_to_past:
-        :return:
+        """Search in topology info
+
+        Args:
+            transaction_id (bytes): base transaction_id
+            traverse_to_past (bool): True: search backward (to past), False: search forward (to future)
+        Returns:
+            list: list of records of topology table
         """
         if transaction_id is None:
             return None
@@ -486,13 +523,15 @@ class DataHandler:
                                  self.db_adaptors[0].placeholder, args=(transaction_id,))
 
     def store_in_storage(self, asset_group_id, asset_id, content, do_overwrite=False):
-        """
-        Store data in local storage
-        :param asset_group_id
-        :param asset_id:
-        :param content:
-        :param do_overwrite: If True, file is overwritten.
-        :return:
+        """Store asset file in local storage
+
+        Args:
+            asset_group_id (bytes): asset_group_id of the asset
+            asset_id (bytes): asset_id of the asset
+            content (bytes): the content of the asset file
+            do_overwrite (bool): If True, file is overwritten
+        Returns:
+            bool: True if successful
         """
         #print("store_in_storage: for asset_id =", asset_id.hex())
         self.stats.update_stats_increment("data_handler", "store_in_storage", 1)
@@ -511,11 +550,13 @@ class DataHandler:
         return os.path.exists(path)
 
     def get_in_storage(self, asset_group_id, asset_id):
-        """
-        Get the file with the asset_id from local storage
-        :param asset_group_id:
-        :param asset_id:   file name
-        :return:       the file content (None if not found)
+        """Get the asset file with the asset_id from local storage
+
+        Args:
+            asset_group_id (bytes): asset_group_id of the asset
+            asset_id (bytes): asset_id of the asset
+        Returns:
+            bytes or None: the file content
         """
         asset_group_id_str = binascii.b2a_hex(asset_group_id).decode('utf-8')
         storage_path = os.path.join(self.storage_root, asset_group_id_str)
@@ -533,11 +574,11 @@ class DataHandler:
             return None
 
     def _remove_in_storage(self, asset_group_id, asset_id):
-        """
-        Delete asset file
-        :param asset_group_id:
-        :param asset_id:
-        :return:
+        """Delete asset file
+
+        Args:
+            asset_group_id (bytes): asset_group_id of the asset
+            asset_id (bytes): asset_id of the asset
         """
         #print("_remove_in_storage: for asset_id =", asset_id.hex())
         asset_group_id_str = binascii.b2a_hex(asset_group_id).decode('utf-8')
@@ -550,10 +591,10 @@ class DataHandler:
         os.remove(path)
 
     def process_message(self, msg):
-        """
-        Process received message
-        :param msg:       the message body (already deserialized)
-        :return:
+        """Process received message
+
+        Args:
+            msg (dict): received message
         """
         if KeyType.infra_command not in msg:
             return
@@ -605,6 +646,7 @@ class DataHandler:
 
 
 class DataHandlerDomain0(DataHandler):
+    """Data handler for domain_global_0"""
     def __init__(self, networking=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
         pass
 
@@ -646,6 +688,7 @@ class DataHandlerDomain0(DataHandler):
 
 
 class DbAdaptor:
+    """Base class for DB adaptor"""
     def __init__(self, handler=None, db_name=None, db_num=0, loglevel="all", logname=None):
         self.handler = handler
         self.db = None
@@ -656,26 +699,39 @@ class DbAdaptor:
         self.logger = logger.get_logger(key="db_adaptor", level=loglevel, logname=logname)
 
     def open_db(self):
+        """Open the DB"""
         pass
 
     def create_table(self, tbl, tbl_definition, primary_key=0, indices=[]):
+        """Create a table"""
         pass
 
     def check_table_existence(self, tblname):
+        """Check whether the table exists or not"""
         pass
 
 
 class SqliteAdaptor(DbAdaptor):
+    """DB adaptor for SQLite3"""
     def __init__(self, handler=None, db_name=None, loglevel="all", logname=None):
         super(SqliteAdaptor, self).__init__(handler=handler, db_name=db_name, loglevel=loglevel, logname=logname)
         self.placeholder = "?"
 
     def open_db(self):
+        """Open the DB (create DB file if not exists)"""
         import sqlite3
         self.db = sqlite3.connect(self.db_name, isolation_level=None)
         self.db_cur = self.db.cursor()
 
     def create_table(self, tbl, tbl_definition, primary_key=0, indices=[]):
+        """Create a table
+
+        Args:
+            tbl (str): table name
+            tbl_definition (list): schema of the table [["column_name", "data type"],["colmun_name", "data type"],,]
+            primary_key (int): index (column) of the primary key of the table
+            indices (list): list of indices to create index
+        """
         if len(self.check_table_existence(tbl)) > 0:
             return
         sql = "CREATE TABLE %s " % tbl
@@ -689,10 +745,12 @@ class SqliteAdaptor(DbAdaptor):
                                   commit=True)
 
     def check_table_existence(self, tblname):
+        """Check whether the table exists or not"""
         return self.handler.exec_sql(sql="SELECT * FROM sqlite_master WHERE type='table' AND name=?", args=(tblname,))
 
 
 class MysqlAdaptor(DbAdaptor):
+    """DB adaptor for MySQL"""
     def __init__(self, handler=None, db_name=None, db_num=None, server_info=None, loglevel="all", logname=None):
         super(MysqlAdaptor, self).__init__(handler, db_name, db_num, loglevel, logname)
         self.placeholder = "%s"
@@ -702,6 +760,7 @@ class MysqlAdaptor(DbAdaptor):
         self.db_pass = server_info[3]
 
     def open_db(self):
+        """Open the DB"""
         import mysql.connector
         self.db = mysql.connector.connect(
             host=self.db_addr,
@@ -714,6 +773,14 @@ class MysqlAdaptor(DbAdaptor):
         self.db_cur = self.db.cursor(buffered=True)
 
     def create_table(self, tbl, tbl_definition, primary_key=0, indices=[]):
+        """Create a table
+
+        Args:
+            tbl (str): table name
+            tbl_definition (list): schema of the table [["column_name", "data type"],["colmun_name", "data type"],,]
+            primary_key (int): index (column) of the primary key of the table
+            indices (list): list of indices to create index
+        """
         if len(self.check_table_existence(tbl)) == 1:
             return
         sql = "CREATE TABLE %s " % tbl
@@ -740,5 +807,6 @@ class MysqlAdaptor(DbAdaptor):
                                                               % (tbl, tbl_definition[idx][0]), commit=True)
 
     def check_table_existence(self, tblname):
+        """Check whether the table exists or not"""
         sql = "show tables from %s like '%s';" % (self.db_name, tblname)
         return self.handler.exec_sql(db_num=self.db_num, sql=sql)

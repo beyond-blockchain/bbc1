@@ -183,87 +183,47 @@ limitations under the License.</p>
 <dt id="bbc1.core.query_management.QueryEntry">
 <em class="property">class </em><code class="descclassname">bbc1.core.query_management.</code><code class="descname">QueryEntry</code><span class="sig-paren">(</span><em>expire_after=30</em>, <em>callback_expire=None</em>, <em>callback=None</em>, <em>callback_error=None</em>, <em>interval=0</em>, <em>data={}</em>, <em>retry_count=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Querying entry</p>
+<p>Callback manager</p>
 <dl class="method">
 <dt id="bbc1.core.query_management.QueryEntry.callback">
 <code class="descname">callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call a callback function for successful case</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.query_management.QueryEntry.callback_error">
 <code class="descname">callback_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.callback_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.callback_error" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call a callback function for failure case</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.query_management.QueryEntry.deactivate">
 <code class="descname">deactivate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.deactivate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.deactivate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deactivate the entry</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.query_management.QueryEntry.update">
 <code class="descname">update</code><span class="sig-paren">(</span><em>fire_after=None</em>, <em>expire_after=None</em>, <em>callback=None</em>, <em>callback_error=None</em>, <em>init=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the entry information</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>fire_after</strong> – </li>
-<li><strong>expire_after</strong> – </li>
-<li><strong>callback</strong> – </li>
-<li><strong>callback_error</strong> – </li>
-<li><strong>init</strong> – </li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
-</td>
-</tr>
-</tbody>
-</table>
+<dd><p>Update the entry information
+:param fire_after: set callback (periodical) to fire after given time (in second)
+:type fire_after: float
+:param expire_after: set expiration timer to given time (in second)
+:type expire_after: float
+:param callback: callback method that will be called periodically
+:type callback: obj
+:param callback_error: callback method that will be called when error happens
+:type callback_error: obj
+:param init: If True, the scheduler is sorted again
+:type init: bool</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.query_management.QueryEntry.update_expiration_time">
 <code class="descname">update_expiration_time</code><span class="sig-paren">(</span><em>expire_after</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.update_expiration_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.update_expiration_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the expire timer</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>expire_after</strong> – </td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
+<dd><p>Update the expire timer
+:param expire_after: new expiration time in second
+:type expire_after: float</p>
 </dd></dl>
 
 </dd></dl>
@@ -276,12 +236,14 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.query_management.Ticker.del_entry">
 <code class="descname">del_entry</code><span class="sig-paren">(</span><em>nonce</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#Ticker.del_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.Ticker.del_entry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Delete an entry from the scheduler identified by nonce</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.query_management.Ticker.get_entry">
 <code class="descname">get_entry</code><span class="sig-paren">(</span><em>nonce</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#Ticker.get_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.Ticker.get_entry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get an entry identified by nonce</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -355,9 +317,7 @@ limitations under the License.</p>
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

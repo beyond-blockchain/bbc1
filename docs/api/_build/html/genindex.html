@@ -204,10 +204,10 @@
 </li>
       <li><a href="bbc1.core.bbclib.html#bbc1.core.bbclib.add_relation_asset">add_relation_asset() (in module bbc1.core.bbclib)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbc1.core.bbclib.html#bbc1.core.bbclib.add_relation_pointer">add_relation_pointer() (in module bbc1.core.bbclib)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcReference.add_signature">add_signature() (bbc1.core.bbclib.BBcReference method)</a>
 
       <ul>
@@ -227,6 +227,8 @@
       <li><a href="bbc1.core.message_key_types.html#bbc1.core.message_key_types.KeyType.all_included">all_included (bbc1.core.message_key_types.KeyType attribute)</a>
 </li>
       <li><a href="bbc1.core.message_key_types.html#bbc1.core.message_key_types.KeyType.anycast_ttl">anycast_ttl (bbc1.core.message_key_types.KeyType attribute)</a>
+</li>
+      <li><a href="bbc1.core.message_key_types.html#bbc1.core.message_key_types.KeyType.asset_file">asset_file (bbc1.core.message_key_types.KeyType attribute)</a>
 </li>
       <li><a href="bbc1.core.message_key_types.html#bbc1.core.message_key_types.KeyType.asset_group_id">asset_group_id (bbc1.core.message_key_types.KeyType attribute)</a>
 </li>
@@ -422,8 +424,6 @@
 </li>
       <li><a href="bbc1.core.query_management.html#bbc1.core.query_management.Ticker.del_entry">del_entry() (bbc1.core.query_management.Ticker method)</a>
 </li>
-      <li><a href="bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.delete_obsoleted_domain_keys">delete_obsoleted_domain_keys() (bbc1.core.bbc_network.BBcNetwork method)</a>
-</li>
       <li><a href="bbc1.core.message_key_types.html#bbc1.core.message_key_types.derive_shared_key">derive_shared_key() (in module bbc1.core.message_key_types)</a>
 </li>
       <li><a href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcAsset.deserialize">deserialize() (bbc1.core.bbclib.BBcAsset method)</a>
@@ -489,8 +489,6 @@
       <li><a href="bbc1.core.bbclib.html#bbc1.core.bbclib.MsgType.DOMAIN_PING">DOMAIN_PING (bbc1.core.bbclib.MsgType attribute)</a>
 </li>
       <li><a href="bbc1.core.message_key_types.html#bbc1.core.message_key_types.KeyType.domain_ping">domain_ping (bbc1.core.message_key_types.KeyType attribute)</a>
-</li>
-      <li><a href="bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.domain_ping">domain_ping() (bbc1.core.bbc_network.BBcNetwork method)</a>
 </li>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.domain_setup">domain_setup() (bbc1.core.bbc_app.BBcAppClient method)</a>
 </li>
@@ -566,13 +564,17 @@
 </li>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.get_from_queue">get_from_queue() (bbc1.core.bbc_app.Callback method)</a>
 </li>
-      <li><a href="bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.get_json_config">get_json_config() (bbc1.core.bbc_config.BBcConfig method)</a>
+      <li><a href="bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.get_in_storage">get_in_storage() (bbc1.core.data_handler.DataHandler method)</a>
+
+      <ul>
+        <li><a href="bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandlerDomain0.get_in_storage">(bbc1.core.data_handler.DataHandlerDomain0 method)</a>
 </li>
-      <li><a href="bbc1.core.logger.html#bbc1.core.logger.get_logger">get_logger() (in module bbc1.core.logger)</a>
+      </ul></li>
+      <li><a href="bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.get_json_config">get_json_config() (bbc1.core.bbc_config.BBcConfig method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.get_my_socket_info">get_my_socket_info() (bbc1.core.bbc_network.BBcNetwork method)</a>
+      <li><a href="bbc1.core.logger.html#bbc1.core.logger.get_logger">get_logger() (in module bbc1.core.logger)</a>
 </li>
       <li><a href="bbc1.core.bbclib.html#bbc1.core.bbclib.get_n_byte_int">get_n_byte_int() (in module bbc1.core.bbclib)</a>
 </li>
@@ -894,10 +896,10 @@
 </li>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_get_userlist">proc_resp_get_userlist() (bbc1.core.bbc_app.Callback method)</a>
 </li>
-      <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_insert">proc_resp_insert() (bbc1.core.bbc_app.Callback method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_insert">proc_resp_insert() (bbc1.core.bbc_app.Callback method)</a>
+</li>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_ledger_subsystem">proc_resp_ledger_subsystem() (bbc1.core.bbc_app.Callback method)</a>
 </li>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_register_hash">proc_resp_register_hash() (bbc1.core.bbc_app.Callback method)</a>
@@ -910,7 +912,7 @@
 </li>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_sign_request">proc_resp_sign_request() (bbc1.core.bbc_app.Callback method)</a>
 </li>
-      <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_travarse_transactions">proc_resp_travarse_transactions() (bbc1.core.bbc_app.Callback method)</a>
+      <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_traverse_transactions">proc_resp_traverse_transactions() (bbc1.core.bbc_app.Callback method)</a>
 </li>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_verify_cross_ref">proc_resp_verify_cross_ref() (bbc1.core.bbc_app.Callback method)</a>
 </li>
@@ -918,11 +920,9 @@
 </li>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_user_message">proc_user_message() (bbc1.core.bbc_app.Callback method)</a>
 </li>
-      <li><a href="bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.process_message">process_message() (bbc1.core.bbc_network.BBcNetwork method)</a>
+      <li><a href="bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.process_message">process_message() (bbc1.core.data_handler.DataHandler method)</a>
 
       <ul>
-        <li><a href="bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.process_message">(bbc1.core.data_handler.DataHandler method)</a>
-</li>
         <li><a href="bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandlerDomain0.process_message">(bbc1.core.data_handler.DataHandlerDomain0 method)</a>
 </li>
         <li><a href="bbc1.core.domain0_manager.html#bbc1.core.domain0_manager.Domain0Manager.process_message">(bbc1.core.domain0_manager.Domain0Manager method)</a>
@@ -934,8 +934,6 @@
         <li><a href="bbc1.core.user_message_routing.html#bbc1.core.user_message_routing.UserMessageRoutingDummy.process_message">(bbc1.core.user_message_routing.UserMessageRoutingDummy method)</a>
 </li>
       </ul></li>
-      <li><a href="bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.process_message_base">process_message_base() (bbc1.core.bbc_network.BBcNetwork method)</a>
-</li>
       <li><a href="bbc1.core.bbc_network.html#bbc1.core.bbc_network.NeighborInfo.purge">purge() (bbc1.core.bbc_network.NeighborInfo method)</a>
 </li>
       <li><a href="bbc1.core.bbc_network.html#bbc1.core.bbc_network.NeighborInfo.PURGE_INTERVAL_SEC">PURGE_INTERVAL_SEC (bbc1.core.bbc_network.NeighborInfo attribute)</a>
@@ -971,8 +969,6 @@
       <li><a href="bbc1.core.message_key_types.html#bbc1.core.message_key_types.KeyType.reason">reason (bbc1.core.message_key_types.KeyType attribute)</a>
 </li>
       <li><a href="bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_confirmation">receive_confirmation() (bbc1.core.key_exchange_manager.KeyExchangeManager method)</a>
-</li>
-      <li><a href="bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.receive_domain_ping">receive_domain_ping() (bbc1.core.bbc_network.BBcNetwork method)</a>
 </li>
       <li><a href="bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_request">receive_exchange_request() (bbc1.core.key_exchange_manager.KeyExchangeManager method)</a>
 </li>
@@ -1015,8 +1011,6 @@
       <li><a href="bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.remove_domain_config">remove_domain_config() (bbc1.core.bbc_config.BBcConfig method)</a>
 </li>
       <li><a href="bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.remove_from_notification_list">remove_from_notification_list() (bbc1.core.bbc_core.BBcCoreService method)</a>
-</li>
-      <li><a href="bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.remove_notification_entry">remove_notification_entry() (bbc1.core.bbc_core.BBcCoreService method)</a>
 </li>
       <li><a href="bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.remove_old_key">remove_old_key() (in module bbc1.core.key_exchange_manager)</a>
 </li>
@@ -1074,12 +1068,14 @@
 </li>
       <li><a href="bbc1.core.bbclib.html#bbc1.core.bbclib.MsgType.REQUEST_MANIP_LEDGER_SUBSYS">REQUEST_MANIP_LEDGER_SUBSYS (bbc1.core.bbclib.MsgType attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbc1.core.bbclib.html#bbc1.core.bbclib.MsgType.REQUEST_REGISTER_HASH_IN_SUBSYS">REQUEST_REGISTER_HASH_IN_SUBSYS (bbc1.core.bbclib.MsgType attribute)</a>
 </li>
       <li><a href="bbc1.core.bbclib.html#bbc1.core.bbclib.MsgType.REQUEST_REPAIR">REQUEST_REPAIR (bbc1.core.bbclib.MsgType attribute)</a>
 </li>
+      <li><a href="bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager.REQUEST_REPAIR_ASSET_FILE">REQUEST_REPAIR_ASSET_FILE (bbc1.core.repair_manager.RepairManager attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager.REQUEST_REPAIR_TRANSACTION">REQUEST_REPAIR_TRANSACTION (bbc1.core.repair_manager.RepairManager attribute)</a>
 </li>
       <li><a href="bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.REQUEST_REPLICATION_INSERT">REQUEST_REPLICATION_INSERT (bbc1.core.data_handler.DataHandler attribute)</a>
@@ -1096,7 +1092,11 @@
 </li>
       <li><a href="bbc1.core.bbclib.html#bbc1.core.bbclib.MsgType.REQUEST_SIGNATURE">REQUEST_SIGNATURE (bbc1.core.bbclib.MsgType attribute)</a>
 </li>
+      <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.request_to_repair_asset">request_to_repair_asset() (bbc1.core.bbc_app.BBcAppClient method)</a>
+</li>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.request_to_repair_transaction">request_to_repair_transaction() (bbc1.core.bbc_app.BBcAppClient method)</a>
+</li>
+      <li><a href="bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager.REQUEST_TO_SEND_ASSET_FILE">REQUEST_TO_SEND_ASSET_FILE (bbc1.core.repair_manager.RepairManager attribute)</a>
 </li>
       <li><a href="bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager.REQUEST_TO_SEND_TRANSACTION_DATA">REQUEST_TO_SEND_TRANSACTION_DATA (bbc1.core.repair_manager.RepairManager attribute)</a>
 </li>
@@ -1115,6 +1115,8 @@
       <li><a href="bbc1.core.user_message_routing.html#bbc1.core.user_message_routing.UserMessageRouting.RESOLVE_TIMEOUT">RESOLVE_TIMEOUT (bbc1.core.user_message_routing.UserMessageRouting attribute)</a>
 </li>
       <li><a href="bbc1.core.user_message_routing.html#bbc1.core.user_message_routing.UserMessageRouting.RESOLVE_USER_LOCATION">RESOLVE_USER_LOCATION (bbc1.core.user_message_routing.UserMessageRouting attribute)</a>
+</li>
+      <li><a href="bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager.RESPONSE_ASSET_FILE">RESPONSE_ASSET_FILE (bbc1.core.repair_manager.RepairManager attribute)</a>
 </li>
       <li><a href="bbc1.core.bbclib.html#bbc1.core.bbclib.MsgType.RESPONSE_CLOSE_DOMAIN">RESPONSE_CLOSE_DOMAIN (bbc1.core.bbclib.MsgType attribute)</a>
 </li>
@@ -1176,7 +1178,7 @@
 </li>
       <li><a href="bbc1.core.bbclib.html#bbc1.core.bbclib.MsgType.RESPONSE_VERIFY_HASH_IN_SUBSYS">RESPONSE_VERIFY_HASH_IN_SUBSYS (bbc1.core.bbclib.MsgType attribute)</a>
 </li>
-      <li><a href="bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.restore_data">restore_data() (bbc1.core.data_handler.DataHandler method)</a>
+      <li><a href="bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.restore_transaction_data">restore_transaction_data() (bbc1.core.data_handler.DataHandler method)</a>
 </li>
       <li><a href="bbc1.core.message_key_types.html#bbc1.core.message_key_types.KeyType.result">result (bbc1.core.message_key_types.KeyType attribute)</a>
 </li>
@@ -1242,8 +1244,6 @@
         <li><a href="bbc1.core.user_message_routing.html#bbc1.core.user_message_routing.UserMessageRoutingDummy.send_message_to_user">(bbc1.core.user_message_routing.UserMessageRoutingDummy method)</a>
 </li>
       </ul></li>
-      <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.send_msg">send_msg() (bbc1.core.bbc_app.BBcAppClient method)</a>
-</li>
       <li><a href="bbc1.core.user_message_routing.html#bbc1.core.user_message_routing.UserMessageRouting.send_multicast_join">send_multicast_join() (bbc1.core.user_message_routing.UserMessageRouting method)</a>
 
       <ul>
@@ -1280,14 +1280,14 @@
 </li>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_callback">set_callback() (bbc1.core.bbc_app.BBcAppClient method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.set_cipher">set_cipher() (bbc1.core.key_exchange_manager.KeyExchangeManager method)</a>
 
       <ul>
         <li><a href="bbc1.core.message_key_types.html#bbc1.core.message_key_types.set_cipher">(in module bbc1.core.message_key_types)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.set_client">set_client() (bbc1.core.bbc_app.Callback method)</a>
 </li>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_domain_id">set_domain_id() (bbc1.core.bbc_app.BBcAppClient method)</a>
@@ -1303,8 +1303,6 @@
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.set_logger">set_logger() (bbc1.core.bbc_app.Callback method)</a>
 </li>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_node_key">set_node_key() (bbc1.core.bbc_app.BBcAppClient method)</a>
-</li>
-      <li><a href="bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.set_state">set_state() (bbc1.core.key_exchange_manager.KeyExchangeManager method)</a>
 </li>
       <li><a href="bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_user_id">set_user_id() (bbc1.core.bbc_app.BBcAppClient method)</a>
 </li>
@@ -1358,6 +1356,12 @@
         <li><a href="bbc1.core.user_message_routing.html#bbc1.core.user_message_routing.UserMessageRouting.stop_all_timers">(bbc1.core.user_message_routing.UserMessageRouting method)</a>
 </li>
         <li><a href="bbc1.core.user_message_routing.html#bbc1.core.user_message_routing.UserMessageRoutingDummy.stop_all_timers">(bbc1.core.user_message_routing.UserMessageRoutingDummy method)</a>
+</li>
+      </ul></li>
+      <li><a href="bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.store_in_storage">store_in_storage() (bbc1.core.data_handler.DataHandler method)</a>
+
+      <ul>
+        <li><a href="bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandlerDomain0.store_in_storage">(bbc1.core.data_handler.DataHandlerDomain0 method)</a>
 </li>
       </ul></li>
       <li><a href="bbc1.core.bbclib.html#bbc1.core.bbclib.str_binary">str_binary() (in module bbc1.core.bbclib)</a>
@@ -1566,9 +1570,7 @@
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

@@ -222,19 +222,24 @@
 
 
 <div class="viewcode-block" id="activate_ledgersubsystem"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.activate_ledgersubsystem">[docs]</a><span class="k">def</span> <span class="nf">activate_ledgersubsystem</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Load module of ledger_subsystem if installed&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">ledger_subsystem_module</span>
     <span class="k">if</span> <span class="n">ledger_subsystem_module</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">ledger_subsystem_module</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;ledger_subsystem&quot;</span><span class="p">)</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ledger_subsystem_module</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;ledger_subsystem&quot;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">ledger_subsystem_module</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
 <span class="k">def</span> <span class="nf">_make_message_structure</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">dstid</span><span class="p">,</span> <span class="n">qid</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    (internal use) Create a base structure of message</span>
-
-<span class="sd">    :param cmd:</span>
-<span class="sd">    :param dstid: destination_user_id</span>
-<span class="sd">    :param qid:   query_id</span>
-<span class="sd">    :return:</span>
+    <span class="sd">&quot;&quot;&quot;Create a base structure of message</span>
+<span class="sd">    Args:</span>
+<span class="sd">        domain_id (bytes): the target domain_id</span>
+<span class="sd">        cmd (bytes): command type in message_key_types.KeyType</span>
+<span class="sd">        dstid (bytes): destination user_id</span>
+<span class="sd">        qid (bytes): query_id to include in the message</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: message</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">{</span>
         <span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">:</span> <span class="n">domain_id</span><span class="p">,</span>
@@ -246,6 +251,7 @@
 
 
 <span class="k">def</span> <span class="nf">_create_search_result</span><span class="p">(</span><span class="n">txobj_dict</span><span class="p">,</span> <span class="n">asset_files_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create transaction search result&quot;&quot;&quot;</span>
     <span class="n">response_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">txid</span><span class="p">,</span> <span class="n">txobj</span> <span class="ow">in</span> <span class="n">txobj_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">txid</span> <span class="o">!=</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">:</span>
@@ -259,16 +265,17 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_assets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">response_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span>
-            <span class="k">for</span> <span class="n">asid</span> <span class="ow">in</span> <span class="n">valid_assets</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">asgid</span><span class="p">,</span> <span class="n">asid</span> <span class="ow">in</span> <span class="n">valid_assets</span><span class="p">:</span>
                 <span class="n">response_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span><span class="p">][</span><span class="n">asid</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_files_dict</span><span class="p">[</span><span class="n">asid</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">invalid_assets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">response_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">KeyType</span><span class="o">.</span><span class="n">compromised_asset_files</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span>
-            <span class="k">for</span> <span class="n">asid</span> <span class="ow">in</span> <span class="n">invalid_assets</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">asgid</span><span class="p">,</span> <span class="n">asid</span> <span class="ow">in</span> <span class="n">invalid_assets</span><span class="p">:</span>
                 <span class="n">response_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">compromised_asset_files</span><span class="p">][</span><span class="n">asid</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_files_dict</span><span class="p">[</span><span class="n">asid</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">response_info</span>
 
 
 <div class="viewcode-block" id="BBcCoreService"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService">[docs]</a><span class="k">class</span> <span class="nc">BBcCoreService</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Base service object of BBc-1&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p2p_port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">core_port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_domain0</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ip4addr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ip6addr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">workingdir</span><span class="o">=</span><span class="s2">&quot;.bbc1&quot;</span><span class="p">,</span> <span class="n">configfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_nodekey</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_ledger_subsystem</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">server_start</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -312,16 +319,21 @@
                                                                                                 <span class="n">domain_id</span><span class="o">=</span><span class="n">domain_id</span><span class="p">,</span>
                                                                                                 <span class="n">loglevel</span><span class="o">=</span><span class="n">loglevel</span><span class="p">,</span>
                                                                                                 <span class="n">logname</span><span class="o">=</span><span class="n">logname</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Failed to load ledger_subsystem module&quot;</span><span class="p">)</span>
+
         <span class="n">gevent</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quit_program</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">server_start</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_start_server</span><span class="p">(</span><span class="n">core_port</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BBcCoreService.quit_program"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.quit_program">[docs]</a>    <span class="k">def</span> <span class="nf">quit_program</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Processes when quiting program&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">save_all_static_node_list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">()</span>
         <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_start_server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start TCP(v4 or v6) server&quot;&quot;&quot;</span>
         <span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="n">POOL_SIZE</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">ip6_address</span> <span class="o">==</span> <span class="s2">&quot;::&quot;</span><span class="p">:</span>
             <span class="n">server</span> <span class="o">=</span> <span class="n">StreamServer</span><span class="p">((</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">port</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handler</span><span class="p">,</span> <span class="n">spawn</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
@@ -333,6 +345,14 @@
             <span class="k">pass</span>
 
     <span class="k">def</span> <span class="nf">_error_reply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">err_code</span><span class="o">=</span><span class="n">EINVALID_COMMAND</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create and send error reply message</span>
+<span class="sd">        Args:</span>
+<span class="sd">            msg (dict): message to send</span>
+<span class="sd">            err_code (int): error code defined in bbc_error.py</span>
+<span class="sd">            txt (str): error message</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">status</span><span class="p">]</span> <span class="o">=</span> <span class="n">err_code</span>
         <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">reason</span><span class="p">]</span> <span class="o">=</span> <span class="n">txt</span>
         <span class="n">domain_id</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">]</span>
@@ -343,13 +363,7 @@
             <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Message wait loop</span>
-
-<span class="sd">        :param socket:</span>
-<span class="sd">        :param address:</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Message wait loop for a client&quot;&quot;&quot;</span>
         <span class="c1"># self.logger.debug(&quot;New connection&quot;)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;client&quot;</span><span class="p">,</span> <span class="s2">&quot;total_num&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">user_info</span> <span class="o">=</span> <span class="kc">None</span>
@@ -375,8 +389,7 @@
             <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;closing socket&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">user_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">user_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;user&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unregister_user</span><span class="p">(</span><span class="n">user_info</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                                                                                                      <span class="n">socket</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">user_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;user&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unregister_user</span><span class="p">(</span><span class="n">user_info</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">socket</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">socket</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">py_socket</span><span class="o">.</span><span class="n">SHUT_RDWR</span><span class="p">)</span>
             <span class="n">socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -386,10 +399,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_decrement</span><span class="p">(</span><span class="s2">&quot;client&quot;</span><span class="p">,</span> <span class="s2">&quot;total_num&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_node_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get or create node key for creating a domain by bbc_app</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Get or create node key for creating a domain by bbc_app&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;The core use node_key to check signature on admin command message&quot;</span><span class="p">)</span>
         <span class="n">keypath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="s2">&quot;node_key.pem&quot;</span><span class="p">)</span>
 
@@ -407,10 +417,11 @@
         <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">_check_signature_by_nodekey</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Verify signature in the message</span>
-<span class="sd">        :param dat:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Verify signature in the message</span>
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message that includes KeyType.admin command</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if check is successful</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
@@ -424,12 +435,12 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_param_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check if the param is included</span>
-
-<span class="sd">        :param param: string or list of strings</span>
-<span class="sd">        :param dat:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Check if the param is included</span>
+<span class="sd">        Args:</span>
+<span class="sd">            param (bytes|list): Commands that must be included in the message</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if check is successful</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">param</span><span class="p">:</span>
@@ -443,13 +454,14 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">payload_type</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Process received message</span>
-
-<span class="sd">        :param socket:</span>
-<span class="sd">        :param dat:</span>
-<span class="sd">        :param payload_type: PayloadType value of msg</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Process received message</span>
+<span class="sd">        Args:</span>
+<span class="sd">            socket (Socket): server socket</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">            payload_type (bytes): PayloadType value of msg</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if disconnection is detected</span>
+<span class="sd">            list: return user info (domain_id, user_id) when a new user_id is coming</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;client&quot;</span><span class="p">,</span> <span class="s2">&quot;num_message_receive&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="c1">#self.logger.debug(&quot;process message from %s: %s&quot; % (binascii.b2a_hex(dat[KeyType.source_user_id]), dat))</span>
@@ -659,11 +671,14 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">get_domain_keypair</span><span class="p">(</span><span class="n">domain_id</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_REPAIR</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_check</span><span class="p">([</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">],</span> <span class="n">dat</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+                <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">=</span> <span class="n">repair_manager</span><span class="o">.</span><span class="n">RepairManager</span><span class="o">.</span><span class="n">REQUEST_REPAIR_TRANSACTION</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;repair&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">put_message</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="ow">in</span> <span class="n">dat</span> <span class="ow">and</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+                <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">=</span> <span class="n">repair_manager</span><span class="o">.</span><span class="n">RepairManager</span><span class="o">.</span><span class="n">REQUEST_REPAIR_ASSET_FILE</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;repair&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">put_message</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;REQUEST_REPAIR: bad format&quot;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
-            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">=</span> <span class="n">repair_manager</span><span class="o">.</span><span class="n">RepairManager</span><span class="o">.</span><span class="n">REQUEST_REPAIR_TRANSACTION</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;repair&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">put_message</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
 
         <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GET_NEIGHBORLIST</span><span class="p">:</span>
@@ -815,12 +830,11 @@
         <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_register_to_notification_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Register user_id in notification_list</span>
-<span class="sd">        :param domain_id:</span>
-<span class="sd">        :param asset_group_id:</span>
-<span class="sd">        :param user_id:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Register user_id in insert completion notification list</span>
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id</span>
+<span class="sd">            asset_group_id (bytes): target asset_group_id of which you want to get notification about the insertion</span>
+<span class="sd">            user_id (bytes): user_id that registers in the list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span>
@@ -829,39 +843,46 @@
         <span class="n">umr</span><span class="o">.</span><span class="n">send_multicast_join</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">permanent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BBcCoreService.remove_from_notification_list"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.remove_from_notification_list">[docs]</a>    <span class="k">def</span> <span class="nf">remove_from_notification_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Remove entry from insert completion notification list</span>
-<span class="sd">        :param domain_id:</span>
-<span class="sd">        :param asset_group_id:</span>
-<span class="sd">        :param user_id:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Remove entry from insert completion notification list</span>
+
+<span class="sd">        This method checks validation only.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id</span>
+<span class="sd">            asset_group_id (bytes): target asset_group_id of which you want to get notification about the insertion</span>
+<span class="sd">            user_id (bytes): user_id that registers in the list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="k">if</span> <span class="n">asset_group_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">asset_group_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">remove_notification_entry</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_remove_notification_entry</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">asset_group_id</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">remove_notification_entry</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_remove_notification_entry</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BBcCoreService.remove_notification_entry"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.remove_notification_entry">[docs]</a>    <span class="k">def</span> <span class="nf">remove_notification_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_remove_notification_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove entry from insert completion notification list</span>
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id</span>
+<span class="sd">            asset_group_id (bytes): target asset_group_id of which you want to get notification about the insertion</span>
+<span class="sd">            user_id (bytes): user_id that registers in the list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="n">asset_group_id</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="n">asset_group_id</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span><span class="p">[</span><span class="n">domain_id</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="n">umr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;user&#39;</span><span class="p">]</span>
             <span class="n">umr</span><span class="o">.</span><span class="n">send_multicast_leave</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span><span class="p">[</span><span class="n">domain_id</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BBcCoreService.validate_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.validate_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">validate_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Validate transaction by verifying signature</span>
-
-<span class="sd">        :param txid:          transaction_id</span>
-<span class="sd">        :param txdata:        BBcTransaction data</span>
-<span class="sd">        :param asset_files:   dictionary of { asid=&gt;asset_content,,, }</span>
-<span class="sd">        :return: BBcTransaction or None</span>
+        <span class="sd">&quot;&quot;&quot;Validate transaction by verifying signature</span>
+<span class="sd">        Args:</span>
+<span class="sd">            txdata (bytes): serialized transaction data</span>
+<span class="sd">            asset_files (dict): dictionary of {asset_id: content} for the transaction</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            BBcTransaction: if validation fails, None returns.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">txobj</span> <span class="o">=</span> <span class="n">BBcTransaction</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">txobj</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">txdata</span><span class="p">):</span>
@@ -882,12 +903,13 @@
             <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="BBcCoreService.insert_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.insert_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">insert_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Insert transaction into ledger</span>
-<span class="sd">        :param domain_id:     domain_id where the transaction is inserted</span>
-<span class="sd">        :param txdata:        BBcTransaction data</span>
-<span class="sd">        :param asset_files:   dictionary of { asid=&gt;asset_content,,, }</span>
-<span class="sd">        :return: result or str</span>
+        <span class="sd">&quot;&quot;&quot;Insert transaction into ledger</span>
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id</span>
+<span class="sd">            txdata (bytes): serialized transaction data</span>
+<span class="sd">            asset_files (dict): dictionary of {asset_id: content} for the transaction</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict|str: inserted transaction_id or error message</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span> <span class="s2">&quot;insert_count&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -918,13 +940,12 @@
         <span class="k">return</span> <span class="p">{</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">:</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">}</span></div>
 
 <div class="viewcode-block" id="BBcCoreService.send_inserted_notification"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.send_inserted_notification">[docs]</a>    <span class="k">def</span> <span class="nf">send_inserted_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_ids</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">only_registered_user</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        broadcast NOTIFY_INSERTED</span>
-<span class="sd">        :param domain_id:</span>
-<span class="sd">        :param asset_group_ids:</span>
-<span class="sd">        :param transaction_id:</span>
-<span class="sd">        :param only_registered_user:  If True, notification is not sent to other nodes</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Broadcast NOTIFY_INSERTED</span>
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id</span>
+<span class="sd">            asset_group_ids (list): list of asset_group_ids</span>
+<span class="sd">            transaction_id (bytes): transaction_id that has just inserted</span>
+<span class="sd">            only_registered_user (bool): If True, notification is not sent to other nodes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">umr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;user&#39;</span><span class="p">]</span>
         <span class="n">destination_users</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -959,13 +980,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">send_message_in_network</span><span class="p">(</span><span class="n">domain_id</span><span class="o">=</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_distribute_transaction_to_gather_signatures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Request to distribute sign_request to users</span>
-
-<span class="sd">        :param domain_id:</span>
-<span class="sd">        :param dat:</span>
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Request to distribute sign_request to users</span>
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id</span>
+<span class="sd">            dat (dict): message to send</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">destinations</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_ids</span><span class="p">]</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="n">_make_message_structure</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_SIGNATURE</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">])</span>
@@ -985,30 +1005,29 @@
             <span class="n">umr</span><span class="o">.</span><span class="n">send_message_to_user</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_search_transaction_by_txid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">txid</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Search transaction_data by transaction_id</span>
-
-<span class="sd">        :param domain_id:        domain_id where the transaction is inserted</span>
-<span class="sd">        :param txid:  transaction_id</span>
-<span class="sd">        :rtype: **response_info</span>
-<span class="sd">        :return: {transaction_id, transaction_data, asset_files}</span>
+    <span class="k">def</span> <span class="nf">_search_transaction_by_txid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Search transaction_data by transaction_id</span>
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id</span>
+<span class="sd">            transaction_id (bytes): transaction_id to search</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: dictionary having transaction_id, serialized transaction data, asset files</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span> <span class="s2">&quot;search_count&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No such domain&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">txid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">transaction_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Transaction_id must not be None&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="n">dh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
-        <span class="n">ret_txobj</span><span class="p">,</span> <span class="n">ret_asset_files</span> <span class="o">=</span> <span class="n">dh</span><span class="o">.</span><span class="n">search_transaction</span><span class="p">(</span><span class="n">transaction_id</span><span class="o">=</span><span class="n">txid</span><span class="p">)</span>
+        <span class="n">ret_txobj</span><span class="p">,</span> <span class="n">ret_asset_files</span> <span class="o">=</span> <span class="n">dh</span><span class="o">.</span><span class="n">search_transaction</span><span class="p">(</span><span class="n">transaction_id</span><span class="o">=</span><span class="n">transaction_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ret_txobj</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret_txobj</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="n">response_info</span> <span class="o">=</span> <span class="n">_create_search_result</span><span class="p">(</span><span class="n">ret_txobj</span><span class="p">,</span> <span class="n">ret_asset_files</span><span class="p">)</span>
-        <span class="n">response_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">txid</span>
+        <span class="n">response_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
         <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">transactions</span> <span class="ow">in</span> <span class="n">response_info</span><span class="p">:</span>
             <span class="n">response_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">response_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transactions</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">del</span> <span class="n">response_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transactions</span><span class="p">]</span>
@@ -1018,14 +1037,18 @@
         <span class="k">return</span> <span class="n">response_info</span>
 
 <div class="viewcode-block" id="BBcCoreService.search_transaction_with_condition"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction_with_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Search transactions that match given conditions</span>
-<span class="sd">        :param domain_id:</span>
-<span class="sd">        :param asset_group_id:</span>
-<span class="sd">        :param asset_group_id:</span>
-<span class="sd">        :param user_id:</span>
-<span class="sd">        :rtype: response_info</span>
-<span class="sd">        :return: {transactions, all_asset_files, compromised_transactions, compromised_asset, compromised_asset_files}</span>
+        <span class="sd">&quot;&quot;&quot;Search transactions that match given conditions</span>
+
+<span class="sd">        When Multiple conditions are given, they are considered as AND condition.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id</span>
+<span class="sd">            asset_group_id (bytes): asset_group_id that target transactions should have</span>
+<span class="sd">            asset_id (bytes): asset_id that target transactions should have</span>
+<span class="sd">            user_id (bytes): user_id that target transactions should have</span>
+<span class="sd">            count (int): The maximum number of transactions to retrieve</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: dictionary having transaction_id, serialized transaction data, asset files</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No such domain&quot;</span><span class="p">)</span>
@@ -1040,13 +1063,18 @@
         <span class="k">return</span> <span class="n">_create_search_result</span><span class="p">(</span><span class="n">ret_txobj</span><span class="p">,</span> <span class="n">ret_asset_files</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_traverse_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">hop_count</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get transaction tree from a base txid</span>
-<span class="sd">        :param domain_id:</span>
-<span class="sd">        :param transaction_id:</span>
-<span class="sd">        :param direction: 1:backward, non-1:forward</span>
-<span class="sd">        :param hop_count:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Get transaction tree from the specified transaction_id</span>
+
+<span class="sd">        Transaction tree in the return values are in the following format:</span>
+<span class="sd">        [ [list of serialized transactions in 1-hop from the base], [list of serialized transactions in 2-hop from the base],,,,</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id</span>
+<span class="sd">            transaction_id (bytes): the base transaction_id from which traverse starts</span>
+<span class="sd">            direction (int): 1:backward, non-1:forward</span>
+<span class="sd">            hop_count (bytes): hop count to traverse</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: list of [include_all_flag, transaction tree, asset_files]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span> <span class="s2">&quot;search_count&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1106,6 +1134,7 @@
 
 
 <div class="viewcode-block" id="daemonize"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.daemonize">[docs]</a><span class="k">def</span> <span class="nf">daemonize</span><span class="p">(</span><span class="n">pidfile</span><span class="o">=</span><span class="n">PID_FILE</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run in background&quot;&quot;&quot;</span>
     <span class="n">pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">pid</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -1202,9 +1231,7 @@
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

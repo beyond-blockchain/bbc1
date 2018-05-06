@@ -31,9 +31,7 @@ from bbc1.core import logger
 
 
 class RepairManager:
-    """
-    Data repair messager for forged transaction/asset
-    """
+    """Data repair manager for forged transaction/asset"""
     REQUEST_REPAIR_TRANSACTION = 0
     REQUEST_REPAIR_ASSET_FILE = 1
     REQUEST_TO_SEND_TRANSACTION_DATA = 2
@@ -60,14 +58,17 @@ class RepairManager:
         th_nw_loop.start()
 
     def _output_log(self, repair_info):
+        """Output log in json format"""
         with open(self.repair_log, "a") as f:
             f.write(json.dumps(repair_info)+"\n")
 
     def exit_loop(self):
+        """Exit the manager loop"""
         self.loop_flag = False
         self.put_message()
 
     def _manager_loop(self):
+        """Main loop"""
         while self.loop_flag:
             msg = self.queue.get()
             if msg is None:
@@ -86,13 +87,14 @@ class RepairManager:
                 self._receive_asset_file_from_others(msg)
 
     def put_message(self, msg=None):
+        """append a message to the queue"""
         self.queue.put(msg)
 
     def _repair_transaction_data(self, transaction_id):
-        """
-        Repair forged transaction_data or asset_file by getting legitimate one from other nodes
-        :param transaction_id:
-        :return:
+        """Repair forged transaction_data or asset_file by getting legitimate one from other nodes
+
+        Args:
+            transaction_id (bytes): target transaction_id
         """
         #print("_repair_transaction_data:")
         self.stats.update_stats_increment("transaction", "repair_request", 1)
@@ -149,12 +151,12 @@ class RepairManager:
         return
 
     def _repair_asset_file(self, asset_group_id, asset_id, need_check=True):
-        """
-        Repair forged asset_file by getting legitimate one from other nodes
-        :param asset_group_id:
-        :param asset_id:
-        :param need_check:
-        :return:
+        """Repair forged asset_file by getting legitimate one from other nodes
+
+        Args:
+            asset_group_id (bytes): asset_group_id of the asset
+            asset_id (bytes): asset_id of the asset
+            need_check (bool): If True, check the digest of the asset file
         """
         #print("_repair_asset_file:")
         if self.data_handler.use_external_storage:
@@ -185,11 +187,7 @@ class RepairManager:
                                                   payload_type=PayloadType.Type_any, msg=msg)
 
     def _send_transaction_data(self, dat):
-        """
-        Send transaction data if having valid one
-        :param dat:
-        :return:
-        """
+        """Send transaction data if having valid one"""
         #print("_send_transaction_data::")
         transaction_id = dat[KeyType.transaction_id]
         for idx in range(len(self.data_handler.db_adaptors)):
@@ -203,10 +201,10 @@ class RepairManager:
                 return
 
     def _receive_transaction_data_from_others(self, dat):
-        """
-        Receive transaction data from other core_nodes and check its validity
-        :param dat:
-        :return:
+        """Receive transaction data from other core_nodes and check its validity
+
+        Args:
+            dat (dict): received message
         """
         #print("_receive_transaction_data_from_others:")
         if KeyType.transaction_data not in dat or KeyType.transaction_id not in dat or KeyType.nonce not in dat:
@@ -234,10 +232,10 @@ class RepairManager:
             del self.requesting_list[dat[KeyType.nonce]]
 
     def _send_asset_file(self, dat):
-        """
-        Send the asset file if having valid one
-        :param dat:
-        :return:
+        """Send the asset file if having valid one
+
+        Args:
+            dat (dict): received message
         """
         #print("_send_asset_file::")
         asset_group_id = dat[KeyType.asset_group_id]
@@ -259,10 +257,10 @@ class RepairManager:
             self.network.send_message_in_network(None, domain_id=self.domain_id, msg=dat)
 
     def _receive_asset_file_from_others(self, dat):
-        """
-        Receive asset file from other core_nodes and check its validity
-        :param dat:
-        :return:
+        """Receive asset file from other core_nodes and check its validity
+
+        Args:
+            dat (dict): received message
         """
         #print("_receive_asset_file_from_others:")
         if KeyType.nonce not in dat or dat[KeyType.nonce] not in self.requesting_list:

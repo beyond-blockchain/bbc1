@@ -34,14 +34,12 @@ def get_ticker(tick_interval=TICK_INTERVAL):
 
 
 class Ticker:
-    """
-    Clock ticker for query timers
-    """
+    """Clock ticker for query timers"""
     def __init__(self, tick_interval=TICK_INTERVAL):
-        """
-        Create Ticker object. schedule_final array is for the fail safe to avoid zombie entry.
+        """Create Ticker object
 
-        :param tick_interval:
+        Args:
+            tick_interval (float): tick interval in second
         """
         self.tick_interval = tick_interval
         self.schedule = []
@@ -72,6 +70,7 @@ class Ticker:
             #print(".")
 
     def _add_entry(self, entry):
+        """Add an event to the scheduler"""
         nonce = random.randint(0, 0xFFFFFFFF)  # 4-byte
         while nonce in self.queries:
             nonce = random.randint(0, 0xFFFFFFFF)  # 4-byte
@@ -85,13 +84,16 @@ class Ticker:
         return nonce
 
     def get_entry(self, nonce):
+        """Get an entry identified by nonce"""
         return self.queries.get(nonce, None)
 
     def del_entry(self, nonce):
+        """Delete an entry from the scheduler identified by nonce"""
         entry = self.queries[nonce]
         del self.queries[entry.nonce]
 
     def _update_timer(self, nonce, append_new_flag):
+        """Sort the list of scheduler"""
         if nonce not in self.queries:
             return
         entry = self.queries[nonce]
@@ -101,23 +103,25 @@ class Ticker:
             self.schedule.sort()
 
     def _refresh_timer(self):
+        """Sort the list of scheduler triggered by the refresh timer"""
         with self.lock:
             self.schedule.sort()
 
 
 class QueryEntry:
-    """
-    Querying entry
-    """
+    """Callback manager"""
     def __init__(self, expire_after=30, callback_expire=None, callback=None, callback_error=None,
                  interval=0, data={}, retry_count=-1):
-        """
-        Create entry. expire_after and callback_expire ensures that this entry expires eventually.
+        """Create an entry. expire_after and callback_expire ensures that this entry expires eventually
 
-        :param expire_after:
-        :param callback_expire:
-        :param data:
-        :param retry_count: retry count until calling callback_expire (if retry_count==-1, no limit)
+        Args:
+            expire_after (float): expiration time in seconds
+            callback_expire (obj): callback method that will be called when expire
+            callback (obj): callback method that will be called periodically or when successful
+            callback_error (obj): callback method that will be called when error happens
+            interval (float): interval for periodical callback
+            data (dict): arbitrary parameters for callback methods
+            retry_count (int): the number of retry before expiration
         """
         self.created_at = time.time()
         self.active = True
@@ -137,19 +141,14 @@ class QueryEntry:
         return self.fire_at < other.fire_at
 
     def deactivate(self):
-        """
-        Deactivate the entry
-
-        :return:
-        """
+        """Deactivate the entry"""
         self.active = False
 
     def update_expiration_time(self, expire_after):
-        """
-        Update the expire timer
+        """Update the expire timer
 
-        :param expire_after:
-        :return:
+        Args:
+            expire_after (float): new expiration time in second
         """
         self.expire_at = time.time() + expire_after
         #print(" -> update_expiration_time:", self.expire_at)
@@ -159,10 +158,10 @@ class QueryEntry:
                 ticker._refresh_timer()
 
     def _fire(self):
-        """
-        Fire the entry
+        """Fire the entry
 
-        :return: True if expire
+        Returns:
+            bool: True if this fire is triggered by expiration
         """
         if time.time() < self.expire_at and self.retry_count != 0:
             self.entry_exists_in_ticker_scheduler = False
@@ -184,15 +183,14 @@ class QueryEntry:
             return True
 
     def update(self, fire_after=None, expire_after=None, callback=None, callback_error=None, init=False):
-        """
-        Update the entry information
+        """Update the entry information
 
-        :param fire_after:
-        :param expire_after:
-        :param callback:
-        :param callback_error:
-        :param init:
-        :return:
+        Args:
+            fire_after (float): set callback (periodical) to fire after given time (in second)
+            expire_after (float): set expiration timer to given time (in second)
+            callback (obj): callback method that will be called periodically
+            callback_error (obj): callback method that will be called when error happens
+            init (bool): If True, the scheduler is sorted again
         """
         now = time.time()
         if expire_after is not None:
@@ -214,21 +212,13 @@ class QueryEntry:
         self.entry_exists_in_ticker_scheduler = True
 
     def callback(self):
-        """
-        Call a callback function for successful case
-
-        :return:
-        """
+        """Call a callback function for successful case"""
         self.deactivate()
         if self.callback_success is not None:
             self.callback_success(self)
 
     def callback_error(self):
-        """
-        Call a callback function for failure case
-
-        :return:
-        """
+        """Call a callback function for failure case"""
         self.retry_count -= 1
         if self.retry_count == 0:
             return self._fire()

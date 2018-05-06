@@ -29,8 +29,7 @@ ticker = query_management.get_ticker()
 
 
 class TopologyManagerBase:
-    """
-    Network topology management for a domain
+    """Network topology management for a domain
 
     This class defines how to create topology, meaning that who should be neighbors and provides very simple topology
     management, that is full mesh topology. If P2P routing algorithm is needed, you should override this class
@@ -55,21 +54,18 @@ class TopologyManagerBase:
         self.update_refresh_timer_entry()
 
     def stop_all_timers(self):
-        """
-        Invalidate all running timers
-        :return:
-        """
+        """Invalidate all running timers"""
         if self.advertise_wait_entry is not None:
             self.advertise_wait_entry.deactivate()
         if self.neighbor_refresh_timer_entry is not None:
             self.neighbor_refresh_timer_entry.deactivate()
 
     def notify_neighbor_update(self, node_id, is_new=True):
-        """
-        Notified when neighbor node info is updated
-        :param node_id:
-        :param is_new:
-        :return:
+        """Update expiration timer for the notified node_id
+
+        Args:
+            node_id (bytes): target node_id
+            is_new (bool): If True, this node is a new comer node
         """
         if node_id is not None:
             self.logger.debug("[%s] notify_neighbor_update: node_id=%s, is_new=%s" % (self.my_node_id.hex()[:4],
@@ -86,6 +82,7 @@ class TopologyManagerBase:
             self.advertise_wait_entry.update_expiration_time(rand_time)
 
     def update_refresh_timer_entry(self, new_entry=True, force_refresh_time=None):
+        """Update expiration timer"""
         if force_refresh_time is None:
             rand_interval = random.randint(int(TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL * 2 / 3),
                                            int(TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL * 4 / 3))
@@ -100,10 +97,7 @@ class TopologyManagerBase:
             self.neighbor_refresh_timer_entry.update_expiration_time(rand_interval)
 
     def _advertise_neighbor_info(self, query_entry):
-        """
-        Broadcast nodeinfo list
-        :return:
-        """
+        """Broadcast nodeinfo list"""
         #print("[%s]: _advertise_neighbor_info" % self.my_node_id.hex()[:4])
         self.advertise_wait_entry = None
         msg = {
@@ -121,10 +115,7 @@ class TopologyManagerBase:
             self.update_refresh_timer_entry()
 
     def make_neighbor_list(self):
-        """
-        make nodelist binary for advertising
-        :return:
-        """
+        """make nodelist binary for advertising"""
         nodeinfo = bytearray()
 
         # the node itself
@@ -144,10 +135,12 @@ class TopologyManagerBase:
         return bytes(nodes)
 
     def _update_neighbor_list(self, binary_data):
-        """
-        Parse binary data and update neighbors
-        :param binary_data:
-        :return: True/False:  True if the received nodeinfo and that the node has is different
+        """Parse binary data and update neighbors
+
+        Args:
+            binary_data (bytes): received data
+        Returns:
+            bool: True if the received nodeinfo has changed
         """
         count_originally = len(list(filter(lambda nd: nd.is_alive, self.neighbors.nodeinfo_list.values())))
         count_unchanged = 0
@@ -171,14 +164,11 @@ class TopologyManagerBase:
         else:
             return True
 
-    def process_message(self, ipv4, ipv6, port, msg):
-        """
-        (internal use) process received message
-        :param ipv4:      sender ipv4 address
-        :param ipv6:      sender ipv6 address
-        :param port:      sender address and port (None if TCP)
-        :param msg:
-        :return:
+    def process_message(self, msg):
+        """Process received message
+
+        Args:
+            msg (dict): received message
         """
         if KeyType.destination_node_id not in msg or KeyType.command not in msg:
             return

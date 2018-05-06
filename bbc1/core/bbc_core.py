@@ -73,6 +73,7 @@ admin_message_commands = (
 
 
 def activate_ledgersubsystem():
+    """Load module of ledger_subsystem if installed"""
     global ledger_subsystem_module
     if ledger_subsystem_module is None:
         try:
@@ -82,13 +83,15 @@ def activate_ledgersubsystem():
 
 
 def _make_message_structure(domain_id, cmd, dstid, qid):
-    """
-    (internal use) Create a base structure of message
+    """Create a base structure of message
 
-    :param cmd:
-    :param dstid: destination_user_id
-    :param qid:   query_id
-    :return:
+    Args:
+        domain_id (bytes): the target domain_id
+        cmd (bytes): command type in message_key_types.KeyType
+        dstid (bytes): destination user_id
+        qid (bytes): query_id to include in the message
+    Returns:
+        dict: message
     """
     return {
         KeyType.domain_id: domain_id,
@@ -100,6 +103,7 @@ def _make_message_structure(domain_id, cmd, dstid, qid):
 
 
 def _create_search_result(txobj_dict, asset_files_dict):
+    """Create transaction search result"""
     response_info = dict()
     for txid, txobj in txobj_dict.items():
         if txid != txobj.transaction_id:
@@ -123,6 +127,7 @@ def _create_search_result(txobj_dict, asset_files_dict):
 
 
 class BBcCoreService:
+    """Base service object of BBc-1"""
     def __init__(self, p2p_port=None, core_port=None, use_domain0=False, ip4addr=None, ip6addr=None,
                  workingdir=".bbc1", configfile=None, use_nodekey=None, use_ledger_subsystem=False,
                  loglevel="all", logname="-", server_start=True):
@@ -174,11 +179,13 @@ class BBcCoreService:
             self._start_server(core_port)
 
     def quit_program(self):
+        """Processes when quiting program"""
         self.networking.save_all_static_node_list()
         self.config.update_config()
         os._exit(0)
 
     def _start_server(self, port):
+        """Start TCP(v4 or v6) server"""
         pool = Pool(POOL_SIZE)
         if self.networking.ip6_address == "::":
             server = StreamServer(("0.0.0.0", port), self._handler, spawn=pool)
@@ -190,6 +197,15 @@ class BBcCoreService:
             pass
 
     def _error_reply(self, msg=None, err_code=EINVALID_COMMAND, txt=""):
+        """Create and send error reply message
+
+        Args:
+            msg (dict): message to send
+            err_code (int): error code defined in bbc_error.py
+            txt (str): error message
+        Returns:
+            bool:
+        """
         msg[KeyType.status] = err_code
         msg[KeyType.reason] = txt
         domain_id = msg[KeyType.domain_id]
@@ -200,13 +216,7 @@ class BBcCoreService:
             return False
 
     def _handler(self, socket, address):
-        """
-        Message wait loop
-
-        :param socket:
-        :param address:
-        :return:
-        """
+        """Message wait loop for a client"""
         # self.logger.debug("New connection")
         self.stats.update_stats_increment("client", "total_num", 1)
         user_info = None
@@ -232,8 +242,7 @@ class BBcCoreService:
             traceback.print_exc()
         self.logger.debug("closing socket")
         if user_info is not None:
-            self.networking.domains[user_info[0]]['user'].unregister_user(user_info[1],
-                                                                                                      socket)
+            self.networking.domains[user_info[0]]['user'].unregister_user(user_info[1], socket)
         try:
             socket.shutdown(py_socket.SHUT_RDWR)
             socket.close()
@@ -243,10 +252,7 @@ class BBcCoreService:
         self.stats.update_stats_decrement("client", "total_num", 1)
 
     def _get_node_key(self):
-        """
-        Get or create node key for creating a domain by bbc_app
-        :return:
-        """
+        """Get or create node key for creating a domain by bbc_app"""
         self.logger.info("The core use node_key to check signature on admin command message")
         keypath = os.path.join(self.config.working_dir, "node_key.pem")
 
@@ -264,10 +270,12 @@ class BBcCoreService:
         return
 
     def _check_signature_by_nodekey(self, dat):
-        """
-        Verify signature in the message
-        :param dat:
-        :return:
+        """Verify signature in the message
+
+        Args:
+            dat (dict): received message that includes KeyType.admin command
+        Returns:
+            bool: True if check is successful
         """
         if self.node_key is None:
             return True
@@ -281,12 +289,13 @@ class BBcCoreService:
         return True
 
     def _param_check(self, param, dat):
-        """
-        Check if the param is included
+        """Check if the param is included
 
-        :param param: string or list of strings
-        :param dat:
-        :return:
+        Args:
+            param (bytes|list): Commands that must be included in the message
+            dat (dict): received message
+        Returns:
+            bool: True if check is successful
         """
         if isinstance(param, list):
             for p in param:
@@ -300,13 +309,15 @@ class BBcCoreService:
         return True
 
     def _process(self, socket, dat, payload_type):
-        """
-        Process received message
+        """Process received message
 
-        :param socket:
-        :param dat:
-        :param payload_type: PayloadType value of msg
-        :return:
+        Args:
+            socket (Socket): server socket
+            dat (dict): received message
+            payload_type (bytes): PayloadType value of msg
+        Returns:
+            bool: True if disconnection is detected
+            list: return user info (domain_id, user_id) when a new user_id is coming
         """
         self.stats.update_stats_increment("client", "num_message_receive", 1)
         #self.logger.debug("process message from %s: %s" % (binascii.b2a_hex(dat[KeyType.source_user_id]), dat))
@@ -675,12 +686,12 @@ class BBcCoreService:
         return False, None
 
     def _register_to_notification_list(self, domain_id, asset_group_id, user_id):
-        """
-        Register user_id in notification_list
-        :param domain_id:
-        :param asset_group_id:
-        :param user_id:
-        :return:
+        """Register user_id in insert completion notification list
+
+        Args:
+            domain_id (bytes): target domain_id
+            asset_group_id (bytes): target asset_group_id of which you want to get notification about the insertion
+            user_id (bytes): user_id that registers in the list
         """
         self.insert_notification_user_list.setdefault(domain_id, dict())
         self.insert_notification_user_list[domain_id].setdefault(asset_group_id, set())
@@ -689,23 +700,32 @@ class BBcCoreService:
         umr.send_multicast_join(asset_group_id, permanent=True)
 
     def remove_from_notification_list(self, domain_id, asset_group_id, user_id):
-        """
-        Remove entry from insert completion notification list
-        :param domain_id:
-        :param asset_group_id:
-        :param user_id:
-        :return:
+        """Remove entry from insert completion notification list
+
+        This method checks validation only.
+
+        Args:
+            domain_id (bytes): target domain_id
+            asset_group_id (bytes): target asset_group_id of which you want to get notification about the insertion
+            user_id (bytes): user_id that registers in the list
         """
         if domain_id not in self.insert_notification_user_list:
             return
         if asset_group_id is not None:
             if asset_group_id in self.insert_notification_user_list[domain_id]:
-                self.remove_notification_entry(domain_id, asset_group_id, user_id)
+                self._remove_notification_entry(domain_id, asset_group_id, user_id)
         else:
             for asset_group_id in list(self.insert_notification_user_list[domain_id]):
-                self.remove_notification_entry(domain_id, asset_group_id, user_id)
+                self._remove_notification_entry(domain_id, asset_group_id, user_id)
 
-    def remove_notification_entry(self, domain_id, asset_group_id, user_id):
+    def _remove_notification_entry(self, domain_id, asset_group_id, user_id):
+        """Remove entry from insert completion notification list
+
+        Args:
+            domain_id (bytes): target domain_id
+            asset_group_id (bytes): target asset_group_id of which you want to get notification about the insertion
+            user_id (bytes): user_id that registers in the list
+        """
         self.insert_notification_user_list[domain_id][asset_group_id].remove(user_id)
         if len(self.insert_notification_user_list[domain_id][asset_group_id]) == 0:
             self.insert_notification_user_list[domain_id].pop(asset_group_id, None)
@@ -715,13 +735,13 @@ class BBcCoreService:
             self.insert_notification_user_list.pop(domain_id, None)
 
     def validate_transaction(self, txdata, asset_files=None):
-        """
-        Validate transaction by verifying signature
+        """Validate transaction by verifying signature
 
-        :param txid:          transaction_id
-        :param txdata:        BBcTransaction data
-        :param asset_files:   dictionary of { asid=>asset_content,,, }
-        :return: BBcTransaction or None
+        Args:
+            txdata (bytes): serialized transaction data
+            asset_files (dict): dictionary of {asset_id: content} for the transaction
+        Returns:
+            BBcTransaction: if validation fails, None returns.
         """
         txobj = BBcTransaction()
         if not txobj.deserialize(txdata):
@@ -742,12 +762,14 @@ class BBcCoreService:
             return None
 
     def insert_transaction(self, domain_id, txdata, asset_files):
-        """
-        Insert transaction into ledger
-        :param domain_id:     domain_id where the transaction is inserted
-        :param txdata:        BBcTransaction data
-        :param asset_files:   dictionary of { asid=>asset_content,,, }
-        :return: result or str
+        """Insert transaction into ledger
+
+        Args:
+            domain_id (bytes): target domain_id
+            txdata (bytes): serialized transaction data
+            asset_files (dict): dictionary of {asset_id: content} for the transaction
+        Returns:
+            dict|str: inserted transaction_id or error message
         """
         self.stats.update_stats_increment("transaction", "insert_count", 1)
         if domain_id is None:
@@ -778,13 +800,13 @@ class BBcCoreService:
         return {KeyType.transaction_id: txobj.transaction_id}
 
     def send_inserted_notification(self, domain_id, asset_group_ids, transaction_id, only_registered_user=False):
-        """
-        broadcast NOTIFY_INSERTED
-        :param domain_id:
-        :param asset_group_ids:
-        :param transaction_id:
-        :param only_registered_user:  If True, notification is not sent to other nodes
-        :return:
+        """Broadcast NOTIFY_INSERTED
+
+        Args:
+            domain_id (bytes): target domain_id
+            asset_group_ids (list): list of asset_group_ids
+            transaction_id (bytes): transaction_id that has just inserted
+            only_registered_user (bool): If True, notification is not sent to other nodes
         """
         umr = self.networking.domains[domain_id]['user']
         destination_users = set()
@@ -819,13 +841,13 @@ class BBcCoreService:
             self.networking.send_message_in_network(domain_id=domain_id, msg=msg)
 
     def _distribute_transaction_to_gather_signatures(self, domain_id, dat):
-        """
-        Request to distribute sign_request to users
+        """Request to distribute sign_request to users
 
-        :param domain_id:
-        :param dat:
-        :rtype: bool
-        :return:
+        Args:
+            domain_id (bytes): target domain_id
+            dat (dict): message to send
+        Returns:
+            bool: True
         """
         destinations = dat[KeyType.destination_user_ids]
         msg = _make_message_structure(domain_id, MsgType.REQUEST_SIGNATURE, None, dat[KeyType.query_id])
@@ -845,30 +867,30 @@ class BBcCoreService:
             umr.send_message_to_user(msg)
         return True
 
-    def _search_transaction_by_txid(self, domain_id, txid):
-        """
-        Search transaction_data by transaction_id
+    def _search_transaction_by_txid(self, domain_id, transaction_id):
+        """Search transaction_data by transaction_id
 
-        :param domain_id:        domain_id where the transaction is inserted
-        :param txid:  transaction_id
-        :rtype: **response_info
-        :return: {transaction_id, transaction_data, asset_files}
+        Args:
+            domain_id (bytes): target domain_id
+            transaction_id (bytes): transaction_id to search
+        Returns:
+            dict: dictionary having transaction_id, serialized transaction data, asset files
         """
         self.stats.update_stats_increment("transaction", "search_count", 1)
         if domain_id is None:
             self.logger.error("No such domain")
             return None
-        if txid is None:
+        if transaction_id is None:
             self.logger.error("Transaction_id must not be None")
             return None
 
         dh = self.networking.domains[domain_id]['data']
-        ret_txobj, ret_asset_files = dh.search_transaction(transaction_id=txid)
+        ret_txobj, ret_asset_files = dh.search_transaction(transaction_id=transaction_id)
         if ret_txobj is None or len(ret_txobj) == 0:
             return None
 
         response_info = _create_search_result(ret_txobj, ret_asset_files)
-        response_info[KeyType.transaction_id] = txid
+        response_info[KeyType.transaction_id] = transaction_id
         if KeyType.transactions in response_info:
             response_info[KeyType.transaction_data] = response_info[KeyType.transactions][0]
             del response_info[KeyType.transactions]
@@ -878,14 +900,18 @@ class BBcCoreService:
         return response_info
 
     def search_transaction_with_condition(self, domain_id, asset_group_id=None, asset_id=None, user_id=None, count=1):
-        """
-        Search transactions that match given conditions
-        :param domain_id:
-        :param asset_group_id:
-        :param asset_group_id:
-        :param user_id:
-        :rtype: response_info
-        :return: {transactions, all_asset_files, compromised_transactions, compromised_asset, compromised_asset_files}
+        """Search transactions that match given conditions
+
+        When Multiple conditions are given, they are considered as AND condition.
+
+        Args:
+            domain_id (bytes): target domain_id
+            asset_group_id (bytes): asset_group_id that target transactions should have
+            asset_id (bytes): asset_id that target transactions should have
+            user_id (bytes): user_id that target transactions should have
+            count (int): The maximum number of transactions to retrieve
+        Returns:
+            dict: dictionary having transaction_id, serialized transaction data, asset files
         """
         if domain_id is None:
             self.logger.error("No such domain")
@@ -900,13 +926,18 @@ class BBcCoreService:
         return _create_search_result(ret_txobj, ret_asset_files)
 
     def _traverse_transactions(self, domain_id, transaction_id, direction=1, hop_count=3):
-        """
-        Get transaction tree from a base txid
-        :param domain_id:
-        :param transaction_id:
-        :param direction: 1:backward, non-1:forward
-        :param hop_count:
-        :return:
+        """Get transaction tree from the specified transaction_id
+
+        Transaction tree in the return values are in the following format:
+        [ [list of serialized transactions in 1-hop from the base], [list of serialized transactions in 2-hop from the base],,,,
+
+        Args:
+            domain_id (bytes): target domain_id
+            transaction_id (bytes): the base transaction_id from which traverse starts
+            direction (int): 1:backward, non-1:forward
+            hop_count (bytes): hop count to traverse
+        Returns:
+            list: list of [include_all_flag, transaction tree, asset_files]
         """
         self.stats.update_stats_increment("transaction", "search_count", 1)
         if domain_id is None:
@@ -966,6 +997,7 @@ class BBcCoreService:
 
 
 def daemonize(pidfile=PID_FILE):
+    """Run in background"""
     pid = os.fork()
     if pid > 0:
         os._exit(0)

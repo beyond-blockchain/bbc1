@@ -201,41 +201,38 @@ This class does not manage the neighbor list itself (It’s in BBcNetwork)</p>
 <dl class="method">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.make_neighbor_list">
 <code class="descname">make_neighbor_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.make_neighbor_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.make_neighbor_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>make nodelist binary for advertising
-:return:</p>
+<dd><p>make nodelist binary for advertising</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.notify_neighbor_update">
 <code class="descname">notify_neighbor_update</code><span class="sig-paren">(</span><em>node_id</em>, <em>is_new=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.notify_neighbor_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.notify_neighbor_update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Notified when neighbor node info is updated
-:param node_id:
-:param is_new:
-:return:</p>
+<dd><p>Update expiration timer for the notified node_id
+:param node_id: target node_id
+:type node_id: bytes
+:param is_new: If True, this node is a new comer node
+:type is_new: bool</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.process_message">
-<code class="descname">process_message</code><span class="sig-paren">(</span><em>ipv4</em>, <em>ipv6</em>, <em>port</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.process_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>(internal use) process received message
-:param ipv4:      sender ipv4 address
-:param ipv6:      sender ipv6 address
-:param port:      sender address and port (None if TCP)
-:param msg:
-:return:</p>
+<code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.process_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process received message
+:param msg: received message
+:type msg: dict</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.stop_all_timers">
 <code class="descname">stop_all_timers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.stop_all_timers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.stop_all_timers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Invalidate all running timers
-:return:</p>
+<dd><p>Invalidate all running timers</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.update_refresh_timer_entry">
 <code class="descname">update_refresh_timer_entry</code><span class="sig-paren">(</span><em>new_entry=True</em>, <em>force_refresh_time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.update_refresh_timer_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.update_refresh_timer_entry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Update expiration timer</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -304,9 +301,7 @@ This class does not manage the neighbor list itself (It’s in BBcNetwork)</p>
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

@@ -183,6 +183,7 @@ limitations under the License.</p>
 <dt id="bbc1.core.message_key_types.InfraMessageCategory">
 <em class="property">class </em><code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">InfraMessageCategory</code><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#InfraMessageCategory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.InfraMessageCategory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Types of message for inter-core nodes messaging</p>
 <dl class="attribute">
 <dt id="bbc1.core.message_key_types.InfraMessageCategory.CATEGORY_DATA">
 <code class="descname">CATEGORY_DATA</code><em class="property"> = b'\x00\x03'</em><a class="headerlink" href="#bbc1.core.message_key_types.InfraMessageCategory.CATEGORY_DATA" title="Permalink to this definition">¶</a></dt>
@@ -214,6 +215,7 @@ limitations under the License.</p>
 <dt id="bbc1.core.message_key_types.KeyType">
 <em class="property">class </em><code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">KeyType</code><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#KeyType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.KeyType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Types of items in a message</p>
 <dl class="attribute">
 <dt id="bbc1.core.message_key_types.KeyType.admin_info">
 <code class="descname">admin_info</code><em class="property"> = b'\x00\x00\x00\x17'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.admin_info" title="Permalink to this definition">¶</a></dt>
@@ -221,7 +223,7 @@ limitations under the License.</p>
 
 <dl class="attribute">
 <dt id="bbc1.core.message_key_types.KeyType.all_asset_files">
-<code class="descname">all_asset_files</code><em class="property"> = b'\x00\x00\x00t'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.all_asset_files" title="Permalink to this definition">¶</a></dt>
+<code class="descname">all_asset_files</code><em class="property"> = b'\x00\x00\x00u'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.all_asset_files" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -232,6 +234,11 @@ limitations under the License.</p>
 <dl class="attribute">
 <dt id="bbc1.core.message_key_types.KeyType.anycast_ttl">
 <code class="descname">anycast_ttl</code><em class="property"> = b'\x00\x00\x00\x1a'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.anycast_ttl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.asset_file">
+<code class="descname">asset_file</code><em class="property"> = b'\x00\x00\x00t'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.asset_file" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -281,12 +288,12 @@ limitations under the License.</p>
 
 <dl class="attribute">
 <dt id="bbc1.core.message_key_types.KeyType.cross_ref">
-<code class="descname">cross_ref</code><em class="property"> = b'\x00\x00\x00v'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.cross_ref" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cross_ref</code><em class="property"> = b'\x00\x00\x00w'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.cross_ref" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.message_key_types.KeyType.cross_ref_verification_info">
-<code class="descname">cross_ref_verification_info</code><em class="property"> = b'\x00\x00\x00z'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.cross_ref_verification_info" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cross_ref_verification_info</code><em class="property"> = b'\x00\x00\x00{'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.cross_ref_verification_info" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -451,7 +458,7 @@ limitations under the License.</p>
 
 <dl class="attribute">
 <dt id="bbc1.core.message_key_types.KeyType.outer_domain_id">
-<code class="descname">outer_domain_id</code><em class="property"> = b'\x00\x00\x00w'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.outer_domain_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">outer_domain_id</code><em class="property"> = b'\x00\x00\x00x'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.outer_domain_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -491,12 +498,12 @@ limitations under the License.</p>
 
 <dl class="attribute">
 <dt id="bbc1.core.message_key_types.KeyType.signature">
-<code class="descname">signature</code><em class="property"> = b'\x00\x00\x00u'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.signature" title="Permalink to this definition">¶</a></dt>
+<code class="descname">signature</code><em class="property"> = b'\x00\x00\x00v'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.signature" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.message_key_types.KeyType.source_domain_id">
-<code class="descname">source_domain_id</code><em class="property"> = b'\x00\x00\x00x'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.source_domain_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">source_domain_id</code><em class="property"> = b'\x00\x00\x00y'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.source_domain_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -551,7 +558,7 @@ limitations under the License.</p>
 
 <dl class="attribute">
 <dt id="bbc1.core.message_key_types.KeyType.txid_having_cross_ref">
-<code class="descname">txid_having_cross_ref</code><em class="property"> = b'\x00\x00\x00y'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.txid_having_cross_ref" title="Permalink to this definition">¶</a></dt>
+<code class="descname">txid_having_cross_ref</code><em class="property"> = b'\x00\x00\x00z'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.txid_having_cross_ref" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -570,6 +577,7 @@ limitations under the License.</p>
 <dt id="bbc1.core.message_key_types.Message">
 <em class="property">class </em><code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">Message</code><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#Message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.Message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Message parser</p>
 <dl class="attribute">
 <dt id="bbc1.core.message_key_types.Message.HEADER_LEN">
 <code class="descname">HEADER_LEN</code><em class="property"> = 8</em><a class="headerlink" href="#bbc1.core.message_key_types.Message.HEADER_LEN" title="Permalink to this definition">¶</a></dt>
@@ -578,12 +586,14 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.message_key_types.Message.parse">
 <code class="descname">parse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#Message.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.Message.parse" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Parse the message in the buffer</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.message_key_types.Message.recv">
 <code class="descname">recv</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#Message.recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.Message.recv" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Append message to the buffer</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -616,47 +626,58 @@ limitations under the License.</p>
 <dl class="function">
 <dt id="bbc1.core.message_key_types.convert_from_binary">
 <code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">convert_from_binary</code><span class="sig-paren">(</span><em>data_type</em>, <em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#convert_from_binary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.convert_from_binary" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Deserialization from simple serialization</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.message_key_types.derive_shared_key">
 <code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">derive_shared_key</code><span class="sig-paren">(</span><em>private_key</em>, <em>serialized_pubkey</em>, <em>shared_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#derive_shared_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.derive_shared_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Utility for deriving shared key in ECDH procedure</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.message_key_types.deserialize_data">
 <code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">deserialize_data</code><span class="sig-paren">(</span><em>payload_type</em>, <em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#deserialize_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.deserialize_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Utility for deserializing the received message</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.message_key_types.get_ECDH_parameters">
 <code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">get_ECDH_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#get_ECDH_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.get_ECDH_parameters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Utility for initialization of ECDH parameters</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.message_key_types.make_TLV_formatted_message">
 <code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">make_TLV_formatted_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#make_TLV_formatted_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.make_TLV_formatted_message" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Utility for simple serialization function</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.message_key_types.make_binary">
 <code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">make_binary</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#make_binary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.make_binary" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Simple serialize function
+Basically, Type-Length-Value format is created for each item.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.message_key_types.make_dictionary_from_TLV_format">
 <code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">make_dictionary_from_TLV_format</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#make_dictionary_from_TLV_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.make_dictionary_from_TLV_format" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Utility for simple deserialization function</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.message_key_types.make_message">
 <code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">make_message</code><span class="sig-paren">(</span><em>payload_type</em>, <em>msg</em>, <em>payload_version=0</em>, <em>key_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#make_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.make_message" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Utility for making serialized message data</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.message_key_types.set_cipher">
 <code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">set_cipher</code><span class="sig-paren">(</span><em>shared_key</em>, <em>nonce</em>, <em>key_name</em>, <em>hint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#set_cipher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.set_cipher" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set shared key to the encryptor and decryptor
+Encryptor and Decryptor are created for each inter-node connection</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.message_key_types.to_2byte">
@@ -738,9 +759,7 @@ limitations under the License.</p>
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

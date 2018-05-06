@@ -37,6 +37,7 @@ def to_2byte(val, offset=0):
 
 
 def make_message(payload_type, msg, payload_version=0, key_name=None):
+    """Utility for making serialized message data"""
     if payload_type == PayloadType.Type_msgpack:
         dat = msgpack.packb(msg)
     elif payload_type == PayloadType.Type_binary:
@@ -56,6 +57,7 @@ def make_message(payload_type, msg, payload_version=0, key_name=None):
 
 
 def deserialize_data(payload_type, dat):
+    """Utility for deserializing the received message"""
     if payload_type == PayloadType.Type_msgpack:
         return msgpack.unpackb(dat)
     elif payload_type == PayloadType.Type_binary:
@@ -72,6 +74,10 @@ def deserialize_data(payload_type, dat):
 
 
 def make_binary(dat):
+    """Simple serialize function
+
+    Basically, Type-Length-Value format is created for each item.
+    """
     ret = bytearray()
     if isinstance(dat, list) or isinstance(dat, tuple):
         ret.extend(int(3).to_bytes(4, "big"))  # data type = list
@@ -103,6 +109,7 @@ def make_binary(dat):
 
 
 def make_TLV_formatted_message(msg):
+    """Utility for simple serialization function"""
     dat = bytearray()
     for k, v in msg.items():
         dat.extend(k)
@@ -111,6 +118,7 @@ def make_TLV_formatted_message(msg):
 
 
 def convert_from_binary(data_type, dat):
+    """Deserialization from simple serialization"""
     if data_type == 0:
         return dat
     elif data_type == 1:
@@ -133,6 +141,7 @@ def convert_from_binary(data_type, dat):
 
 
 def make_dictionary_from_TLV_format(dat):
+    """Utility for simple deserialization function"""
     msg = dict()
     ptr = 0
     while ptr < len(dat)-1:
@@ -146,6 +155,7 @@ def make_dictionary_from_TLV_format(dat):
 
 
 def get_ECDH_parameters():
+    """Utility for initialization of ECDH parameters"""
     global encryptors, decryptors
     private_key = ec.generate_private_key(ec.SECP384R1(), default_backend())
     serialized_pubkey = private_key.public_key().public_numbers().encode_point()
@@ -160,6 +170,7 @@ def get_ECDH_parameters():
 
 
 def derive_shared_key(private_key, serialized_pubkey, shared_info):
+    """Utility for deriving shared key in ECDH procedure"""
     deserialized_public_numbers = ec.EllipticCurvePublicNumbers.from_encoded_point(ec.SECP384R1(), serialized_pubkey)
     deserialized_pubkey = deserialized_public_numbers.public_key(default_backend())
     shared_key = private_key.exchange(ec.ECDH(), deserialized_pubkey)
@@ -169,6 +180,10 @@ def derive_shared_key(private_key, serialized_pubkey, shared_info):
 
 
 def set_cipher(shared_key, nonce, key_name, hint):
+    """Set shared key to the encryptor and decryptor
+
+    Encryptor and Decryptor are created for each inter-node connection
+    """
     global encryptors, decryptors
     cipher = Cipher(algorithms.AES(bytes(shared_key)), modes.CTR(nonce), backend=default_backend())
     encryptors[key_name] = [cipher.encryptor(), hint]
@@ -189,6 +204,7 @@ class PayloadType:
 
 
 class Message:
+    """Message parser"""
     HEADER_LEN = 8  # Type, length of data_body, data_body
 
     def __init__(self):
@@ -201,9 +217,11 @@ class Message:
         self.lock = threading.Lock()
 
     def recv(self, dat):
+        """Append message to the buffer"""
         self.pending_buf.extend(dat)
 
     def parse(self):
+        """Parse the message in the buffer"""
         #print(" > pending_buf=%d,%d"%(len(self.pending_buf), Message.HEADER_LEN))
         if self.is_new_chunk:
             if len(self.pending_buf) < Message.HEADER_LEN:
@@ -232,6 +250,7 @@ class Message:
 
 
 class KeyType:
+    """Types of items in a message"""
     status = to_4byte(0)    # status code in bbc_error
     reason = to_4byte(1)    # text
     result = to_4byte(2)    # True/False
@@ -314,6 +333,7 @@ class KeyType:
 
 
 class InfraMessageCategory:
+    """Types of message for inter-core nodes messaging"""
     CATEGORY_NETWORK = to_2byte(0)
     CATEGORY_TOPOLOGY = to_2byte(1)
     CATEGORY_USER = to_2byte(2)

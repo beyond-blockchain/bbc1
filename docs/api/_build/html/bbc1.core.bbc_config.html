@@ -183,42 +183,50 @@ limitations under the License.</p>
 <dt id="bbc1.core.bbc_config.BBcConfig">
 <em class="property">class </em><code class="descclassname">bbc1.core.bbc_config.</code><code class="descname">BBcConfig</code><span class="sig-paren">(</span><em>directory=None</em>, <em>file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>System configuration</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_config.BBcConfig.get_config">
 <code class="descname">get_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.get_config" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return config dictionary</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_config.BBcConfig.get_domain_config">
 <code class="descname">get_domain_config</code><span class="sig-paren">(</span><em>domain_id</em>, <em>create_if_new=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.get_domain_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.get_domain_config" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return the part of specified domain_id in the config dictionary</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_config.BBcConfig.get_json_config">
 <code class="descname">get_json_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.get_json_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.get_json_config" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get config in json format</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_config.BBcConfig.read_config">
 <code class="descname">read_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.read_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.read_config" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Read config file</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_config.BBcConfig.remove_domain_config">
 <code class="descname">remove_domain_config</code><span class="sig-paren">(</span><em>domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.remove_domain_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.remove_domain_config" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Remove the part of specified domain_id in the config dictionary</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_config.BBcConfig.update_config">
 <code class="descname">update_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.update_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.update_config" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Write config to file (config.json)</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.bbc_config.update_deep">
 <code class="descclassname">bbc1.core.bbc_config.</code><code class="descname">update_deep</code><span class="sig-paren">(</span><em>d</em>, <em>u</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#update_deep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.update_deep" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Utility for updating nested dictionary</p>
+</dd></dl>
 
 </div>
 
@@ -285,9 +293,7 @@ limitations under the License.</p>
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

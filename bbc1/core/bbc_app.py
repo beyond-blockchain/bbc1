@@ -41,6 +41,12 @@ MESSAGE_WITH_NO_RESPONSE = (MsgType.MESSAGE, MsgType.REGISTER, MsgType.UNREGISTE
 
 
 def _parse_one_level_list(dat):
+    """Get list information from queued message
+    Args:
+        dat (bytes): received message data
+    Returns:
+        list: list of information
+    """
     results = []
     count = int.from_bytes(dat[:2], 'big')
     for i in range(count):
@@ -50,6 +56,12 @@ def _parse_one_level_list(dat):
 
 
 def _parse_two_level_dict(dat):
+    """Get hierarchical list information from queued message
+    Args:
+        dat (bytes): received message data
+    Returns:
+        dict: dictionary of information list
+    """
     results = dict()
     count = int.from_bytes(dat[:2], 'big')
     ptr = 2
@@ -67,6 +79,7 @@ def _parse_two_level_dict(dat):
 
 
 class BBcAppClient:
+    """Basic functions for a client of bbc_core"""
     def __init__(self, host='127.0.0.1', port=DEFAULT_CORE_PORT, multiq=True, logname="-", loglevel="none"):
         self.logger = logger.get_logger(key="bbc_app", level=loglevel, logname=logname)
         self.connection = socket.create_connection((host, port))
@@ -85,44 +98,44 @@ class BBcAppClient:
         self.start_receiver_loop()
 
     def set_callback(self, callback_obj):
-        """
-        Set callback object that implements message processing functions
-        :param callback_obj:
-        :return:
+        """Set callback object that implements message processing functions
+
+        Args:
+            callback_obj (obj): callback method object
         """
         self.callback = callback_obj
         self.callback.set_logger(self.logger)
         self.callback.set_client(self)
 
     def set_domain_id(self, domain_id):
-        """
-        set domain_id to this client to include it in all messages
-        :param domain_id:
-        :return:
+        """Set domain_id to this client to include it in all messages
+
+        Args:
+            domain_id (bytes): domain_id to join in
         """
         self.domain_id = domain_id
 
     def set_user_id(self, identifier):
-        """
-        Set user_id of the object
-        :param identifier:
-        :return:
+        """Set user_id of the object
+
+        Args:
+            identifier (bytes): user_id of this clients
         """
         self.user_id = identifier
 
     def set_keypair(self, keypair):
-        """
-        Set keypair for the user
-        :param keypair:
-        :return:
+        """Set keypair for the user
+
+        Args:
+            keypair (KeyPair): KeyPair object for signing
         """
         self.keypair = keypair
 
     def set_node_key(self, pem_file=None):
-        """
-        Set node_key to this client
-        :param pem_file:
-        :return:
+        """Set node_key to this client
+
+        Args:
+            pem_file (str): path string for the pem file
         """
         if pem_file is None:
             self.node_keypair = None
@@ -142,10 +155,10 @@ class BBcAppClient:
             dat.update(admin_info)
 
     def _make_message_structure(self, cmd):
-        """
-        Make a base message structure for sending to the core node
-        :param cmd:
-        :return:
+        """Make a base message structure for sending to the core node
+
+        Args:
+            cmd (bytes): command type defined in bbclib.MsgType class
         """
         self.query_id = ((int.from_bytes(self.query_id, 'little') + 1) % 65536).to_bytes(2, 'little')
         if cmd not in MESSAGE_WITH_NO_RESPONSE:
@@ -162,10 +175,12 @@ class BBcAppClient:
         return msg
 
     def _send_msg(self, dat):
-        """
-        send the message to the core node
-        :param dat:
-        :return query_id or None:
+        """Send the message to the core node
+
+        Args:
+            dat (dict): message object to send
+        Returns:
+            bytes: query ID for request/response type message
         """
         if KeyType.domain_id not in dat or KeyType.source_user_id not in dat:
             self.logger.warn("Message must include domain_id and source_id")
@@ -182,9 +197,10 @@ class BBcAppClient:
         return self.query_id
 
     def exchange_key(self):
-        """
-        Perform ECDH (key exchange algorithm)
-        :return:
+        """Perform ECDH (key exchange algorithm)
+
+        Returns:
+            bytes: query_id
         """
         if self.domain_id is None:
             self.logger.error("Need to set domain first!")
@@ -197,11 +213,15 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def domain_setup(self, domain_id, config=None):
-        """
-        Set up domain with the specified network module and storage (maybe used by a system administrator)
-        :param domain_id:
-        :param config:       in json format
-        :return:
+        """Set up domain with the specified network module and storage
+
+        This method should be used by a system administrator.
+
+        Args:
+            domain_id (bytes): domain_id to create
+            config (str): system config in json format
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_SETUP_DOMAIN)
         admin_info = {
@@ -214,10 +234,12 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def domain_close(self, domain_id=None):
-        """
-        Close domain leading to remove_domain in the core
-        :param domain_id: if None, use self.domain_id
-        :return:
+        """Close domain leading to remove_domain in the core
+
+        Args:
+            domain_id (bytes): domain_id to delete
+        Returns:
+            bytes: query_id
         """
         if domain_id is None and self.domain_id is not None:
             domain_id = self.domain_id
@@ -232,19 +254,23 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def get_node_id(self):
-        """
-        Get node_id of the connecting core node
-        :param domain_id:
-        :return:
+        """Get node_id of the connecting core node
+
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_NODEID)
         return self._send_msg(dat)
 
     def get_domain_neighborlist(self, domain_id):
-        """
-        Get peer list of the domain from the core node (maybe used by a system administrator)
-        :param domain_id:
-        :return:
+        """Get peer list of the domain from the core node
+
+        This method should be used by a system administrator.
+
+        Args:
+            domain_id (bytes): domain_id of the neighbor list
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_NEIGHBORLIST)
         dat[KeyType.domain_id] = domain_id
@@ -255,14 +281,19 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def set_domain_static_node(self, domain_id, node_id, ipv4, ipv6, port):
-        """
-        Set static node to the core node (maybe used by a system administrator)
-        :param domain_id:
-        :param node_id:
-        :param ipv4:
-        :param ipv6:
-        :param port:
-        :return:
+        """Set static node to the core node
+
+        IPv6 is used for socket communication if both IPv4 and IPv6 is specified.
+        This method should be used by a system administrator.
+
+        Args:
+            domain_id (bytes): target domain_id to set static neighbor entry
+            node_id (bytes): node_id to register
+            ipv4 (str): IPv4 address of the node
+            ipv6 (str): IPv6 address of the node
+            port (int): Port number to wait messages (UDP/TCP)
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_SET_STATIC_NODE)
         dat[KeyType.domain_id] = domain_id
@@ -273,13 +304,17 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def send_domain_ping(self, domain_id, ipv4=None, ipv6=None, port=DEFAULT_P2P_PORT):
-        """
-        Send domain ping to notify the existence of the node (maybe used by a system administrator)
-        :param domain_id:
-        :param ipv4:
-        :param ipv6:
-        :param port:
-        :return:
+        """ Send domain ping to notify the existence of the node
+
+        This method should be used by a system administrator.
+
+        Args:
+            domain_id (bytes): target domain_id to send ping
+            ipv4 (str): IPv4 address of the node
+            ipv6 (str): IPv6 address of the node
+            port (int): Port number to wait messages UDP
+        Returns:
+            bytes: query_id
         """
         if ipv4 is None and ipv6 is None:
             return
@@ -296,9 +331,12 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def get_bbc_config(self):
-        """
-        Get config file of bbc_core (maybe used by a system administrator)
-        :return:
+        """Get config file of bbc_core
+
+        This method should be used by a system administrator.
+
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_CONFIG)
         admin_info = {
@@ -308,9 +346,12 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def notify_domain_key_update(self):
-        """
-        Notify update of bbc_core
-        :return:
+        """Notify update of bbc_core
+
+        This method should be used by a system administrator.
+
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.NOTIFY_DOMAIN_KEY_UPDATE)
         admin_info = {
@@ -320,9 +361,10 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def get_domain_list(self):
-        """
-        Get domain_id list in bbc_core (maybe used by a system administrator)
-        :return:
+        """Get domain_id list in bbc_core
+
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_DOMAINLIST)
         admin_info = {
@@ -332,9 +374,10 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def get_user_list(self):
-        """
-        Get user_ids in the domain that are connecting to the core node
-        :return:
+        """Get user_ids in the domain that are connecting to the core node
+
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_USERS)
         admin_info = {
@@ -344,9 +387,10 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def get_forwarding_list(self):
-        """
-        Get forwarding_list of the domain in the core node
-        :return:
+        """Get forwarding_list of the domain in the core node
+
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_FORWARDING_LIST)
         admin_info = {
@@ -356,9 +400,10 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def get_notification_list(self):
-        """
-        Get notification_list of the core node
-        :return:
+        """Get notification_list of the core node
+
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_NOTIFICATION_LIST)
         admin_info = {
@@ -368,11 +413,15 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def manipulate_ledger_subsystem(self, enable=False, domain_id=None):
-        """
-        start/stop ledger_subsystem on the bbc_core (maybe used by a system administrator)
-        :param enable: True->start, False->stop
-        :param domain_id:
-        :return:
+        """Start/stop ledger_subsystem on the bbc_core
+
+        This method should be used by a system administrator.
+
+        Args:
+            enable (bool): True->start, False->stop
+            domain_id (bytes): target domain_id to enable/disable ledger_subsystem
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_MANIP_LEDGER_SUBSYS)
         dat[KeyType.domain_id] = domain_id
@@ -384,10 +433,14 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def register_to_core(self, on_multiple_nodes=False):
-        """
-        Register the client (user_id) to the core node. After that, the client can communicate with the core node
-        :param on_multiple_nodes: True if this user_id is for multicast address
-        :return:
+        """Register the client (user_id) to the core node
+
+        After that, the client can communicate with the core node.
+
+        Args:
+            on_multiple_nodes (bool): True if this user_id is for multicast address
+        Returns:
+            bool: True
         """
         dat = self._make_message_structure(MsgType.REGISTER)
         if on_multiple_nodes:
@@ -396,9 +449,10 @@ class BBcAppClient:
         return True
 
     def unregister_from_core(self):
-        """
-        Unregister and disconnect from the core node
-        :return:
+        """Unregister and disconnect from the core node
+
+        Returns:
+            bool: True
         """
         dat = self._make_message_structure(MsgType.UNREGISTER)
         self._send_msg(dat)
@@ -410,40 +464,46 @@ class BBcAppClient:
         return True
 
     def request_insert_completion_notification(self, asset_group_id):
-        """
-        Request notification when a transaction has been inserted (as a copy of transaction)
-        :param asset_group_id:
-        :return:
+        """Request notification when a transaction has been inserted (as a copy of transaction)
+
+        Args:
+            asset_group_id (bytes): asset_group_id for requesting notification about insertion
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_INSERT_NOTIFICATION)
         dat[KeyType.asset_group_id] = asset_group_id
         return self._send_msg(dat)
 
     def cancel_insert_completion_notification(self, asset_group_id):
-        """
-        Cancel notification when a transaction has been inserted (as a copy of transaction)
-        :param asset_group_id:
-        :return:
+        """Cancel notification when a transaction has been inserted (as a copy of transaction)
+
+        Args:
+            asset_group_id (bytes): asset_group_id for requesting notification about insertion
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.CANCEL_INSERT_NOTIFICATION)
         dat[KeyType.asset_group_id] = asset_group_id
         return self._send_msg(dat)
 
-    def gather_signatures(self, tx_obj, reference_obj=None, asset_files=None, destinations=None, anycast=False):
-        """
-        Request to gather signatures from the specified user_ids
-        :param tx_obj:
-        :param reference_obj: BBcReference object
-        :param asset_files: dictionary of {asset_id: file_content}
-        :param destinations: list of destination user_ids
-        :param anycast: True if this message is for anycasting
-        :return:
+    def gather_signatures(self, txobj, reference_obj=None, asset_files=None, destinations=None, anycast=False):
+        """Request to gather signatures from the specified user_ids
+
+        Args:
+            txobj (BBcTransaction):
+            reference_obj (BBcReference): BBcReference object that includes the information about destinations
+            asset_files (dict): mapping from asset_id to its file content
+            destinations (list): list of destination user_ids
+            anycast (bool): True if this message is for anycasting
+        Returns:
+            bytes: query_id
         """
         if reference_obj is None and destinations is None:
             return False
         dat = self._make_message_structure(MsgType.REQUEST_GATHER_SIGNATURE)
-        dat[KeyType.transaction_data] = tx_obj.serialize()
-        dat[KeyType.transaction_id] = tx_obj.transaction_id
+        dat[KeyType.transaction_data] = txobj.serialize()
+        dat[KeyType.transaction_id] = txobj.transaction_id
         if anycast:
             dat[KeyType.is_anycast] = True
         if reference_obj is not None:
@@ -459,14 +519,18 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def sendback_signature(self, dest_user_id=None, transaction_id=None, ref_index=-1, signature=None, query_id=None):
-        """
-        Send back the signed transaction to the source
-        :param dest_user_id:
-        :param transaction_id:
-        :param ref_index: Which reference in transaction the signature is for
-        :param signature: BBcSignature object
-        :param query_id:
-        :return:
+        """Send back the signed transaction to the source
+
+        This method is called if the receiver (signer) approves the transaction.
+
+        Args:
+            dest_user_id (bytes): destination user_id to send back
+            transaction_id (bytes):
+            ref_index (int): (optional) which reference in transaction the signature is for
+            signature (BBcSignature): Signature that expresses approval of the transaction with transaction_id
+            query_id: The query_id that was in the received SIGN_REQUEST message
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dest_user_id
@@ -478,13 +542,17 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def sendback_denial_of_sign(self, dest_user_id=None, transaction_id=None, reason_text=None, query_id=None):
-        """
-        Send back the denial of sign the transaction
-        :param dest_user_id:
-        :param transaction_id:
-        :param reason_text:
-        :param query_id:
-        :return:
+        """Send back the denial of sign the transaction
+
+        This method is called if the receiver (signer) denies the transaction.
+
+        Args:
+            dest_user_id (bytes): destination user_id to send back
+            transaction_id (bytes):
+            reason_text (str): message to the requester about why the node denies the transaction
+            query_id: The query_id that was in the received SIGN_REQUEST message
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.RESPONSE_SIGNATURE)
         dat[KeyType.destination_user_id] = dest_user_id
@@ -496,10 +564,12 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def insert_transaction(self, tx_obj):
-        """
-        Request to insert a legitimate transaction
-        :param tx_obj: Transaction object (not deserialized one)
-        :return:
+        """Request to insert a legitimate transaction
+
+        Args:
+            tx_obj (BBcTransaction): Transaction object to insert
+        Returns:
+            bytes: query_id
         """
         if tx_obj.transaction_id is None:
             tx_obj.digest()
@@ -522,13 +592,17 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def search_transaction_with_condition(self, asset_group_id=None, asset_id=None, user_id=None, count=1):
-        """
-        Search transaction data by asset_group_id/asset_id/user_id
-        :param asset_group_id:
-        :param asset_id:
-        :param user_id:
-        :param count:
-        :return:
+        """Search transaction data by asset_group_id/asset_id/user_id
+
+        If multiple conditions are specified, they are considered as AND condition.
+
+        Args:
+            asset_group_id (bytes): asset_group_id in BBcEvent and BBcRelations
+            asset_id (bytes): asset_id in BBcAsset
+            user_id (bytes): user_id in BBcAsset that means the owner of the asset
+            count (int): the number of transactions to retrieve
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_SEARCH_WITH_CONDITIONS)
         if asset_group_id is not None:
@@ -541,24 +615,29 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def search_transaction(self, transaction_id):
-        """
-        Search request for transaction_data
+        """Search request for a transaction
 
-        :param transaction_id:
-        :return:
+        Args:
+            transaction_id (bytes): the target transaction to retrieve
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_SEARCH_TRANSACTION)
         dat[KeyType.transaction_id] = transaction_id
         return self._send_msg(dat)
 
     def traverse_transactions(self, transaction_id, direction=1, hop_count=3):
-        """
-        Search request for transaction_data
+        """Search request for transactions
 
-        :param transaction_id:
-        :param direction: 1:backforward, non-1:forward
-        :param hop_count:
-        :return:
+        The method traverses the transaction graph in the ledger.
+        The response from the bbc_core includes the list of transactions.
+
+        Args:
+            transaction_id (bytes): the target transaction to retrieve
+            direction (int): 1:backforward, non-1:forward
+            hop_count (int): hop count to traverse from the specified origin point
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_TRAVERSE_TRANSACTIONS)
         dat[KeyType.transaction_id] = transaction_id
@@ -567,21 +646,25 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def request_to_repair_transaction(self, transaction_id):
-        """
-        Request to repair compromised transaction data
-        :param transaction_id:
-        :return:
+        """Request to repair compromised transaction data
+
+        Args:
+            transaction_id (bytes): the target transaction to repair
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_REPAIR)
         dat[KeyType.transaction_id] = transaction_id
         return self._send_msg(dat)
 
     def request_to_repair_asset(self, asset_group_id, asset_id):
-        """
-        Request to repair compromised asset file
-        :param asset_group_id:
-        :param asset_id:
-        :return:
+        """Request to repair compromised asset file
+
+        Args:
+            asset_group_id (bytes): the asset_group_id of the target asset
+            asset_id (bytes): the target asset_id
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_REPAIR)
         dat[KeyType.asset_group_id] = asset_group_id
@@ -589,30 +672,35 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def request_verify_by_cross_ref(self, transaction_id):
-        """
-        Request to verify the transaction by Cross_ref in transaction of outer domain
-        :param transaction_id:
-        :return:
+        """Request to verify the transaction by Cross_ref in transaction of outer domain
+
+        Args:
+            transaction_id (bytes): the target transaction_id
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_CROSS_REF_VERIFY)
         dat[KeyType.transaction_id] = transaction_id
         return self._send_msg(dat)
 
     def request_cross_ref_holders_list(self):
-        """
-        Request the list of transaction_ids that are registered as cross_ref in outer domains
-        :return:
+        """Request the list of transaction_ids that are registered as cross_ref in outer domains
+
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_CROSS_REF_LIST)
         # TODO: need to limit the number of entries??
         return self._send_msg(dat)
 
     def register_in_ledger_subsystem(self, asset_group_id, transaction_id):
-        """
-        Register transaction_id in the ledger_subsystem
-        :param asset_group_id:
-        :param transaction_id:
-        :return:
+        """Register transaction_id in the ledger_subsystem
+
+        Args:
+            asset_group_id (bytes):
+            transaction_id (bytes): the target transaction_id
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_REGISTER_HASH_IN_SUBSYS)
         dat[KeyType.transaction_id] = transaction_id
@@ -620,11 +708,13 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def verify_in_ledger_subsystem(self, asset_group_id, transaction_id):
-        """
-        Verify transaction_id in the ledger_subsystem
-        :param asset_group_id:
-        :param transaction_id:
-        :return:
+        """Verify transaction_id in the ledger_subsystem
+
+        Args:
+            asset_group_id (bytes):
+            transaction_id (bytes): the target transaction_id
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_VERIFY_HASH_IN_SUBSYS)
         dat[KeyType.transaction_id] = transaction_id
@@ -632,9 +722,10 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def get_stats(self):
-        """
-        Get statistics of bbc_core
-        :return:
+        """Get statistics of bbc_core
+
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_STATS)
         admin_info = {
@@ -644,12 +735,14 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def send_message(self, msg, dst_user_id, is_anycast=False):
-        """
-        Send peer-to-peer message to the specified user_id
-        :param msg:
-        :param dst_user_id:
-        :param is_anycast:
-        :return:
+        """Send a message to the specified user_id
+
+        Args:
+            msg (dict): message to send
+            dst_user_id (bytes): destination user_id
+            is_anycast (bool): If true, the message is treated as an anycast message.
+        Returns:
+            bytes: query_id
         """
         dat = self._make_message_structure(MsgType.MESSAGE)
         dat[KeyType.destination_user_id] = dst_user_id
@@ -681,18 +774,22 @@ class BBcAppClient:
         self.connection.close()
 
     def include_cross_ref(self, txobj):
-        """
-        Include BBcCrossRef if cross_ref has been assigned to the client from other domains
-        :param txobj:
-        :return:
+        """Include BBcCrossRef from other domains in the transaction
+
+        If the client object has one or more cross_ref objects, one of them is included in the given transaction.
+        This method should be voluntarily called for inter-domain weak collaboration.
+
+        Args:
+            txobj (BBcTransaction): Transaction object to include cross_ref
         """
         if len(self.cross_ref_list) > 0:
             txobj.add(cross_ref=self.cross_ref_list.pop(0))
 
 
 class Callback:
-    """
-    Set of callback functions for processing received message
+    """Set of callback functions for processing received message
+
+    If you want to implement your own way to process messages, inherit this class.
     """
     def __init__(self, log=None):
         self.logger = log
@@ -729,7 +826,7 @@ class Callback:
         elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_WITH_CONDITIONS:
             self.proc_resp_search_with_condition(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_TRAVERSE_TRANSACTIONS:
-            self.proc_resp_travarse_transactions(dat)
+            self.proc_resp_traverse_transactions(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GATHER_SIGNATURE:
             self.proc_resp_gather_signature(dat)
         elif dat[KeyType.command] == MsgType.REQUEST_SIGNATURE:
@@ -782,10 +879,12 @@ class Callback:
             self.logger.warn("No method to process for command=%d" % dat[KeyType.command])
 
     def synchronize(self, timeout=None):
-        """
-        Wait for receiving message
-        :param timeout: timeout second for waiting
-        :return:
+        """Wait for receiving message with a common queue
+
+        Args:
+            timeout (int): timeout for waiting a message in seconds
+        Returns:
+            dict: a received message
         """
         try:
             return self.queue.get(timeout=timeout)
@@ -793,12 +892,16 @@ class Callback:
             return None
 
     def sync_by_queryid(self, query_id, timeout=None, no_delete_q=False):
-        """
-        Wait for message with specified query_id
-        :param query_id:
-        :param timeout: timeout second for waiting
-        :param no_delete_q: if true, queue for the query_id remains after popping a message
-        :return:
+        """Wait for the message with specified query_id
+
+        This method creates a queue for the query_id and waits for the response
+
+        Args:
+            query_id (byte): timeout for waiting a message in seconds
+            timeout (int): timeout for waiting a message in seconds
+            no_delete_q (bool): If True, the queue for the query_id remains after popping a message
+        Returns:
+            dict: a received message
         """
         try:
             if query_id not in self.query_queue:
@@ -808,16 +911,44 @@ class Callback:
             return None
 
     def proc_notify_cross_ref(self, dat):
+        """Callback for message NOTIFY_CROSS_REF
+
+        This method must not be overridden.
+
+        Args:
+            dat (dict): received message
+        """
         cross_ref = bbclib.BBcCrossRef(dat[KeyType.cross_ref][0], dat[KeyType.cross_ref][1])
         self.client.cross_ref_list.append(cross_ref)
 
     def proc_cmd_sign_request(self, dat):
+        """Callback for message REQUEST_SIGNATURE
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_sign_request(self, dat):
+        """Callback for message RESPONSE_SIGNATURE
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_gather_signature(self, dat):
+        """Callback for message RESPONSE_GATHER_SIGNATURE
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         if KeyType.status not in dat or dat[KeyType.status] < ESUCCESS:
             self.queue.put(dat)
             return
@@ -825,55 +956,163 @@ class Callback:
         self.queue.put({KeyType.status: ESUCCESS, KeyType.result: (dat[KeyType.ref_index], dat[KeyType.source_user_id], sig)})
 
     def proc_resp_insert(self, dat):
+        """Callback for message RESPONSE_INSERT
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_notify_inserted(self, dat):
+        """Callback for message NOTIFY_INSERTED
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_search_with_condition(self, dat):
+        """Callback for message RESPONSE_SEARCH_WITH_CONDITIONS
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_search_transaction(self, dat):
+        """Callback for message RESPONSE_SEARCH_TRANSACTION
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
-    def proc_resp_travarse_transactions(self, dat):
+    def proc_resp_traverse_transactions(self, dat):
+        """Callback for message RESPONSE_TRAVERSE_TRANSACTIONS
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_user_message(self, dat):
+        """Callback for message MESSAGE
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_verify_cross_ref(self, dat):
+        """Callback for message RESPONSE_CROSS_REF_VERIFY
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_cross_ref_list(self, dat):
+        """Callback for message RESPONSE_CROSS_REF_LIST
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_ledger_subsystem(self, dat):
+        """Callback for message RESPONSE_MANIP_LEDGER_SUBSYS
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_register_hash(self, dat):
+        """Callback for message RESPONSE_REGISTER_HASH_IN_SUBSYS
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_verify_hash(self, dat):
+        """Callback for message RESPONSE_VERIFY_HASH_IN_SUBSYS
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_domain_setup(self, dat):
+        """Callback for message RESPONSE_SETUP_DOMAIN
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_domain_close(self, dat):
+        """Callback for message RESPONSE_CLOSE_DOMAIN
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_set_neighbor(self, dat):
+        """Callback for message RESPONSE_SET_STATIC_NODE
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_get_config(self, dat):
+        """Callback for message RESPONSE_GET_CONFIG
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_get_neighborlist(self, dat):
-        """
-        Return node info
-        :param dat:
-        :return: list of node info (the first one is that of the connecting core)
+        """Callback for message RESPONSE_GET_NEIGHBORLIST
+
+        List of neighbor node info (the first one is that of the connecting core) is queued rather than message itself.
+        This method must not be overridden.
+
+        Args:
+            dat (dict): received message
         """
         if KeyType.neighbor_list not in dat:
             self.queue.put(None)
@@ -893,10 +1132,13 @@ class Callback:
         self.queue.put(results)
 
     def proc_resp_get_domainlist(self, dat):
-        """
-        Return domain_ids
-        :param dat:
-        :return: list of domain_id
+        """Callback for message RESPONSE_GET_DOMAINLIST
+
+        List of domain_ids is queued rather than message itself.
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
         """
         if KeyType.domain_list not in dat:
             self.queue.put(None)
@@ -904,10 +1146,13 @@ class Callback:
         self.queue.put(_parse_one_level_list(dat[KeyType.domain_list]))
 
     def proc_resp_get_userlist(self, dat):
-        """
-        Return list of user_ids
-        :param dat:
-        :return:
+        """Callback for message RESPONSE_GET_USERS
+
+        List of user_ids is queued rather than message itself.
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
         """
         if KeyType.user_list not in dat:
             self.queue.put(None)
@@ -915,27 +1160,65 @@ class Callback:
         self.queue.put(_parse_one_level_list(dat[KeyType.user_list]))
 
     def proc_resp_get_forwardinglist(self, dat):
+        """Callback for message RESPONSE_GET_FORWARDING_LIST
+
+        List of user_ids in other core nodes is queued rather than message itself.
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         if KeyType.forwarding_list not in dat:
             self.queue.put(None)
             return
         self.queue.put(_parse_two_level_dict(dat[KeyType.forwarding_list]))
 
     def proc_resp_get_notificationlist(self, dat):
+        """Callback for message RESPONSE_GET_NOTIFICATION_LIST
+
+        List of user_ids in other core nodes is queued rather than message itself.
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         if KeyType.notification_list not in dat:
             self.queue.put(None)
             return
         self.queue.put(_parse_two_level_dict(dat[KeyType.notification_list]))
 
     def proc_resp_get_node_id(self, dat):
+        """Callback for message RESPONSE_GET_NODEID
+
+        Node_id is queued rather than message itself.
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         if KeyType.node_id not in dat:
             self.queue.put(dat)
             return
         self.queue.put(dat[KeyType.node_id])
 
     def proc_resp_get_stats(self, dat):
+        """Callback for message RESPONSE_GET_STATS
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
         self.queue.put(dat)
 
     def proc_resp_ecdh_key_exchange(self, dat):
+        """Callback for message RESPONSE_ECDH_KEY_EXCHANGE
+
+        This method must not be overridden.
+
+        Args:
+            dat (dict): received message
+        """
         shared_key = message_key_types.derive_shared_key(self.client.privatekey_for_ecdh,
                                                          dat[KeyType.ecdh], dat[KeyType.random])
         message_key_types.set_cipher(shared_key, dat[KeyType.nonce], self.client.aes_key_name, dat[KeyType.hint])

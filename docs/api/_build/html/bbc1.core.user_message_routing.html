@@ -182,7 +182,7 @@ limitations under the License.</p>
 <dt id="bbc1.core.user_message_routing.UserMessageRouting">
 <em class="property">class </em><code class="descclassname">bbc1.core.user_message_routing.</code><code class="descname">UserMessageRouting</code><span class="sig-paren">(</span><em>networking</em>, <em>domain_id</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Handle message for user</p>
+<p>Handle message for clients</p>
 <dl class="attribute">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.CROSS_REF_ASSIGNMENT">
 <code class="descname">CROSS_REF_ASSIGNMENT</code><em class="property"> = b'\x00\x05'</em><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.CROSS_REF_ASSIGNMENT" title="Permalink to this definition">¶</a></dt>
@@ -231,69 +231,69 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.process_message">
 <code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.process_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>(internal use) process received message
-:param msg:       the message body (already deserialized)
-:return:</p>
+<dd><p>Process received message
+:param msg: received message
+:type msg: dict</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.register_user">
 <code class="descname">register_user</code><span class="sig-paren">(</span><em>user_id</em>, <em>socket</em>, <em>on_multiple_nodes=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.register_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.register_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register user to forward message
-:param user_id:
-:param socket:
-:param on_multiple_nodes:
-:return:</p>
+:param user_id: user_id of the client
+:type user_id: bytes
+:param socket: socket for the client
+:type socket: Socket
+:param on_multiple_nodes: If True, the user_id is also registered in other nodes, meaning multicasting.
+:type on_multiple_nodes: bool</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.send_message_to_user">
 <code class="descname">send_message_to_user</code><span class="sig-paren">(</span><em>msg</em>, <em>direct_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.send_message_to_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.send_message_to_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Forward message to connecting user
-:param msg:
-:param direct_only: If true, _forward_message_to_another_node is not called.
-:return:</p>
+:param msg: message to send
+:type msg: dict
+:param direct_only: If True, _forward_message_to_another_node is not called.
+:type direct_only: bool</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.send_multicast_join">
 <code class="descname">send_multicast_join</code><span class="sig-paren">(</span><em>user_id</em>, <em>permanent=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.send_multicast_join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.send_multicast_join" title="Permalink to this definition">¶</a></dt>
-<dd><p>Broadcast JOIN_MULTICAST_RECEIVER
-:param user_id:
-:return:</p>
+<dd><p>Broadcast JOIN_MULTICAST_RECEIVER</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.send_multicast_leave">
 <code class="descname">send_multicast_leave</code><span class="sig-paren">(</span><em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.send_multicast_leave"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.send_multicast_leave" title="Permalink to this definition">¶</a></dt>
-<dd><p>Broadcast LEAVE_MULTICAST_RECEIVER
-:param user_id:
-:return:</p>
+<dd><p>Broadcast LEAVE_MULTICAST_RECEIVER</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.set_aes_name">
 <code class="descname">set_aes_name</code><span class="sig-paren">(</span><em>socket</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.set_aes_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.set_aes_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set name for specifying AES key for message encryption
-:param socket:
-:param name:
-:return:</p>
+:param socket: socket for the client
+:type socket: Socket
+:param name: name of the client (4-byte random value generated in message_key_types.get_ECDH_parameters)
+:type name: bytes</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.stop_all_timers">
 <code class="descname">stop_all_timers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.stop_all_timers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.stop_all_timers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cancel all callback of query_entries
-:return:</p>
+<dd><p>Cancel all running timers</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.unregister_user">
 <code class="descname">unregister_user</code><span class="sig-paren">(</span><em>user_id</em>, <em>socket</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.unregister_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.unregister_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unregister user from the list and delete AES key if exists
-:param user_id:
-:param socket:
-:return:</p>
+:param user_id: user_id of the client
+:type user_id: bytes
+:param socket: socket for the client
+:type socket: Socket</p>
 </dd></dl>
 
 </dd></dl>
@@ -302,55 +302,57 @@ limitations under the License.</p>
 <dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy">
 <em class="property">class </em><code class="descclassname">bbc1.core.user_message_routing.</code><code class="descname">UserMessageRoutingDummy</code><span class="sig-paren">(</span><em>networking</em>, <em>domain_id</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bbc1.core.user_message_routing.UserMessageRouting" title="bbc1.core.user_message_routing.UserMessageRouting"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbc1.core.user_message_routing.UserMessageRouting</span></code></a></p>
+<p>Dummy class for bbc_core.py</p>
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.process_message">
 <code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.process_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>(internal use) process received message
-:param msg:       the message body (already deserialized)
-:return:</p>
+<dd><p>Process received message
+:param msg: received message
+:type msg: dict</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.register_user">
 <code class="descname">register_user</code><span class="sig-paren">(</span><em>user_id</em>, <em>socket</em>, <em>on_multiple_nodes=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.register_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.register_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register user to forward message
-:param user_id:
-:param socket:
-:param on_multiple_nodes:
-:return:</p>
+:param user_id: user_id of the client
+:type user_id: bytes
+:param socket: socket for the client
+:type socket: Socket
+:param on_multiple_nodes: If True, the user_id is also registered in other nodes, meaning multicasting.
+:type on_multiple_nodes: bool</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.send_message_to_user">
 <code class="descname">send_message_to_user</code><span class="sig-paren">(</span><em>msg</em>, <em>direct_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.send_message_to_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.send_message_to_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Forward message to connecting user
-:param msg:
-:param direct_only: If true, _forward_message_to_another_node is not called.
-:return:</p>
+:param msg: message to send
+:type msg: dict
+:param direct_only: If True, _forward_message_to_another_node is not called.
+:type direct_only: bool</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.send_multicast_join">
 <code class="descname">send_multicast_join</code><span class="sig-paren">(</span><em>user_id</em>, <em>permanent=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.send_multicast_join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.send_multicast_join" title="Permalink to this definition">¶</a></dt>
-<dd><p>Broadcast JOIN_MULTICAST_RECEIVER
-:param user_id:
-:return:</p>
+<dd><p>Broadcast JOIN_MULTICAST_RECEIVER</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.stop_all_timers">
 <code class="descname">stop_all_timers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.stop_all_timers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.stop_all_timers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cancel all callback of query_entries
-:return:</p>
+<dd><p>Cancel all running timers</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.unregister_user">
 <code class="descname">unregister_user</code><span class="sig-paren">(</span><em>user_id</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.unregister_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.unregister_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unregister user from the list and delete AES key if exists
-:param user_id:
-:param socket:
-:return:</p>
+:param user_id: user_id of the client
+:type user_id: bytes
+:param socket: socket for the client
+:type socket: Socket</p>
 </dd></dl>
 
 </dd></dl>
@@ -423,9 +425,7 @@ limitations under the License.</p>
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

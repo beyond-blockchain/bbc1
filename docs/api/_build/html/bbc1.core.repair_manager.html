@@ -183,31 +183,48 @@ limitations under the License.</p>
 <dt id="bbc1.core.repair_manager.RepairManager">
 <em class="property">class </em><code class="descclassname">bbc1.core.repair_manager.</code><code class="descname">RepairManager</code><span class="sig-paren">(</span><em>network=None</em>, <em>domain_id=None</em>, <em>workingdir='.'</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/repair_manager.html#RepairManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.repair_manager.RepairManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Data repair messager for forged transaction/asset</p>
+<p>Data repair manager for forged transaction/asset</p>
+<dl class="attribute">
+<dt id="bbc1.core.repair_manager.RepairManager.REQUEST_REPAIR_ASSET_FILE">
+<code class="descname">REQUEST_REPAIR_ASSET_FILE</code><em class="property"> = 1</em><a class="headerlink" href="#bbc1.core.repair_manager.RepairManager.REQUEST_REPAIR_ASSET_FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="bbc1.core.repair_manager.RepairManager.REQUEST_REPAIR_TRANSACTION">
 <code class="descname">REQUEST_REPAIR_TRANSACTION</code><em class="property"> = 0</em><a class="headerlink" href="#bbc1.core.repair_manager.RepairManager.REQUEST_REPAIR_TRANSACTION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="bbc1.core.repair_manager.RepairManager.REQUEST_TO_SEND_ASSET_FILE">
+<code class="descname">REQUEST_TO_SEND_ASSET_FILE</code><em class="property"> = 4</em><a class="headerlink" href="#bbc1.core.repair_manager.RepairManager.REQUEST_TO_SEND_ASSET_FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="bbc1.core.repair_manager.RepairManager.REQUEST_TO_SEND_TRANSACTION_DATA">
-<code class="descname">REQUEST_TO_SEND_TRANSACTION_DATA</code><em class="property"> = 1</em><a class="headerlink" href="#bbc1.core.repair_manager.RepairManager.REQUEST_TO_SEND_TRANSACTION_DATA" title="Permalink to this definition">¶</a></dt>
+<code class="descname">REQUEST_TO_SEND_TRANSACTION_DATA</code><em class="property"> = 2</em><a class="headerlink" href="#bbc1.core.repair_manager.RepairManager.REQUEST_TO_SEND_TRANSACTION_DATA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.repair_manager.RepairManager.RESPONSE_ASSET_FILE">
+<code class="descname">RESPONSE_ASSET_FILE</code><em class="property"> = 5</em><a class="headerlink" href="#bbc1.core.repair_manager.RepairManager.RESPONSE_ASSET_FILE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.repair_manager.RepairManager.RESPONSE_TRANSACTION_DATA">
-<code class="descname">RESPONSE_TRANSACTION_DATA</code><em class="property"> = 2</em><a class="headerlink" href="#bbc1.core.repair_manager.RepairManager.RESPONSE_TRANSACTION_DATA" title="Permalink to this definition">¶</a></dt>
+<code class="descname">RESPONSE_TRANSACTION_DATA</code><em class="property"> = 3</em><a class="headerlink" href="#bbc1.core.repair_manager.RepairManager.RESPONSE_TRANSACTION_DATA" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.repair_manager.RepairManager.exit_loop">
 <code class="descname">exit_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/repair_manager.html#RepairManager.exit_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.repair_manager.RepairManager.exit_loop" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Exit the manager loop</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.repair_manager.RepairManager.put_message">
 <code class="descname">put_message</code><span class="sig-paren">(</span><em>msg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/repair_manager.html#RepairManager.put_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.repair_manager.RepairManager.put_message" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>append a message to the queue</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -276,9 +293,7 @@ limitations under the License.</p>
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

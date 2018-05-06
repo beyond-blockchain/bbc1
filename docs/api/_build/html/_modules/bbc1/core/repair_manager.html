@@ -165,6 +165,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">queue</span>
@@ -179,12 +180,13 @@
 
 
 <div class="viewcode-block" id="RepairManager"><a class="viewcode-back" href="../../../bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager">[docs]</a><span class="k">class</span> <span class="nc">RepairManager</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Data repair messager for forged transaction/asset</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Data repair manager for forged transaction/asset&quot;&quot;&quot;</span>
     <span class="n">REQUEST_REPAIR_TRANSACTION</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">REQUEST_TO_SEND_TRANSACTION_DATA</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">RESPONSE_TRANSACTION_DATA</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">REQUEST_REPAIR_ASSET_FILE</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">REQUEST_TO_SEND_TRANSACTION_DATA</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">RESPONSE_TRANSACTION_DATA</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">REQUEST_TO_SEND_ASSET_FILE</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">RESPONSE_ASSET_FILE</span> <span class="o">=</span> <span class="mi">5</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">workingdir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">network</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -205,40 +207,48 @@
         <span class="n">th_nw_loop</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_output_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repair_info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Output log in json format&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repair_log</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">repair_info</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RepairManager.exit_loop"><a class="viewcode-back" href="../../../bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager.exit_loop">[docs]</a>    <span class="k">def</span> <span class="nf">exit_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Exit the manager loop&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">put_message</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_manager_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Main loop&quot;&quot;&quot;</span>
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">msg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">RepairManager</span><span class="o">.</span><span class="n">REQUEST_REPAIR_TRANSACTION</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_repair_transaction_data</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">RepairManager</span><span class="o">.</span><span class="n">REQUEST_REPAIR_ASSET_FILE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_repair_asset_file</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span><span class="p">])</span>
             <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">RepairManager</span><span class="o">.</span><span class="n">REQUEST_TO_SEND_TRANSACTION_DATA</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_send_transaction_data</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">RepairManager</span><span class="o">.</span><span class="n">RESPONSE_TRANSACTION_DATA</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_receive_transaction_data_from_others</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">RepairManager</span><span class="o">.</span><span class="n">REQUEST_TO_SEND_ASSET_FILE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_send_asset_file</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">RepairManager</span><span class="o">.</span><span class="n">RESPONSE_ASSET_FILE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_receive_asset_file_from_others</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RepairManager.put_message"><a class="viewcode-back" href="../../../bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager.put_message">[docs]</a>    <span class="k">def</span> <span class="nf">put_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;append a message to the queue&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_repair_transaction_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Repair forged transaction_data or asset_file by getting legitimate one from other nodes</span>
-<span class="sd">        :param domain_id:</span>
-<span class="sd">        :param transaction_id:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Repair forged transaction_data or asset_file by getting legitimate one from other nodes</span>
+<span class="sd">        Args:</span>
+<span class="sd">            transaction_id (bytes): target transaction_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#print(&quot;_repair_transaction_data:&quot;)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span> <span class="s2">&quot;repair_request&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">forged_asset_files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">valid_txobj</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">valid_asset_files</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
             <span class="n">db_nums_with_invalid_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">)):</span>
                 <span class="n">result_txobj</span><span class="p">,</span> <span class="n">result_asset_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">search_transaction</span><span class="p">(</span><span class="n">transaction_id</span><span class="o">=</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">db_num</span><span class="o">=</span><span class="n">idx</span><span class="p">)</span>
@@ -248,21 +258,26 @@
                     <span class="n">valid_txobj</span> <span class="o">=</span> <span class="n">result_txobj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">txobj_is_valid</span><span class="p">:</span>
                     <span class="n">db_nums_with_invalid_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">ast</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">valid_assets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">valid_asset_files</span><span class="p">[</span><span class="n">ast</span><span class="p">]</span> <span class="o">=</span> <span class="n">file</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">invalid_assets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">ent</span> <span class="ow">in</span> <span class="n">invalid_assets</span><span class="p">:</span>
+                        <span class="n">forged_asset_files</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ent</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">valid_txobj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span> <span class="s2">&quot;fail_to_repair_in_local&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="s2">&quot;Failed to repair transaction locally (transaction_id=</span><span class="si">%s</span><span class="s2"> in domain=</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">transaction_id</span><span class="o">.</span><span class="n">hex</span><span class="p">(),</span>
-                                                                                                   <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="s2">&quot;Failed to repair transaction locally (transaction_id=</span><span class="si">%s</span><span class="s2"> in domain=</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span>
+                                  <span class="p">(</span><span class="n">transaction_id</span><span class="o">.</span><span class="n">hex</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">db_nums_with_invalid_data</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">restore_data</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">txobj</span><span class="o">=</span><span class="n">valid_txobj</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="n">valid_assets</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">restore_transaction_data</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">txobj</span><span class="o">=</span><span class="n">valid_txobj</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span> <span class="s2">&quot;success_repair&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_output_log</span><span class="p">({</span><span class="s2">&quot;transaction_id&quot;</span><span class="p">:</span> <span class="n">transaction_id</span><span class="o">.</span><span class="n">hex</span><span class="p">(),</span> <span class="s2">&quot;request_at&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
                              <span class="s2">&quot;repaired_by&quot;</span><span class="p">:</span> <span class="s2">&quot;locally&quot;</span><span class="p">,</span> <span class="s2">&quot;repaired_at&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())})</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">replication_strategy</span> <span class="o">==</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPLICATION_EXT</span><span class="p">:</span>
-                <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">forged_asset_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">asgid</span><span class="p">,</span> <span class="n">ast</span> <span class="ow">in</span> <span class="n">forged_asset_files</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_repair_asset_file</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="n">asgid</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="n">ast</span><span class="p">,</span> <span class="n">need_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">replication_strategy</span> <span class="o">==</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPLICATION_EXT</span><span class="p">:</span>
+            <span class="k">return</span>
 
         <span class="n">random_nonce</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
         <span class="k">while</span> <span class="n">random_nonce</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">requesting_list</span><span class="p">:</span>
@@ -283,6 +298,41 @@
                                                   <span class="n">payload_type</span><span class="o">=</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_any</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">return</span>
 
+    <span class="k">def</span> <span class="nf">_repair_asset_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">need_check</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Repair forged asset_file by getting legitimate one from other nodes</span>
+<span class="sd">        Args:</span>
+<span class="sd">            asset_group_id (bytes): asset_group_id of the asset</span>
+<span class="sd">            asset_id (bytes): asset_id of the asset</span>
+<span class="sd">            need_check (bool): If True, check the digest of the asset file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;_repair_asset_file:&quot;)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">use_external_storage</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">need_check</span><span class="p">:</span>
+            <span class="n">asset_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">get_in_storage</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">asset_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">asset_id</span> <span class="o">==</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">asset_file</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">():</span>
+                <span class="k">return</span>
+
+        <span class="n">random_nonce</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">random_nonce</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">requesting_list</span><span class="p">:</span>
+            <span class="n">random_nonce</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requesting_list</span><span class="p">[</span><span class="n">random_nonce</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;asset_group_id&quot;</span><span class="p">:</span> <span class="n">asset_group_id</span><span class="o">.</span><span class="n">hex</span><span class="p">(),</span>
+            <span class="s2">&quot;asset_id&quot;</span><span class="p">:</span> <span class="n">asset_id</span><span class="o">.</span><span class="n">hex</span><span class="p">(),</span>
+            <span class="s2">&quot;request_at&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+        <span class="p">}</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">infra_msg_type</span><span class="p">:</span> <span class="n">InfraMessageCategory</span><span class="o">.</span><span class="n">CATEGORY_DATA</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">infra_command</span><span class="p">:</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPAIR_TRANSACTION_DATA</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">:</span> <span class="n">RepairManager</span><span class="o">.</span><span class="n">REQUEST_TO_SEND_ASSET_FILE</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">:</span> <span class="n">asset_group_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span><span class="p">:</span> <span class="n">asset_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">nonce</span><span class="p">:</span> <span class="n">random_nonce</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">broadcast_message_in_network</span><span class="p">(</span><span class="n">domain_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
+                                                  <span class="n">payload_type</span><span class="o">=</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_any</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_send_transaction_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Send transaction data if having valid one</span>
@@ -293,25 +343,18 @@
         <span class="n">transaction_id</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">)):</span>
             <span class="n">result_txobj</span><span class="p">,</span> <span class="n">result_asset_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">search_transaction</span><span class="p">(</span><span class="n">transaction_id</span><span class="o">=</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">db_num</span><span class="o">=</span><span class="n">idx</span><span class="p">)</span>
-            <span class="n">txobj_is_valid</span><span class="p">,</span> <span class="n">valid_assets</span><span class="p">,</span> <span class="n">invalid_assets</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">validate_transaction_object</span><span class="p">(</span><span class="n">result_txobj</span><span class="p">[</span><span class="n">transaction_id</span><span class="p">],</span>
-                                                                                              <span class="n">result_asset_files</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">txobj_is_valid</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">invalid_assets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">txobj_is_valid</span><span class="p">,</span> <span class="n">valid_assets</span><span class="p">,</span> <span class="n">invalid_assets</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">validate_transaction_object</span><span class="p">(</span><span class="n">result_txobj</span><span class="p">[</span><span class="n">transaction_id</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">txobj_is_valid</span><span class="p">:</span>
                 <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">=</span> <span class="n">RepairManager</span><span class="o">.</span><span class="n">RESPONSE_TRANSACTION_DATA</span>
                 <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">result_txobj</span><span class="p">[</span><span class="n">transaction_id</span><span class="p">]</span><span class="o">.</span><span class="n">transaction_data</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_assets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span><span class="p">]</span> <span class="o">=</span> <span class="n">valid_assets</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
-                        <span class="k">del</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span><span class="p">]</span>
                 <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_node_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">source_node_id</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">send_message_in_network</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">dat</span><span class="p">)</span>
                 <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">_receive_transaction_data_from_others</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Receive transaction data from other core_nodes and check its validity</span>
-<span class="sd">        :param dat:</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot;Receive transaction data from other core_nodes and check its validity</span>
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#print(&quot;_receive_transaction_data_from_others:&quot;)</span>
         <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span> <span class="ow">or</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span> <span class="ow">or</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">nonce</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
@@ -324,12 +367,70 @@
         <span class="n">txobj</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcTransaction</span><span class="p">(</span><span class="n">deserialize</span><span class="o">=</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
+
         <span class="n">txobj_is_valid</span><span class="p">,</span> <span class="n">valid_assets</span><span class="p">,</span> <span class="n">invalid_assets</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">validate_transaction_object</span><span class="p">(</span><span class="n">txobj</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">txobj_is_valid</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">invalid_assets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">txobj_is_valid</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span> <span class="s2">&quot;success_repair&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">)):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">restore_data</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">,</span>
-                                               <span class="n">txobj</span><span class="o">=</span><span class="n">txobj</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="n">valid_assets</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">restore_transaction_data</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">txobj</span><span class="o">=</span><span class="n">txobj</span><span class="p">)</span>
+            <span class="n">add_info</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;repaired_by&quot;</span><span class="p">:</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">source_node_id</span><span class="p">]</span><span class="o">.</span><span class="n">hex</span><span class="p">(),</span>
+                <span class="s2">&quot;repaired_at&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+            <span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">requesting_list</span><span class="p">[</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">nonce</span><span class="p">]]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">add_info</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_output_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requesting_list</span><span class="p">[</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">nonce</span><span class="p">]])</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">requesting_list</span><span class="p">[</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">nonce</span><span class="p">]]</span>
+
+    <span class="k">def</span> <span class="nf">_send_asset_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send the asset file if having valid one</span>
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;_send_asset_file::&quot;)</span>
+        <span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">]</span>
+        <span class="n">asset_id</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span>
+        <span class="n">asset_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">get_in_storage</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">asset_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">result_txobj</span><span class="p">,</span> <span class="n">result_asset_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">search_transaction</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="n">asset_group_id</span><span class="p">,</span>
+                                                                                <span class="n">asset_id</span><span class="o">=</span><span class="n">asset_id</span><span class="p">)</span>
+        <span class="n">txobj</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">result_txobj</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+        <span class="n">txobj_is_valid</span><span class="p">,</span> <span class="n">valid_assets</span><span class="p">,</span> <span class="n">invalid_assets</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">validate_transaction_object</span><span class="p">(</span><span class="n">txobj</span><span class="p">,</span> <span class="n">result_asset_files</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">)</span> <span class="ow">in</span> <span class="n">valid_assets</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">=</span> <span class="n">RepairManager</span><span class="o">.</span><span class="n">RESPONSE_ASSET_FILE</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_group_id</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_id</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_file</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_file</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_node_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">source_node_id</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">send_message_in_network</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">dat</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_receive_asset_file_from_others</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Receive asset file from other core_nodes and check its validity</span>
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;_receive_asset_file_from_others:&quot;)</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">nonce</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span> <span class="ow">or</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">nonce</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">requesting_list</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span> <span class="ow">or</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span> <span class="ow">or</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">asset_file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">]</span>
+        <span class="n">asset_id</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span>
+        <span class="n">asset_file</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_file</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">asset_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">asset_files</span> <span class="o">=</span> <span class="p">{</span><span class="n">asset_id</span><span class="p">:</span> <span class="n">asset_file</span><span class="p">}</span>
+        <span class="n">result_txobj</span><span class="p">,</span> <span class="n">result_asset_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">search_transaction</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="n">asset_group_id</span><span class="p">,</span>
+                                                                                <span class="n">asset_id</span><span class="o">=</span><span class="n">asset_id</span><span class="p">)</span>
+        <span class="n">txobj</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">result_txobj</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+
+        <span class="n">txobj_is_valid</span><span class="p">,</span> <span class="n">valid_assets</span><span class="p">,</span> <span class="n">invalid_assets</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">validate_transaction_object</span><span class="p">(</span><span class="n">txobj</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">)</span> <span class="ow">in</span> <span class="n">valid_assets</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">store_in_storage</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">asset_file</span><span class="p">,</span> <span class="n">do_overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">add_info</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">&quot;repaired_by&quot;</span><span class="p">:</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">source_node_id</span><span class="p">]</span><span class="o">.</span><span class="n">hex</span><span class="p">(),</span>
                 <span class="s2">&quot;repaired_at&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
@@ -337,7 +438,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">requesting_list</span><span class="p">[</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">nonce</span><span class="p">]]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">add_info</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_output_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requesting_list</span><span class="p">[</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">nonce</span><span class="p">]])</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">requesting_list</span><span class="p">[</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">nonce</span><span class="p">]]</span></div>
-
 </pre></div>
 
            </div>
@@ -393,9 +493,7 @@
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 
