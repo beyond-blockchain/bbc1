@@ -215,6 +215,7 @@
 
 <div class="viewcode-block" id="UserMessageRouting.set_aes_name"><a class="viewcode-back" href="../../../bbc1.core.user_message_routing.html#bbc1.core.user_message_routing.UserMessageRouting.set_aes_name">[docs]</a>    <span class="k">def</span> <span class="nf">set_aes_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Set name for specifying AES key for message encryption</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            socket (Socket): socket for the client</span>
 <span class="sd">            name (bytes): name of the client (4-byte random value generated in message_key_types.get_ECDH_parameters)</span>
@@ -223,6 +224,7 @@
 
 <div class="viewcode-block" id="UserMessageRouting.register_user"><a class="viewcode-back" href="../../../bbc1.core.user_message_routing.html#bbc1.core.user_message_routing.UserMessageRouting.register_user">[docs]</a>    <span class="k">def</span> <span class="nf">register_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">on_multiple_nodes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Register user to forward message</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            user_id (bytes): user_id of the client</span>
 <span class="sd">            socket (Socket): socket for the client</span>
@@ -235,6 +237,7 @@
 
 <div class="viewcode-block" id="UserMessageRouting.unregister_user"><a class="viewcode-back" href="../../../bbc1.core.user_message_routing.html#bbc1.core.user_message_routing.UserMessageRouting.unregister_user">[docs]</a>    <span class="k">def</span> <span class="nf">unregister_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">socket</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Unregister user from the list and delete AES key if exists</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            user_id (bytes): user_id of the client</span>
 <span class="sd">            socket (Socket): socket for the client</span>
@@ -251,6 +254,7 @@
 
     <span class="k">def</span> <span class="nf">_add_user_for_forwarding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">permanent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Register user to forwarding list</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            user_id (bytes): target user_id</span>
 <span class="sd">            node_id (bytes): node_id which the client with the user_id connects to</span>
@@ -288,6 +292,7 @@
 
 <div class="viewcode-block" id="UserMessageRouting.send_message_to_user"><a class="viewcode-back" href="../../../bbc1.core.user_message_routing.html#bbc1.core.user_message_routing.UserMessageRouting.send_message_to_user">[docs]</a>    <span class="k">def</span> <span class="nf">send_message_to_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">direct_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Forward message to connecting user</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            msg (dict): message to send</span>
 <span class="sd">            direct_only (bool): If True, _forward_message_to_another_node is not called.</span>
@@ -461,6 +466,7 @@
 
 <div class="viewcode-block" id="UserMessageRouting.process_message"><a class="viewcode-back" href="../../../bbc1.core.user_message_routing.html#bbc1.core.user_message_routing.UserMessageRouting.process_message">[docs]</a>    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Process received message</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            msg (dict): received message</span>
 <span class="sd">        &quot;&quot;&quot;</span>

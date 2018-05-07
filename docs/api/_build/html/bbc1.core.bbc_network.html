@@ -207,26 +207,26 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.add_neighbor">
 <code class="descname">add_neighbor</code><span class="sig-paren">(</span><em>domain_id</em>, <em>node_id</em>, <em>ipv4=None</em>, <em>ipv6=None</em>, <em>port=None</em>, <em>is_static=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.add_neighbor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.add_neighbor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add node in the neighbor list
-:param domain_id: target domain_id
-:type domain_id: bytes
-:param node_id: target node_id
-:type node_id: bytes
-:param ipv4: IPv4 address of the node
-:type ipv4: str
-:param ipv6: IPv6 address of the node
-:type ipv6: str
-:param port: Port number that the node is waiting at
-:type port: int
-:param is_static: If true, the entry is treated as static one and will be saved in config.json
-:type is_static: bool</p>
+<dd><p>Add node in the neighbor list</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if it is a new entry, None if error.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
+<li><strong>node_id</strong> (<em>bytes</em>) – target node_id</li>
+<li><strong>ipv4</strong> (<em>str</em>) – IPv4 address of the node</li>
+<li><strong>ipv6</strong> (<em>str</em>) – IPv6 address of the node</li>
+<li><strong>port</strong> (<em>int</em>) – Port number that the node is waiting at</li>
+<li><strong>is_static</strong> (<em>bool</em>) – If true, the entry is treated as static one and will be saved in config.json</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if it is a new entry, None if error.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -235,20 +235,23 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.broadcast_message_in_network">
 <code class="descname">broadcast_message_in_network</code><span class="sig-paren">(</span><em>domain_id</em>, <em>payload_type=1</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.broadcast_message_in_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.broadcast_message_in_network" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send message to all neighbor nodes
-:param payload_type: message format type
-:type payload_type: bytes
-:param domain_id: target domain_id
-:type domain_id: bytes
-:param msg: message to send
-:type msg: dict</p>
+<dd><p>Send message to all neighbor nodes</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if successful</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>payload_type</strong> (<em>bytes</em>) – message format type</li>
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
+<li><strong>msg</strong> (<em>dict</em>) – message to send</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if successful</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -257,18 +260,22 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.check_admin_signature">
 <code class="descname">check_admin_signature</code><span class="sig-paren">(</span><em>domain_id</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.check_admin_signature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.check_admin_signature" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check admin signature in the message
-:param domain_id: target domain_id
-:type domain_id: bytes
-:param msg: received message
-:type msg: dict</p>
+<dd><p>Check admin signature in the message</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if valid</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
+<li><strong>msg</strong> (<em>dict</em>) – received message</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if valid</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -277,18 +284,22 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.create_domain">
 <code class="descname">create_domain</code><span class="sig-paren">(</span><em>domain_id=b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'</em>, <em>config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.create_domain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.create_domain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create domain and register user in the domain
-:param domain_id: target domain_id to create
-:type domain_id: bytes
-:param config: confituration for the domain
-:type config: dict</p>
+<dd><p>Create domain and register user in the domain</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id to create</li>
+<li><strong>config</strong> (<em>dict</em>) – confituration for the domain</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -297,9 +308,15 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.get_domain_keypair">
 <code class="descname">get_domain_keypair</code><span class="sig-paren">(</span><em>domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.get_domain_keypair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.get_domain_keypair" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get domain_keys (private key and public key)
-:param domain_id: target domain_id
-:type domain_id: bytes</p>
+<dd><p>Get domain_keys (private key and public key)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -311,16 +328,16 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.remove_domain">
 <code class="descname">remove_domain</code><span class="sig-paren">(</span><em>domain_id=b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.remove_domain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.remove_domain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Leave the domain and remove it
-:param domain_id: target domain_id to remove
-:type domain_id: bytes</p>
+<dd><p>Leave the domain and remove it</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if successful</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> (<em>bytes</em>) – target domain_id to remove</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if successful</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
 </tr>
 </tbody>
 </table>
@@ -335,24 +352,25 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.send_domain_ping">
 <code class="descname">send_domain_ping</code><span class="sig-paren">(</span><em>domain_id</em>, <em>ipv4</em>, <em>ipv6</em>, <em>port</em>, <em>is_static=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.send_domain_ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.send_domain_ping" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send domain ping to the specified node
-:param domain_id: target domain_id
-:type domain_id: bytes
-:param ipv4: IPv4 address of the node
-:type ipv4: str
-:param ipv6: IPv6 address of the node
-:type ipv6: str
-:param port: Port number
-:type port: int
-:param is_static: If true, the entry is treated as static one and will be saved in config.json
-:type is_static: bool</p>
+<dd><p>Send domain ping to the specified node</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if successful</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
+<li><strong>ipv4</strong> (<em>str</em>) – IPv4 address of the node</li>
+<li><strong>ipv6</strong> (<em>str</em>) – IPv6 address of the node</li>
+<li><strong>port</strong> (<em>int</em>) – Port number</li>
+<li><strong>is_static</strong> (<em>bool</em>) – If true, the entry is treated as static one and will be saved in config.json</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if successful</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -367,22 +385,24 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.send_message_in_network">
 <code class="descname">send_message_in_network</code><span class="sig-paren">(</span><em>nodeinfo=None</em>, <em>payload_type=1</em>, <em>domain_id=None</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.send_message_in_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.send_message_in_network" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send message over a domain network
-:param nodeinfo: NodeInfo object of the destination
-:type nodeinfo: NodeInfo
-:param payload_type: message format type
-:type payload_type: bytes
-:param domain_id: target domain_id
-:type domain_id: bytes
-:param msg: message to send
-:type msg: dict</p>
+<dd><p>Send message over a domain network</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if successful</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nodeinfo</strong> (<a class="reference internal" href="#bbc1.core.bbc_network.NodeInfo" title="bbc1.core.bbc_network.NodeInfo"><em>NodeInfo</em></a>) – NodeInfo object of the destination</li>
+<li><strong>payload_type</strong> (<em>bytes</em>) – message format type</li>
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
+<li><strong>msg</strong> (<em>dict</em>) – message to send</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if successful</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -391,11 +411,19 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.send_message_to_a_domain0_manager">
 <code class="descname">send_message_to_a_domain0_manager</code><span class="sig-paren">(</span><em>domain_id</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.send_message_to_a_domain0_manager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.send_message_to_a_domain0_manager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Choose one of domain0_managers and send msg to it
-:param domain_id: target domain_id
-:type domain_id: bytes
-:param msg: message to send
-:type msg: bytes</p>
+<dd><p>Choose one of domain0_managers and send msg to it</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
+<li><strong>msg</strong> (<em>bytes</em>) – message to send</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -493,9 +521,17 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_network.NodeInfo.get_nodeinfo">
 <code class="descname">get_nodeinfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NodeInfo.get_nodeinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.get_nodeinfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of node info
-:returns: [node_id, ipv4, ipv6, port, domain0_flag, update_at]
-:rtype: list</p>
+<dd><p>Return a list of node info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">[node_id, ipv4, ipv6, port, domain0_flag, update_at]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -506,24 +542,25 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_network.NodeInfo.update">
 <code class="descname">update</code><span class="sig-paren">(</span><em>ipv4=None</em>, <em>ipv6=None</em>, <em>port=None</em>, <em>seq=None</em>, <em>domain0=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NodeInfo.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the entry
-:param ipv4: IPv4 address of the sender node
-:type ipv4: str
-:param ipv6: IPv6 address of the sender node
-:type ipv6: str
-:param port: Port number of the sender
-:type port: int
-:param sec: message sequence number
-:type sec: int
-:param domain0: If True, the node is domain0 manager
-:type domain0: bool or None</p>
+<dd><p>Update the entry</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the entry has changed</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ipv4</strong> (<em>str</em>) – IPv4 address of the sender node</li>
+<li><strong>ipv6</strong> (<em>str</em>) – IPv6 address of the sender node</li>
+<li><strong>port</strong> (<em>int</em>) – Port number of the sender</li>
+<li><strong>sec</strong> (<em>int</em>) – message sequence number</li>
+<li><strong>domain0</strong> (<em>bool</em><em> or </em><em>None</em>) – If True, the node is domain0 manager</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the entry has changed</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
 </tr>
 </tbody>
 </table>

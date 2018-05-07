@@ -207,19 +207,33 @@ This class does not manage the neighbor list itself (It’s in BBcNetwork)</p>
 <dl class="method">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.notify_neighbor_update">
 <code class="descname">notify_neighbor_update</code><span class="sig-paren">(</span><em>node_id</em>, <em>is_new=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.notify_neighbor_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.notify_neighbor_update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update expiration timer for the notified node_id
-:param node_id: target node_id
-:type node_id: bytes
-:param is_new: If True, this node is a new comer node
-:type is_new: bool</p>
+<dd><p>Update expiration timer for the notified node_id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>node_id</strong> (<em>bytes</em>) – target node_id</li>
+<li><strong>is_new</strong> (<em>bool</em>) – If True, this node is a new comer node</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.process_message">
 <code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.process_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Process received message
-:param msg: received message
-:type msg: dict</p>
+<dd><p>Process received message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">

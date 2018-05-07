@@ -305,6 +305,7 @@
 
     <span class="k">def</span> <span class="nf">_get_my_nodeinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return NodeInfo</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            node_id (bytes): my node_id</span>
 <span class="sd">        Returns:</span>
@@ -360,6 +361,7 @@
 
 <div class="viewcode-block" id="BBcNetwork.create_domain"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.create_domain">[docs]</a>    <span class="k">def</span> <span class="nf">create_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="n">ZEROS</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create domain and register user in the domain</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id to create</span>
 <span class="sd">            config (dict): confituration for the domain</span>
@@ -415,6 +417,7 @@
 
 <div class="viewcode-block" id="BBcNetwork.remove_domain"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.remove_domain">[docs]</a>    <span class="k">def</span> <span class="nf">remove_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="n">ZEROS</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Leave the domain and remove it</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id to remove</span>
 <span class="sd">        Returns:</span>
@@ -470,6 +473,7 @@
 
 <div class="viewcode-block" id="BBcNetwork.send_message_to_a_domain0_manager"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.send_message_to_a_domain0_manager">[docs]</a>    <span class="k">def</span> <span class="nf">send_message_to_a_domain0_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Choose one of domain0_managers and send msg to it</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            msg (bytes): message to send</span>
@@ -487,6 +491,7 @@
 
 <div class="viewcode-block" id="BBcNetwork.get_domain_keypair"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.get_domain_keypair">[docs]</a>    <span class="k">def</span> <span class="nf">get_domain_keypair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get domain_keys (private key and public key)</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -526,6 +531,7 @@
 
 <div class="viewcode-block" id="BBcNetwork.send_domain_ping"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.send_domain_ping">[docs]</a>    <span class="k">def</span> <span class="nf">send_domain_ping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">is_static</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send domain ping to the specified node</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            ipv4 (str): IPv4 address of the node</span>
@@ -652,6 +658,7 @@
 
 <div class="viewcode-block" id="BBcNetwork.send_message_in_network"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.send_message_in_network">[docs]</a>    <span class="k">def</span> <span class="nf">send_message_in_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodeinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">payload_type</span><span class="o">=</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_any</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send message over a domain network</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            nodeinfo (NodeInfo): NodeInfo object of the destination</span>
 <span class="sd">            payload_type (bytes): message format type</span>
@@ -704,6 +711,7 @@
 
 <div class="viewcode-block" id="BBcNetwork.broadcast_message_in_network"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.broadcast_message_in_network">[docs]</a>    <span class="k">def</span> <span class="nf">broadcast_message_in_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">payload_type</span><span class="o">=</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_any</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send message to all neighbor nodes</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            payload_type (bytes): message format type</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
@@ -720,6 +728,7 @@
 
 <div class="viewcode-block" id="BBcNetwork.add_neighbor"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.add_neighbor">[docs]</a>    <span class="k">def</span> <span class="nf">add_neighbor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_static</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add node in the neighbor list</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            node_id (bytes): target node_id</span>
@@ -742,6 +751,7 @@
 
 <div class="viewcode-block" id="BBcNetwork.check_admin_signature"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.check_admin_signature">[docs]</a>    <span class="k">def</span> <span class="nf">check_admin_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check admin signature in the message</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            msg (dict): received message</span>
@@ -768,6 +778,7 @@
 
     <span class="k">def</span> <span class="nf">_process_message_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Process received message (common process for any kind of network module)</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            ipv4 (str): IPv4 address of the sender node</span>
@@ -798,6 +809,7 @@
 
     <span class="k">def</span> <span class="nf">_process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Process received message</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            ipv4 (str): IPv4 address of the sender node</span>
@@ -1094,6 +1106,7 @@
 
 <div class="viewcode-block" id="NodeInfo.update"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.NodeInfo.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipv4</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the entry</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            ipv4 (str): IPv4 address of the sender node</span>
 <span class="sd">            ipv6 (str): IPv6 address of the sender node</span>
@@ -1132,6 +1145,7 @@
 
 <div class="viewcode-block" id="NodeInfo.get_nodeinfo"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.NodeInfo.get_nodeinfo">[docs]</a>    <span class="k">def</span> <span class="nf">get_nodeinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a list of node info</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            list: [node_id, ipv4, ipv6, port, domain0_flag, update_at]</span>
 <span class="sd">        &quot;&quot;&quot;</span>

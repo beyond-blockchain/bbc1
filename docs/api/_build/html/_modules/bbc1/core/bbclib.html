@@ -213,6 +213,7 @@
 
 <div class="viewcode-block" id="get_new_id"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.get_new_id">[docs]</a><span class="k">def</span> <span class="nf">get_new_id</span><span class="p">(</span><span class="n">seed_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_timestamp</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return 256-bit binary data</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">          seed_str (str): seed string that is hashed by SHA256</span>
 <span class="sd">          include_timestamp (bool): if True, timestamp (current time) is appended to the seed string</span>
@@ -228,6 +229,7 @@
 
 <div class="viewcode-block" id="get_random_id"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.get_random_id">[docs]</a><span class="k">def</span> <span class="nf">get_random_id</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Return 256-bit binary data</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">          bytes: 256-bit random binary</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -262,6 +264,7 @@
 
 <div class="viewcode-block" id="make_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.make_transaction">[docs]</a><span class="k">def</span> <span class="nf">make_transaction</span><span class="p">(</span><span class="n">event_num</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">relation_num</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">witness</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Utility to make transaction object</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        event_num (int): the number of BBcEvent object to include in the transaction</span>
 <span class="sd">        relation_num (int): the number of BBcRelation object to include in the transaction</span>
@@ -298,6 +301,7 @@
 
 <div class="viewcode-block" id="add_reference_to_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.add_reference_to_transaction">[docs]</a><span class="k">def</span> <span class="nf">add_reference_to_transaction</span><span class="p">(</span><span class="n">transaction</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">ref_transaction_obj</span><span class="p">,</span> <span class="n">event_index_in_ref</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Utility to add BBcReference object in the transaction</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        BBcReference:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -383,6 +387,7 @@
 
 <div class="viewcode-block" id="validate_transaction_object"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.validate_transaction_object">[docs]</a><span class="k">def</span> <span class="nf">validate_transaction_object</span><span class="p">(</span><span class="n">txobj</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Validate transaction and its asset</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        txobj (BBcTransaction): target transaction object</span>
 <span class="sd">        asset_files (dict): dictionary containing the asset file contents</span>
@@ -434,6 +439,7 @@
 
 <div class="viewcode-block" id="verify_using_cross_ref"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.verify_using_cross_ref">[docs]</a><span class="k">def</span> <span class="nf">verify_using_cross_ref</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">transaction_base_digest</span><span class="p">,</span> <span class="n">cross_ref_data</span><span class="p">,</span> <span class="n">sigdata</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Confirm the existence of the transaction using cross_ref</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        domain_id (bytes): target domain_id</span>
 <span class="sd">        transaction_id (bytes): target transaction_id of which existence you want to confirm</span>
@@ -540,6 +546,7 @@
 
 <div class="viewcode-block" id="KeyPair.sign"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.KeyPair.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digest</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sign to the given value</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            digest (bytes): given value</span>
 <span class="sd">        Returns:</span>
@@ -603,6 +610,7 @@
 
 <div class="viewcode-block" id="BBcSignature.deserialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcSignature.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Deserialize into this object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            data (bytes): serialized binary data</span>
 <span class="sd">        Returns:</span>
@@ -624,6 +632,7 @@
 
 <div class="viewcode-block" id="BBcSignature.verify"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcSignature.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digest</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Verify digest using pubkey in signature</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            digest (bytes): digest to verify</span>
 <span class="sd">        Returns:</span>
@@ -719,6 +728,7 @@
 
 <div class="viewcode-block" id="BBcTransaction.get_sig_index"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction.get_sig_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_sig_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Reserve a space for signature for the specified user_id</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            user_id (bytes): user_id whose signature will be added to the signature part</span>
 <span class="sd">        Returns:</span>
@@ -731,6 +741,7 @@
 
 <div class="viewcode-block" id="BBcTransaction.add_signature"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction.add_signature">[docs]</a>    <span class="k">def</span> <span class="nf">add_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add signature in the reserved space</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            user_id (bytes): user_id of the signature owner</span>
 <span class="sd">            signature (bytes): signature</span>
@@ -813,6 +824,7 @@
 
 <div class="viewcode-block" id="BBcTransaction.deserialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Deserialize into this object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            data (bytes): serialized binary data</span>
 <span class="sd">        Returns:</span>
@@ -903,6 +915,7 @@
 
 <div class="viewcode-block" id="BBcTransaction.sign"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_type</span><span class="o">=</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ECDSA_SECP256k1</span><span class="p">,</span> <span class="n">private_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">public_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keypair</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sign the transaction</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            key_type (int): Type of encryption key algorighm (currently, KeyType.ECDSA_SECP256k1 only)</span>
 <span class="sd">            private_key (bytes):</span>
@@ -1209,6 +1222,7 @@
 
 <div class="viewcode-block" id="BBcEvent.deserialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcEvent.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Deserialize into this object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            data (bytes): serialized binary data</span>
 <span class="sd">        Returns:</span>
@@ -1291,6 +1305,7 @@
 
 <div class="viewcode-block" id="BBcReference.add_signature"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcReference.add_signature">[docs]</a>    <span class="k">def</span> <span class="nf">add_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add signature in the reserved space</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            user_id (bytes): user_id of the signature owner</span>
 <span class="sd">            signature (bytes): signature</span>
@@ -1321,6 +1336,7 @@
 
 <div class="viewcode-block" id="BBcReference.deserialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcReference.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Deserialize into this object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            data (bytes): serialized binary data</span>
 <span class="sd">        Returns:</span>
@@ -1392,6 +1408,7 @@
 
 <div class="viewcode-block" id="BBcRelation.deserialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcRelation.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Deserialize into this object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            data (bytes): serialized binary data</span>
 <span class="sd">        Returns:</span>
@@ -1454,6 +1471,7 @@
 
 <div class="viewcode-block" id="BBcPointer.deserialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcPointer.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Deserialize into this object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            data (bytes): serialized binary data</span>
 <span class="sd">        Returns:</span>
@@ -1498,6 +1516,7 @@
 
 <div class="viewcode-block" id="BBcWitness.add_signature"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcWitness.add_signature">[docs]</a>    <span class="k">def</span> <span class="nf">add_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add signature in the reserved space for the user_id that was registered before</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            user_id (bytes): user_id of the signature owner</span>
 <span class="sd">            signature (bytes): signature</span>
@@ -1514,6 +1533,7 @@
 
 <div class="viewcode-block" id="BBcWitness.deserialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcWitness.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Deserialize into this object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            data (bytes): serialized binary data</span>
 <span class="sd">        Returns:</span>
@@ -1591,6 +1611,7 @@
 
 <div class="viewcode-block" id="BBcAsset.get_asset_file"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcAsset.get_asset_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_asset_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get asset file content and its digest</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            bytes: digest of the file content</span>
 <span class="sd">            bytes: the file content</span>
@@ -1636,6 +1657,7 @@
 
 <div class="viewcode-block" id="BBcAsset.deserialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcAsset.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Deserialize into this object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            data (bytes): serialized binary data</span>
 <span class="sd">        Returns:</span>
@@ -1683,6 +1705,7 @@
 
 <div class="viewcode-block" id="BBcCrossRef.deserialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcCrossRef.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Deserialize into this object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            data (bytes): serialized binary data</span>
 <span class="sd">        Returns:</span>

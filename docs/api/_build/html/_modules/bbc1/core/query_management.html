@@ -186,6 +186,7 @@
     <span class="sd">&quot;&quot;&quot;Clock ticker for query timers&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tick_interval</span><span class="o">=</span><span class="n">TICK_INTERVAL</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create Ticker object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            tick_interval (float): tick interval in second</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -260,7 +261,8 @@
     <span class="sd">&quot;&quot;&quot;Callback manager&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expire_after</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">callback_expire</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callback_error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">interval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{},</span> <span class="n">retry_count</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create an entry. expire_after and callback_expire ensures that this entry expires eventually.</span>
+        <span class="sd">&quot;&quot;&quot;Create an entry. expire_after and callback_expire ensures that this entry expires eventually</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            expire_after (float): expiration time in seconds</span>
 <span class="sd">            callback_expire (obj): callback method that will be called when expire</span>
@@ -293,6 +295,7 @@
 
 <div class="viewcode-block" id="QueryEntry.update_expiration_time"><a class="viewcode-back" href="../../../bbc1.core.query_management.html#bbc1.core.query_management.QueryEntry.update_expiration_time">[docs]</a>    <span class="k">def</span> <span class="nf">update_expiration_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expire_after</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the expire timer</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            expire_after (float): new expiration time in second</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -305,6 +308,7 @@
 
     <span class="k">def</span> <span class="nf">_fire</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fire the entry</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if this fire is triggered by expiration</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -329,6 +333,7 @@
 
 <div class="viewcode-block" id="QueryEntry.update"><a class="viewcode-back" href="../../../bbc1.core.query_management.html#bbc1.core.query_management.QueryEntry.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fire_after</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expire_after</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callback_error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the entry information</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            fire_after (float): set callback (periodical) to fire after given time (in second)</span>
 <span class="sd">            expire_after (float): set expiration timer to given time (in second)</span>

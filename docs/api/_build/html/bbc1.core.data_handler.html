@@ -243,24 +243,25 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.exec_sql">
 <code class="descname">exec_sql</code><span class="sig-paren">(</span><em>db_num=0</em>, <em>sql=None</em>, <em>args=()</em>, <em>commit=False</em>, <em>fetch_one=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.exec_sql"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.exec_sql" title="Permalink to this definition">¶</a></dt>
-<dd><p>Execute sql sentence
-:param db_num: index of DB if multiple DBs are used
-:type db_num: int
-:param sql: SQL string
-:type sql: str
-:param args: Args for the SQL
-:type args: list
-:param commit: If True, commit is performed
-:type commit: bool
-:param fetch_one: If True, fetch just one record
-:type fetch_one: bool</p>
+<dd><p>Execute sql sentence</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of records</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
+<li><strong>sql</strong> (<em>str</em>) – SQL string</li>
+<li><strong>args</strong> (<em>list</em>) – Args for the SQL</li>
+<li><strong>commit</strong> (<em>bool</em>) – If True, commit is performed</li>
+<li><strong>fetch_one</strong> (<em>bool</em>) – If True, fetch just one record</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of records</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -269,18 +270,22 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.get_in_storage">
 <code class="descname">get_in_storage</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.get_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.get_in_storage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the asset file with the asset_id from local storage
-:param asset_group_id: asset_group_id of the asset
-:type asset_group_id: bytes
-:param asset_id: asset_id of the asset
-:type asset_id: bytes</p>
+<dd><p>Get the asset file with the asset_id from local storage</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the file content</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id of the asset</li>
+<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id of the asset</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes or None</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the file content</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes or None</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -289,15 +294,21 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.insert_cross_ref">
 <code class="descname">insert_cross_ref</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>outer_domain_id</em>, <em>txid_having_cross_ref</em>, <em>no_replication=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.insert_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.insert_cross_ref" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert cross_ref information into cross_ref_table
-:param transaction_id: target transaction_id
-:type transaction_id: bytes
-:param outer_domain_id: domain_id that holds cross_ref about the transaction_id
-:type outer_domain_id: bytes
-:param txid_having_cross_ref: transaction_id in the outer_domain that includes the cross_ref
-:type txid_having_cross_ref: bytes
-:param no_replication: If False, the replication is sent to other nodes in the domain
-:type no_replication: bool</p>
+<dd><p>Insert cross_ref information into cross_ref_table</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</li>
+<li><strong>outer_domain_id</strong> (<em>bytes</em>) – domain_id that holds cross_ref about the transaction_id</li>
+<li><strong>txid_having_cross_ref</strong> (<em>bytes</em>) – transaction_id in the outer_domain that includes the cross_ref</li>
+<li><strong>no_replication</strong> (<em>bool</em>) – If False, the replication is sent to other nodes in the domain</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -329,9 +340,15 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.process_message">
 <code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.process_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Process received message
-:param msg: received message
-:type msg: dict</p>
+<dd><p>Process received message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -363,16 +380,16 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.search_domain_having_cross_ref">
 <code class="descname">search_domain_having_cross_ref</code><span class="sig-paren">(</span><em>transaction_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_domain_having_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_domain_having_cross_ref" title="Permalink to this definition">¶</a></dt>
-<dd><p>Search domain_id that holds cross_ref about the specified transaction_id
-:param transaction_id: target transaction_id
-:type transaction_id: bytes</p>
+<dd><p>Search domain_id that holds cross_ref about the specified transaction_id</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">records of cross_ref_tables [“id”,”transaction_id”, “outer_domain_id”, “txid_having_cross_ref”]</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">records of cross_ref_tables [“id”,”transaction_id”, “outer_domain_id”, “txid_having_cross_ref”]</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
 </tr>
 </tbody>
 </table>
@@ -411,18 +428,22 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.search_transaction_topology">
 <code class="descname">search_transaction_topology</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>traverse_to_past=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_transaction_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_transaction_topology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Search in topology info
-:param transaction_id: base transaction_id
-:type transaction_id: bytes
-:param traverse_to_past: True: search backward (to past), False: search forward (to future)
-:type traverse_to_past: bool</p>
+<dd><p>Search in topology info</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of records of topology table</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>transaction_id</strong> (<em>bytes</em>) – base transaction_id</li>
+<li><strong>traverse_to_past</strong> (<em>bool</em>) – True: search backward (to past), False: search forward (to future)</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of records of topology table</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -431,22 +452,24 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.store_in_storage">
 <code class="descname">store_in_storage</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em>, <em>content</em>, <em>do_overwrite=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.store_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.store_in_storage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Store asset file in local storage
-:param asset_group_id: asset_group_id of the asset
-:type asset_group_id: bytes
-:param asset_id: asset_id of the asset
-:type asset_id: bytes
-:param content: the content of the asset file
-:type content: bytes
-:param do_overwrite: If True, file is overwritten
-:type do_overwrite: bool</p>
+<dd><p>Store asset file in local storage</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if successful</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id of the asset</li>
+<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id of the asset</li>
+<li><strong>content</strong> (<em>bytes</em>) – the content of the asset file</li>
+<li><strong>do_overwrite</strong> (<em>bool</em>) – If True, file is overwritten</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if successful</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -462,24 +485,25 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.exec_sql">
 <code class="descname">exec_sql</code><span class="sig-paren">(</span><em>sql</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.exec_sql"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.exec_sql" title="Permalink to this definition">¶</a></dt>
-<dd><p>Execute sql sentence
-:param db_num: index of DB if multiple DBs are used
-:type db_num: int
-:param sql: SQL string
-:type sql: str
-:param args: Args for the SQL
-:type args: list
-:param commit: If True, commit is performed
-:type commit: bool
-:param fetch_one: If True, fetch just one record
-:type fetch_one: bool</p>
+<dd><p>Execute sql sentence</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of records</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
+<li><strong>sql</strong> (<em>str</em>) – SQL string</li>
+<li><strong>args</strong> (<em>list</em>) – Args for the SQL</li>
+<li><strong>commit</strong> (<em>bool</em>) – If True, commit is performed</li>
+<li><strong>fetch_one</strong> (<em>bool</em>) – If True, fetch just one record</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of records</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -488,18 +512,22 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.get_in_storage">
 <code class="descname">get_in_storage</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.get_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.get_in_storage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the asset file with the asset_id from local storage
-:param asset_group_id: asset_group_id of the asset
-:type asset_group_id: bytes
-:param asset_id: asset_id of the asset
-:type asset_id: bytes</p>
+<dd><p>Get the asset file with the asset_id from local storage</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the file content</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id of the asset</li>
+<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id of the asset</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes or None</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the file content</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes or None</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -534,9 +562,15 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.process_message">
 <code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.process_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Process received message
-:param msg: received message
-:type msg: dict</p>
+<dd><p>Process received message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -592,18 +626,22 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.search_transaction_topology">
 <code class="descname">search_transaction_topology</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>reverse_link=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.search_transaction_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.search_transaction_topology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Search in topology info
-:param transaction_id: base transaction_id
-:type transaction_id: bytes
-:param traverse_to_past: True: search backward (to past), False: search forward (to future)
-:type traverse_to_past: bool</p>
+<dd><p>Search in topology info</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of records of topology table</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>transaction_id</strong> (<em>bytes</em>) – base transaction_id</li>
+<li><strong>traverse_to_past</strong> (<em>bool</em>) – True: search backward (to past), False: search forward (to future)</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of records of topology table</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -612,22 +650,24 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.store_in_storage">
 <code class="descname">store_in_storage</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em>, <em>content</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.store_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.store_in_storage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Store asset file in local storage
-:param asset_group_id: asset_group_id of the asset
-:type asset_group_id: bytes
-:param asset_id: asset_id of the asset
-:type asset_id: bytes
-:param content: the content of the asset file
-:type content: bytes
-:param do_overwrite: If True, file is overwritten
-:type do_overwrite: bool</p>
+<dd><p>Store asset file in local storage</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if successful</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id of the asset</li>
+<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id of the asset</li>
+<li><strong>content</strong> (<em>bytes</em>) – the content of the asset file</li>
+<li><strong>do_overwrite</strong> (<em>bool</em>) – If True, file is overwritten</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if successful</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -674,15 +714,21 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.MysqlAdaptor.create_table">
 <code class="descname">create_table</code><span class="sig-paren">(</span><em>tbl</em>, <em>tbl_definition</em>, <em>primary_key=0</em>, <em>indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#MysqlAdaptor.create_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.MysqlAdaptor.create_table" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a table
-:param tbl: table name
-:type tbl: str
-:param tbl_definition: schema of the table [[“column_name”, “data type”],[“colmun_name”, “data type”],,]
-:type tbl_definition: list
-:param primary_key: index (column) of the primary key of the table
-:type primary_key: int
-:param indices: list of indices to create index
-:type indices: list</p>
+<dd><p>Create a table</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tbl</strong> (<em>str</em>) – table name</li>
+<li><strong>tbl_definition</strong> (<em>list</em>) – schema of the table [[“column_name”, “data type”],[“colmun_name”, “data type”],,]</li>
+<li><strong>primary_key</strong> (<em>int</em>) – index (column) of the primary key of the table</li>
+<li><strong>indices</strong> (<em>list</em>) – list of indices to create index</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -707,15 +753,21 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.SqliteAdaptor.create_table">
 <code class="descname">create_table</code><span class="sig-paren">(</span><em>tbl</em>, <em>tbl_definition</em>, <em>primary_key=0</em>, <em>indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#SqliteAdaptor.create_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.SqliteAdaptor.create_table" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a table
-:param tbl: table name
-:type tbl: str
-:param tbl_definition: schema of the table [[“column_name”, “data type”],[“colmun_name”, “data type”],,]
-:type tbl_definition: list
-:param primary_key: index (column) of the primary key of the table
-:type primary_key: int
-:param indices: list of indices to create index
-:type indices: list</p>
+<dd><p>Create a table</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tbl</strong> (<em>str</em>) – table name</li>
+<li><strong>tbl_definition</strong> (<em>list</em>) – schema of the table [[“column_name”, “data type”],[“colmun_name”, “data type”],,]</li>
+<li><strong>primary_key</strong> (<em>int</em>) – index (column) of the primary key of the table</li>
+<li><strong>indices</strong> (<em>list</em>) – list of indices to create index</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">

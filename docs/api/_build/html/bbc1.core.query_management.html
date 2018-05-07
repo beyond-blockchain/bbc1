@@ -205,25 +205,36 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.query_management.QueryEntry.update">
 <code class="descname">update</code><span class="sig-paren">(</span><em>fire_after=None</em>, <em>expire_after=None</em>, <em>callback=None</em>, <em>callback_error=None</em>, <em>init=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the entry information
-:param fire_after: set callback (periodical) to fire after given time (in second)
-:type fire_after: float
-:param expire_after: set expiration timer to given time (in second)
-:type expire_after: float
-:param callback: callback method that will be called periodically
-:type callback: obj
-:param callback_error: callback method that will be called when error happens
-:type callback_error: obj
-:param init: If True, the scheduler is sorted again
-:type init: bool</p>
+<dd><p>Update the entry information</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fire_after</strong> (<em>float</em>) – set callback (periodical) to fire after given time (in second)</li>
+<li><strong>expire_after</strong> (<em>float</em>) – set expiration timer to given time (in second)</li>
+<li><strong>callback</strong> (<em>obj</em>) – callback method that will be called periodically</li>
+<li><strong>callback_error</strong> (<em>obj</em>) – callback method that will be called when error happens</li>
+<li><strong>init</strong> (<em>bool</em>) – If True, the scheduler is sorted again</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.query_management.QueryEntry.update_expiration_time">
 <code class="descname">update_expiration_time</code><span class="sig-paren">(</span><em>expire_after</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.update_expiration_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.update_expiration_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the expire timer
-:param expire_after: new expiration time in second
-:type expire_after: float</p>
+<dd><p>Update the expire timer</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>expire_after</strong> (<em>float</em>) – new expiration time in second</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

@@ -248,6 +248,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.set_callback"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_callback">[docs]</a>    <span class="k">def</span> <span class="nf">set_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_obj</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Set callback object that implements message processing functions</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            callback_obj (obj): callback method object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -265,6 +266,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.set_user_id"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_user_id">[docs]</a>    <span class="k">def</span> <span class="nf">set_user_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Set user_id of the object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            identifier (bytes): user_id of this clients</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -272,6 +274,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.set_keypair"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_keypair">[docs]</a>    <span class="k">def</span> <span class="nf">set_keypair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keypair</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Set keypair for the user</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            keypair (KeyPair): KeyPair object for signing</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -279,6 +282,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.set_node_key"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_node_key">[docs]</a>    <span class="k">def</span> <span class="nf">set_node_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pem_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Set node_key to this client</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            pem_file (str): path string for the pem file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -301,6 +305,7 @@
 
     <span class="k">def</span> <span class="nf">_make_message_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Make a base message structure for sending to the core node</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            cmd (bytes): command type defined in bbclib.MsgType class</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -320,6 +325,7 @@
 
     <span class="k">def</span> <span class="nf">_send_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send the message to the core node</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            dat (dict): message object to send</span>
 <span class="sd">        Returns:</span>
@@ -341,6 +347,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.exchange_key"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.exchange_key">[docs]</a>    <span class="k">def</span> <span class="nf">exchange_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Perform ECDH (key exchange algorithm)</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            bytes: query_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -397,6 +404,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.get_node_id"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_node_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get node_id of the connecting core node</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            bytes: query_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -503,6 +511,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.get_domain_list"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_domain_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_domain_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get domain_id list in bbc_core</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            bytes: query_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -515,6 +524,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.get_user_list"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_user_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_user_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get user_ids in the domain that are connecting to the core node</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            bytes: query_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -527,6 +537,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.get_forwarding_list"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_forwarding_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_forwarding_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get forwarding_list of the domain in the core node</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            bytes: query_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -539,6 +550,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.get_notification_list"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_notification_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_notification_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get notification_list of the core node</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            bytes: query_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -587,6 +599,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.unregister_from_core"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.unregister_from_core">[docs]</a>    <span class="k">def</span> <span class="nf">unregister_from_core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Unregister and disconnect from the core node</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -601,6 +614,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.request_insert_completion_notification"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.request_insert_completion_notification">[docs]</a>    <span class="k">def</span> <span class="nf">request_insert_completion_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Request notification when a transaction has been inserted (as a copy of transaction)</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            asset_group_id (bytes): asset_group_id for requesting notification about insertion</span>
 <span class="sd">        Returns:</span>
@@ -612,6 +626,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.cancel_insert_completion_notification"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.cancel_insert_completion_notification">[docs]</a>    <span class="k">def</span> <span class="nf">cancel_insert_completion_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Cancel notification when a transaction has been inserted (as a copy of transaction)</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            asset_group_id (bytes): asset_group_id for requesting notification about insertion</span>
 <span class="sd">        Returns:</span>
@@ -623,6 +638,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.gather_signatures"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.gather_signatures">[docs]</a>    <span class="k">def</span> <span class="nf">gather_signatures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">,</span> <span class="n">reference_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">destinations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">anycast</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Request to gather signatures from the specified user_ids</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            txobj (BBcTransaction):</span>
 <span class="sd">            reference_obj (BBcReference): BBcReference object that includes the information about destinations</span>
@@ -698,6 +714,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.insert_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.insert_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">insert_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tx_obj</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Request to insert a legitimate transaction</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            tx_obj (BBcTransaction): Transaction object to insert</span>
 <span class="sd">        Returns:</span>
@@ -748,6 +765,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.search_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.search_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search request for a transaction</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            transaction_id (bytes): the target transaction to retrieve</span>
 <span class="sd">        Returns:</span>
@@ -778,6 +796,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.request_to_repair_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.request_to_repair_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">request_to_repair_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Request to repair compromised transaction data</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            transaction_id (bytes): the target transaction to repair</span>
 <span class="sd">        Returns:</span>
@@ -789,6 +808,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.request_to_repair_asset"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.request_to_repair_asset">[docs]</a>    <span class="k">def</span> <span class="nf">request_to_repair_asset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Request to repair compromised asset file</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            asset_group_id (bytes): the asset_group_id of the target asset</span>
 <span class="sd">            asset_id (bytes): the target asset_id</span>
@@ -802,6 +822,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.request_verify_by_cross_ref"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.request_verify_by_cross_ref">[docs]</a>    <span class="k">def</span> <span class="nf">request_verify_by_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Request to verify the transaction by Cross_ref in transaction of outer domain</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            transaction_id (bytes): the target transaction_id</span>
 <span class="sd">        Returns:</span>
@@ -813,6 +834,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.request_cross_ref_holders_list"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.request_cross_ref_holders_list">[docs]</a>    <span class="k">def</span> <span class="nf">request_cross_ref_holders_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Request the list of transaction_ids that are registered as cross_ref in outer domains</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            bytes: query_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -822,6 +844,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.register_in_ledger_subsystem"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.register_in_ledger_subsystem">[docs]</a>    <span class="k">def</span> <span class="nf">register_in_ledger_subsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Register transaction_id in the ledger_subsystem</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            asset_group_id (bytes):</span>
 <span class="sd">            transaction_id (bytes): the target transaction_id</span>
@@ -835,6 +858,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.verify_in_ledger_subsystem"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.verify_in_ledger_subsystem">[docs]</a>    <span class="k">def</span> <span class="nf">verify_in_ledger_subsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Verify transaction_id in the ledger_subsystem</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            asset_group_id (bytes):</span>
 <span class="sd">            transaction_id (bytes): the target transaction_id</span>
@@ -848,6 +872,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.get_stats"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_stats">[docs]</a>    <span class="k">def</span> <span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get statistics of bbc_core</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            bytes: query_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -860,6 +885,7 @@
 
 <div class="viewcode-block" id="BBcAppClient.send_message"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">dst_user_id</span><span class="p">,</span> <span class="n">is_anycast</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send a message to the specified user_id</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            msg (dict): message to send</span>
 <span class="sd">            dst_user_id (bytes): destination user_id</span>
@@ -911,6 +937,7 @@
 
 <div class="viewcode-block" id="Callback"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback">[docs]</a><span class="k">class</span> <span class="nc">Callback</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Set of callback functions for processing received message</span>
+
 <span class="sd">    If you want to implement your own way to process messages, inherit this class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1002,6 +1029,7 @@
 
 <div class="viewcode-block" id="Callback.synchronize"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.synchronize">[docs]</a>    <span class="k">def</span> <span class="nf">synchronize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Wait for receiving message with a common queue</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            timeout (int): timeout for waiting a message in seconds</span>
 <span class="sd">        Returns:</span>

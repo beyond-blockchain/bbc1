@@ -224,6 +224,7 @@
 
 <div class="viewcode-block" id="make_binary"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.make_binary">[docs]</a><span class="k">def</span> <span class="nf">make_binary</span><span class="p">(</span><span class="n">dat</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Simple serialize function</span>
+
 <span class="sd">    Basically, Type-Length-Value format is created for each item.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
@@ -329,6 +330,7 @@
 
 <div class="viewcode-block" id="set_cipher"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.set_cipher">[docs]</a><span class="k">def</span> <span class="nf">set_cipher</span><span class="p">(</span><span class="n">shared_key</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">hint</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Set shared key to the encryptor and decryptor</span>
+
 <span class="sd">    Encryptor and Decryptor are created for each inter-node connection</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">encryptors</span><span class="p">,</span> <span class="n">decryptors</span>

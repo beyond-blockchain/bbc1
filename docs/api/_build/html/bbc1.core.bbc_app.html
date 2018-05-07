@@ -187,16 +187,16 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.cancel_insert_completion_notification">
 <code class="descname">cancel_insert_completion_notification</code><span class="sig-paren">(</span><em>asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.cancel_insert_completion_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.cancel_insert_completion_notification" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cancel notification when a transaction has been inserted (as a copy of transaction)
-:param asset_group_id: asset_group_id for requesting notification about insertion
-:type asset_group_id: bytes</p>
+<dd><p>Cancel notification when a transaction has been inserted (as a copy of transaction)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id for requesting notification about insertion</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
 </tr>
 </tbody>
 </table>
@@ -248,25 +248,7 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.exchange_key">
 <code class="descname">exchange_key</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.exchange_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.exchange_key" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform ECDH (key exchange algorithm)
-:returns: query_id
-:rtype: bytes</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.bbc_app.BBcAppClient.gather_signatures">
-<code class="descname">gather_signatures</code><span class="sig-paren">(</span><em>txobj</em>, <em>reference_obj=None</em>, <em>asset_files=None</em>, <em>destinations=None</em>, <em>anycast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.gather_signatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.gather_signatures" title="Permalink to this definition">¶</a></dt>
-<dd><p>Request to gather signatures from the specified user_ids
-:param txobj:
-:type txobj: BBcTransaction
-:param reference_obj: BBcReference object that includes the information about destinations
-:type reference_obj: BBcReference
-:param asset_files: mapping from asset_id to its file content
-:type asset_files: dict
-:param destinations: list of destination user_ids
-:type destinations: list
-:param anycast: True if this message is for anycasting
-:type anycast: bool</p>
+<dd><p>Perform ECDH (key exchange algorithm)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -274,6 +256,33 @@ limitations under the License.</p>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.gather_signatures">
+<code class="descname">gather_signatures</code><span class="sig-paren">(</span><em>txobj</em>, <em>reference_obj=None</em>, <em>asset_files=None</em>, <em>destinations=None</em>, <em>anycast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.gather_signatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.gather_signatures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request to gather signatures from the specified user_ids</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – </li>
+<li><strong>reference_obj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcReference" title="bbc1.core.bbclib.BBcReference"><em>BBcReference</em></a>) – BBcReference object that includes the information about destinations</li>
+<li><strong>asset_files</strong> (<em>dict</em>) – mapping from asset_id to its file content</li>
+<li><strong>destinations</strong> (<em>list</em>) – list of destination user_ids</li>
+<li><strong>anycast</strong> (<em>bool</em>) – True if this message is for anycasting</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -299,9 +308,17 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_domain_list">
 <code class="descname">get_domain_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_domain_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_domain_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get domain_id list in bbc_core
-:returns: query_id
-:rtype: bytes</p>
+<dd><p>Get domain_id list in bbc_core</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -326,41 +343,81 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_forwarding_list">
 <code class="descname">get_forwarding_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_forwarding_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_forwarding_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get forwarding_list of the domain in the core node
-:returns: query_id
-:rtype: bytes</p>
+<dd><p>Get forwarding_list of the domain in the core node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_node_id">
 <code class="descname">get_node_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_node_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_node_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get node_id of the connecting core node
-:returns: query_id
-:rtype: bytes</p>
+<dd><p>Get node_id of the connecting core node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_notification_list">
 <code class="descname">get_notification_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_notification_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_notification_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get notification_list of the core node
-:returns: query_id
-:rtype: bytes</p>
+<dd><p>Get notification_list of the core node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_stats">
 <code class="descname">get_stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_stats" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get statistics of bbc_core
-:returns: query_id
-:rtype: bytes</p>
+<dd><p>Get statistics of bbc_core</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_user_list">
 <code class="descname">get_user_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_user_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_user_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get user_ids in the domain that are connecting to the core node
-:returns: query_id
-:rtype: bytes</p>
+<dd><p>Get user_ids in the domain that are connecting to the core node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -387,16 +444,16 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.insert_transaction">
 <code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>tx_obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.insert_transaction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Request to insert a legitimate transaction
-:param tx_obj: Transaction object to insert
-:type tx_obj: BBcTransaction</p>
+<dd><p>Request to insert a legitimate transaction</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tx_obj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – Transaction object to insert</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
 </tr>
 </tbody>
 </table>
@@ -452,18 +509,22 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.register_in_ledger_subsystem">
 <code class="descname">register_in_ledger_subsystem</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.register_in_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.register_in_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register transaction_id in the ledger_subsystem
-:param asset_group_id:
-:type asset_group_id: bytes
-:param transaction_id: the target transaction_id
-:type transaction_id: bytes</p>
+<dd><p>Register transaction_id in the ledger_subsystem</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – </li>
+<li><strong>transaction_id</strong> (<em>bytes</em>) – the target transaction_id</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -491,17 +552,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.request_cross_ref_holders_list">
 <code class="descname">request_cross_ref_holders_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_cross_ref_holders_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_cross_ref_holders_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Request the list of transaction_ids that are registered as cross_ref in outer domains
-:returns: query_id
-:rtype: bytes</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.bbc_app.BBcAppClient.request_insert_completion_notification">
-<code class="descname">request_insert_completion_notification</code><span class="sig-paren">(</span><em>asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_insert_completion_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_insert_completion_notification" title="Permalink to this definition">¶</a></dt>
-<dd><p>Request notification when a transaction has been inserted (as a copy of transaction)
-:param asset_group_id: asset_group_id for requesting notification about insertion
-:type asset_group_id: bytes</p>
+<dd><p>Request the list of transaction_ids that are registered as cross_ref in outer domains</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -509,6 +560,24 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.request_insert_completion_notification">
+<code class="descname">request_insert_completion_notification</code><span class="sig-paren">(</span><em>asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_insert_completion_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_insert_completion_notification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request notification when a transaction has been inserted (as a copy of transaction)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id for requesting notification about insertion</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
 </tr>
 </tbody>
 </table>
@@ -517,18 +586,22 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.request_to_repair_asset">
 <code class="descname">request_to_repair_asset</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_to_repair_asset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_to_repair_asset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Request to repair compromised asset file
-:param asset_group_id: the asset_group_id of the target asset
-:type asset_group_id: bytes
-:param asset_id: the target asset_id
-:type asset_id: bytes</p>
+<dd><p>Request to repair compromised asset file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – the asset_group_id of the target asset</li>
+<li><strong>asset_id</strong> (<em>bytes</em>) – the target asset_id</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -537,16 +610,16 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.request_to_repair_transaction">
 <code class="descname">request_to_repair_transaction</code><span class="sig-paren">(</span><em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_to_repair_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_to_repair_transaction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Request to repair compromised transaction data
-:param transaction_id: the target transaction to repair
-:type transaction_id: bytes</p>
+<dd><p>Request to repair compromised transaction data</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transaction_id</strong> (<em>bytes</em>) – the target transaction to repair</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
 </tr>
 </tbody>
 </table>
@@ -555,16 +628,16 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.request_verify_by_cross_ref">
 <code class="descname">request_verify_by_cross_ref</code><span class="sig-paren">(</span><em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_verify_by_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_verify_by_cross_ref" title="Permalink to this definition">¶</a></dt>
-<dd><p>Request to verify the transaction by Cross_ref in transaction of outer domain
-:param transaction_id: the target transaction_id
-:type transaction_id: bytes</p>
+<dd><p>Request to verify the transaction by Cross_ref in transaction of outer domain</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transaction_id</strong> (<em>bytes</em>) – the target transaction_id</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
 </tr>
 </tbody>
 </table>
@@ -573,16 +646,16 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.search_transaction">
 <code class="descname">search_transaction</code><span class="sig-paren">(</span><em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.search_transaction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Search request for a transaction
-:param transaction_id: the target transaction to retrieve
-:type transaction_id: bytes</p>
+<dd><p>Search request for a transaction</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transaction_id</strong> (<em>bytes</em>) – the target transaction to retrieve</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
 </tr>
 </tbody>
 </table>
@@ -645,20 +718,23 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.send_message">
 <code class="descname">send_message</code><span class="sig-paren">(</span><em>msg</em>, <em>dst_user_id</em>, <em>is_anycast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.send_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.send_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send a message to the specified user_id
-:param msg: message to send
-:type msg: dict
-:param dst_user_id: destination user_id
-:type dst_user_id: bytes
-:param is_anycast: If true, the message is treated as an anycast message.
-:type is_anycast: bool</p>
+<dd><p>Send a message to the specified user_id</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>msg</strong> (<em>dict</em>) – message to send</li>
+<li><strong>dst_user_id</strong> (<em>bytes</em>) – destination user_id</li>
+<li><strong>is_anycast</strong> (<em>bool</em>) – If true, the message is treated as an anycast message.</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -722,9 +798,15 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.set_callback">
 <code class="descname">set_callback</code><span class="sig-paren">(</span><em>callback_obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_callback" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set callback object that implements message processing functions
-:param callback_obj: callback method object
-:type callback_obj: obj</p>
+<dd><p>Set callback object that implements message processing functions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>callback_obj</strong> (<em>obj</em>) – callback method object</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -773,25 +855,43 @@ This method should be used by a system administrator.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.set_keypair">
 <code class="descname">set_keypair</code><span class="sig-paren">(</span><em>keypair</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_keypair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_keypair" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set keypair for the user
-:param keypair: KeyPair object for signing
-:type keypair: KeyPair</p>
+<dd><p>Set keypair for the user</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keypair</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.KeyPair" title="bbc1.core.bbclib.KeyPair"><em>KeyPair</em></a>) – KeyPair object for signing</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.set_node_key">
 <code class="descname">set_node_key</code><span class="sig-paren">(</span><em>pem_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_node_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_node_key" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set node_key to this client
-:param pem_file: path string for the pem file
-:type pem_file: str</p>
+<dd><p>Set node_key to this client</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pem_file</strong> (<em>str</em>) – path string for the pem file</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.set_user_id">
 <code class="descname">set_user_id</code><span class="sig-paren">(</span><em>identifier</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_user_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_user_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set user_id of the object
-:param identifier: user_id of this clients
-:type identifier: bytes</p>
+<dd><p>Set user_id of the object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>identifier</strong> (<em>bytes</em>) – user_id of this clients</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -829,26 +929,38 @@ The response from the bbc_core includes the list of transactions.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.unregister_from_core">
 <code class="descname">unregister_from_core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.unregister_from_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.unregister_from_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Unregister and disconnect from the core node
-:returns: True
-:rtype: bool</p>
+<dd><p>Unregister and disconnect from the core node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.verify_in_ledger_subsystem">
 <code class="descname">verify_in_ledger_subsystem</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.verify_in_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.verify_in_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
-<dd><p>Verify transaction_id in the ledger_subsystem
-:param asset_group_id:
-:type asset_group_id: bytes
-:param transaction_id: the target transaction_id
-:type transaction_id: bytes</p>
+<dd><p>Verify transaction_id in the ledger_subsystem</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – </li>
+<li><strong>transaction_id</strong> (<em>bytes</em>) – the target transaction_id</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -860,8 +972,8 @@ The response from the bbc_core includes the list of transactions.</p>
 <dt id="bbc1.core.bbc_app.Callback">
 <em class="property">class </em><code class="descclassname">bbc1.core.bbc_app.</code><code class="descname">Callback</code><span class="sig-paren">(</span><em>log=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Set of callback functions for processing received message
-If you want to implement your own way to process messages, inherit this class.</p>
+<p>Set of callback functions for processing received message</p>
+<p>If you want to implement your own way to process messages, inherit this class.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.create_queue">
 <code class="descname">create_queue</code><span class="sig-paren">(</span><em>query_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.create_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.create_queue" title="Permalink to this definition">¶</a></dt>
@@ -1327,16 +1439,16 @@ This method should be overridden if you want to process the message asynchronous
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.synchronize">
 <code class="descname">synchronize</code><span class="sig-paren">(</span><em>timeout=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.synchronize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.synchronize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Wait for receiving message with a common queue
-:param timeout: timeout for waiting a message in seconds
-:type timeout: int</p>
+<dd><p>Wait for receiving message with a common queue</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a received message</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>int</em>) – timeout for waiting a message in seconds</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a received message</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
 </tr>
 </tbody>
 </table>

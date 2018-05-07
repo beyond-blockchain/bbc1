@@ -233,6 +233,7 @@
 
 <span class="k">def</span> <span class="nf">_make_message_structure</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">dstid</span><span class="p">,</span> <span class="n">qid</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a base structure of message</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        domain_id (bytes): the target domain_id</span>
 <span class="sd">        cmd (bytes): command type in message_key_types.KeyType</span>
@@ -346,6 +347,7 @@
 
     <span class="k">def</span> <span class="nf">_error_reply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">err_code</span><span class="o">=</span><span class="n">EINVALID_COMMAND</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create and send error reply message</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            msg (dict): message to send</span>
 <span class="sd">            err_code (int): error code defined in bbc_error.py</span>
@@ -418,6 +420,7 @@
 
     <span class="k">def</span> <span class="nf">_check_signature_by_nodekey</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Verify signature in the message</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            dat (dict): received message that includes KeyType.admin command</span>
 <span class="sd">        Returns:</span>
@@ -436,6 +439,7 @@
 
     <span class="k">def</span> <span class="nf">_param_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check if the param is included</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            param (bytes|list): Commands that must be included in the message</span>
 <span class="sd">            dat (dict): received message</span>
@@ -455,6 +459,7 @@
 
     <span class="k">def</span> <span class="nf">_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">payload_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Process received message</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            socket (Socket): server socket</span>
 <span class="sd">            dat (dict): received message</span>
@@ -831,6 +836,7 @@
 
     <span class="k">def</span> <span class="nf">_register_to_notification_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Register user_id in insert completion notification list</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            asset_group_id (bytes): target asset_group_id of which you want to get notification about the insertion</span>
@@ -863,6 +869,7 @@
 
     <span class="k">def</span> <span class="nf">_remove_notification_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Remove entry from insert completion notification list</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            asset_group_id (bytes): target asset_group_id of which you want to get notification about the insertion</span>
@@ -878,6 +885,7 @@
 
 <div class="viewcode-block" id="BBcCoreService.validate_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.validate_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">validate_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Validate transaction by verifying signature</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            txdata (bytes): serialized transaction data</span>
 <span class="sd">            asset_files (dict): dictionary of {asset_id: content} for the transaction</span>
@@ -904,6 +912,7 @@
 
 <div class="viewcode-block" id="BBcCoreService.insert_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.insert_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">insert_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Insert transaction into ledger</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            txdata (bytes): serialized transaction data</span>
@@ -941,6 +950,7 @@
 
 <div class="viewcode-block" id="BBcCoreService.send_inserted_notification"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.send_inserted_notification">[docs]</a>    <span class="k">def</span> <span class="nf">send_inserted_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_ids</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">only_registered_user</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Broadcast NOTIFY_INSERTED</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            asset_group_ids (list): list of asset_group_ids</span>
@@ -981,6 +991,7 @@
 
     <span class="k">def</span> <span class="nf">_distribute_transaction_to_gather_signatures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Request to distribute sign_request to users</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            dat (dict): message to send</span>
@@ -1007,6 +1018,7 @@
 
     <span class="k">def</span> <span class="nf">_search_transaction_by_txid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search transaction_data by transaction_id</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            transaction_id (bytes): transaction_id to search</span>

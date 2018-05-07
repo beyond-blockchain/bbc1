@@ -282,6 +282,7 @@
 
 <div class="viewcode-block" id="DataHandler.exec_sql"><a class="viewcode-back" href="../../../bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.exec_sql">[docs]</a>    <span class="k">def</span> <span class="nf">exec_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_num</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fetch_one</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Execute sql sentence</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            db_num (int): index of DB if multiple DBs are used</span>
 <span class="sd">            sql (str): SQL string</span>
@@ -321,6 +322,7 @@
 
     <span class="k">def</span> <span class="nf">_get_asset_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve asset information from transaction object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            txobj (BBcTransaction): transaction object to analyze</span>
 <span class="sd">        Returns:</span>
@@ -400,6 +402,7 @@
 
     <span class="k">def</span> <span class="nf">_insert_transaction_into_a_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_num</span><span class="p">,</span> <span class="n">txobj</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Insert transaction data into the transaction table of the specified DB</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            db_num (int): index of DB if multiple DBs are used</span>
 <span class="sd">            txobj (BBcTransaction): transaction object to insert</span>
@@ -433,6 +436,7 @@
 
 <div class="viewcode-block" id="DataHandler.insert_cross_ref"><a class="viewcode-back" href="../../../bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.insert_cross_ref">[docs]</a>    <span class="k">def</span> <span class="nf">insert_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">outer_domain_id</span><span class="p">,</span> <span class="n">txid_having_cross_ref</span><span class="p">,</span> <span class="n">no_replication</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Insert cross_ref information into cross_ref_table</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            transaction_id (bytes): target transaction_id</span>
 <span class="sd">            outer_domain_id (bytes): domain_id that holds cross_ref about the transaction_id</span>
@@ -458,6 +462,7 @@
 
 <div class="viewcode-block" id="DataHandler.search_domain_having_cross_ref"><a class="viewcode-back" href="../../../bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.search_domain_having_cross_ref">[docs]</a>    <span class="k">def</span> <span class="nf">search_domain_having_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search domain_id that holds cross_ref about the specified transaction_id</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            transaction_id (bytes): target transaction_id</span>
 <span class="sd">        Returns:</span>
@@ -471,6 +476,7 @@
 
     <span class="k">def</span> <span class="nf">_store_asset_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Store all asset_files related to the transaction_object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            txobj (BBcTransaction): transaction object to insert</span>
 <span class="sd">            asset_files (dict): dictionary of {asset_id: content} for the transaction</span>
@@ -509,6 +515,7 @@
 
     <span class="k">def</span> <span class="nf">_send_cross_ref_replication_to_other_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">outer_domain_id</span><span class="p">,</span> <span class="n">txid_having_cross_ref</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Broadcast replication of cross_ref</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            transaction_id (bytes): target transaction_id</span>
 <span class="sd">            outer_domain_id (bytes): domain_id that holds cross_ref about the transaction_id</span>
@@ -647,6 +654,7 @@
 
 <div class="viewcode-block" id="DataHandler.search_transaction_topology"><a class="viewcode-back" href="../../../bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.search_transaction_topology">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">traverse_to_past</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search in topology info</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            transaction_id (bytes): base transaction_id</span>
 <span class="sd">            traverse_to_past (bool): True: search backward (to past), False: search forward (to future)</span>
@@ -665,6 +673,7 @@
 
 <div class="viewcode-block" id="DataHandler.store_in_storage"><a class="viewcode-back" href="../../../bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.store_in_storage">[docs]</a>    <span class="k">def</span> <span class="nf">store_in_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">do_overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Store asset file in local storage</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            asset_group_id (bytes): asset_group_id of the asset</span>
 <span class="sd">            asset_id (bytes): asset_id of the asset</span>
@@ -691,6 +700,7 @@
 
 <div class="viewcode-block" id="DataHandler.get_in_storage"><a class="viewcode-back" href="../../../bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.get_in_storage">[docs]</a>    <span class="k">def</span> <span class="nf">get_in_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get the asset file with the asset_id from local storage</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            asset_group_id (bytes): asset_group_id of the asset</span>
 <span class="sd">            asset_id (bytes): asset_id of the asset</span>
@@ -714,6 +724,7 @@
 
     <span class="k">def</span> <span class="nf">_remove_in_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Delete asset file</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            asset_group_id (bytes): asset_group_id of the asset</span>
 <span class="sd">            asset_id (bytes): asset_id of the asset</span>
@@ -730,6 +741,7 @@
 
 <div class="viewcode-block" id="DataHandler.process_message"><a class="viewcode-back" href="../../../bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.process_message">[docs]</a>    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Process received message</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            msg (dict): received message</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -862,6 +874,7 @@
 
 <div class="viewcode-block" id="SqliteAdaptor.create_table"><a class="viewcode-back" href="../../../bbc1.core.data_handler.html#bbc1.core.data_handler.SqliteAdaptor.create_table">[docs]</a>    <span class="k">def</span> <span class="nf">create_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[]):</span>
         <span class="sd">&quot;&quot;&quot;Create a table</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            tbl (str): table name</span>
 <span class="sd">            tbl_definition (list): schema of the table [[&quot;column_name&quot;, &quot;data type&quot;],[&quot;colmun_name&quot;, &quot;data type&quot;],,]</span>
@@ -910,6 +923,7 @@
 
 <div class="viewcode-block" id="MysqlAdaptor.create_table"><a class="viewcode-back" href="../../../bbc1.core.data_handler.html#bbc1.core.data_handler.MysqlAdaptor.create_table">[docs]</a>    <span class="k">def</span> <span class="nf">create_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[]):</span>
         <span class="sd">&quot;&quot;&quot;Create a table</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            tbl (str): table name</span>
 <span class="sd">            tbl_definition (list): schema of the table [[&quot;column_name&quot;, &quot;data type&quot;],[&quot;colmun_name&quot;, &quot;data type&quot;],,]</span>

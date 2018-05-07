@@ -241,6 +241,7 @@
 
     <span class="k">def</span> <span class="nf">_repair_transaction_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Repair forged transaction_data or asset_file by getting legitimate one from other nodes</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            transaction_id (bytes): target transaction_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -300,6 +301,7 @@
 
     <span class="k">def</span> <span class="nf">_repair_asset_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">need_check</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Repair forged asset_file by getting legitimate one from other nodes</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            asset_group_id (bytes): asset_group_id of the asset</span>
 <span class="sd">            asset_id (bytes): asset_id of the asset</span>
@@ -334,11 +336,7 @@
                                                   <span class="n">payload_type</span><span class="o">=</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_any</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_send_transaction_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Send transaction data if having valid one</span>
-<span class="sd">        :param dat:</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Send transaction data if having valid one&quot;&quot;&quot;</span>
         <span class="c1">#print(&quot;_send_transaction_data::&quot;)</span>
         <span class="n">transaction_id</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">)):</span>
@@ -353,6 +351,7 @@
 
     <span class="k">def</span> <span class="nf">_receive_transaction_data_from_others</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Receive transaction data from other core_nodes and check its validity</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            dat (dict): received message</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -383,6 +382,7 @@
 
     <span class="k">def</span> <span class="nf">_send_asset_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send the asset file if having valid one</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            dat (dict): received message</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -407,6 +407,7 @@
 
     <span class="k">def</span> <span class="nf">_receive_asset_file_from_others</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Receive asset file from other core_nodes and check its validity</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            dat (dict): received message</span>
 <span class="sd">        &quot;&quot;&quot;</span>

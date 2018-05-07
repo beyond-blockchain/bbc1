@@ -223,6 +223,7 @@
 
     <span class="k">def</span> <span class="nf">_register_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Register node of other domain</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            node_id (bytes): target node_id</span>
@@ -234,6 +235,7 @@
 
     <span class="k">def</span> <span class="nf">_remove_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Remove node from the lists</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            node_id (bytes): target node_id</span>
@@ -257,6 +259,7 @@
 
 <div class="viewcode-block" id="Domain0Manager.update_domain_belong_to"><a class="viewcode-back" href="../../../bbc1.core.domain0_manager.html#bbc1.core.domain0_manager.Domain0Manager.update_domain_belong_to">[docs]</a>    <span class="k">def</span> <span class="nf">update_domain_belong_to</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the list domain_belong_to</span>
+
 <span class="sd">        domain_belong_to holds all domain_ids that this node belongs to</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">domains_belong_to</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
@@ -308,6 +311,7 @@
 
     <span class="k">def</span> <span class="nf">_update_domain_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Parse binary data and update domain_list</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            msg (dict): received message</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -328,6 +332,7 @@
 
 <div class="viewcode-block" id="Domain0Manager.distribute_cross_ref_in_domain0"><a class="viewcode-back" href="../../../bbc1.core.domain0_manager.html#bbc1.core.domain0_manager.Domain0Manager.distribute_cross_ref_in_domain0">[docs]</a>    <span class="k">def</span> <span class="nf">distribute_cross_ref_in_domain0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Determine if the node distributes the cross_ref (into domain_global_0)</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">            transaction_id (bytes): target transaction_id</span>
@@ -404,6 +409,7 @@
 
     <span class="k">def</span> <span class="nf">_get_acceptance_margin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check how many cross ref will be accepted</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): target domain_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -425,6 +431,7 @@
 
 <div class="viewcode-block" id="Domain0Manager.cross_ref_registered"><a class="viewcode-back" href="../../../bbc1.core.domain0_manager.html#bbc1.core.domain0_manager.Domain0Manager.cross_ref_registered">[docs]</a>    <span class="k">def</span> <span class="nf">cross_ref_registered</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">cross_ref</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Notify cross_ref inclusion in a transaction of the outer domain and insert the info into DB</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            domain_id (bytes): domain_id where the cross_ref is from</span>
 <span class="sd">            transaction_id (bytes): transaction_id that the cross_ref proves</span>
@@ -472,6 +479,7 @@
 
 <div class="viewcode-block" id="Domain0Manager.process_message"><a class="viewcode-back" href="../../../bbc1.core.domain0_manager.html#bbc1.core.domain0_manager.Domain0Manager.process_message">[docs]</a>    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Process received message</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            msg (dict): received message</span>
 <span class="sd">        &quot;&quot;&quot;</span>

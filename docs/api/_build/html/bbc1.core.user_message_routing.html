@@ -231,31 +231,52 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.process_message">
 <code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.process_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Process received message
-:param msg: received message
-:type msg: dict</p>
+<dd><p>Process received message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.register_user">
 <code class="descname">register_user</code><span class="sig-paren">(</span><em>user_id</em>, <em>socket</em>, <em>on_multiple_nodes=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.register_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.register_user" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register user to forward message
-:param user_id: user_id of the client
-:type user_id: bytes
-:param socket: socket for the client
-:type socket: Socket
-:param on_multiple_nodes: If True, the user_id is also registered in other nodes, meaning multicasting.
-:type on_multiple_nodes: bool</p>
+<dd><p>Register user to forward message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id of the client</li>
+<li><strong>socket</strong> (<em>Socket</em>) – socket for the client</li>
+<li><strong>on_multiple_nodes</strong> (<em>bool</em>) – If True, the user_id is also registered in other nodes, meaning multicasting.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.send_message_to_user">
 <code class="descname">send_message_to_user</code><span class="sig-paren">(</span><em>msg</em>, <em>direct_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.send_message_to_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.send_message_to_user" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward message to connecting user
-:param msg: message to send
-:type msg: dict
-:param direct_only: If True, _forward_message_to_another_node is not called.
-:type direct_only: bool</p>
+<dd><p>Forward message to connecting user</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>msg</strong> (<em>dict</em>) – message to send</li>
+<li><strong>direct_only</strong> (<em>bool</em>) – If True, _forward_message_to_another_node is not called.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -273,11 +294,19 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.set_aes_name">
 <code class="descname">set_aes_name</code><span class="sig-paren">(</span><em>socket</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.set_aes_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.set_aes_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set name for specifying AES key for message encryption
-:param socket: socket for the client
-:type socket: Socket
-:param name: name of the client (4-byte random value generated in message_key_types.get_ECDH_parameters)
-:type name: bytes</p>
+<dd><p>Set name for specifying AES key for message encryption</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>socket</strong> (<em>Socket</em>) – socket for the client</li>
+<li><strong>name</strong> (<em>bytes</em>) – name of the client (4-byte random value generated in message_key_types.get_ECDH_parameters)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -289,11 +318,19 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRouting.unregister_user">
 <code class="descname">unregister_user</code><span class="sig-paren">(</span><em>user_id</em>, <em>socket</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.unregister_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.unregister_user" title="Permalink to this definition">¶</a></dt>
-<dd><p>Unregister user from the list and delete AES key if exists
-:param user_id: user_id of the client
-:type user_id: bytes
-:param socket: socket for the client
-:type socket: Socket</p>
+<dd><p>Unregister user from the list and delete AES key if exists</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id of the client</li>
+<li><strong>socket</strong> (<em>Socket</em>) – socket for the client</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -306,31 +343,52 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.process_message">
 <code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.process_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Process received message
-:param msg: received message
-:type msg: dict</p>
+<dd><p>Process received message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.register_user">
 <code class="descname">register_user</code><span class="sig-paren">(</span><em>user_id</em>, <em>socket</em>, <em>on_multiple_nodes=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.register_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.register_user" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register user to forward message
-:param user_id: user_id of the client
-:type user_id: bytes
-:param socket: socket for the client
-:type socket: Socket
-:param on_multiple_nodes: If True, the user_id is also registered in other nodes, meaning multicasting.
-:type on_multiple_nodes: bool</p>
+<dd><p>Register user to forward message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id of the client</li>
+<li><strong>socket</strong> (<em>Socket</em>) – socket for the client</li>
+<li><strong>on_multiple_nodes</strong> (<em>bool</em>) – If True, the user_id is also registered in other nodes, meaning multicasting.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.send_message_to_user">
 <code class="descname">send_message_to_user</code><span class="sig-paren">(</span><em>msg</em>, <em>direct_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.send_message_to_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.send_message_to_user" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward message to connecting user
-:param msg: message to send
-:type msg: dict
-:param direct_only: If True, _forward_message_to_another_node is not called.
-:type direct_only: bool</p>
+<dd><p>Forward message to connecting user</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>msg</strong> (<em>dict</em>) – message to send</li>
+<li><strong>direct_only</strong> (<em>bool</em>) – If True, _forward_message_to_another_node is not called.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -348,11 +406,19 @@ limitations under the License.</p>
 <dl class="method">
 <dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.unregister_user">
 <code class="descname">unregister_user</code><span class="sig-paren">(</span><em>user_id</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.unregister_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.unregister_user" title="Permalink to this definition">¶</a></dt>
-<dd><p>Unregister user from the list and delete AES key if exists
-:param user_id: user_id of the client
-:type user_id: bytes
-:param socket: socket for the client
-:type socket: Socket</p>
+<dd><p>Unregister user from the list and delete AES key if exists</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id of the client</li>
+<li><strong>socket</strong> (<em>Socket</em>) – socket for the client</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

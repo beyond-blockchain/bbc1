@@ -178,20 +178,23 @@
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.insert_transaction">
 <code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>domain_id</em>, <em>txdata</em>, <em>asset_files</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.insert_transaction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert transaction into ledger
-:param domain_id: target domain_id
-:type domain_id: bytes
-:param txdata: serialized transaction data
-:type txdata: bytes
-:param asset_files: dictionary of {asset_id: content} for the transaction
-:type asset_files: dict</p>
+<dd><p>Insert transaction into ledger</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">inserted transaction_id or error message</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
+<li><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</li>
+<li><strong>asset_files</strong> (<em>dict</em>) – dictionary of {asset_id: content} for the transaction</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict|str</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">inserted transaction_id or error message</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict|str</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -254,32 +257,42 @@
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.send_inserted_notification">
 <code class="descname">send_inserted_notification</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_ids</em>, <em>transaction_id</em>, <em>only_registered_user=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.send_inserted_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.send_inserted_notification" title="Permalink to this definition">¶</a></dt>
-<dd><p>Broadcast NOTIFY_INSERTED
-:param domain_id: target domain_id
-:type domain_id: bytes
-:param asset_group_ids: list of asset_group_ids
-:type asset_group_ids: list
-:param transaction_id: transaction_id that has just inserted
-:type transaction_id: bytes
-:param only_registered_user: If True, notification is not sent to other nodes
-:type only_registered_user: bool</p>
+<dd><p>Broadcast NOTIFY_INSERTED</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
+<li><strong>asset_group_ids</strong> (<em>list</em>) – list of asset_group_ids</li>
+<li><strong>transaction_id</strong> (<em>bytes</em>) – transaction_id that has just inserted</li>
+<li><strong>only_registered_user</strong> (<em>bool</em>) – If True, notification is not sent to other nodes</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.validate_transaction">
 <code class="descname">validate_transaction</code><span class="sig-paren">(</span><em>txdata</em>, <em>asset_files=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.validate_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.validate_transaction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validate transaction by verifying signature
-:param txdata: serialized transaction data
-:type txdata: bytes
-:param asset_files: dictionary of {asset_id: content} for the transaction
-:type asset_files: dict</p>
+<dd><p>Validate transaction by verifying signature</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">if validation fails, None returns.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</li>
+<li><strong>asset_files</strong> (<em>dict</em>) – dictionary of {asset_id: content} for the transaction</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction">BBcTransaction</a></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">if validation fails, None returns.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction">BBcTransaction</a></p>
+</td>
 </tr>
 </tbody>
 </table>
