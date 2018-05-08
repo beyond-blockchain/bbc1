@@ -6,4 +6,5 @@ cd third_party/openssl
 ./config && make
 
 cd ../libbbcsig
+make clean
 make
