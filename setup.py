@@ -26,7 +26,7 @@ class MyInstall(install):
 bbc1_requires = [
                  'pyOpenSSL>=16.2.0',
                  'jinja2==2.8.1',
-                 'Flask>=0.10.1',
+                 'Flask>=0.10.1,<=1.0.1',
                  'requests>=2.12.4',
                  'pytest>=3.0.5',
                  'gevent>=1.2.1',
