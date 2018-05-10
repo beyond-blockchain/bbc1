@@ -22,15 +22,16 @@ class MyInstall(install):
         else:
             install.run(self)
 
-
 bbc1_requires = [
                  'pyOpenSSL>=16.2.0',
-                 'jinja2==2.8.1',
-                 'Flask>=0.10.1',
+                 'jinja2>=2.8.1',
                  'requests>=2.12.4',
-                 'pytest>=3.0.5',
                  'gevent>=1.2.1',
-                 'msgpack-python>=0.4.8'
+                 'cryptography==2.1.4',
+                 'pytest<=3.2.*,>=3.0.5',
+                 'msgpack-python>=0.4.8',
+                 'mysql-connector-python==8.0.5',
+                 'Flask>=0.10.1,<=1.0.1'
                 ]
 
 bbc1_packages = ['bbc1', 'bbc1.core', 'bbc1.core.libbbcsig']
