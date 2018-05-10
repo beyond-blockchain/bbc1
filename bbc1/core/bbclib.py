@@ -170,20 +170,6 @@ def add_event_asset(transaction, event_idx, asset_group_id, user_id, asset_body=
     transaction.events[event_idx].add(asset_group_id=asset_group_id, asset=ast)
 
 
-# =================== Methods below will be obsoleted in v1.0 =================
-def make_transaction_for_base_asset(asset_group_id=None, event_num=1, witness=False):
-    transaction = BBcTransaction()
-    for i in range(event_num):
-        evt = BBcEvent(asset_group_id=asset_group_id)
-        ast = BBcAsset()
-        evt.add(asset=ast)
-        transaction.add(event=evt)
-    if witness:
-        transaction.add(witness=BBcWitness())
-    return transaction
-# =====================================================
-
-
 def recover_signature_object(data):
     """Deserialize signature data"""
     sig = BBcSignature()
