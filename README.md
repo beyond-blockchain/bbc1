@@ -25,6 +25,7 @@ For the details, please read documents in docs/ directory. Not only documents bu
 * Python
     - Python 3.5.0 or later
     - pipenv is recommended
+        - add ```export PIPENV_VENV_IN_PROJECT=true``` in .bash_profile
 
 * tools for macOS by Homebrew
     ```
@@ -64,10 +65,17 @@ Some documents are available in docs/.
     ```
     sh prepare.sh
     ```
-5. Install dependencies by the following command.
+5. Install dependencies by the following command (in the case of python 3.6)
     ```
-    pip install -r requirements.txt
+    pipenv install
+    pipenv shell
     ```
+    Because Pipfile is configured for python version 3.6, use the following if your python version is not 3.6:
+    ```
+    pipenv install -r requirements.txt
+    pipenv shell
+    ``` 
+    
 6. Start bbc_core.py on a terminal
     ```
     cd core

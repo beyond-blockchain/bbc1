@@ -1,5 +1,7 @@
 Core system of BBc-1 (Beyond Blockchain One)
 ===========================================
+![travisCI](https://travis-ci.org/beyond-blockchain/bbc1.svg?branch=develop)
+
 This project is a Python-based reference implementation of BBc-1, a trustable system of record keeping beyond blockchains.
 
 The design paper (white paper) and the analysis paper are available [here](https://beyond-blockchain.org/public/bbc1-design-paper.pdf) and [here](https://beyond-blockchain.org/public/bbc1-analysis.pdf). BBc-1 is inspired from blockchain technologies like Bitcoin, Ethereum, Hyperledger projects, and so on.
@@ -9,24 +11,31 @@ A transaction should be signed by the players who are the stake holders of the d
 BBc-1 can be applied to both private/enterprise use and public use. BBc-1 has a concept of *domain* for determining a region of data management. Any networking implementation (like Kademlia for P2P topology management) can be applied for each domain.
 Although there are many TODOs in BBc-1, this reference implementation includes most of the concept of BBc-1 and would work in private/enterprise systems. When sophisticated P2P algorithms are ready, BBc-1 will be able to support public use cases.
 
-Every directory includes README.md. Please read it for the details. Furthermore, directory docs/ includes documents and slide decks (PDF) that explain the design of the BBc-1 and its implementation.
+The source codes in this repository is a platform of BBc-1 and bbc\_core.py is the main process of a core node.
+The APIs of BBc-1 is defined in bbc\_app.py and bbclib.py. So application developers should import them in your apps.
+ For building a BBc-1 system, bbc1 package needs to be installed in the hosts and you need to run bbc\_core.py on
+ each host. In order to configure the BBc-1 network, the utilities in utils/ directory are available. They are a kind
+  of BBc-1 application, so that you can develop your own management tools.
 
-### Plan for v1.0
-The next update will be a major version up to v1.0. However, the basic feature will be the same as v0.10. Re-design of package structure, updating documents and implementing admin tools are main task for v1.0.
+
+For the details, please read documents in docs/ directory. Not only documents but slide decks (PDF) explain the design of the BBc-1 and its implementation.
 
 # Environment
 
 * Python
     - Python 3.5.0 or later
+    - pipenv is recommended
+        - add ```export PIPENV_VENV_IN_PROJECT=true``` in .bash_profile
 
 * tools for macOS by Homebrew
     ```
-    brew install libtool automake geth solidity pkg-config
+    brew install libtool automake python3 pipenv
     ```
 
 * tools for Linux (Ubuntu 16.04 LTS)
     ```
-    sudo apt-get install -y git tzdata openssh-server python3 python3-dev python3-venv libffi-dev net-tools autoconf automake libtool libssl-dev make
+    sudo apt-get install -y git tzdata openssh-server python3 python3-dev libffi-dev net-tools autoconf automake libtool libssl-dev make
+    pip install pipenv
     ```
 
 
@@ -34,21 +43,39 @@ The next update will be a major version up to v1.0. However, the basic feature w
 
 ## Documents
 Some documents are available in docs/.
-* [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
+* Policy, design and analysis
+  * [BBc-trust.pdf](docs/BBc-trust.pdf)
+  * [BBc-trust_ja.pdf](docs/BBc-trust_ja.pdf)
+  * [BBc-1_design_paper.pdf](docs/BBc-1_design_paper.pdf)
+  * [BBc1_design_document_v1.0_ja_r1.pdf](docs/BBc1_design_document_v1.0_ja_r1.pdf)
+* Usage
+    * [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
+    * [libbbcsig_dll_build_for_Windows_x64_ja.md](docs/libbbcsig_dll_build_for_Windows_x64_ja.md)
+* Programing
+    * [BBc1_programming_guide_v1.0_ja_r1.md](docs/BBc1_programming_guide_v1.0_ja_r1.md)
+* API reference
+    * readthedocs.io
 
 
 ## From source code in github
-1. Install tools (libtool, automake)
+1. Install development tools (libtool, automake)
 2. Install python and pip
 3. Clone this project
 4. Prepare OpenSSL-based library in the root directory
     ```
     sh prepare.sh
     ```
-5. Install dependencies by the following command.
+5. Install dependencies by the following command (in the case of python 3.6)
     ```
-    pip install -r requirements.txt
+    pipenv install
+    pipenv shell
     ```
+    Because Pipfile is configured for python version 3.6, use the following if your python version is not 3.6:
+    ```
+    pipenv install -r requirements.txt
+    pipenv shell
+    ```
+
 6. Start bbc_core.py on a terminal
     ```
     cd core
@@ -62,11 +89,11 @@ Some documents are available in docs/.
 
 
 ## Use pip
-1. Install tools (libtool, automake)
+1. Install development tools (libtool, automake)
 2. Install python and pip
 3. Install BBc1 by pip
     ```
-    pip install bbc1
+    pipenv install bbc1
     ```
 
 ## Use docker (See README.md in docker/)
@@ -102,12 +129,8 @@ The working directory of BBc-1 on the docker container is mounted on docker/data
 
 
 # Files/Directories
-* core/
+* bbc1/core/
     - core functions of BBc-1
-* app/
-    - SDK for applications using BBc-1
-* common/
-    - libraries and utilities for both core and app
 * utils/
     - BBc-1 system configuration utilities
 * examples/
@@ -126,3 +149,5 @@ The working directory of BBc-1 on the docker container is mounted on docker/data
 * MANIFEST.in
 * prepare.py
     - for creatign python modules
+* prepare.sh
+    - setup script

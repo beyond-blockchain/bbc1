@@ -319,20 +319,6 @@
     <span class="n">transaction</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="n">event_idx</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset</span><span class="o">=</span><span class="n">ast</span><span class="p">)</span></div>
 
 
-<span class="c1"># =================== Methods below will be obsoleted in v1.0 =================</span>
-<div class="viewcode-block" id="make_transaction_for_base_asset"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.make_transaction_for_base_asset">[docs]</a><span class="k">def</span> <span class="nf">make_transaction_for_base_asset</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">witness</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="n">transaction</span> <span class="o">=</span> <span class="n">BBcTransaction</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">event_num</span><span class="p">):</span>
-        <span class="n">evt</span> <span class="o">=</span> <span class="n">BBcEvent</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="n">asset_group_id</span><span class="p">)</span>
-        <span class="n">ast</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">()</span>
-        <span class="n">evt</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">asset</span><span class="o">=</span><span class="n">ast</span><span class="p">)</span>
-        <span class="n">transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">evt</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">witness</span><span class="p">:</span>
-        <span class="n">transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">witness</span><span class="o">=</span><span class="n">BBcWitness</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">transaction</span></div>
-<span class="c1"># =====================================================</span>
-
-
 <div class="viewcode-block" id="recover_signature_object"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.recover_signature_object">[docs]</a><span class="k">def</span> <span class="nf">recover_signature_object</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Deserialize signature data&quot;&quot;&quot;</span>
     <span class="n">sig</span> <span class="o">=</span> <span class="n">BBcSignature</span><span class="p">()</span>

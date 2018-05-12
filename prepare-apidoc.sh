@@ -1,14 +1,10 @@
 #!/bin/bash
 
-source venv/bin/activate
+pipenv install sphinx sphinx_rtd_theme
 
-pip install sphinx sphinx_rtd_theme
-
-sphinx-apidoc -F -e -o docs/api/ bbc1
+pipenv run sphinx-apidoc -F -e -o docs/api/ bbc1
 cd docs/api
 
 rm -f bbc1.core.libbbcsig.test_ecdsa.rst bbc1.core.libbbcsig.test_pybbcsig.rst
 
-make html
-
-deactivate
+pipenv run make html
