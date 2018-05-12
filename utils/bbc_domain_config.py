@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import pprint
 from argparse import ArgumentParser
 sys.path.append("../")
 from bbc1.core.bbc_config import DEFAULT_WORKING_DIR, DEFAULT_CONFIG_FILE
@@ -162,7 +163,7 @@ def write_proc(targetobj, domainhex, k1obj, k2obj, filepath):
     print("------")
     if k1obj['value'] is None and k2obj['value'] is None:
         targetobj["domains"][domainhex] = simple_domain_conf
-        print(targetobj)
+        pprint.pprint(targetobj, width=80)
         return file_output(filepath, targetobj)
     if k2obj['key'] is not None and k1obj['key'] is None:
         print("k2 is not None and k1 is None")
@@ -183,7 +184,7 @@ def write_proc(targetobj, domainhex, k1obj, k2obj, filepath):
     else:
         print("invalid domainhex : %s" % domainhex)
         return False
-    print(targetobj)
+    pprint.pprint(targetobj, width=80)
     return file_output(filepath, targetobj)
 
 
@@ -212,7 +213,7 @@ def delete_proc(targetobj, domainhex, k1obj, k2obj, filepath):
             else:
                 print("delete domainhex, but does not have key : %s" % domainhex)
                 return False
-    print(targetobj)
+    pprint.pprint(targetobj, width=80)
     return file_output(filepath, targetobj)
 
 
