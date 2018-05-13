@@ -1,7 +1,7 @@
 # for alpine
 #FROM sickp/alpine-sshd:latest
 # for ubuntu
-FROM ubuntu:latest
+FROM ubuntu:16.04
 
 LABEL maintainer "Michihito Kato <mkato@zettant.com>"
 
