@@ -21,7 +21,7 @@ WORKDIR /root/
 # for ubuntu
 RUN apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:jonathonf/python-3.6
 
-RUN apt-get update && apt-get install -y git tzdata openssh-server python3.6 python3.6-dev python3-pip python3.6-venv libffi-dev net-tools autoconf automake libtool libssl-dev make pkg-config
+RUN apt-get update && apt-get install -y git tzdata openssh-server python3.6 python3.6-dev python3-pip python3-distutils python3.6-venv libffi-dev net-tools autoconf automake libtool libssl-dev make pkg-config
 
 RUN mkdir -p ${SHARE_DIR} && echo "root:${PASSWORD}" | chpasswd
 
@@ -39,5 +39,6 @@ ADD bbc1.tar.gz /root/
 WORKDIR /root/bbc1/
 
 RUN sh prepare.sh
+RUN cp -R /root/bbc1/third_party/* /root/bbc1/bbc1/core/
 
 CMD bash /entrypoint.sh
