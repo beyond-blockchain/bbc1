@@ -23,6 +23,7 @@ import argparse
 import time
 import binascii
 import sys
+import os
 import ipaddress
 sys.path.append("../")
 
@@ -39,6 +40,8 @@ def argument_parser():
     argparser.add_argument('-4', '--ip4address', action='store', help='bbc_core address (IPv4) to connect')
     argparser.add_argument('-6', '--ip6address', action='store', help='bbc_core address (IPv6) to connect')
     argparser.add_argument('-p', '--port', action='store', default=DEFAULT_CORE_PORT,  help='port number of bbc_core')
+    argparser.add_argument('-k', '--node_key', action='store', default=".bbc1/node_key.pem",
+                           help="path to node key pem file")
     argparser.add_argument('domain_id', action='store', nargs='?', default=None,  help='Hex string of the domain_id')
     argparser.add_argument('dst_address', action='store', nargs='?',
                            help='destination IPv4/v6 address of the neighbor node')
@@ -69,6 +72,8 @@ if __name__ == '__main__':
     port = parsed_args.port
 
     bbcclient = bbc_app.BBcAppClient(host=addr, port=port, multiq=False, loglevel="all")
+    if os.path.exists(parsed_args.node_key):
+        bbcclient.set_node_key(parsed_args.node_key)
 
     domain_id = bbclib.convert_idstring_to_bytes(parsed_args.domain_id)
     query_id = bbcclient.domain_setup(domain_id)
