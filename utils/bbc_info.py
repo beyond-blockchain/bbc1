@@ -68,7 +68,7 @@ def argument_parser():
                            help='Get neighbor_list in bbc_core')
     argparser.add_argument('-u', '--userlist', action='store_true', default=False, help='Get user_ist in bbc_core')
     argparser.add_argument('-n', '--my_node_id', action='store_true', default=False,  help='Get my node_id')
-    argparser.add_argument('--stat', action='store_true', default=False,  help='Get statistics of the bbc_core')
+    argparser.add_argument('--stat', action='store_true', default=True,  help='Get statistics of the bbc_core')
     argparser.add_argument('--getconfig', action='store_true', default=False, help='Get config from bbc_core')
     argparser.add_argument('-k', '--node_key', action='store', default=".bbc1/node_key.pem",
                            help="path to node key pem file")
@@ -90,19 +90,19 @@ if __name__ == '__main__':
     if os.path.exists(parsed_args.node_key):
         bbcclient.set_node_key(parsed_args.node_key)
 
-    if parsed_args.stat:
-        bbcclient.get_stats()
-        dat = wait_check_result_msg_type(bbcclient.callback, bbclib.MsgType.RESPONSE_GET_STATS)
-        print("------ statistics ------")
-        pprint.pprint(dat[KeyType.stats], width=80)
-        sys.exit(0)
-
     if parsed_args.getconfig:
         bbcclient.get_bbc_config()
         dat = wait_check_result_msg_type(bbcclient.callback, bbclib.MsgType.RESPONSE_GET_CONFIG)
         print("------ config.json ------")
         conf = json.loads(dat[KeyType.bbc_configuration].decode())
         pprint.pprint(conf, width=80)
+        sys.exit(0)
+
+    if parsed_args.stat:
+        bbcclient.get_stats()
+        dat = wait_check_result_msg_type(bbcclient.callback, bbclib.MsgType.RESPONSE_GET_STATS)
+        print("------ statistics ------")
+        pprint.pprint(dat[KeyType.stats], width=80)
         sys.exit(0)
 
     if parsed_args.domain_id is None:

@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
     domain_id = bbclib.convert_idstring_to_bytes(parsed_args.domain_id)
     query_id = bbcclient.domain_setup(domain_id)
-    dat = bbcclient.callback.sync_by_queryid(query_id)
+    dat = bbcclient.callback.synchronize()
     assert dat[KeyType.status] == ESUCCESS
 
     send_domain_ping(bbcclient, domain_id, parsed_args.dst_address, parsed_args.dst_port)
@@ -85,12 +85,12 @@ if __name__ == '__main__':
     print("*** wait 5 sec, checking neighbor list in the core ***")
     time.sleep(5)
     query_id = bbcclient.get_domain_neighborlist(domain_id=domain_id)
-    dat = bbcclient.callback.sync_by_queryid(query_id)
+    dat = bbcclient.callback.synchronize()
     print("====== neighbor list =====")
     for k in range(len(dat)):
-        node_id, ipv4, ipv6, port = dat[k]
+        node_id, ipv4, ipv6, port, domain0 = dat[k]
         if k == 0:
-            print("*my_self*   %s, %s, %s, %d" % (binascii.b2a_hex(node_id[:4]), ipv4, ipv6, port))
+            print("*my_self*   %s, %s, %s, %d, domain0:%s" % (binascii.b2a_hex(node_id[:4]), ipv4, ipv6, port, domain0))
         else:
-            print("            %s, %s, %s, %d" % (binascii.b2a_hex(node_id[:4]), ipv4, ipv6, port))
+            print("            %s, %s, %s, %d, domain0:%s" % (binascii.b2a_hex(node_id[:4]), ipv4, ipv6, port, domain0))
     sys.exit(0)
