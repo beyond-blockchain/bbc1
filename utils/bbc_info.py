@@ -68,7 +68,7 @@ def argument_parser():
                            help='Get neighbor_list in bbc_core')
     argparser.add_argument('-u', '--userlist', action='store_true', default=False, help='Get user_ist in bbc_core')
     argparser.add_argument('-n', '--my_node_id', action='store_true', default=False,  help='Get my node_id')
-    argparser.add_argument('--stat', action='store_true', default=True,  help='Get statistics of the bbc_core')
+    argparser.add_argument('--stat', action='store_true', default=False,  help='Get statistics of the bbc_core')
     argparser.add_argument('--getconfig', action='store_true', default=False, help='Get config from bbc_core')
     argparser.add_argument('-k', '--node_key', action='store', default=".bbc1/node_key.pem",
                            help="path to node key pem file")
@@ -98,7 +98,7 @@ if __name__ == '__main__':
         pprint.pprint(conf, width=80)
         sys.exit(0)
 
-    if parsed_args.stat:
+    if parsed_args.stat or (not parsed_args.my_node_id and not parsed_args.userlist and not parsed_args.neighborlist):
         bbcclient.get_stats()
         dat = wait_check_result_msg_type(bbcclient.callback, bbclib.MsgType.RESPONSE_GET_STATS)
         print("------ statistics ------")
