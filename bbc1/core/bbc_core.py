@@ -46,7 +46,7 @@ from bbc1.core.data_handler import InfraMessageCategory
 from bbc1.core import command
 from bbc1.core.bbc_error import *
 
-VERSION = "core version 0.9"
+VERSION = "core version 1.0"
 
 PID_FILE = "/tmp/bbc1.pid"
 POOL_SIZE = 1000
