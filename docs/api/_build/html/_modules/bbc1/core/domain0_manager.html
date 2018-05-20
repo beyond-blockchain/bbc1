@@ -167,6 +167,7 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">bson</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -475,7 +476,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;repair&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">put_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">txobj</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_base_digest</span><span class="p">,</span> <span class="n">txobj</span><span class="o">.</span><span class="n">cross_ref</span><span class="o">.</span><span class="n">serialize</span><span class="p">(),</span> <span class="n">txobj</span><span class="o">.</span><span class="n">signatures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">txobj</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="n">cross_ref_dat</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">txobj</span><span class="o">.</span><span class="n">cross_ref</span><span class="o">.</span><span class="n">serialize</span><span class="p">())</span>
+            <span class="n">sigdata</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">txobj</span><span class="o">.</span><span class="n">signatures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">serialize</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cross_ref_dat</span> <span class="o">=</span> <span class="n">txobj</span><span class="o">.</span><span class="n">cross_ref</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+            <span class="n">sigdata</span> <span class="o">=</span> <span class="n">txobj</span><span class="o">.</span><span class="n">signatures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_base_digest</span><span class="p">,</span> <span class="n">cross_ref_dat</span><span class="p">,</span> <span class="n">sigdata</span><span class="p">,</span> <span class="n">txobj</span><span class="o">.</span><span class="n">format_type</span>
 
 <div class="viewcode-block" id="Domain0Manager.process_message"><a class="viewcode-back" href="../../../bbc1.core.domain0_manager.html#bbc1.core.domain0_manager.Domain0Manager.process_message">[docs]</a>    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Process received message</span>

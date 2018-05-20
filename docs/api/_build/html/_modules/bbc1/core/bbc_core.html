@@ -195,7 +195,7 @@
 <span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">command</span>
 <span class="kn">from</span> <span class="nn">bbc1.core.bbc_error</span> <span class="k">import</span> <span class="o">*</span>
 
-<span class="n">VERSION</span> <span class="o">=</span> <span class="s2">&quot;core version 0.9&quot;</span>
+<span class="n">VERSION</span> <span class="o">=</span> <span class="s2">&quot;core version 1.0&quot;</span>
 
 <span class="n">PID_FILE</span> <span class="o">=</span> <span class="s2">&quot;/tmp/bbc1.pid&quot;</span>
 <span class="n">POOL_SIZE</span> <span class="o">=</span> <span class="mi">1000</span>
@@ -576,8 +576,9 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;RESPONSE_SIGNATURE: bad format&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
             <span class="n">retmsg</span> <span class="o">=</span> <span class="n">_make_message_structure</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GATHER_SIGNATURE</span><span class="p">,</span>
-                                            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_id</span><span class="p">],</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">])</span>
+                                             <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_id</span><span class="p">],</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+                <span class="n">retmsg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data_format</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data_format</span><span class="p">]</span>
                 <span class="n">retmsg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">]</span>
                 <span class="n">retmsg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ref_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ref_index</span><span class="p">]</span>
             <span class="k">elif</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>

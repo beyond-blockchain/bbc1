@@ -81,8 +81,9 @@ Some documents are available in docs/.
     cd core
     python bbc_core.py
     ```
-7. Start a sample app in another terminal
+7. Start a sample app in another terminal (should be initially at bbc1/ top directory)
     ```
+    pipenv shell
     cd examples
     python file_proof.py arg1 arg2..
     ```

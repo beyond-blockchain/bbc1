@@ -21,6 +21,7 @@ from gevent import socket
 import traceback
 import queue
 import hashlib
+import bson
 import os
 
 import sys
@@ -536,7 +537,12 @@ class BBcAppClient:
         dat[KeyType.destination_user_id] = dest_user_id
         dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.ref_index] = ref_index
-        dat[KeyType.signature] = signature.serialize()
+        if signature.format_type in [bbclib.BBcFormat.FORMAT_BSON, bbclib.BBcFormat.FORMAT_BSON_COMPRESS_BZ2]:
+            dat[KeyType.signature] = bson.dumps(signature.serialize())
+            dat[KeyType.transaction_data_format] = bbclib.BBcFormat.FORMAT_BSON
+        else:
+            dat[KeyType.signature] = signature.serialize()
+            dat[KeyType.transaction_data_format] = bbclib.BBcFormat.FORMAT_BINARY
         if query_id is not None:
             dat[KeyType.query_id] = query_id
         return self._send_msg(dat)
@@ -784,6 +790,7 @@ class BBcAppClient:
         """
         if len(self.cross_ref_list) > 0:
             txobj.add(cross_ref=self.cross_ref_list.pop(0))
+            txobj.cross_ref.format_type = txobj.format_type
 
 
 class Callback:
@@ -918,7 +925,7 @@ class Callback:
         Args:
             dat (dict): received message
         """
-        cross_ref = bbclib.BBcCrossRef(dat[KeyType.cross_ref][0], dat[KeyType.cross_ref][1])
+        cross_ref = bbclib.BBcCrossRef(domain_id=dat[KeyType.cross_ref][0], transaction_id=dat[KeyType.cross_ref][1])
         self.client.cross_ref_list.append(cross_ref)
 
     def proc_cmd_sign_request(self, dat):
@@ -952,7 +959,12 @@ class Callback:
         if KeyType.status not in dat or dat[KeyType.status] < ESUCCESS:
             self.queue.put(dat)
             return
-        sig = bbclib.recover_signature_object(dat[KeyType.signature])
+        format_type = dat[KeyType.transaction_data_format]
+        if format_type in [bbclib.BBcFormat.FORMAT_BSON, bbclib.BBcFormat.FORMAT_BSON_COMPRESS_BZ2]:
+            sigdata = bson.loads(dat[KeyType.signature])
+        else:
+            sigdata = dat[KeyType.signature]
+        sig = bbclib.recover_signature_object(sigdata, format_type=format_type)
         self.queue.put({KeyType.status: ESUCCESS, KeyType.result: (dat[KeyType.ref_index], dat[KeyType.source_user_id], sig)})
 
     def proc_resp_insert(self, dat):

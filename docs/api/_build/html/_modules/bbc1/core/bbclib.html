@@ -167,6 +167,8 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">binascii</span>
 <span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">bson</span>
+<span class="kn">import</span> <span class="nn">bz2</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
@@ -188,6 +190,12 @@
 
 <span class="n">error_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 <span class="n">error_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="BBcFormat"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcFormat">[docs]</a><span class="k">class</span> <span class="nc">BBcFormat</span><span class="p">:</span>
+    <span class="n">FORMAT_BINARY</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">FORMAT_BSON</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">FORMAT_BSON_COMPRESS_BZ2</span> <span class="o">=</span> <span class="mi">2</span></div>
 
 
 <div class="viewcode-block" id="set_error"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.set_error">[docs]</a><span class="k">def</span> <span class="nf">set_error</span><span class="p">(</span><span class="n">code</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
@@ -262,40 +270,41 @@
     <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="make_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.make_transaction">[docs]</a><span class="k">def</span> <span class="nf">make_transaction</span><span class="p">(</span><span class="n">event_num</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">relation_num</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">witness</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="make_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.make_transaction">[docs]</a><span class="k">def</span> <span class="nf">make_transaction</span><span class="p">(</span><span class="n">event_num</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">relation_num</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">witness</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Utility to make transaction object</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        event_num (int): the number of BBcEvent object to include in the transaction</span>
 <span class="sd">        relation_num (int): the number of BBcRelation object to include in the transaction</span>
 <span class="sd">        witness (bool): If true, BBcWitness object is included in the transaction</span>
+<span class="sd">        format_type (int): Data format defined in BBcFormat class</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        BBcTransaction:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">transaction</span> <span class="o">=</span> <span class="n">BBcTransaction</span><span class="p">()</span>
+    <span class="n">transaction</span> <span class="o">=</span> <span class="n">BBcTransaction</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">format_type</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">event_num</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">event_num</span><span class="p">):</span>
-            <span class="n">evt</span> <span class="o">=</span> <span class="n">BBcEvent</span><span class="p">()</span>
-            <span class="n">ast</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">()</span>
+            <span class="n">evt</span> <span class="o">=</span> <span class="n">BBcEvent</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">format_type</span><span class="p">)</span>
+            <span class="n">ast</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">format_type</span><span class="p">)</span>
             <span class="n">evt</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">asset</span><span class="o">=</span><span class="n">ast</span><span class="p">)</span>
             <span class="n">transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">evt</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">relation_num</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">relation_num</span><span class="p">):</span>
-            <span class="n">transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">relation</span><span class="o">=</span><span class="n">BBcRelation</span><span class="p">())</span>
+            <span class="n">transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">relation</span><span class="o">=</span><span class="n">BBcRelation</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">format_type</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">witness</span><span class="p">:</span>
-        <span class="n">transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">witness</span><span class="o">=</span><span class="n">BBcWitness</span><span class="p">())</span>
+        <span class="n">transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">witness</span><span class="o">=</span><span class="n">BBcWitness</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">format_type</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">transaction</span></div>
 
 
 <div class="viewcode-block" id="add_relation_asset"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.add_relation_asset">[docs]</a><span class="k">def</span> <span class="nf">add_relation_asset</span><span class="p">(</span><span class="n">transaction</span><span class="p">,</span> <span class="n">relation_idx</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">asset_body</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Utility to add BBcRelation object with BBcAsset in the transaction&quot;&quot;&quot;</span>
-    <span class="n">ast</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">asset_file</span><span class="o">=</span><span class="n">asset_file</span><span class="p">,</span> <span class="n">asset_body</span><span class="o">=</span><span class="n">asset_body</span><span class="p">)</span>
+    <span class="n">ast</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">asset_file</span><span class="o">=</span><span class="n">asset_file</span><span class="p">,</span> <span class="n">asset_body</span><span class="o">=</span><span class="n">asset_body</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">transaction</span><span class="o">.</span><span class="n">format_type</span><span class="p">)</span>
     <span class="n">transaction</span><span class="o">.</span><span class="n">relations</span><span class="p">[</span><span class="n">relation_idx</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset</span><span class="o">=</span><span class="n">ast</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="add_relation_pointer"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.add_relation_pointer">[docs]</a><span class="k">def</span> <span class="nf">add_relation_pointer</span><span class="p">(</span><span class="n">transaction</span><span class="p">,</span> <span class="n">relation_idx</span><span class="p">,</span> <span class="n">ref_transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ref_asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Utility to add BBcRelation object with BBcPointer in the transaction&quot;&quot;&quot;</span>
-    <span class="n">pointer</span> <span class="o">=</span> <span class="n">BBcPointer</span><span class="p">(</span><span class="n">transaction_id</span><span class="o">=</span><span class="n">ref_transaction_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="n">ref_asset_id</span><span class="p">)</span>
+    <span class="n">pointer</span> <span class="o">=</span> <span class="n">BBcPointer</span><span class="p">(</span><span class="n">transaction_id</span><span class="o">=</span><span class="n">ref_transaction_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="n">ref_asset_id</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">transaction</span><span class="o">.</span><span class="n">format_type</span><span class="p">)</span>
     <span class="n">transaction</span><span class="o">.</span><span class="n">relations</span><span class="p">[</span><span class="n">relation_idx</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pointer</span><span class="o">=</span><span class="n">pointer</span><span class="p">)</span></div>
 
 
@@ -306,7 +315,8 @@
 <span class="sd">        BBcReference:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ref</span> <span class="o">=</span> <span class="n">BBcReference</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="n">asset_group_id</span><span class="p">,</span>
-                       <span class="n">transaction</span><span class="o">=</span><span class="n">transaction</span><span class="p">,</span> <span class="n">ref_transaction</span><span class="o">=</span><span class="n">ref_transaction_obj</span><span class="p">,</span> <span class="n">event_index_in_ref</span><span class="o">=</span><span class="n">event_index_in_ref</span><span class="p">)</span>
+                       <span class="n">transaction</span><span class="o">=</span><span class="n">transaction</span><span class="p">,</span> <span class="n">ref_transaction</span><span class="o">=</span><span class="n">ref_transaction_obj</span><span class="p">,</span>
+                       <span class="n">event_index_in_ref</span><span class="o">=</span><span class="n">event_index_in_ref</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">transaction</span><span class="o">.</span><span class="n">format_type</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">ref</span><span class="o">.</span><span class="n">transaction_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="n">transaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">reference</span><span class="o">=</span><span class="n">ref</span><span class="p">)</span>
@@ -315,13 +325,13 @@
 
 <div class="viewcode-block" id="add_event_asset"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.add_event_asset">[docs]</a><span class="k">def</span> <span class="nf">add_event_asset</span><span class="p">(</span><span class="n">transaction</span><span class="p">,</span> <span class="n">event_idx</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">asset_body</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Utility to add BBcEvent object with BBcAsset in the transaction&quot;&quot;&quot;</span>
-    <span class="n">ast</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">asset_file</span><span class="o">=</span><span class="n">asset_file</span><span class="p">,</span> <span class="n">asset_body</span><span class="o">=</span><span class="n">asset_body</span><span class="p">)</span>
+    <span class="n">ast</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">asset_file</span><span class="o">=</span><span class="n">asset_file</span><span class="p">,</span> <span class="n">asset_body</span><span class="o">=</span><span class="n">asset_body</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">transaction</span><span class="o">.</span><span class="n">format_type</span><span class="p">)</span>
     <span class="n">transaction</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="n">event_idx</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">asset_group_id</span><span class="o">=</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset</span><span class="o">=</span><span class="n">ast</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="recover_signature_object"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.recover_signature_object">[docs]</a><span class="k">def</span> <span class="nf">recover_signature_object</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="recover_signature_object"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.recover_signature_object">[docs]</a><span class="k">def</span> <span class="nf">recover_signature_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Deserialize signature data&quot;&quot;&quot;</span>
-    <span class="n">sig</span> <span class="o">=</span> <span class="n">BBcSignature</span><span class="p">()</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="n">BBcSignature</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">format_type</span><span class="p">)</span>
     <span class="n">sig</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sig</span></div>
 
@@ -423,7 +433,8 @@
     <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">valid_asset</span><span class="p">,</span> <span class="n">invalid_asset</span></div>
 
 
-<div class="viewcode-block" id="verify_using_cross_ref"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.verify_using_cross_ref">[docs]</a><span class="k">def</span> <span class="nf">verify_using_cross_ref</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">transaction_base_digest</span><span class="p">,</span> <span class="n">cross_ref_data</span><span class="p">,</span> <span class="n">sigdata</span><span class="p">):</span>
+<div class="viewcode-block" id="verify_using_cross_ref"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.verify_using_cross_ref">[docs]</a><span class="k">def</span> <span class="nf">verify_using_cross_ref</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">transaction_base_digest</span><span class="p">,</span> <span class="n">cross_ref_data</span><span class="p">,</span> <span class="n">sigdata</span><span class="p">,</span>
+                           <span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Confirm the existence of the transaction using cross_ref</span>
 
 <span class="sd">    Args:</span>
@@ -432,18 +443,28 @@
 <span class="sd">        transaction_base_digest (bytes): digest obtained from the outer domain</span>
 <span class="sd">        cross_ref_data (bytes): serialized BBcCrossRef object</span>
 <span class="sd">        sigdata (bytes): serialized signature</span>
+<span class="sd">        format_type (int): Data format defined in BBcFormat class</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        bool: True if valid</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cross</span> <span class="o">=</span> <span class="n">BBcCrossRef</span><span class="p">(</span><span class="n">deserialize</span><span class="o">=</span><span class="n">cross_ref_data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+        <span class="n">cross_ref_data</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">cross_ref_data</span><span class="p">)</span>
+        <span class="n">sigdata</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">sigdata</span><span class="p">)</span>
+    <span class="n">cross</span> <span class="o">=</span> <span class="n">BBcCrossRef</span><span class="p">(</span><span class="n">deserialize</span><span class="o">=</span><span class="n">cross_ref_data</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">format_type</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">cross</span><span class="o">.</span><span class="n">domain_id</span> <span class="o">!=</span> <span class="n">domain_id</span> <span class="ow">or</span> <span class="n">cross</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">!=</span> <span class="n">transaction_id</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
-    <span class="n">sig</span> <span class="o">=</span> <span class="n">BBcSignature</span><span class="p">(</span><span class="n">deserialize</span><span class="o">=</span><span class="n">sigdata</span><span class="p">)</span>
-    <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">transaction_base_digest</span><span class="p">)</span>
-    <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-    <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_4byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cross_ref_data</span><span class="p">)))</span>
-    <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">cross_ref_data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+            <span class="s2">&quot;tx_base&quot;</span><span class="p">:</span> <span class="n">transaction_base_digest</span><span class="p">,</span>
+            <span class="s2">&quot;cross_ref&quot;</span><span class="p">:</span> <span class="n">cross_ref_data</span><span class="p">,</span>
+        <span class="p">})</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">transaction_base_digest</span><span class="p">)</span>
+        <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_4byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cross_ref_data</span><span class="p">)))</span>
+        <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">cross_ref_data</span><span class="p">)</span>
     <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="n">BBcSignature</span><span class="p">(</span><span class="n">deserialize</span><span class="o">=</span><span class="n">sigdata</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">format_type</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">digest</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span></div>
 
 
@@ -560,7 +581,8 @@
 
 <div class="viewcode-block" id="BBcSignature"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcSignature">[docs]</a><span class="k">class</span> <span class="nc">BBcSignature</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Signature part in a transaction&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_type</span><span class="o">=</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ECDSA_SECP256k1</span><span class="p">,</span> <span class="n">deserialize</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_type</span><span class="o">=</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ECDSA_SECP256k1</span><span class="p">,</span> <span class="n">deserialize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="o">=</span> <span class="n">format_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">key_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pubkey</span> <span class="o">=</span> <span class="kc">None</span>
@@ -585,6 +607,8 @@
 
 <div class="viewcode-block" id="BBcSignature.serialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcSignature.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_bson</span><span class="p">()</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_4byte</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
         <span class="n">pubkey_len_bit</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pubkey</span><span class="p">)</span> <span class="o">*</span> <span class="mi">8</span>
         <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_4byte</span><span class="p">(</span><span class="n">pubkey_len_bit</span><span class="p">))</span>
@@ -602,6 +626,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if successful</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize_bson</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
@@ -611,6 +637,33 @@
             <span class="n">ptr</span><span class="p">,</span> <span class="n">sig_len_bit</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
             <span class="n">sig_len</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sig_len_bit</span><span class="o">/</span><span class="mi">8</span><span class="p">)</span>
             <span class="n">ptr</span><span class="p">,</span> <span class="n">signature</span> <span class="o">=</span> <span class="n">get_n_bytes</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">sig_len</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span> <span class="n">pubkey</span><span class="o">=</span><span class="n">pubkey</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcSignature.serialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcSignature.serialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="n">pubkey_len_bit</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pubkey</span><span class="p">)</span> <span class="o">*</span> <span class="mi">8</span>
+        <span class="n">sig_len_bit</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="p">)</span> <span class="o">*</span> <span class="mi">8</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;pubkey_len&#39;</span><span class="p">:</span> <span class="n">pubkey_len_bit</span><span class="p">,</span>
+            <span class="s1">&#39;pubkey&#39;</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pubkey</span><span class="p">),</span>
+            <span class="s1">&#39;signature_len&#39;</span><span class="p">:</span> <span class="n">sig_len_bit</span><span class="p">,</span>
+            <span class="s1">&#39;signature&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BBcSignature.deserialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcSignature.deserialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bson_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deserialize bson data into this object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (dict): bson data</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pubkey</span> <span class="o">=</span> <span class="n">bson_data</span><span class="p">[</span><span class="s1">&#39;pubkey&#39;</span><span class="p">]</span>
+            <span class="n">signature</span> <span class="o">=</span> <span class="n">bson_data</span><span class="p">[</span><span class="s1">&#39;signature&#39;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span> <span class="n">pubkey</span><span class="o">=</span><span class="n">pubkey</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -638,7 +691,8 @@
 
 <div class="viewcode-block" id="BBcTransaction"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction">[docs]</a><span class="k">class</span> <span class="nc">BBcTransaction</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Transaction object&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">deserialize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">jsonload</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">deserialize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">jsonload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="o">=</span> <span class="n">format_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
@@ -730,7 +784,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            user_id (bytes): user_id of the signature owner</span>
-<span class="sd">            signature (bytes): signature</span>
+<span class="sd">            signature (BBcSignature): signature</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if successful</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -755,6 +809,8 @@
 
 <div class="viewcode-block" id="BBcTransaction.serialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">for_id</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Serialize the whole parts&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_bson</span><span class="p">(</span><span class="n">for_id</span><span class="p">)</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_4byte</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">))</span>
         <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_8byte</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">))</span>
         <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">)))</span>
@@ -791,9 +847,9 @@
             <span class="n">dat_cross</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">for_id</span><span class="p">:</span>
-            <span class="n">dat2</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transaction_base_digest</span><span class="p">)</span>
-            <span class="n">dat2</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dat_cross</span><span class="p">)</span>
-            <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">dat2</span><span class="p">)</span>
+            <span class="n">dat_for_id</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transaction_base_digest</span><span class="p">)</span>
+            <span class="n">dat_for_id</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dat_cross</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">dat_for_id</span><span class="p">)</span>
 
         <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dat_cross</span><span class="p">)</span>
 
@@ -805,7 +861,7 @@
                 <span class="n">sig</span> <span class="o">=</span> <span class="n">signature</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
                 <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_4byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sig</span><span class="p">)))</span>
                 <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transaction_data</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transaction_data</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_type</span><span class="p">)</span><span class="o">+</span><span class="n">dat</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction_data</span></div>
 
 <div class="viewcode-block" id="BBcTransaction.deserialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
@@ -818,6 +874,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transaction_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:]</span>
         <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize_bson</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
         <span class="n">data_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">get_n_byte_int</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
@@ -899,6 +958,100 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
+<div class="viewcode-block" id="BBcTransaction.serialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction.serialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">for_id</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Serialize the whole parts&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">witness</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">witness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">witness</span><span class="o">.</span><span class="n">serialize_bson</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">witness</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tx_crossref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_ref</span><span class="o">.</span><span class="n">serialize_bson</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tx_crossref</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">tx_base</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+                <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;events&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">evt</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span> <span class="k">for</span> <span class="n">evt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">],</span>
+            <span class="s2">&quot;references&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">refe</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span> <span class="k">for</span> <span class="n">refe</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">references</span><span class="p">],</span>
+            <span class="s2">&quot;relations&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">rtn</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span> <span class="k">for</span> <span class="n">rtn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">],</span>
+            <span class="s2">&quot;witness&quot;</span><span class="p">:</span> <span class="n">witness</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transaction_base_digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">bson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">tx_base</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">for_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">bson</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+                <span class="s2">&quot;tx_base&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction_base_digest</span><span class="p">,</span>
+                <span class="s2">&quot;cross_ref&quot;</span><span class="p">:</span> <span class="n">tx_crossref</span><span class="p">,</span>
+            <span class="p">})</span>
+        <span class="n">tx_base</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;cross_ref&quot;</span><span class="p">:</span> <span class="n">tx_crossref</span><span class="p">})</span>
+
+        <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">signatures</span><span class="p">:</span>
+            <span class="n">dat</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+                <span class="s2">&quot;transaction_base&quot;</span><span class="p">:</span> <span class="n">tx_base</span><span class="p">,</span>
+            <span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dat</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+                <span class="s2">&quot;transaction_base&quot;</span><span class="p">:</span> <span class="n">tx_base</span><span class="p">,</span>
+                <span class="s2">&quot;signatures&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">sig</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span> <span class="k">for</span> <span class="n">sig</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">signatures</span><span class="p">],</span>
+            <span class="p">})</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="o">==</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">:</span>
+            <span class="n">dat</span> <span class="o">=</span> <span class="n">bz2</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transaction_data</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_type</span><span class="p">)</span> <span class="o">+</span> <span class="n">dat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction_data</span></div>
+
+<div class="viewcode-block" id="BBcTransaction.deserialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction.deserialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deserialize bson data into this object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (dict): bson data</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="o">==</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">bz2</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">bsondata</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">tx_base</span> <span class="o">=</span> <span class="n">bsondata</span><span class="p">[</span><span class="s2">&quot;transaction_base&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">tx_base</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">][</span><span class="s2">&quot;version&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">tx_base</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">][</span><span class="s2">&quot;timestamp&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">evt_bson</span> <span class="ow">in</span> <span class="n">tx_base</span><span class="p">[</span><span class="s2">&quot;events&quot;</span><span class="p">]:</span>
+            <span class="n">evt</span> <span class="o">=</span> <span class="n">BBcEvent</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">)</span>
+            <span class="n">evt</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">evt_bson</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">references</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">refe_bson</span> <span class="ow">in</span> <span class="n">tx_base</span><span class="p">[</span><span class="s2">&quot;references&quot;</span><span class="p">]:</span>
+            <span class="n">refe</span> <span class="o">=</span> <span class="n">BBcReference</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">)</span>
+            <span class="n">refe</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">refe_bson</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">references</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">refe</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">rtn_bson</span> <span class="ow">in</span> <span class="n">tx_base</span><span class="p">[</span><span class="s2">&quot;relations&quot;</span><span class="p">]:</span>
+            <span class="n">rtn</span> <span class="o">=</span> <span class="n">BBcRelation</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">)</span>
+            <span class="n">rtn</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">rtn_bson</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rtn</span><span class="p">)</span>
+        <span class="n">wit</span> <span class="o">=</span> <span class="n">tx_base</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;witness&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">wit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">witness</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">witness</span> <span class="o">=</span> <span class="n">BBcWitness</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">witness</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">wit</span><span class="p">)</span>
+        <span class="n">cross_ref</span> <span class="o">=</span> <span class="n">tx_base</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cross_ref&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cross_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cross_ref</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cross_ref</span> <span class="o">=</span> <span class="n">BBcCrossRef</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cross_ref</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">cross_ref</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">signatures</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s2">&quot;signatures&quot;</span> <span class="ow">in</span> <span class="n">bsondata</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sig_bson</span> <span class="ow">in</span> <span class="n">bsondata</span><span class="p">[</span><span class="s2">&quot;signatures&quot;</span><span class="p">]:</span>
+                <span class="n">sig</span> <span class="o">=</span> <span class="n">BBcSignature</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">)</span>
+                <span class="n">sig</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">sig_bson</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">signatures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
 <div class="viewcode-block" id="BBcTransaction.sign"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_type</span><span class="o">=</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ECDSA_SECP256k1</span><span class="p">,</span> <span class="n">private_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">public_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keypair</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sign the transaction</span>
 
@@ -923,7 +1076,7 @@
                 <span class="n">set_error</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">EBADKEYPAIR</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;Bad private_key/public_key&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="n">sig</span> <span class="o">=</span> <span class="n">BBcSignature</span><span class="p">(</span><span class="n">key_type</span><span class="o">=</span><span class="n">keypair</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">BBcSignature</span><span class="p">(</span><span class="n">key_type</span><span class="o">=</span><span class="n">keypair</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">format_type</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">keypair</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">set_error</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">EOTHER</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;sig_type </span><span class="si">%d</span><span class="s2"> is not supported&quot;</span> <span class="o">%</span> <span class="n">keypair</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
@@ -1140,7 +1293,8 @@
 
 <div class="viewcode-block" id="BBcEvent"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcEvent">[docs]</a><span class="k">class</span> <span class="nc">BBcEvent</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Event part in a transaction&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="o">=</span> <span class="n">format_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">asset_group_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reference_indices</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mandatory_approvers</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1190,6 +1344,8 @@
 
 <div class="viewcode-block" id="BBcEvent.serialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcEvent.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_bson</span><span class="p">()</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">))</span>
         <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_indices</span><span class="p">)))</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_indices</span><span class="p">)):</span>
@@ -1214,6 +1370,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if successful</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize_bson</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">data_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1246,12 +1404,51 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">astdata</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcEvent.serialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcEvent.serialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">asset</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">asset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">serialize_bson</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;asset_group_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">,</span>
+            <span class="s1">&#39;reference_indices&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_indices</span><span class="p">,</span>
+            <span class="s1">&#39;mandatory_approvers&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mandatory_approvers</span><span class="p">,</span>
+            <span class="s1">&#39;option_approver_num_numerator&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">option_approver_num_numerator</span><span class="p">,</span>
+            <span class="s1">&#39;option_approver_num_denominator&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">option_approver_num_denominator</span><span class="p">,</span>
+            <span class="s1">&#39;option_approvers&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">option_approvers</span><span class="p">,</span>
+            <span class="s1">&#39;asset&#39;</span><span class="p">:</span> <span class="n">asset</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BBcEvent.deserialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcEvent.deserialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deserialize bson data into this object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (dict): bson data</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asset_group_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reference_indices</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;reference_indices&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mandatory_approvers</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mandatory_approvers&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">option_approver_num_numerator</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;option_approver_num_numerator&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">option_approver_num_denominator</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;option_approver_num_denominator&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">option_approvers</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;option_approvers&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">asset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asset&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">asset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">deserialize_bson</span><span class="p">(</span><span class="n">asset</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span></div></div>
 
 
 <div class="viewcode-block" id="BBcReference"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcReference">[docs]</a><span class="k">class</span> <span class="nc">BBcReference</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Reference part in a transaction&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction</span><span class="p">,</span> <span class="n">ref_transaction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_index_in_ref</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction</span><span class="p">,</span> <span class="n">ref_transaction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_index_in_ref</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="o">=</span> <span class="n">format_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">asset_group_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span> <span class="o">=</span> <span class="n">transaction</span>
@@ -1294,7 +1491,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            user_id (bytes): user_id of the signature owner</span>
-<span class="sd">            signature (bytes): signature</span>
+<span class="sd">            signature (BBcSignature): signature</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">user_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">option_approvers</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">option_sig_ids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -1312,6 +1509,8 @@
 
 <div class="viewcode-block" id="BBcReference.serialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcReference.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_bson</span><span class="p">()</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">))</span>
         <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">))</span>
         <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_index_in_ref</span><span class="p">))</span>
@@ -1328,6 +1527,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if successful</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize_bson</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">data_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1343,12 +1544,36 @@
                     <span class="k">return</span> <span class="kc">False</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcReference.serialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcReference.serialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;asset_group_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">,</span>
+            <span class="s1">&#39;transaction_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">,</span>
+            <span class="s1">&#39;event_index_in_ref&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_index_in_ref</span><span class="p">,</span>
+            <span class="s1">&#39;sig_indices&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BBcReference.deserialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcReference.deserialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deserialize bson data into this object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (dict): bson data</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asset_group_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transaction_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_index_in_ref</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;event_index_in_ref&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sig_indices&#39;</span><span class="p">,</span> <span class="p">[])</span>
         <span class="k">return</span> <span class="kc">True</span></div></div>
 
 
 <div class="viewcode-block" id="BBcRelation"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcRelation">[docs]</a><span class="k">class</span> <span class="nc">BBcRelation</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Relation part in a transaction&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="o">=</span> <span class="n">format_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">asset_group_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1378,6 +1603,8 @@
 
 <div class="viewcode-block" id="BBcRelation.serialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcRelation.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_bson</span><span class="p">()</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">))</span>
         <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">)))</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">)):</span>
@@ -1393,13 +1620,15 @@
         <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BBcRelation.deserialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcRelation.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Deserialize into this object</span>
+        <span class="sd">&quot;&quot;&quot;Deserialize bson data into this object</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            data (bytes): serialized binary data</span>
+<span class="sd">            data (dict): bson data</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if successful</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize_bson</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">data_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1424,12 +1653,46 @@
                     <span class="k">return</span> <span class="kc">False</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcRelation.serialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcRelation.serialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">asset</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">asset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">serialize_bson</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;asset_group_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">,</span>
+            <span class="s1">&#39;pointers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">ptr</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span> <span class="k">for</span> <span class="n">ptr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">],</span>
+            <span class="s1">&#39;asset&#39;</span><span class="p">:</span> <span class="n">asset</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BBcRelation.deserialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcRelation.deserialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deserialize bson data into this object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (dict): bson data</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asset_group_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ptr_bson</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pointers&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">ptr</span> <span class="o">=</span> <span class="n">BBcPointer</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">)</span>
+            <span class="n">ptr</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">ptr_bson</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span>
+        <span class="n">asset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asset&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">asset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset</span> <span class="o">=</span> <span class="n">BBcAsset</span><span class="p">(</span><span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">deserialize_bson</span><span class="p">(</span><span class="n">asset</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span></div></div>
 
 
 <div class="viewcode-block" id="BBcPointer"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcPointer">[docs]</a><span class="k">class</span> <span class="nc">BBcPointer</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Pointer part in a transaction&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="o">=</span> <span class="n">format_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="n">transaction_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="o">=</span> <span class="n">asset_id</span>
 
@@ -1447,6 +1710,8 @@
 
 <div class="viewcode-block" id="BBcPointer.serialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcPointer.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_bson</span><span class="p">()</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
@@ -1463,6 +1728,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if successful</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize_bson</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="n">get_bigint</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
@@ -1473,12 +1740,32 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcPointer.serialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcPointer.serialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;transaction_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">,</span>
+            <span class="s1">&#39;asset_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BBcPointer.deserialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcPointer.deserialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deserialize bson data into this object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (dict): bson data</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transaction_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asset_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span></div></div>
 
 
 <div class="viewcode-block" id="BBcWitness"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcWitness">[docs]</a><span class="k">class</span> <span class="nc">BBcWitness</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Witness part in a transaction&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="o">=</span> <span class="n">format_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -1511,6 +1798,8 @@
 
 <div class="viewcode-block" id="BBcWitness.serialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcWitness.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_bson</span><span class="p">()</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span><span class="p">)))</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span><span class="p">)):</span>
             <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
@@ -1525,6 +1814,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if successful</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize_bson</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">data_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1540,12 +1831,32 @@
                     <span class="k">return</span> <span class="kc">False</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcWitness.serialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcWitness.serialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;user_ids&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_ids</span><span class="p">,</span>
+            <span class="s1">&#39;sig_indices&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BBcWitness.deserialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcWitness.deserialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deserialize bson data into this object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (dict): bson data</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_ids</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user_ids&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_indices</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sig_indices&#39;</span><span class="p">,</span> <span class="p">[])</span>
         <span class="k">return</span> <span class="kc">True</span></div></div>
 
 
 <div class="viewcode-block" id="BBcAsset"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcAsset">[docs]</a><span class="k">class</span> <span class="nc">BBcAsset</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Asset part in a transaction&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_body</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_body</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="o">=</span> <span class="n">format_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="n">user_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span> <span class="o">=</span> <span class="n">get_random_value</span><span class="p">()</span>
@@ -1617,6 +1928,8 @@
 
 <div class="viewcode-block" id="BBcAsset.serialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcAsset.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">for_digest_calculation</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_bson</span><span class="p">(</span><span class="n">for_digest_calculation</span><span class="o">=</span><span class="n">for_digest_calculation</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">for_digest_calculation</span><span class="p">:</span>
             <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_id</span><span class="p">))</span>
             <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_2byte</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nonce</span><span class="p">)))</span>
@@ -1649,6 +1962,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if successful</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize_bson</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="o">=</span> <span class="n">get_bigint</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
@@ -1666,12 +1981,52 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
             <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcAsset.serialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcAsset.serialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">for_digest_calculation</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">for_digest_calculation</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">bson</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+                <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="s1">&#39;nonce&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span><span class="p">,</span>
+                <span class="s1">&#39;asset_file_size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_size</span><span class="p">,</span>
+                <span class="s1">&#39;asset_file_digest&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_digest</span><span class="p">,</span>
+                <span class="s1">&#39;asset_body_size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_body_size</span><span class="p">,</span>
+                <span class="s1">&#39;asset_body&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_body</span><span class="p">,</span>
+            <span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;asset_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span><span class="p">,</span>
+                <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="s1">&#39;nonce&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span><span class="p">,</span>
+                <span class="s1">&#39;asset_file_size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_size</span><span class="p">,</span>
+                <span class="s1">&#39;asset_file_digest&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_digest</span><span class="p">,</span>
+                <span class="s1">&#39;asset_body_size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_body_size</span><span class="p">,</span>
+                <span class="s1">&#39;asset_body&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_body</span><span class="p">,</span>
+            <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BBcAsset.deserialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcAsset.deserialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deserialize bson data into this object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (dict): bson data</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asset_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nonce&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_size</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asset_file_size&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_file_digest</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asset_file_digest&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_body_size</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asset_body_size&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_body</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asset_body&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span></div></div>
 
 
 <div class="viewcode-block" id="BBcCrossRef"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcCrossRef">[docs]</a><span class="k">class</span> <span class="nc">BBcCrossRef</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;CrossRef part in a transaction&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">deserialize</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">deserialize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="o">=</span> <span class="n">format_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span> <span class="o">=</span> <span class="n">domain_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="n">transaction_id</span>
         <span class="k">if</span> <span class="n">deserialize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1685,6 +2040,8 @@
 
 <div class="viewcode-block" id="BBcCrossRef.serialize"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcCrossRef.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Serialize this object&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_bson</span><span class="p">()</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">))</span>
         <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">to_bigint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">))</span>
         <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
@@ -1697,12 +2054,33 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if successful</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize_bson</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span> <span class="o">=</span> <span class="n">get_bigint</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
             <span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="n">get_bigint</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcCrossRef.serialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcCrossRef.serialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Serialize this object into bson format&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;domain_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
+            <span class="s1">&#39;transaction_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BBcCrossRef.deserialize_bson"><a class="viewcode-back" href="../../../bbc1.core.bbclib.html#bbc1.core.bbclib.BBcCrossRef.deserialize_bson">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize_bson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deserialize bson data into this object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (dict): bson data</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;domain_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transaction_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span></div></div>
 
 

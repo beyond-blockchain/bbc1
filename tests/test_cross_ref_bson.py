@@ -28,9 +28,10 @@ asset_group_id = bbclib.get_new_id("asset_group_0")
 core_domains = [None for i in range(core_num)]
 msg_processor = [None for i in range(client_num)]
 
-num_assign_cross_ref = 0
+num_assigned_cross_ref = 0
 num_cross_ref_registered = 0
 cross_ref_regsistered_list = dict()
+fmt = bbclib.BBcFormat.FORMAT_BSON_COMPRESS_BZ2
 
 
 def show_domain_list(domain_list):
@@ -51,16 +52,16 @@ def sleep_tick(wait_for):
 def prepare_transaction(asset_group, client, datnum, txid_pointer=None, no_cross_ref=False):
     user_id = client['user_id']
     kp = client['keypair']
-    txobj = bbclib.BBcTransaction()
-    rtn = bbclib.BBcRelation()
-    asset = bbclib.BBcAsset()
+    txobj = bbclib.BBcTransaction(format_type=fmt)
+    rtn = bbclib.BBcRelation(format_type=fmt)
+    asset = bbclib.BBcAsset(format_type=fmt)
     asset.add(user_id=user_id, asset_body=b'data=%d' % datnum)
     rtn.add(asset_group_id=asset_group, asset=asset)
     if txid_pointer is not None:
-        ptr = bbclib.BBcPointer()
+        ptr = bbclib.BBcPointer(format_type=fmt)
         ptr.add(transaction_id=txid_pointer)
         rtn.add(pointer=ptr)
-    wit = bbclib.BBcWitness()
+    wit = bbclib.BBcWitness(format_type=fmt)
     txobj.add(relation=rtn, witness=wit)
     wit.add_witness(user_id)
     if not no_cross_ref:
@@ -85,7 +86,7 @@ class TestBBcAppClient(object):
         for i in range(domain_num):
             for j in range(core_per_domain):
                 base_core_index = i * core_per_domain + j
-                domain0_flag = True if j == 0 or j == 1 else False
+                domain0_flag = True if j == 0 else False
                 start_core_thread(index=base_core_index, core_port_increment=base_core_index,
                                   p2p_port_increment=base_core_index, use_domain0=domain0_flag)
                 domain_setup_utility(base_core_index, domain_ids[i])
@@ -119,18 +120,15 @@ class TestBBcAppClient(object):
         ipv4 = cores[0].networking.ip_address
         ipv6 = cores[0].networking.ip6_address
         port = cores[0].networking.port
-        for i in [1, 5, 6, 10, 11]:
+        for i in [5, 10]:
             cores[i].networking.send_domain_ping(domain_id=bbclib.domain_global_0, ipv4=ipv4, ipv6=ipv6, port=port, is_static=True)
         print("-- wait 5 seconds --")
         time.sleep(5)
 
-        assert len(cores[0].networking.domains[bbclib.domain_global_0]['neighbor'].nodeinfo_list) == 5  # 6 - 1
-        assert len(cores[1].networking.domains[bbclib.domain_global_0]['neighbor'].nodeinfo_list) == 5
-        assert len(cores[5].networking.domains[bbclib.domain_global_0]['neighbor'].nodeinfo_list) == 5
-        assert len(cores[6].networking.domains[bbclib.domain_global_0]['neighbor'].nodeinfo_list) == 5
-        assert len(cores[10].networking.domains[bbclib.domain_global_0]['neighbor'].nodeinfo_list) == 5
-        assert len(cores[11].networking.domains[bbclib.domain_global_0]['neighbor'].nodeinfo_list) == 5
-        assert bbclib.domain_global_0 not in cores[2].networking.domains
+        assert len(cores[0].networking.domains[bbclib.domain_global_0]['neighbor'].nodeinfo_list) == domain_num - 1
+        assert len(cores[5].networking.domains[bbclib.domain_global_0]['neighbor'].nodeinfo_list) == domain_num - 1
+        assert len(cores[10].networking.domains[bbclib.domain_global_0]['neighbor'].nodeinfo_list) == domain_num - 1
+        assert bbclib.domain_global_0 not in cores[1].networking.domains
         print("-- wait 5 seconds --")
         time.sleep(5)
 
@@ -157,17 +155,24 @@ class TestBBcAppClient(object):
 
     def test_13_wait(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        print("-- sleep 10 sec")
-        time.sleep(10)
-        for i in range(domain_num):
-            print("****** [%d] %s ******" % (i, cores[i*core_per_domain].networking.domain0manager.my_node_id.hex()))
-            dm = cores[i*core_per_domain].networking.domain0manager.domain_list
-            show_domain_list(dm)
-        print("-- sleep 10 sec")
-        time.sleep(10)
-        for i in range(domain_num):
-            nd = cores[i*core_per_domain].networking.domain0manager.node_domain_list
-            assert len(nd) == 4  # 6(all dom0_managers) - 2(dom0_managers in the domain)
+        ready_flag = False
+        count = 10
+        while count > 0 and not ready_flag:
+            print("-- sleep 5 sec")
+            time.sleep(5)
+            ready_flag = True
+            for i in range(domain_num):
+                for k in range(core_per_domain):
+                    idx = i * core_per_domain + k
+                    dm = clients[idx*client_per_core]['app'].domain_id
+                    print(cores[idx].networking.domains[dm]['neighbor'].show_list())
+                    num = len(list(filter(lambda nd: nd.is_domain0_node,
+                                          cores[idx].networking.domains[dm]['neighbor'].nodeinfo_list.values())))
+                    if k == 0:
+                        assert num == 0
+                    else:
+                        ready_flag = ready_flag & (num == 1)
+            count -= 1
 
     def test_20_make_transactions(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -180,11 +185,9 @@ class TestBBcAppClient(object):
                 cl['app'].insert_transaction(txobj)
                 msg_processor[k].synchronize()
                 i += 1
-            cl['app'].get_stats()
-            msg_processor[k].synchronize()
         time.sleep(3)
 
-        global num_assign_cross_ref
+        global num_assigned_cross_ref
         num_cross_ref_in_clients = 0
         num_distribute_cross_ref_in_domain0 = 0
         num_drop_cross_ref = 0
@@ -197,10 +200,11 @@ class TestBBcAppClient(object):
             if KeyType.stats in dat:
                 stat = dat[KeyType.stats]
                 if i % 10 > 1:
-                    print("[%d] transaction.insert_count=%d" % (i, stat[b'transaction'][b'insert_count']))
-                    print("[%d] data_handler.insert_transaction=%d" % (i, stat[b'data_handler'][b'insert_transaction']))
+                    #print("[%d] transaction.insert_count=%d" % (i, stat[b'transaction'][b'insert_count']))
+                    #print("[%d] data_handler.insert_transaction=%d" % (i, stat[b'data_handler'][b'insert_transaction']))
                     assert stat[b'transaction'][b'insert_count'] == 5 * client_per_core
                     assert stat[b'data_handler'][b'insert_transaction'] == 5 * (core_per_domain - 1) * client_per_core
+            if KeyType.stats in dat and b'domain0' in dat[KeyType.stats]:
                 if b'domain0' in dat[KeyType.stats]:
                     print("[%d] distribute_cross_ref_in_domain0=%d" %
                           (i, stat[b'domain0'].get(b'distribute_cross_ref_in_domain0', 0)))
@@ -213,10 +217,10 @@ class TestBBcAppClient(object):
                     print("[%d] cross_ref_registered=%d" %
                           (i, stat[b'domain0'].get(b'cross_ref_registered', 0)))
                     num_distribute_cross_ref_in_domain0 += stat[b'domain0'].get(b'distribute_cross_ref_in_domain0', 0)
-                    num_assign_cross_ref += stat[b'domain0'].get(b'assign_cross_ref_to_nodes', 0)
+                    num_assigned_cross_ref += stat[b'domain0'].get(b'assign_cross_ref_to_nodes', 0)
                     num_drop_cross_ref += stat[b'domain0'].get(b'drop_cross_ref_because_exceed_margin', 0)
                     assert stat[b'domain0'].get(b'cross_ref_registered', 0) == 0
-        assert num_distribute_cross_ref_in_domain0 == num_assign_cross_ref + num_drop_cross_ref
+        assert num_distribute_cross_ref_in_domain0 == num_assigned_cross_ref + num_drop_cross_ref
 
     def test_21_make_transactions(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -232,6 +236,7 @@ class TestBBcAppClient(object):
                 if txobj.cross_ref is not None:
                     num_including_cross_ref += 1
                 i += 1
+        print("# num_including_cross_ref=", num_including_cross_ref)
         time.sleep(5)
 
         global num_cross_ref_registered
@@ -245,14 +250,13 @@ class TestBBcAppClient(object):
                 if b'cross_ref_registered' in stat[b'domain0']:
                     print("[%d] cross_ref_registered=%d" % (i, stat[b'domain0'][b'cross_ref_registered']))
                     num_cross_ref_registered += stat[b'domain0'][b'cross_ref_registered']
-                print("[%d] insert_cross_ref=%d" % (i, stat[b'data_handler'][b'insert_cross_ref']))
         assert num_including_cross_ref == num_cross_ref_registered
 
     def test_22_get_cross_ref_list(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         num_in_registered_list = 0
         global cross_ref_regsistered_list
-        for i in [7, 17, 27]:
+        for i in [3, 13, 23]:
             clients[i]['app'].request_cross_ref_holders_list()
             dat = msg_processor[i].synchronize()
             assert KeyType.transaction_id_list in dat
@@ -267,7 +271,7 @@ class TestBBcAppClient(object):
 
     def test_23_verify_cross_ref(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        for i in [6, 16, 26]:
+        for i in [5, 15, 25]:
             dm = clients[i]['app'].domain_id
             if len(cross_ref_regsistered_list[dm]) == 0:
                 continue

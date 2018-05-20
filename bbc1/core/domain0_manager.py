@@ -18,6 +18,7 @@ limitations under the License.
 import time
 import random
 import threading
+import bson
 
 import os
 import sys
@@ -326,7 +327,13 @@ class Domain0Manager:
             self.networking.domains[domain_id]['repair'].put_message(msg)
             return None
         txobj.digest()
-        return txobj.transaction_base_digest, txobj.cross_ref.serialize(), txobj.signatures[0].serialize()
+        if txobj.format_type in [bbclib.BBcFormat.FORMAT_BSON, bbclib.BBcFormat.FORMAT_BSON_COMPRESS_BZ2]:
+            cross_ref_dat = bson.dumps(txobj.cross_ref.serialize())
+            sigdata = bson.dumps(txobj.signatures[0].serialize())
+        else:
+            cross_ref_dat = txobj.cross_ref.serialize()
+            sigdata = txobj.signatures[0].serialize()
+        return txobj.transaction_base_digest, cross_ref_dat, sigdata, txobj.format_type
 
     def process_message(self, msg):
         """Process received message

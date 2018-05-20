@@ -60,7 +60,7 @@ asset_group_id = bbclib.get_new_id("asset_group_id for testing")
 keypair = bbclib.Keypair()
 keypair.generate()
 
-txobj = bbclib.make_transaction(relation_num=, witness=True)
+txobj = bbclib.make_transaction(relation_num=1, witness=True)
 bbclib.add_relation_asset(txobj, relation_idx=0, asset_group_id=asset_group_id,
                           user_id=user_id, asset_body=b'test asset data', asset_file=b'file content')
 txobj.witness.add_witness(user_id)
@@ -77,6 +77,34 @@ make\_transaction()はトランザクションデータ構造を生成するた�
 witness.add\_witness(user\_id)は、user\_id用の署名領域をトランザクション内に確保する。その後、witness.add\_signature()によって、実際の署名オブジェクトをトランザクションに格納する。署名オブジェクトはトランザクションオブジェクト(txobj)のsign()に鍵を指定すれば得られる。
 
 BBcTransactionクラスには__str__メソッドが定義されているので、print文などで文字列としてアクセスすれば、トランザクションデータの内容を取得できる。
+
+### トランザクションのデータフォーマット
+トランザクションのデータフォーマットは、デフォルト設定では独自のバイナリフォーマットである。無駄が少ないためデータサイズは小さくなるが、バイナリ操作を必要とするためjavascript
+などの言語では利用しにくい。そのため、データフォーマットとして、bson (binary JSON)
+およびbzip2で圧縮したbsonフォーマットもサポートする。トランザクションデータの先頭2バイトがフォーマットタイプを表しており、取りうる値はbbclib.pyのBBcFormatクラスに宣言されている。
+なお、圧縮されたbsonフォーマットは解凍後はbsonフォーマットと全く同じものになるため、bbclib.pyの内部では全く同じ処理が行われている（シリアライズの最後のデータ出力じにcompress、デシリアライズの最初のデータ入力時にdecompressするのみである）
+
+データフォーマットが変わると、同じ内容でもtransaction\_idが変わってしまうため、署名結果も変わってしまう。したがって、同一domain内ではデータフォーマットを統一すべきである。
+
+デフォルトのフォーマット以外を利用する際は、各種オブジェクトを生成する際に、format_typeパラメータを指定する必要がある。
+```
+asset_group_id = bbclib.get_new_id("asset_group_id for testing")
+
+keypair = bbclib.Keypair()
+keypair.generate()
+
+txobj = bbclib.make_transaction(relation_num=1, witness=True, format_type=bbclib.BBcFormat.FORMAT_BSON_COMPRESS_BZ2)
+bbclib.add_relation_asset(txobj, relation_idx=0, asset_group_id=asset_group_id,
+                          user_id=user_id, asset_body=b'test asset data', asset_file=b'file content')
+txobj.witness.add_witness(user_id)
+sig = txobj.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1, private_key=keypair.private_key, public_key=keypair.public_key)
+
+txobj.witness.add_signature(user_id=user_id, signature=sig)
+
+print(txobj)
+```
+上記の例では、make\_transaction()のところで、```format_type=bbclib.BBcFormat.FORMAT_BSON_COMPRESS_BZ2```を指定している。
+BBcAssetなどのオブジェクトを直接生成する場合は、それぞれのオブジェクト生成時に同じように```format_type=```を指定する必要がある（不整合が起こるとエラーでinsertできなくなる）。
 
 ## トランザクションの登録
 生成したトランザクションは以下のようにしてcore nodeに登録する。
@@ -524,7 +552,9 @@ if KeyType.transaction_tree in response_data:
             asset_body = txobj.events[0].asset.asset_body
             print("[%d] asset=%s" % (i, asset_body))
 ```
-traverse\_transactionsメソッドには、起点となるトランザクションのtransaction\_idと、履歴を辿る方向(1なら過去のトランザクションに向かって検索、1以外なら未来のトランザクションに向かって検索)、および取得する最大ホップ数(いくつ離れたところまで取るか)である。その応答として得られるメッセージの中のKeyType.transaction\_treeがトランザクションの履歴である。KeyType.transaction\_treeのvalueの中身はリストになっており、リストのリスト構造は以下のとおりである。
+traverse\_transactionsメソッドには、起点となるトランザクションのtransaction\_idと、履歴を辿る方向(1なら過去のトランザクションに向かって検索、1以外なら未来のトランザクションに向かって検索)
+、および取得する最大ホップ数(何世代離れたところまで取るか)である。その応答として得られるメッセージの中のKeyType.transaction\_treeがトランザクションの履歴である。KeyType
+.transaction\_treeのvalueの中身はリストになっており、リストのリスト構造は以下のとおりである。
 ```
   tree_of_tx = [ [txdata1_1, txdata1_2, txdata1_3,,,,], [txdata2_1, txdata2_1, txdata2_1,,,,], [txdata3_1, txdata3_1, txdata3_1,,,,],,,,, ]
 ```
@@ -561,8 +591,8 @@ for txid_to_verify in dat[KeyType.transaction_id_list]:
     client.request_verify_by_cross_ref(txid_to_verify)
     response_data2 = client.callback.synchronize()
     if KeyType.cross_ref_verification_info in dat
-        transaction_base_digest, cross_ref_data, sigdata = dat[KeyType.cross_ref_verification_info]
-        result = bbclib.verify_using_cross_ref(dm, txid_to_verify, transaction_base_digest, cross_ref_data, sigdata)
+        transaction_base_digest, cross_ref_data, sigdata, tx_format = dat[KeyType.cross_ref_verification_info]
+        result = bbclib.verify_using_cross_ref(dm, txid_to_verify, transaction_base_digest, cross_ref_data, sigdata, format_type=tx_format)
         if result:
             print("transaction_id %s had registered in another domain")
         else:

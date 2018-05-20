@@ -427,8 +427,9 @@ class BBcCoreService:
                 self.logger.debug("RESPONSE_SIGNATURE: bad format")
                 return False, None
             retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GATHER_SIGNATURE,
-                                            dat[KeyType.destination_user_id], dat[KeyType.query_id])
+                                             dat[KeyType.destination_user_id], dat[KeyType.query_id])
             if KeyType.signature in dat:
+                retmsg[KeyType.transaction_data_format] = dat[KeyType.transaction_data_format]
                 retmsg[KeyType.signature] = dat[KeyType.signature]
                 retmsg[KeyType.ref_index] = dat[KeyType.ref_index]
             elif KeyType.status not in dat:

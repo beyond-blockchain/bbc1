@@ -321,6 +321,7 @@ class KeyType:
     source_domain_id = to_4byte(9, 0x70)
     txid_having_cross_ref = to_4byte(10, 0x70)
     cross_ref_verification_info = to_4byte(11, 0x70)
+    transaction_data_format = to_4byte(12, 0x70)
 
     compromised_transaction_data = to_4byte(0, 0x90)
     compromised_transactions = to_4byte(1, 0x90)
