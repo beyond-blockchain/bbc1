@@ -215,7 +215,7 @@ class BBcNetwork:
 
         Args:
             domain_id (bytes): target domain_id to create
-            config (dict): confituration for the domain
+            config (dict): configuration for the domain
         Returns:
             bool:
         """
