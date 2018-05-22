@@ -7,6 +7,8 @@ Submodules
 .. toctree::
 
    bbc1.core.libbbcsig.pybbcsig
+   bbc1.core.libbbcsig.test_ecdsa
+   bbc1.core.libbbcsig.test_pybbcsig
 
 Module contents
 ---------------

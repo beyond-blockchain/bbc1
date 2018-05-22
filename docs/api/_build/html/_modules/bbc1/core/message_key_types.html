@@ -177,15 +177,15 @@
 <span class="n">decryptors</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="to_4byte"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.to_4byte">[docs]</a><span class="k">def</span> <span class="nf">to_4byte</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="to_4byte"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.to_4byte">[docs]</a><span class="k">def</span> <span class="nf">to_4byte</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">val</span><span class="o">+</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span>   <span class="c1"># network byte order</span></div>
 
 
-<div class="viewcode-block" id="to_2byte"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.to_2byte">[docs]</a><span class="k">def</span> <span class="nf">to_2byte</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="to_2byte"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.to_2byte">[docs]</a><span class="k">def</span> <span class="nf">to_2byte</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">val</span><span class="o">+</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span>   <span class="c1"># network byte order</span></div>
 
 
-<div class="viewcode-block" id="make_message"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.make_message">[docs]</a><span class="k">def</span> <span class="nf">make_message</span><span class="p">(</span><span class="n">payload_type</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">payload_version</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="make_message"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.make_message">[docs]</a><span class="k">def</span> <span class="nf">make_message</span><span class="p">(</span><span class="n">payload_type</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">payload_version</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Utility for making serialized message data&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">payload_type</span> <span class="o">==</span> <span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_msgpack</span><span class="p">:</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="n">msgpack</span><span class="o">.</span><span class="n">packb</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -205,7 +205,7 @@
     <span class="k">return</span> <span class="n">msg</span></div>
 
 
-<div class="viewcode-block" id="deserialize_data"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.deserialize_data">[docs]</a><span class="k">def</span> <span class="nf">deserialize_data</span><span class="p">(</span><span class="n">payload_type</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+<div class="viewcode-block" id="deserialize_data"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.deserialize_data">[docs]</a><span class="k">def</span> <span class="nf">deserialize_data</span><span class="p">(</span><span class="n">payload_type</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Utility for deserializing the received message&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">payload_type</span> <span class="o">==</span> <span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_msgpack</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">msgpack</span><span class="o">.</span><span class="n">unpackb</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
@@ -222,7 +222,7 @@
     <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="make_binary"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.make_binary">[docs]</a><span class="k">def</span> <span class="nf">make_binary</span><span class="p">(</span><span class="n">dat</span><span class="p">):</span>
+<div class="viewcode-block" id="make_binary"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.make_binary">[docs]</a><span class="k">def</span> <span class="nf">make_binary</span><span class="p">(</span><span class="n">dat</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Simple serialize function</span>
 
 <span class="sd">    Basically, Type-Length-Value format is created for each item.</span>
@@ -257,7 +257,7 @@
     <span class="k">return</span> <span class="n">ret</span></div>
 
 
-<div class="viewcode-block" id="make_TLV_formatted_message"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.make_TLV_formatted_message">[docs]</a><span class="k">def</span> <span class="nf">make_TLV_formatted_message</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+<div class="viewcode-block" id="make_TLV_formatted_message"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.make_TLV_formatted_message">[docs]</a><span class="k">def</span> <span class="nf">make_TLV_formatted_message</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Utility for simple serialization function&quot;&quot;&quot;</span>
     <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -266,7 +266,7 @@
     <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="convert_from_binary"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.convert_from_binary">[docs]</a><span class="k">def</span> <span class="nf">convert_from_binary</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+<div class="viewcode-block" id="convert_from_binary"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.convert_from_binary">[docs]</a><span class="k">def</span> <span class="nf">convert_from_binary</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Deserialization from simple serialization&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">data_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">dat</span>
@@ -289,7 +289,7 @@
         <span class="k">return</span> <span class="n">ret</span></div>
 
 
-<div class="viewcode-block" id="make_dictionary_from_TLV_format"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.make_dictionary_from_TLV_format">[docs]</a><span class="k">def</span> <span class="nf">make_dictionary_from_TLV_format</span><span class="p">(</span><span class="n">dat</span><span class="p">):</span>
+<div class="viewcode-block" id="make_dictionary_from_TLV_format"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.make_dictionary_from_TLV_format">[docs]</a><span class="k">def</span> <span class="nf">make_dictionary_from_TLV_format</span><span class="p">(</span><span class="n">dat</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Utility for simple deserialization function&quot;&quot;&quot;</span>
     <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
@@ -303,7 +303,7 @@
     <span class="k">return</span> <span class="n">msg</span></div>
 
 
-<div class="viewcode-block" id="get_ECDH_parameters"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.get_ECDH_parameters">[docs]</a><span class="k">def</span> <span class="nf">get_ECDH_parameters</span><span class="p">():</span>
+<div class="viewcode-block" id="get_ECDH_parameters"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.get_ECDH_parameters">[docs]</a><span class="k">def</span> <span class="nf">get_ECDH_parameters</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Utility for initialization of ECDH parameters&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">encryptors</span><span class="p">,</span> <span class="n">decryptors</span>
     <span class="n">private_key</span> <span class="o">=</span> <span class="n">ec</span><span class="o">.</span><span class="n">generate_private_key</span><span class="p">(</span><span class="n">ec</span><span class="o">.</span><span class="n">SECP384R1</span><span class="p">(),</span> <span class="n">default_backend</span><span class="p">())</span>
@@ -318,7 +318,7 @@
     <span class="k">return</span> <span class="n">private_key</span><span class="p">,</span> <span class="n">serialized_pubkey</span><span class="p">,</span> <span class="n">key_name</span></div>
 
 
-<div class="viewcode-block" id="derive_shared_key"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.derive_shared_key">[docs]</a><span class="k">def</span> <span class="nf">derive_shared_key</span><span class="p">(</span><span class="n">private_key</span><span class="p">,</span> <span class="n">serialized_pubkey</span><span class="p">,</span> <span class="n">shared_info</span><span class="p">):</span>
+<div class="viewcode-block" id="derive_shared_key"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.derive_shared_key">[docs]</a><span class="k">def</span> <span class="nf">derive_shared_key</span><span class="p">(</span><span class="n">private_key</span><span class="p">,</span> <span class="n">serialized_pubkey</span><span class="p">,</span> <span class="n">shared_info</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Utility for deriving shared key in ECDH procedure&quot;&quot;&quot;</span>
     <span class="n">deserialized_public_numbers</span> <span class="o">=</span> <span class="n">ec</span><span class="o">.</span><span class="n">EllipticCurvePublicNumbers</span><span class="o">.</span><span class="n">from_encoded_point</span><span class="p">(</span><span class="n">ec</span><span class="o">.</span><span class="n">SECP384R1</span><span class="p">(),</span> <span class="n">serialized_pubkey</span><span class="p">)</span>
     <span class="n">deserialized_pubkey</span> <span class="o">=</span> <span class="n">deserialized_public_numbers</span><span class="o">.</span><span class="n">public_key</span><span class="p">(</span><span class="n">default_backend</span><span class="p">())</span>
@@ -328,7 +328,7 @@
     <span class="k">return</span> <span class="n">derived_key</span></div>
 
 
-<div class="viewcode-block" id="set_cipher"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.set_cipher">[docs]</a><span class="k">def</span> <span class="nf">set_cipher</span><span class="p">(</span><span class="n">shared_key</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">hint</span><span class="p">):</span>
+<div class="viewcode-block" id="set_cipher"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.set_cipher">[docs]</a><span class="k">def</span> <span class="nf">set_cipher</span><span class="p">(</span><span class="n">shared_key</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">hint</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Set shared key to the encryptor and decryptor</span>
 
 <span class="sd">    Encryptor and Decryptor are created for each inter-node connection</span>
@@ -339,20 +339,20 @@
     <span class="n">decryptors</span><span class="p">[</span><span class="n">key_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">decryptor</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="unset_cipher"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.unset_cipher">[docs]</a><span class="k">def</span> <span class="nf">unset_cipher</span><span class="p">(</span><span class="n">key_name</span><span class="p">):</span>
+<div class="viewcode-block" id="unset_cipher"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.unset_cipher">[docs]</a><span class="k">def</span> <span class="nf">unset_cipher</span><span class="p">(</span><span class="n">key_name</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">key_name</span> <span class="ow">in</span> <span class="n">encryptors</span><span class="p">:</span>
         <span class="k">del</span> <span class="n">encryptors</span><span class="p">[</span><span class="n">key_name</span><span class="p">]</span>
         <span class="k">del</span> <span class="n">decryptors</span><span class="p">[</span><span class="n">key_name</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="PayloadType"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.PayloadType">[docs]</a><span class="k">class</span> <span class="nc">PayloadType</span><span class="p">:</span>
+<div class="viewcode-block" id="PayloadType"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.PayloadType">[docs]</a><span class="k">class</span> <span class="nc">PayloadType</span><span class="p">:</span>
     <span class="n">Type_binary</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">Type_any</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">Type_msgpack</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="n">Type_encrypted_msgpack</span> <span class="o">=</span> <span class="mi">3</span></div>
 
 
-<div class="viewcode-block" id="Message"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.Message">[docs]</a><span class="k">class</span> <span class="nc">Message</span><span class="p">:</span>
+<div class="viewcode-block" id="Message"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.Message">[docs]</a><span class="k">class</span> <span class="nc">Message</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Message parser&quot;&quot;&quot;</span>
     <span class="n">HEADER_LEN</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># Type, length of data_body, data_body</span>
 
@@ -365,11 +365,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">msg_len</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Message.recv"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.Message.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+<div class="viewcode-block" id="Message.recv"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.Message.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Append message to the buffer&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pending_buf</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Message.parse"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.Message.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Message.parse"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.Message.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Parse the message in the buffer&quot;&quot;&quot;</span>
         <span class="c1">#print(&quot; &gt; pending_buf=%d,%d&quot;%(len(self.pending_buf), Message.HEADER_LEN))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_new_chunk</span><span class="p">:</span>
@@ -398,7 +398,7 @@
         <span class="k">return</span> <span class="kc">None</span></div></div>
 
 
-<div class="viewcode-block" id="KeyType"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.KeyType">[docs]</a><span class="k">class</span> <span class="nc">KeyType</span><span class="p">:</span>
+<div class="viewcode-block" id="KeyType"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.KeyType">[docs]</a><span class="k">class</span> <span class="nc">KeyType</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Types of items in a message&quot;&quot;&quot;</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>    <span class="c1"># status code in bbc_error</span>
     <span class="n">reason</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>    <span class="c1"># text</span>
@@ -482,7 +482,7 @@
     <span class="n">merkle_tree</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mh">0xA0</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="InfraMessageCategory"><a class="viewcode-back" href="../../../bbc1.core.message_key_types.html#bbc1.core.message_key_types.InfraMessageCategory">[docs]</a><span class="k">class</span> <span class="nc">InfraMessageCategory</span><span class="p">:</span>
+<div class="viewcode-block" id="InfraMessageCategory"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.InfraMessageCategory">[docs]</a><span class="k">class</span> <span class="nc">InfraMessageCategory</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Types of message for inter-core nodes messaging&quot;&quot;&quot;</span>
     <span class="n">CATEGORY_NETWORK</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">CATEGORY_TOPOLOGY</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>

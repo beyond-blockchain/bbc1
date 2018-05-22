@@ -152,7 +152,7 @@
 <span class="kn">from</span> <span class="nn">ctypes</span> <span class="k">import</span> <span class="o">*</span>
 
 
-<div class="viewcode-block" id="PyBBcSigSecp256k1"><a class="viewcode-back" href="../../../../bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1">[docs]</a><span class="k">class</span> <span class="nc">PyBBcSigSecp256k1</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="PyBBcSigSecp256k1"><a class="viewcode-back" href="../../../../orig/bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1">[docs]</a><span class="k">class</span> <span class="nc">PyBBcSigSecp256k1</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -162,7 +162,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lib</span> <span class="o">=</span> <span class="n">cdll</span><span class="o">.</span><span class="n">LoadLibrary</span><span class="p">(</span><span class="s2">&quot;libbbcsig.so&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PyBBcSigSecp256k1.generate_keypair"><a class="viewcode-back" href="../../../../bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.generate_keypair">[docs]</a>    <span class="k">def</span> <span class="nf">generate_keypair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pubkey_type</span><span class="p">):</span>
+<div class="viewcode-block" id="PyBBcSigSecp256k1.generate_keypair"><a class="viewcode-back" href="../../../../orig/bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.generate_keypair">[docs]</a>    <span class="k">def</span> <span class="nf">generate_keypair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pubkey_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">privkey_len</span> <span class="o">=</span> <span class="n">c_int32</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
@@ -176,7 +176,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PyBBcSigSecp256k1.sign"><a class="viewcode-back" href="../../../../bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">privkey</span><span class="p">,</span> <span class="n">digest</span><span class="p">):</span>
+<div class="viewcode-block" id="PyBBcSigSecp256k1.sign"><a class="viewcode-back" href="../../../../orig/bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">privkey</span><span class="p">,</span> <span class="n">digest</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">signature</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">64</span><span class="p">)()</span>
@@ -187,7 +187,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="PyBBcSigSecp256k1.output_der"><a class="viewcode-back" href="../../../../bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.output_der">[docs]</a>    <span class="k">def</span> <span class="nf">output_der</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">privkey</span><span class="p">):</span>
+<div class="viewcode-block" id="PyBBcSigSecp256k1.output_der"><a class="viewcode-back" href="../../../../orig/bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.output_der">[docs]</a>    <span class="k">def</span> <span class="nf">output_der</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">privkey</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">der_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">512</span><span class="p">)()</span>
@@ -199,7 +199,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="PyBBcSigSecp256k1.convert_from_der"><a class="viewcode-back" href="../../../../bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.convert_from_der">[docs]</a>    <span class="k">def</span> <span class="nf">convert_from_der</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">der_data</span><span class="p">,</span> <span class="n">pubkey_type</span><span class="p">):</span>
+<div class="viewcode-block" id="PyBBcSigSecp256k1.convert_from_der"><a class="viewcode-back" href="../../../../orig/bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.convert_from_der">[docs]</a>    <span class="k">def</span> <span class="nf">convert_from_der</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">der_data</span><span class="p">,</span> <span class="n">pubkey_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">privkey_len</span> <span class="o">=</span> <span class="n">c_int32</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
@@ -213,7 +213,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PyBBcSigSecp256k1.get_public_key_compressed"><a class="viewcode-back" href="../../../../bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.get_public_key_compressed">[docs]</a>    <span class="k">def</span> <span class="nf">get_public_key_compressed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">privkey</span><span class="p">):</span>
+<div class="viewcode-block" id="PyBBcSigSecp256k1.get_public_key_compressed"><a class="viewcode-back" href="../../../../orig/bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.get_public_key_compressed">[docs]</a>    <span class="k">def</span> <span class="nf">get_public_key_compressed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">privkey</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pubkey_len</span>  <span class="o">=</span> <span class="n">c_int32</span><span class="p">(</span><span class="mi">65</span><span class="p">)</span>
@@ -225,7 +225,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="PyBBcSigSecp256k1.get_public_key_uncompressed"><a class="viewcode-back" href="../../../../bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.get_public_key_uncompressed">[docs]</a>    <span class="k">def</span> <span class="nf">get_public_key_uncompressed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">privkey</span><span class="p">):</span>
+<div class="viewcode-block" id="PyBBcSigSecp256k1.get_public_key_uncompressed"><a class="viewcode-back" href="../../../../orig/bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.get_public_key_uncompressed">[docs]</a>    <span class="k">def</span> <span class="nf">get_public_key_uncompressed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">privkey</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pubkey_len</span>  <span class="o">=</span> <span class="n">c_int32</span><span class="p">(</span><span class="mi">65</span><span class="p">)</span>
@@ -237,13 +237,13 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="PyBBcSigSecp256k1.verify"><a class="viewcode-back" href="../../../../bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pubkey</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">signature</span><span class="p">):</span>
+<div class="viewcode-block" id="PyBBcSigSecp256k1.verify"><a class="viewcode-back" href="../../../../orig/bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pubkey</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">signature</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pubkey</span><span class="p">),</span> <span class="n">pubkey</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
-<div class="viewcode-block" id="PyBBcSigSecp256k1.output_pem"><a class="viewcode-back" href="../../../../bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.output_pem">[docs]</a>    <span class="k">def</span> <span class="nf">output_pem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">privkey</span><span class="p">):</span>
+<div class="viewcode-block" id="PyBBcSigSecp256k1.output_pem"><a class="viewcode-back" href="../../../../orig/bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.output_pem">[docs]</a>    <span class="k">def</span> <span class="nf">output_pem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">privkey</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pem_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">512</span><span class="p">)()</span>
@@ -257,7 +257,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="PyBBcSigSecp256k1.convert_from_pem"><a class="viewcode-back" href="../../../../bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.convert_from_pem">[docs]</a>    <span class="k">def</span> <span class="nf">convert_from_pem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pem_data</span><span class="p">,</span> <span class="n">pubkey_type</span><span class="p">):</span>
+<div class="viewcode-block" id="PyBBcSigSecp256k1.convert_from_pem"><a class="viewcode-back" href="../../../../orig/bbc1.core.libbbcsig.pybbcsig.html#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.convert_from_pem">[docs]</a>    <span class="k">def</span> <span class="nf">convert_from_pem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pem_data</span><span class="p">,</span> <span class="n">pubkey_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">privkey_len</span> <span class="o">=</span> <span class="n">c_int32</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>

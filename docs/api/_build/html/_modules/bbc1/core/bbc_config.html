@@ -225,7 +225,7 @@
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="update_deep"><a class="viewcode-back" href="../../../bbc1.core.bbc_config.html#bbc1.core.bbc_config.update_deep">[docs]</a><span class="k">def</span> <span class="nf">update_deep</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<div class="viewcode-block" id="update_deep"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.update_deep">[docs]</a><span class="k">def</span> <span class="nf">update_deep</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Utility for updating nested dictionary&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="c1"># this condition handles the problem</span>
@@ -239,7 +239,7 @@
     <span class="k">return</span> <span class="n">d</span></div>
 
 
-<div class="viewcode-block" id="BBcConfig"><a class="viewcode-back" href="../../../bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig">[docs]</a><span class="k">class</span> <span class="nc">BBcConfig</span><span class="p">:</span>
+<div class="viewcode-block" id="BBcConfig"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig">[docs]</a><span class="k">class</span> <span class="nc">BBcConfig</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;System configuration&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_config</span><span class="p">)</span>
@@ -260,7 +260,7 @@
             <span class="n">update_deep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_config</span><span class="p">()</span>
 
-<div class="viewcode-block" id="BBcConfig.read_config"><a class="viewcode-back" href="../../../bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.read_config">[docs]</a>    <span class="k">def</span> <span class="nf">read_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcConfig.read_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.read_config">[docs]</a>    <span class="k">def</span> <span class="nf">read_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read config file&quot;&quot;&quot;</span>
         <span class="n">config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -271,7 +271,7 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">config</span></div>
 
-<div class="viewcode-block" id="BBcConfig.update_config"><a class="viewcode-back" href="../../../bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.update_config">[docs]</a>    <span class="k">def</span> <span class="nf">update_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcConfig.update_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.update_config">[docs]</a>    <span class="k">def</span> <span class="nf">update_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Write config to file (config.json)&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -282,16 +282,16 @@
             <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="BBcConfig.get_json_config"><a class="viewcode-back" href="../../../bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.get_json_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_json_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcConfig.get_json_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.get_json_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_json_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get config in json format&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_config</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BBcConfig.get_config"><a class="viewcode-back" href="../../../bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.get_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcConfig.get_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.get_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return config dictionary&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span></div>
 
-<div class="viewcode-block" id="BBcConfig.get_domain_config"><a class="viewcode-back" href="../../../bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.get_domain_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_domain_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">create_if_new</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcConfig.get_domain_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.get_domain_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_domain_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">create_if_new</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the part of specified domain_id in the config dictionary&quot;&quot;&quot;</span>
         <span class="n">domain_id_str</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">convert_id_to_string</span><span class="p">(</span><span class="n">domain_id</span><span class="p">)</span>
         <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">()</span>
@@ -318,7 +318,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">][</span><span class="n">domain_id_str</span><span class="p">]</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="BBcConfig.remove_domain_config"><a class="viewcode-back" href="../../../bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.remove_domain_config">[docs]</a>    <span class="k">def</span> <span class="nf">remove_domain_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcConfig.remove_domain_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.remove_domain_config">[docs]</a>    <span class="k">def</span> <span class="nf">remove_domain_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Remove the part of specified domain_id in the config dictionary&quot;&quot;&quot;</span>
         <span class="n">domain_id_str</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">convert_id_to_string</span><span class="p">(</span><span class="n">domain_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">domain_id_str</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">]:</span>

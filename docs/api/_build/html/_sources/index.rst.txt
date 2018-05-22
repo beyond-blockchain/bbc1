@@ -1,5 +1,5 @@
 .. bbc1 documentation master file, created by
-   sphinx-quickstart on Mon Apr 30 14:25:39 2018.
+   sphinx-quickstart on Tue May 22 09:13:32 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
