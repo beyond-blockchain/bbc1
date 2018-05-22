@@ -34,6 +34,7 @@ case $1 in
         cp ../requirements.txt .
         cd ..
         git archive --prefix="bbc1/" HEAD > docker/bbc1.tar
+        mkdir libs/openssl
         cd libs/openssl/
         git archive --prefix="bbc1/libs/openssl/" HEAD > ../../docker/sb1.tar
         cd ../../docker
