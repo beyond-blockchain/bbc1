@@ -20,27 +20,6 @@ The APIs of BBc-1 is defined in bbc\_app.py and bbclib.py. So application develo
 
 For the details, please read documents in docs/ directory. Not only documents but slide decks (PDF) explain the design of the BBc-1 and its implementation.
 
-# Environment
-
-* Python
-    - Python 3.5.0 or later
-    - [pipenv](https://docs.pipenv.org) is recommended
-        - add ```export PIPENV_VENV_IN_PROJECT=true``` in .bash_profile
-
-* tools for macOS by Homebrew
-    ```
-    brew install libtool automake python3 pipenv
-    ```
-
-* tools for Linux (Ubuntu 16.04 LTS)
-    ```
-    sudo apt-get install -y git tzdata openssh-server python3 python3-dev libffi-dev net-tools autoconf automake libtool libssl-dev make
-    pip install pipenv
-    ```
-
-
-# Quick start
-
 ## Documents
 Some documents are available in docs/.
 * Policy, design and analysis
@@ -65,6 +44,27 @@ Some documents are available in docs/.
         pipenv run python -m http.server
         ```
 
+
+# Environment
+
+* Python
+    - Python 3.5.0 or later
+    - [pipenv](https://docs.pipenv.org) is recommended
+        - add ```export PIPENV_VENV_IN_PROJECT=true``` in .bash_profile
+
+* tools for macOS by Homebrew
+    ```
+    brew install libtool automake python3 pipenv
+    ```
+
+* tools for Linux (Ubuntu 16.04 LTS)
+    ```
+    sudo apt-get install -y git tzdata openssh-server python3 python3-dev libffi-dev net-tools autoconf automake libtool libssl-dev make
+    pip install pipenv
+    ```
+
+
+# Quick start
 
 ## From source code in github
 1. Install development tools (libtool, automake)
@@ -149,6 +149,8 @@ The working directory of BBc-1 on the docker container is mounted on docker/data
     - docker environments
 * tests/
     - test codes for pytest
+* libs/
+    - some libraries used by BBc-1
 * docs/
     - docs about BBc-1 and its reference implementation
 * somewhere/.bbc1/
