@@ -1,5 +1,5 @@
 CC = gcc
-OPENSSL_DIR=../../../third_party/openssl
+OPENSSL_DIR=../openssl
 INCS = -I$(OPENSSL_DIR)/include -I$(OPENSSL_DIR)
 LIBS = $(OPENSSL_DIR)/libssl.a $(OPENSSL_DIR)/libcrypto.a
 

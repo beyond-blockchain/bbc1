@@ -7,8 +7,8 @@ include package.json
 include *.rst
 include prepare.sh
 include prepare.py
-recursive-include third_party/openssl *
-recursive-include third_party/libbbcsig *
+recursive-include libs/openssl *
+recursive-include libs/libbbcsig *
 graft django
 prune django/contrib/admin/bin
 graft docs
