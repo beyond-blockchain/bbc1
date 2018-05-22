@@ -5,9 +5,10 @@ Change log
 * Restructure the whole package
   * Only bbc1/core/ remains
   * Ledger_subsystem related codes and libraries are separated into other repositories
+* Support BSON (binary JSON) format for transaction data structure
 * Documents are updated
 * Utilities are re-designed
-* Bug fix
+* Bug fixes
 
 ## v0.10
 * The core part is totally re-designed

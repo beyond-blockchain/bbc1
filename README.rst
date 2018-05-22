@@ -20,11 +20,36 @@ The APIs of BBc-1 is defined in bbc\_app.py and bbclib.py. So application develo
 
 For the details, please read documents in docs/ directory. Not only documents but slide decks (PDF) explain the design of the BBc-1 and its implementation.
 
+## Documents
+Some documents are available in docs/.
+* Policy, design and analysis
+  * [BBc-trust.pdf](docs/BBc-trust.pdf)
+  * [BBc-trust_ja.pdf](docs/BBc-trust_ja.pdf)
+  * [BBc-1_design_paper.pdf](docs/BBc-1_design_paper.pdf)
+  * [BBc1_design_document_v1.0_ja.pdf](docs/BBc1_design_document_v1.0_ja.pdf)
+  * [How_BBc1_works_v1.0_ja.pdf](docs/How_BBc1_works_v1.0_ja.pdf)
+* Usage
+    * [How_to_use_BBc1_v1.0_ja.pdf](docs/How_to_use_BBc1_v1.0_ja.pdf)
+    * [BBc1_core_tutorial_installation_ja.md](docs/BBc1_core_tutorial_installation_ja.md)
+    * [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
+    * [libbbcsig_dll_build_for_Windows_x64_ja.md](docs/libbbcsig_dll_build_for_Windows_x64_ja.md)
+* Programing
+    * [BBc1_programming_guide_v1.0_ja.md](docs/BBc1_programming_guide_v1.0_ja.md)
+    * [BBc1_core_tutorial_file_proof_ja.md](docs/BBc1_core_tutorial_file_proof_ja.md)
+* API reference (Coming soon. Currently, something wrong in building docs)
+    * [https://bbc-1.readthedocs.io/en/latest/](https://bbc-1.readthedocs.io/en/latest/)
+    * You can read API docs in your local host by the following command:
+        ```python
+        cd docs/api/_build/html
+        pipenv run python -m http.server
+        ```
+
+
 # Environment
 
 * Python
     - Python 3.5.0 or later
-    - pipenv is recommended
+    - [pipenv](https://docs.pipenv.org) is recommended
         - add ```export PIPENV_VENV_IN_PROJECT=true``` in .bash_profile
 
 * tools for macOS by Homebrew
@@ -40,22 +65,6 @@ For the details, please read documents in docs/ directory. Not only documents bu
 
 
 # Quick start
-
-## Documents
-Some documents are available in docs/.
-* Policy, design and analysis
-  * [BBc-trust.pdf](docs/BBc-trust.pdf)
-  * [BBc-trust_ja.pdf](docs/BBc-trust_ja.pdf)
-  * [BBc-1_design_paper.pdf](docs/BBc-1_design_paper.pdf)
-  * [BBc1_design_document_v1.0_ja_r1.pdf](docs/BBc1_design_document_v1.0_ja_r1.pdf)
-* Usage
-    * [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
-    * [libbbcsig_dll_build_for_Windows_x64_ja.md](docs/libbbcsig_dll_build_for_Windows_x64_ja.md)
-* Programing
-    * [BBc1_programming_guide_v1.0_ja_r1.md](docs/BBc1_programming_guide_v1.0_ja_r1.md)
-* API reference
-    * readthedocs.io
-
 
 ## From source code in github
 1. Install development tools (libtool, automake)
@@ -81,8 +90,9 @@ Some documents are available in docs/.
     cd core
     python bbc_core.py
     ```
-7. Start a sample app in another terminal
+7. Start a sample app in another terminal (should be initially at bbc1/ top directory)
     ```
+    pipenv shell
     cd examples
     python file_proof.py arg1 arg2..
     ```
@@ -139,12 +149,16 @@ The working directory of BBc-1 on the docker container is mounted on docker/data
     - docker environments
 * tests/
     - test codes for pytest
+* libs/
+    - some libraries used by BBc-1
 * docs/
     - docs about BBc-1 and its reference implementation
 * somewhere/.bbc1/
     - default working directory name of bbc_core.py
 * requirements.txt
     - python modules to be required
+* Pipfile, Pipfile.lock
+    - python modules info for pipenv
 * setup.py
 * MANIFEST.in
 * prepare.py
