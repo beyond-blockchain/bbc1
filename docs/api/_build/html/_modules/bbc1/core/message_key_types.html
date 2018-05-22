@@ -1,0 +1,553 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc1.core.message_key_types &mdash; BBc1 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bbc1.html">bbc1 package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BBc1</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>bbc1.core.message_key_types</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bbc1.core.message_key_types</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Copyright (c) 2017 beyond-blockchain.org.</span>
+
+<span class="sd">Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="sd">you may not use this file except in compliance with the License.</span>
+<span class="sd">You may obtain a copy of the License at</span>
+
+<span class="sd">    http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="sd">Unless required by applicable law or agreed to in writing, software</span>
+<span class="sd">distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="sd">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="sd">See the License for the specific language governing permissions and</span>
+<span class="sd">limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">msgpack</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.backends</span> <span class="k">import</span> <span class="n">default_backend</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives</span> <span class="k">import</span> <span class="n">hashes</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives.asymmetric</span> <span class="k">import</span> <span class="n">ec</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives.kdf.hkdf</span> <span class="k">import</span> <span class="n">HKDF</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives.ciphers</span> <span class="k">import</span> <span class="n">Cipher</span><span class="p">,</span> <span class="n">algorithms</span><span class="p">,</span> <span class="n">modes</span>
+
+<span class="n">encryptors</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">decryptors</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="to_4byte"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.to_4byte">[docs]</a><span class="k">def</span> <span class="nf">to_4byte</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">val</span><span class="o">+</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span>   <span class="c1"># network byte order</span></div>
+
+
+<div class="viewcode-block" id="to_2byte"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.to_2byte">[docs]</a><span class="k">def</span> <span class="nf">to_2byte</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">val</span><span class="o">+</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span>   <span class="c1"># network byte order</span></div>
+
+
+<div class="viewcode-block" id="make_message"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.make_message">[docs]</a><span class="k">def</span> <span class="nf">make_message</span><span class="p">(</span><span class="n">payload_type</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">payload_version</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Utility for making serialized message data&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">payload_type</span> <span class="o">==</span> <span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_msgpack</span><span class="p">:</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="n">msgpack</span><span class="o">.</span><span class="n">packb</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">payload_type</span> <span class="o">==</span> <span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_binary</span><span class="p">:</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="n">make_TLV_formatted_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">payload_type</span> <span class="o">==</span> <span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_encrypted_msgpack</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">encryptors</span> <span class="ow">or</span> <span class="n">encryptors</span><span class="p">[</span><span class="n">key_name</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+        <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">encryptors</span><span class="p">[</span><span class="n">key_name</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># add hint to the counter entity</span>
+        <span class="n">dat</span> <span class="o">+=</span> <span class="n">encryptors</span><span class="p">[</span><span class="n">key_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msgpack</span><span class="o">.</span><span class="n">packb</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+    <span class="n">msg</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;&gt;HHI&quot;</span><span class="p">,</span> <span class="n">payload_type</span><span class="p">,</span> <span class="n">payload_version</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dat</span><span class="p">)))</span>
+    <span class="n">msg</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">msg</span></div>
+
+
+<div class="viewcode-block" id="deserialize_data"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.deserialize_data">[docs]</a><span class="k">def</span> <span class="nf">deserialize_data</span><span class="p">(</span><span class="n">payload_type</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Utility for deserializing the received message&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">payload_type</span> <span class="o">==</span> <span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_msgpack</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">msgpack</span><span class="o">.</span><span class="n">unpackb</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">payload_type</span> <span class="o">==</span> <span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_binary</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">make_dictionary_from_TLV_format</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">payload_type</span> <span class="o">==</span> <span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_encrypted_msgpack</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">[:</span><span class="mi">4</span><span class="p">])</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">decryptors</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="mi">4</span><span class="p">:]))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">traceback</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">msgpack</span><span class="o">.</span><span class="n">unpackb</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="make_binary"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.make_binary">[docs]</a><span class="k">def</span> <span class="nf">make_binary</span><span class="p">(</span><span class="n">dat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Simple serialize function</span>
+
+<span class="sd">    Basically, Type-Length-Value format is created for each item.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">))</span>  <span class="c1"># data type = list</span>
+        <span class="n">total_len</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">array_dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">make_binary</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">total_len</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="n">array_dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">total_len</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">))</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">array_dat</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">))</span>  <span class="c1"># data type = bool</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">))</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;little&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">dat</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;little&quot;</span><span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">))</span>  <span class="c1"># data type = int</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">))</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">))</span>  <span class="c1"># data type = bytes</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dat</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="make_TLV_formatted_message"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.make_TLV_formatted_message">[docs]</a><span class="k">def</span> <span class="nf">make_TLV_formatted_message</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Utility for simple serialization function&quot;&quot;&quot;</span>
+    <span class="n">dat</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">dat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">make_binary</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="convert_from_binary"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.convert_from_binary">[docs]</a><span class="k">def</span> <span class="nf">convert_from_binary</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Deserialization from simple serialization&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">data_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dat</span>
+    <span class="k">elif</span> <span class="n">data_type</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">data_type</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="s2">&quot;little&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">dat</span><span class="p">):</span>
+            <span class="n">DT</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;II&quot;</span><span class="p">,</span> <span class="n">dat</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">l</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span>
+            <span class="n">l</span> <span class="o">+=</span> <span class="mi">8</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convert_from_binary</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span> <span class="n">dat</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">l</span><span class="o">+</span><span class="n">L</span><span class="p">]))</span>
+            <span class="n">l</span> <span class="o">+=</span> <span class="n">L</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="make_dictionary_from_TLV_format"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.make_dictionary_from_TLV_format">[docs]</a><span class="k">def</span> <span class="nf">make_dictionary_from_TLV_format</span><span class="p">(</span><span class="n">dat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Utility for simple deserialization function&quot;&quot;&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">ptr</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">ptr</span><span class="p">:</span><span class="n">ptr</span><span class="o">+</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">ptr</span> <span class="o">+=</span> <span class="mi">4</span>
+        <span class="n">DT</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;II&quot;</span><span class="p">,</span> <span class="n">dat</span><span class="p">[</span><span class="n">ptr</span><span class="p">:</span><span class="n">ptr</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span>
+        <span class="n">ptr</span> <span class="o">+=</span> <span class="mi">8</span>
+        <span class="n">msg</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_from_binary</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span> <span class="n">dat</span><span class="p">[</span><span class="n">ptr</span><span class="p">:</span><span class="n">ptr</span><span class="o">+</span><span class="n">L</span><span class="p">])</span>
+        <span class="n">ptr</span> <span class="o">+=</span> <span class="n">L</span>
+    <span class="k">return</span> <span class="n">msg</span></div>
+
+
+<div class="viewcode-block" id="get_ECDH_parameters"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.get_ECDH_parameters">[docs]</a><span class="k">def</span> <span class="nf">get_ECDH_parameters</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Utility for initialization of ECDH parameters&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">encryptors</span><span class="p">,</span> <span class="n">decryptors</span>
+    <span class="n">private_key</span> <span class="o">=</span> <span class="n">ec</span><span class="o">.</span><span class="n">generate_private_key</span><span class="p">(</span><span class="n">ec</span><span class="o">.</span><span class="n">SECP384R1</span><span class="p">(),</span> <span class="n">default_backend</span><span class="p">())</span>
+    <span class="n">serialized_pubkey</span> <span class="o">=</span> <span class="n">private_key</span><span class="o">.</span><span class="n">public_key</span><span class="p">()</span><span class="o">.</span><span class="n">public_numbers</span><span class="p">()</span><span class="o">.</span><span class="n">encode_point</span><span class="p">()</span>
+    <span class="n">key_name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">while</span> <span class="n">key_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">key_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key_name</span> <span class="ow">in</span> <span class="n">encryptors</span><span class="p">:</span>
+            <span class="n">key_name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">encryptors</span><span class="p">[</span><span class="n">key_name</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">decryptors</span><span class="p">[</span><span class="n">key_name</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">private_key</span><span class="p">,</span> <span class="n">serialized_pubkey</span><span class="p">,</span> <span class="n">key_name</span></div>
+
+
+<div class="viewcode-block" id="derive_shared_key"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.derive_shared_key">[docs]</a><span class="k">def</span> <span class="nf">derive_shared_key</span><span class="p">(</span><span class="n">private_key</span><span class="p">,</span> <span class="n">serialized_pubkey</span><span class="p">,</span> <span class="n">shared_info</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Utility for deriving shared key in ECDH procedure&quot;&quot;&quot;</span>
+    <span class="n">deserialized_public_numbers</span> <span class="o">=</span> <span class="n">ec</span><span class="o">.</span><span class="n">EllipticCurvePublicNumbers</span><span class="o">.</span><span class="n">from_encoded_point</span><span class="p">(</span><span class="n">ec</span><span class="o">.</span><span class="n">SECP384R1</span><span class="p">(),</span> <span class="n">serialized_pubkey</span><span class="p">)</span>
+    <span class="n">deserialized_pubkey</span> <span class="o">=</span> <span class="n">deserialized_public_numbers</span><span class="o">.</span><span class="n">public_key</span><span class="p">(</span><span class="n">default_backend</span><span class="p">())</span>
+    <span class="n">shared_key</span> <span class="o">=</span> <span class="n">private_key</span><span class="o">.</span><span class="n">exchange</span><span class="p">(</span><span class="n">ec</span><span class="o">.</span><span class="n">ECDH</span><span class="p">(),</span> <span class="n">deserialized_pubkey</span><span class="p">)</span>
+    <span class="n">derived_key</span> <span class="o">=</span> <span class="n">HKDF</span><span class="p">(</span><span class="n">algorithm</span><span class="o">=</span><span class="n">hashes</span><span class="o">.</span><span class="n">SHA256</span><span class="p">(),</span> <span class="n">length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">info</span><span class="o">=</span><span class="n">shared_info</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">default_backend</span><span class="p">())</span><span class="o">.</span><span class="n">derive</span><span class="p">(</span><span class="n">shared_key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">derived_key</span></div>
+
+
+<div class="viewcode-block" id="set_cipher"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.set_cipher">[docs]</a><span class="k">def</span> <span class="nf">set_cipher</span><span class="p">(</span><span class="n">shared_key</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">hint</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set shared key to the encryptor and decryptor</span>
+
+<span class="sd">    Encryptor and Decryptor are created for each inter-node connection</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">encryptors</span><span class="p">,</span> <span class="n">decryptors</span>
+    <span class="n">cipher</span> <span class="o">=</span> <span class="n">Cipher</span><span class="p">(</span><span class="n">algorithms</span><span class="o">.</span><span class="n">AES</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">shared_key</span><span class="p">)),</span> <span class="n">modes</span><span class="o">.</span><span class="n">CTR</span><span class="p">(</span><span class="n">nonce</span><span class="p">),</span> <span class="n">backend</span><span class="o">=</span><span class="n">default_backend</span><span class="p">())</span>
+    <span class="n">encryptors</span><span class="p">[</span><span class="n">key_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">cipher</span><span class="o">.</span><span class="n">encryptor</span><span class="p">(),</span> <span class="n">hint</span><span class="p">]</span>
+    <span class="n">decryptors</span><span class="p">[</span><span class="n">key_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">decryptor</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="unset_cipher"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.unset_cipher">[docs]</a><span class="k">def</span> <span class="nf">unset_cipher</span><span class="p">(</span><span class="n">key_name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">key_name</span> <span class="ow">in</span> <span class="n">encryptors</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">encryptors</span><span class="p">[</span><span class="n">key_name</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">decryptors</span><span class="p">[</span><span class="n">key_name</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="PayloadType"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.PayloadType">[docs]</a><span class="k">class</span> <span class="nc">PayloadType</span><span class="p">:</span>
+    <span class="n">Type_binary</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">Type_any</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">Type_msgpack</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">Type_encrypted_msgpack</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+<div class="viewcode-block" id="Message"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.Message">[docs]</a><span class="k">class</span> <span class="nc">Message</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Message parser&quot;&quot;&quot;</span>
+    <span class="n">HEADER_LEN</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># Type, length of data_body, data_body</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pending_buf</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_new_chunk</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg_body</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">payload_type</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_version</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg_len</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Message.recv"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.Message.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Append message to the buffer&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pending_buf</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Message.parse"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.Message.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse the message in the buffer&quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot; &gt; pending_buf=%d,%d&quot;%(len(self.pending_buf), Message.HEADER_LEN))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_new_chunk</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pending_buf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Message</span><span class="o">.</span><span class="n">HEADER_LEN</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">payload_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_version</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_len</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;HHI&quot;</span><span class="p">,</span>
+                                                                                 <span class="bp">self</span><span class="o">.</span><span class="n">pending_buf</span><span class="p">[:</span><span class="n">Message</span><span class="o">.</span><span class="n">HEADER_LEN</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_new_chunk</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">msg_body</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="c1">#print(&quot;  &gt;&gt; msg_len=%d&quot;%(self.msg_len))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_len</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_new_chunk</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">msg_body</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pending_buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pending_buf</span><span class="p">[</span><span class="n">Message</span><span class="o">.</span><span class="n">HEADER_LEN</span><span class="p">:]</span>
+            <span class="c1">#print(&quot;  --self.msg_len == Message.HEADER_LEN --&gt;true&quot;)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_len</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pending_buf</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_len</span><span class="o">+</span><span class="n">Message</span><span class="o">.</span><span class="n">HEADER_LEN</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_new_chunk</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">msg_body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pending_buf</span><span class="p">[</span><span class="n">Message</span><span class="o">.</span><span class="n">HEADER_LEN</span><span class="p">:(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_len</span> <span class="o">+</span> <span class="n">Message</span><span class="o">.</span><span class="n">HEADER_LEN</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pending_buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pending_buf</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_len</span><span class="o">+</span><span class="n">Message</span><span class="o">.</span><span class="n">HEADER_LEN</span><span class="p">):]</span>
+            <span class="c1">#print(&quot;  --self.msg_len &gt; Message.HEADER_LEN --&gt;true&quot;)</span>
+            <span class="k">return</span> <span class="n">deserialize_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">payload_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_body</span><span class="p">)</span>
+        <span class="c1">#print(&quot; ---&gt;&gt;&gt; false&quot;)</span>
+        <span class="k">return</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="KeyType"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.KeyType">[docs]</a><span class="k">class</span> <span class="nc">KeyType</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Types of items in a message&quot;&quot;&quot;</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>    <span class="c1"># status code in bbc_error</span>
+    <span class="n">reason</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>    <span class="c1"># text</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>    <span class="c1"># True/False</span>
+
+    <span class="n">infra_msg_type</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>  <span class="c1"># message type in p2p network</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>   <span class="c1"># command type</span>
+    <span class="n">infra_command</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">query_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>      <span class="c1"># query_id from bbc_app</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">nonce</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">14</span><span class="p">)</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+    <span class="n">hint</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">ecdh</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">17</span><span class="p">)</span>     <span class="c1"># peer_public_key value for ECDH</span>
+    <span class="n">random</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">18</span><span class="p">)</span>
+    <span class="n">retry_timer</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">19</span><span class="p">)</span>
+    <span class="n">message_seq</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">domain_ping</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">21</span><span class="p">)</span>   <span class="c1"># send directly to bbc_network without node_id in the domain</span>
+    <span class="n">nodekey_signature</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">22</span><span class="p">)</span>
+    <span class="n">admin_info</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">23</span><span class="p">)</span>
+    <span class="n">on_multinodes</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
+    <span class="n">is_anycast</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+    <span class="n">anycast_ttl</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">26</span><span class="p">)</span>
+    <span class="n">is_replication</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">27</span><span class="p">)</span>
+
+    <span class="n">static_entry</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">ipv4_address</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">ipv6_address</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">port_number</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">external_ip4addr</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">external_ip6addr</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">node_info</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+
+    <span class="n">domain_list</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">forwarding_list</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">user_list</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">neighbor_list</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">notification_list</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">bbc_configuration</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+
+    <span class="n">domain_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x50</span><span class="p">)</span>
+    <span class="n">source_user_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x50</span><span class="p">)</span>
+    <span class="n">destination_user_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mh">0x50</span><span class="p">)</span>
+    <span class="n">destination_user_ids</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mh">0x50</span><span class="p">)</span>
+    <span class="n">node_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mh">0x50</span><span class="p">)</span>
+    <span class="n">source_node_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mh">0x50</span><span class="p">)</span>
+    <span class="n">destination_node_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mh">0x50</span><span class="p">)</span>
+
+    <span class="n">user_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">)</span>
+    <span class="n">transaction_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">)</span>
+    <span class="n">transaction_id_list</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">)</span>
+    <span class="n">asset_group_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">)</span>
+    <span class="n">asset_group_ids</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">)</span>
+    <span class="n">asset_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">)</span>
+    <span class="n">direction</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">)</span>
+    <span class="n">hop_count</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">)</span>
+    <span class="n">all_included</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">)</span>
+
+    <span class="n">transaction_data</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">)</span>
+    <span class="n">transactions</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">)</span>
+    <span class="n">transaction_tree</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">)</span>
+    <span class="n">ref_index</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">)</span>
+    <span class="n">asset_file</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">)</span>
+    <span class="n">all_asset_files</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">)</span>
+    <span class="n">signature</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">)</span>
+    <span class="n">cross_ref</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">)</span>
+    <span class="n">outer_domain_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">)</span>
+    <span class="n">source_domain_id</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">)</span>
+    <span class="n">txid_having_cross_ref</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">)</span>
+    <span class="n">cross_ref_verification_info</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">)</span>
+    <span class="n">transaction_data_format</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">)</span>
+
+    <span class="n">compromised_transaction_data</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x90</span><span class="p">)</span>
+    <span class="n">compromised_transactions</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x90</span><span class="p">)</span>
+    <span class="n">compromised_asset_files</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mh">0x90</span><span class="p">)</span>
+
+    <span class="n">ledger_subsys_manip</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0xA0</span><span class="p">)</span>     <span class="c1"># enable/disable ledger_subsystem</span>
+    <span class="n">ledger_subsys_register</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0xA0</span><span class="p">)</span>
+    <span class="n">ledger_subsys_verify</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mh">0xA0</span><span class="p">)</span>
+    <span class="n">merkle_tree</span> <span class="o">=</span> <span class="n">to_4byte</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mh">0xA0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InfraMessageCategory"><a class="viewcode-back" href="../../../orig/bbc1.core.message_key_types.html#bbc1.core.message_key_types.InfraMessageCategory">[docs]</a><span class="k">class</span> <span class="nc">InfraMessageCategory</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Types of message for inter-core nodes messaging&quot;&quot;&quot;</span>
+    <span class="n">CATEGORY_NETWORK</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">CATEGORY_TOPOLOGY</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">CATEGORY_USER</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">CATEGORY_DATA</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">CATEGORY_DOMAIN0</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.0',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

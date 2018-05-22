@@ -1,0 +1,499 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc1.core.user_message_routing module &mdash; BBc1 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="bbc1.core.topology_manager module" href="bbc1.core.topology_manager.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="bbc1.html">bbc1 package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="bbc1.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="bbc1.core.html">bbc1.core package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="bbc1.core.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#module-bbc1.core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bbc1.html#module-bbc1">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BBc1</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="bbc1.html">bbc1 package</a> &raquo;</li>
+        
+          <li><a href="bbc1.core.html">bbc1.core package</a> &raquo;</li>
+        
+      <li>bbc1.core.user_message_routing module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/bbc1.core.user_message_routing.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-bbc1.core.user_message_routing">
+<span id="bbc1-core-user-message-routing-module"></span><h1>bbc1.core.user_message_routing module<a class="headerlink" href="#module-bbc1.core.user_message_routing" title="Permalink to this headline">¶</a></h1>
+<p>Copyright (c) 2017 beyond-blockchain.org.</p>
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an “AS IS” BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<dl class="class">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting">
+<em class="property">class </em><code class="descclassname">bbc1.core.user_message_routing.</code><code class="descname">UserMessageRouting</code><span class="sig-paren">(</span><em>networking</em>, <em>domain_id</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Handle message for clients</p>
+<dl class="attribute">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.CROSS_REF_ASSIGNMENT">
+<code class="descname">CROSS_REF_ASSIGNMENT</code><em class="property"> = b'\x00\x05'</em><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.CROSS_REF_ASSIGNMENT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.JOIN_MULTICAST_RECEIVER">
+<code class="descname">JOIN_MULTICAST_RECEIVER</code><em class="property"> = b'\x00\x03'</em><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.JOIN_MULTICAST_RECEIVER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.LEAVE_MULTICAST_RECEIVER">
+<code class="descname">LEAVE_MULTICAST_RECEIVER</code><em class="property"> = b'\x00\x04'</em><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.LEAVE_MULTICAST_RECEIVER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.MAX_CROSS_REF_STOCK">
+<code class="descname">MAX_CROSS_REF_STOCK</code><em class="property"> = 10</em><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.MAX_CROSS_REF_STOCK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.REFRESH_FORWARDING_LIST_INTERVAL">
+<code class="descname">REFRESH_FORWARDING_LIST_INTERVAL</code><em class="property"> = 300</em><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.REFRESH_FORWARDING_LIST_INTERVAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.RESOLVE_TIMEOUT">
+<code class="descname">RESOLVE_TIMEOUT</code><em class="property"> = 5</em><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.RESOLVE_TIMEOUT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.RESOLVE_USER_LOCATION">
+<code class="descname">RESOLVE_USER_LOCATION</code><em class="property"> = b'\x00\x00'</em><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.RESOLVE_USER_LOCATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.RESPONSE_NO_SUCH_USER">
+<code class="descname">RESPONSE_NO_SUCH_USER</code><em class="property"> = b'\x00\x02'</em><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.RESPONSE_NO_SUCH_USER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.RESPONSE_USER_LOCATION">
+<code class="descname">RESPONSE_USER_LOCATION</code><em class="property"> = b'\x00\x01'</em><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.RESPONSE_USER_LOCATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.process_message">
+<code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.process_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process received message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.register_user">
+<code class="descname">register_user</code><span class="sig-paren">(</span><em>user_id</em>, <em>socket</em>, <em>on_multiple_nodes=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.register_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.register_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register user to forward message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id of the client</li>
+<li><strong>socket</strong> (<em>Socket</em>) – socket for the client</li>
+<li><strong>on_multiple_nodes</strong> (<em>bool</em>) – If True, the user_id is also registered in other nodes, meaning multicasting.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.send_message_to_user">
+<code class="descname">send_message_to_user</code><span class="sig-paren">(</span><em>msg</em>, <em>direct_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.send_message_to_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.send_message_to_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward message to connecting user</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>msg</strong> (<em>dict</em>) – message to send</li>
+<li><strong>direct_only</strong> (<em>bool</em>) – If True, _forward_message_to_another_node is not called.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.send_multicast_join">
+<code class="descname">send_multicast_join</code><span class="sig-paren">(</span><em>user_id</em>, <em>permanent=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.send_multicast_join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.send_multicast_join" title="Permalink to this definition">¶</a></dt>
+<dd><p>Broadcast JOIN_MULTICAST_RECEIVER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.send_multicast_leave">
+<code class="descname">send_multicast_leave</code><span class="sig-paren">(</span><em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.send_multicast_leave"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.send_multicast_leave" title="Permalink to this definition">¶</a></dt>
+<dd><p>Broadcast LEAVE_MULTICAST_RECEIVER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.set_aes_name">
+<code class="descname">set_aes_name</code><span class="sig-paren">(</span><em>socket</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.set_aes_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.set_aes_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set name for specifying AES key for message encryption</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>socket</strong> (<em>Socket</em>) – socket for the client</li>
+<li><strong>name</strong> (<em>bytes</em>) – name of the client (4-byte random value generated in message_key_types.get_ECDH_parameters)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.stop_all_timers">
+<code class="descname">stop_all_timers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.stop_all_timers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.stop_all_timers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cancel all running timers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRouting.unregister_user">
+<code class="descname">unregister_user</code><span class="sig-paren">(</span><em>user_id</em>, <em>socket</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRouting.unregister_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRouting.unregister_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unregister user from the list and delete AES key if exists</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id of the client</li>
+<li><strong>socket</strong> (<em>Socket</em>) – socket for the client</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy">
+<em class="property">class </em><code class="descclassname">bbc1.core.user_message_routing.</code><code class="descname">UserMessageRoutingDummy</code><span class="sig-paren">(</span><em>networking</em>, <em>domain_id</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="orig/bbc1.core.user_message_routing.html#bbc1.core.user_message_routing.UserMessageRouting" title="bbc1.core.user_message_routing.UserMessageRouting"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbc1.core.user_message_routing.UserMessageRouting</span></code></a></p>
+<p>Dummy class for bbc_core.py</p>
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.process_message">
+<code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.process_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process received message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.register_user">
+<code class="descname">register_user</code><span class="sig-paren">(</span><em>user_id</em>, <em>socket</em>, <em>on_multiple_nodes=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.register_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.register_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register user to forward message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id of the client</li>
+<li><strong>socket</strong> (<em>Socket</em>) – socket for the client</li>
+<li><strong>on_multiple_nodes</strong> (<em>bool</em>) – If True, the user_id is also registered in other nodes, meaning multicasting.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.send_message_to_user">
+<code class="descname">send_message_to_user</code><span class="sig-paren">(</span><em>msg</em>, <em>direct_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.send_message_to_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.send_message_to_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward message to connecting user</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>msg</strong> (<em>dict</em>) – message to send</li>
+<li><strong>direct_only</strong> (<em>bool</em>) – If True, _forward_message_to_another_node is not called.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.send_multicast_join">
+<code class="descname">send_multicast_join</code><span class="sig-paren">(</span><em>user_id</em>, <em>permanent=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.send_multicast_join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.send_multicast_join" title="Permalink to this definition">¶</a></dt>
+<dd><p>Broadcast JOIN_MULTICAST_RECEIVER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.stop_all_timers">
+<code class="descname">stop_all_timers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.stop_all_timers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.stop_all_timers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cancel all running timers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.user_message_routing.UserMessageRoutingDummy.unregister_user">
+<code class="descname">unregister_user</code><span class="sig-paren">(</span><em>user_id</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#UserMessageRoutingDummy.unregister_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.UserMessageRoutingDummy.unregister_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unregister user from the list and delete AES key if exists</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id of the client</li>
+<li><strong>socket</strong> (<em>Socket</em>) – socket for the client</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.user_message_routing.direct_send_to_user">
+<code class="descclassname">bbc1.core.user_message_routing.</code><code class="descname">direct_send_to_user</code><span class="sig-paren">(</span><em>sock</em>, <em>msg</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/user_message_routing.html#direct_send_to_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.user_message_routing.direct_send_to_user" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="bbc1.core.topology_manager.html" class="btn btn-neutral" title="bbc1.core.topology_manager module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

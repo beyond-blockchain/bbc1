@@ -6,10 +6,10 @@ import time
 
 import sys
 sys.path.extend(["../"])
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import KeyType
-from bbc1.common.bbc_error import *
-from bbc1.app import bbc_app
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType
+from bbc1.core.bbc_error import *
+from bbc1.core import bbc_app
 from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility, wait_check_result_msg_type
 
 
@@ -50,7 +50,7 @@ class MessageProcessor(bbc_app.Callback):
     def proc_resp_search_asset(self, dat):
         if KeyType.transaction_data in dat:
             self.logger.debug("OK: Asset [%s] is found." % binascii.b2a_hex(dat[KeyType.asset_id]))
-            tx_obj = bbclib.recover_transaction_object_from_rawdata(dat[KeyType.transaction_data])
+            tx_obj = bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data])
             for evt in tx_obj.events:
                 if evt.asset.asset_body_size > 0:
                     self.logger.debug(" [%s] asset_body --> %s" % (binascii.b2a_hex(evt.asset.asset_id[:4]),
@@ -89,10 +89,13 @@ class TestBBcAppClient(object):
     def test_02_make_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         user = clients[0]['user_id']
-        transactions[0] = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
-        transactions[0].events[0].asset.add(user_id=user, asset_body=b'123456')
-        transactions[0].events[1].asset.add(user_id=user, asset_file=b'abcdefg')
-        transactions[0].events[1].add(mandatory_approver=clients[1]['user_id'])
+        transactions[0] = bbclib.make_transaction(event_num=2, witness=True)
+        transactions[0].events[0].add(mandatory_approver=clients[1]['user_id'])
+        bbclib.add_event_asset(transactions[0], event_idx=0, asset_group_id=asset_group_id,
+                               user_id=user, asset_body=b'123456')
+        bbclib.add_event_asset(transactions[0], event_idx=1, asset_group_id=asset_group_id,
+                               user_id=user, asset_body=b'abcdefg')
+        transactions[0].witness.add_witness(user_id=user)
 
     def test_04_insert(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
@@ -102,7 +105,7 @@ class TestBBcAppClient(object):
             print(bbclib.error_text)
             import os
             os._exit(1)
-        transactions[0].add_signature(user_id=clients[0]['user_id'], signature=sig)
+        transactions[0].witness.add_signature(user_id=clients[0]['user_id'], signature=sig)
         print(transactions[0])
         transactions[0].digest()
         global transaction_dat

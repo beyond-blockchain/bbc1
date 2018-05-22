@@ -1,0 +1,1448 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc1.core.bbc_app &mdash; BBc1 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bbc1.html">bbc1 package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BBc1</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>bbc1.core.bbc_app</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bbc1.core.bbc_app</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Copyright (c) 2017 beyond-blockchain.org.</span>
+
+<span class="sd">Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="sd">you may not use this file except in compliance with the License.</span>
+<span class="sd">You may obtain a copy of the License at</span>
+
+<span class="sd">    http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="sd">Unless required by applicable law or agreed to in writing, software</span>
+<span class="sd">distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="sd">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="sd">See the License for the specific language governing permissions and</span>
+<span class="sd">limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">gevent</span>
+<span class="kn">from</span> <span class="nn">gevent</span> <span class="k">import</span> <span class="n">monkey</span>
+<span class="n">monkey</span><span class="o">.</span><span class="n">patch_all</span><span class="p">()</span>
+<span class="kn">from</span> <span class="nn">gevent</span> <span class="k">import</span> <span class="n">socket</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">queue</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">bson</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;../../&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">bbclib</span>
+<span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">message_key_types</span><span class="p">,</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">bbc1.core.bbclib</span> <span class="k">import</span> <span class="n">MsgType</span>
+<span class="kn">from</span> <span class="nn">bbc1.core.message_key_types</span> <span class="k">import</span> <span class="n">KeyType</span><span class="p">,</span> <span class="n">PayloadType</span>
+<span class="kn">from</span> <span class="nn">bbc1.core.bbc_error</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="n">DEFAULT_CORE_PORT</span> <span class="o">=</span> <span class="mi">9000</span>
+<span class="n">DEFAULT_P2P_PORT</span> <span class="o">=</span> <span class="mi">6641</span>
+
+<span class="n">MESSAGE_WITH_NO_RESPONSE</span> <span class="o">=</span> <span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">MESSAGE</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REGISTER</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">UNREGISTER</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">DOMAIN_PING</span><span class="p">,</span>
+                            <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_INSERT_NOTIFICATION</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">CANCEL_INSERT_NOTIFICATION</span><span class="p">,</span>
+                            <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_REPAIR</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_one_level_list</span><span class="p">(</span><span class="n">dat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get list information from queued message</span>
+<span class="sd">    Args:</span>
+<span class="sd">        dat (bytes): received message data</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        list: list of information</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">32</span> <span class="o">*</span> <span class="n">i</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">base</span><span class="p">:</span><span class="n">base</span> <span class="o">+</span> <span class="mi">32</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">results</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_two_level_dict</span><span class="p">(</span><span class="n">dat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get hierarchical list information from queued message</span>
+<span class="sd">    Args:</span>
+<span class="sd">        dat (bytes): received message data</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: dictionary of information list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span>
+    <span class="n">ptr</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+        <span class="n">first_id</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">ptr</span><span class="p">:</span><span class="n">ptr</span><span class="o">+</span><span class="mi">32</span><span class="p">]</span>
+        <span class="n">ptr</span> <span class="o">+=</span> <span class="mi">32</span>
+        <span class="n">results</span><span class="p">[</span><span class="n">first_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">count2</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">ptr</span><span class="p">:</span><span class="n">ptr</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span>
+        <span class="n">ptr</span> <span class="o">+=</span> <span class="mi">2</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count2</span><span class="p">):</span>
+            <span class="n">second_id</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">ptr</span><span class="p">:</span><span class="n">ptr</span><span class="o">+</span><span class="mi">32</span><span class="p">]</span>
+            <span class="n">ptr</span> <span class="o">+=</span> <span class="mi">32</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">first_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">second_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span>
+
+
+<div class="viewcode-block" id="BBcAppClient"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient">[docs]</a><span class="k">class</span> <span class="nc">BBcAppClient</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Basic functions for a client of bbc_core&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">DEFAULT_CORE_PORT</span><span class="p">,</span> <span class="n">multiq</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;bbc_app&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">loglevel</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="n">logname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">create_connection</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="n">Callback</span><span class="p">(</span><span class="n">log</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">set_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keypair</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_query_id_based_message_wait</span> <span class="o">=</span> <span class="n">multiq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_id</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">privatekey_for_ecdh</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aes_key_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_secure_connection</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_ref_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_receiver_loop</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BBcAppClient.set_callback"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_callback">[docs]</a>    <span class="k">def</span> <span class="nf">set_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set callback object that implements message processing functions</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            callback_obj (obj): callback method object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="n">callback_obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">set_logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">set_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.set_domain_id"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_domain_id">[docs]</a>    <span class="k">def</span> <span class="nf">set_domain_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set domain_id to this client to include it in all messages</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): domain_id to join in</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span> <span class="o">=</span> <span class="n">domain_id</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.set_user_id"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_user_id">[docs]</a>    <span class="k">def</span> <span class="nf">set_user_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set user_id of the object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            identifier (bytes): user_id of this clients</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="n">identifier</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.set_keypair"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_keypair">[docs]</a>    <span class="k">def</span> <span class="nf">set_keypair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keypair</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set keypair for the user</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keypair (KeyPair): KeyPair object for signing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keypair</span> <span class="o">=</span> <span class="n">keypair</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.set_node_key"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_node_key">[docs]</a>    <span class="k">def</span> <span class="nf">set_node_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pem_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set node_key to this client</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pem_file (str): path string for the pem file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">pem_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">KeyPair</span><span class="p">()</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pem_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="o">.</span><span class="n">mk_keyobj_from_private_key_pem</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.include_admin_info"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.include_admin_info">[docs]</a>    <span class="k">def</span> <span class="nf">include_admin_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="n">keypair</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">keypair</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">admin_info</span><span class="p">]</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">make_TLV_formatted_message</span><span class="p">(</span><span class="n">admin_info</span><span class="p">)</span>
+            <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">admin_info</span><span class="p">])</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">nodekey_signature</span><span class="p">]</span> <span class="o">=</span> <span class="n">keypair</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">digest</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">admin_info</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_make_message_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make a base message structure for sending to the core node</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cmd (bytes): command type defined in bbclib.MsgType class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_id</span> <span class="o">=</span> <span class="p">((</span><span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query_id</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">65536</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cmd</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MESSAGE_WITH_NO_RESPONSE</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_query_id_based_message_wait</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">query_queue</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">create_queue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query_id</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">:</span> <span class="n">cmd</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">source_user_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">status</span><span class="p">:</span> <span class="n">ESUCCESS</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">msg</span>
+
+    <span class="k">def</span> <span class="nf">_send_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send the message to the core node</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): message object to send</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query ID for request/response type message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span> <span class="ow">or</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">source_user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Message must include domain_id and source_id&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_secure_connection</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">make_message</span><span class="p">(</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_encrypted_msgpack</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">key_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aes_key_name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">make_message</span><span class="p">(</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_msgpack</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_id</span>
+
+<div class="viewcode-block" id="BBcAppClient.exchange_key"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.exchange_key">[docs]</a>    <span class="k">def</span> <span class="nf">exchange_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform ECDH (key exchange algorithm)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Need to set domain first!&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_ECDH_KEY_EXCHANGE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">privatekey_for_ecdh</span><span class="p">,</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ecdh</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">aes_key_name</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">get_ECDH_parameters</span><span class="p">()</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">nonce</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">hint</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aes_key_name</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">random</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.domain_setup"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.domain_setup">[docs]</a>    <span class="k">def</span> <span class="nf">domain_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set up domain with the specified network module and storage</span>
+
+<span class="sd">        This method should be used by a system administrator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): domain_id to create</span>
+<span class="sd">            config (str): system config in json format</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_SETUP_DOMAIN</span><span class="p">)</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">:</span> <span class="n">domain_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">random</span><span class="p">:</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">admin_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">bbc_configuration</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.domain_close"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.domain_close">[docs]</a>    <span class="k">def</span> <span class="nf">domain_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close domain leading to remove_domain in the core</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): domain_id to delete</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">domain_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span>
+        <span class="k">if</span> <span class="n">domain_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_CLOSE_DOMAIN</span><span class="p">)</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">:</span> <span class="n">domain_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">random</span><span class="p">:</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.get_node_id"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_node_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get node_id of the connecting core node</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GET_NODEID</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.get_domain_neighborlist"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_domain_neighborlist">[docs]</a>    <span class="k">def</span> <span class="nf">get_domain_neighborlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get peer list of the domain from the core node</span>
+
+<span class="sd">        This method should be used by a system administrator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): domain_id of the neighbor list</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GET_NEIGHBORLIST</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain_id</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">random</span><span class="p">:</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.set_domain_static_node"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.set_domain_static_node">[docs]</a>    <span class="k">def</span> <span class="nf">set_domain_static_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set static node to the core node</span>
+
+<span class="sd">        IPv6 is used for socket communication if both IPv4 and IPv6 is specified.</span>
+<span class="sd">        This method should be used by a system administrator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id to set static neighbor entry</span>
+<span class="sd">            node_id (bytes): node_id to register</span>
+<span class="sd">            ipv4 (str): IPv4 address of the node</span>
+<span class="sd">            ipv6 (str): IPv6 address of the node</span>
+<span class="sd">            port (int): Port number to wait messages (UDP/TCP)</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_SET_STATIC_NODE</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain_id</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">node_info</span><span class="p">:</span> <span class="p">[</span><span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">]</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.send_domain_ping"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.send_domain_ping">[docs]</a>    <span class="k">def</span> <span class="nf">send_domain_ping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">DEFAULT_P2P_PORT</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Send domain ping to notify the existence of the node</span>
+
+<span class="sd">        This method should be used by a system administrator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            domain_id (bytes): target domain_id to send ping</span>
+<span class="sd">            ipv4 (str): IPv4 address of the node</span>
+<span class="sd">            ipv6 (str): IPv6 address of the node</span>
+<span class="sd">            port (int): Port number to wait messages UDP</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ipv4</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ipv6</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">DOMAIN_PING</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain_id</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ipv4</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ipv4</span> <span class="o">!=</span> <span class="s2">&quot;0.0.0.0&quot;</span><span class="p">:</span>
+            <span class="n">admin_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ipv4_address</span><span class="p">]</span> <span class="o">=</span> <span class="n">ipv4</span>
+        <span class="k">if</span> <span class="n">ipv6</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ipv6</span> <span class="o">!=</span> <span class="s2">&quot;::&quot;</span><span class="p">:</span>
+            <span class="n">admin_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ipv6_address</span><span class="p">]</span> <span class="o">=</span> <span class="n">ipv6</span>
+        <span class="n">admin_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">port_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">port</span>
+        <span class="n">admin_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">static_entry</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.get_bbc_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_bbc_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_bbc_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get config file of bbc_core</span>
+
+<span class="sd">        This method should be used by a system administrator.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GET_CONFIG</span><span class="p">)</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">random</span><span class="p">:</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.notify_domain_key_update"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.notify_domain_key_update">[docs]</a>    <span class="k">def</span> <span class="nf">notify_domain_key_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Notify update of bbc_core</span>
+
+<span class="sd">        This method should be used by a system administrator.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">NOTIFY_DOMAIN_KEY_UPDATE</span><span class="p">)</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">random</span><span class="p">:</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.get_domain_list"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_domain_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_domain_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get domain_id list in bbc_core</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GET_DOMAINLIST</span><span class="p">)</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">random</span><span class="p">:</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.get_user_list"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_user_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_user_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get user_ids in the domain that are connecting to the core node</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GET_USERS</span><span class="p">)</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">random</span><span class="p">:</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.get_forwarding_list"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_forwarding_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_forwarding_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get forwarding_list of the domain in the core node</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GET_FORWARDING_LIST</span><span class="p">)</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">random</span><span class="p">:</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.get_notification_list"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_notification_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_notification_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get notification_list of the core node</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GET_NOTIFICATION_LIST</span><span class="p">)</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">random</span><span class="p">:</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.manipulate_ledger_subsystem"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.manipulate_ledger_subsystem">[docs]</a>    <span class="k">def</span> <span class="nf">manipulate_ledger_subsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start/stop ledger_subsystem on the bbc_core</span>
+
+<span class="sd">        This method should be used by a system administrator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            enable (bool): True-&gt;start, False-&gt;stop</span>
+<span class="sd">            domain_id (bytes): target domain_id to enable/disable ledger_subsystem</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_MANIP_LEDGER_SUBSYS</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain_id</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">ledger_subsys_manip</span><span class="p">:</span> <span class="n">enable</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">random</span><span class="p">:</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.register_to_core"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.register_to_core">[docs]</a>    <span class="k">def</span> <span class="nf">register_to_core</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on_multiple_nodes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Register the client (user_id) to the core node</span>
+
+<span class="sd">        After that, the client can communicate with the core node.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            on_multiple_nodes (bool): True if this user_id is for multicast address</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REGISTER</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">on_multiple_nodes</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">on_multinodes</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.unregister_from_core"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.unregister_from_core">[docs]</a>    <span class="k">def</span> <span class="nf">unregister_from_core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Unregister and disconnect from the core node</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">UNREGISTER</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aes_key_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">message_key_types</span><span class="o">.</span><span class="n">unset_cipher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aes_key_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">privatekey_for_ecdh</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aes_key_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_secure_connection</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.request_insert_completion_notification"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.request_insert_completion_notification">[docs]</a>    <span class="k">def</span> <span class="nf">request_insert_completion_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Request notification when a transaction has been inserted (as a copy of transaction)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            asset_group_id (bytes): asset_group_id for requesting notification about insertion</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_INSERT_NOTIFICATION</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_group_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.cancel_insert_completion_notification"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.cancel_insert_completion_notification">[docs]</a>    <span class="k">def</span> <span class="nf">cancel_insert_completion_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cancel notification when a transaction has been inserted (as a copy of transaction)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            asset_group_id (bytes): asset_group_id for requesting notification about insertion</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">CANCEL_INSERT_NOTIFICATION</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_group_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.gather_signatures"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.gather_signatures">[docs]</a>    <span class="k">def</span> <span class="nf">gather_signatures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">,</span> <span class="n">reference_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">destinations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">anycast</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Request to gather signatures from the specified user_ids</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            txobj (BBcTransaction):</span>
+<span class="sd">            reference_obj (BBcReference): BBcReference object that includes the information about destinations</span>
+<span class="sd">            asset_files (dict): mapping from asset_id to its file content</span>
+<span class="sd">            destinations (list): list of destination user_ids</span>
+<span class="sd">            anycast (bool): True if this message is for anycasting</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reference_obj</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">destinations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GATHER_SIGNATURE</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">txobj</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span>
+        <span class="k">if</span> <span class="n">anycast</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">is_anycast</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">reference_obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">reference_obj</span><span class="o">.</span><span class="n">get_destinations</span><span class="p">()</span>
+            <span class="n">referred_transactions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">referred_transactions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">reference_obj</span><span class="o">.</span><span class="n">get_referred_transaction</span><span class="p">())</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">referred_transactions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transactions</span><span class="p">]</span> <span class="o">=</span> <span class="n">referred_transactions</span>
+        <span class="k">elif</span> <span class="n">destinations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">destinations</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">asset_files</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_files</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.sendback_signature"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.sendback_signature">[docs]</a>    <span class="k">def</span> <span class="nf">sendback_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest_user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ref_index</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">query_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send back the signed transaction to the source</span>
+
+<span class="sd">        This method is called if the receiver (signer) approves the transaction.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dest_user_id (bytes): destination user_id to send back</span>
+<span class="sd">            transaction_id (bytes):</span>
+<span class="sd">            ref_index (int): (optional) which reference in transaction the signature is for</span>
+<span class="sd">            signature (BBcSignature): Signature that expresses approval of the transaction with transaction_id</span>
+<span class="sd">            query_id: The query_id that was in the received SIGN_REQUEST message</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SIGNATURE</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dest_user_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ref_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref_index</span>
+        <span class="k">if</span> <span class="n">signature</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">]</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">signature</span><span class="o">.</span><span class="n">serialize</span><span class="p">())</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data_format</span><span class="p">]</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">]</span> <span class="o">=</span> <span class="n">signature</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data_format</span><span class="p">]</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span>
+        <span class="k">if</span> <span class="n">query_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.sendback_denial_of_sign"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.sendback_denial_of_sign">[docs]</a>    <span class="k">def</span> <span class="nf">sendback_denial_of_sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest_user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reason_text</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">query_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send back the denial of sign the transaction</span>
+
+<span class="sd">        This method is called if the receiver (signer) denies the transaction.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dest_user_id (bytes): destination user_id to send back</span>
+<span class="sd">            transaction_id (bytes):</span>
+<span class="sd">            reason_text (str): message to the requester about why the node denies the transaction</span>
+<span class="sd">            query_id: The query_id that was in the received SIGN_REQUEST message</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SIGNATURE</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dest_user_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">status</span><span class="p">]</span> <span class="o">=</span> <span class="n">EOTHER</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">reason</span><span class="p">]</span> <span class="o">=</span> <span class="n">reason_text</span>
+        <span class="k">if</span> <span class="n">query_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.insert_transaction"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.insert_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">insert_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tx_obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Request to insert a legitimate transaction</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tx_obj (BBcTransaction): Transaction object to insert</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">transaction_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tx_obj</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_INSERT</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+        <span class="n">ast</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">evt</span> <span class="ow">in</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">evt</span><span class="o">.</span><span class="n">asset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">asset_digest</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">evt</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">get_asset_file</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ast</span><span class="p">[</span><span class="n">evt</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span>
+        <span class="k">for</span> <span class="n">rtn</span> <span class="ow">in</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rtn</span><span class="o">.</span><span class="n">asset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">asset_digest</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">rtn</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">get_asset_file</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ast</span><span class="p">[</span><span class="n">rtn</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.search_transaction_with_condition"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.search_transaction_with_condition">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction_with_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Search transaction data by asset_group_id/asset_id/user_id</span>
+
+<span class="sd">        If multiple conditions are specified, they are considered as AND condition.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            asset_group_id (bytes): asset_group_id in BBcEvent and BBcRelations</span>
+<span class="sd">            asset_id (bytes): asset_id in BBcAsset</span>
+<span class="sd">            user_id (bytes): user_id in BBcAsset that means the owner of the asset</span>
+<span class="sd">            count (int): the number of transactions to retrieve</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_SEARCH_WITH_CONDITIONS</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">asset_group_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_group_id</span>
+        <span class="k">if</span> <span class="n">asset_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_id</span>
+        <span class="k">if</span> <span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.search_transaction"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.search_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Search request for a transaction</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transaction_id (bytes): the target transaction to retrieve</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_SEARCH_TRANSACTION</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.traverse_transactions"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.traverse_transactions">[docs]</a>    <span class="k">def</span> <span class="nf">traverse_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">hop_count</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Search request for transactions</span>
+
+<span class="sd">        The method traverses the transaction graph in the ledger.</span>
+<span class="sd">        The response from the bbc_core includes the list of transactions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transaction_id (bytes): the target transaction to retrieve</span>
+<span class="sd">            direction (int): 1:backforward, non-1:forward</span>
+<span class="sd">            hop_count (int): hop count to traverse from the specified origin point</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_TRAVERSE_TRANSACTIONS</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">direction</span><span class="p">]</span> <span class="o">=</span> <span class="n">direction</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">hop_count</span><span class="p">]</span> <span class="o">=</span> <span class="n">hop_count</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.request_to_repair_transaction"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.request_to_repair_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">request_to_repair_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Request to repair compromised transaction data</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transaction_id (bytes): the target transaction to repair</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_REPAIR</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.request_to_repair_asset"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.request_to_repair_asset">[docs]</a>    <span class="k">def</span> <span class="nf">request_to_repair_asset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Request to repair compromised asset file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            asset_group_id (bytes): the asset_group_id of the target asset</span>
+<span class="sd">            asset_id (bytes): the target asset_id</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_REPAIR</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_group_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.request_verify_by_cross_ref"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.request_verify_by_cross_ref">[docs]</a>    <span class="k">def</span> <span class="nf">request_verify_by_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Request to verify the transaction by Cross_ref in transaction of outer domain</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transaction_id (bytes): the target transaction_id</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_CROSS_REF_VERIFY</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.request_cross_ref_holders_list"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.request_cross_ref_holders_list">[docs]</a>    <span class="k">def</span> <span class="nf">request_cross_ref_holders_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Request the list of transaction_ids that are registered as cross_ref in outer domains</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_CROSS_REF_LIST</span><span class="p">)</span>
+        <span class="c1"># TODO: need to limit the number of entries??</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.register_in_ledger_subsystem"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.register_in_ledger_subsystem">[docs]</a>    <span class="k">def</span> <span class="nf">register_in_ledger_subsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Register transaction_id in the ledger_subsystem</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            asset_group_id (bytes):</span>
+<span class="sd">            transaction_id (bytes): the target transaction_id</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_REGISTER_HASH_IN_SUBSYS</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_group_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.verify_in_ledger_subsystem"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.verify_in_ledger_subsystem">[docs]</a>    <span class="k">def</span> <span class="nf">verify_in_ledger_subsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Verify transaction_id in the ledger_subsystem</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            asset_group_id (bytes):</span>
+<span class="sd">            transaction_id (bytes): the target transaction_id</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_VERIFY_HASH_IN_SUBSYS</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_group_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.get_stats"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.get_stats">[docs]</a>    <span class="k">def</span> <span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get statistics of bbc_core</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GET_STATS</span><span class="p">)</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">random</span><span class="p">:</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">get_random_value</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_keypair</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.send_message"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">dst_user_id</span><span class="p">,</span> <span class="n">is_anycast</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send a message to the specified user_id</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (dict): message to send</span>
+<span class="sd">            dst_user_id (bytes): destination user_id</span>
+<span class="sd">            is_anycast (bool): If true, the message is treated as an anycast message.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: query_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">MESSAGE</span><span class="p">)</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dst_user_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">message</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
+        <span class="k">if</span> <span class="n">is_anycast</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">is_anycast</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.start_receiver_loop"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.start_receiver_loop">[docs]</a>    <span class="k">def</span> <span class="nf">start_receiver_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">jobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">gevent</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_loop</span><span class="p">)]</span></div>
+        <span class="c1">#gevent.joinall(jobs)</span>
+
+<div class="viewcode-block" id="BBcAppClient.receiver_loop"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.receiver_loop">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">msg_parser</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">Message</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">8192</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">msg_parser</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="n">msg_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">msg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">msg_parser</span><span class="o">.</span><span class="n">payload_type</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TCP disconnect: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.include_cross_ref"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.include_cross_ref">[docs]</a>    <span class="k">def</span> <span class="nf">include_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Include BBcCrossRef from other domains in the transaction</span>
+
+<span class="sd">        If the client object has one or more cross_ref objects, one of them is included in the given transaction.</span>
+<span class="sd">        This method should be voluntarily called for inter-domain weak collaboration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            txobj (BBcTransaction): Transaction object to include cross_ref</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_ref_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">txobj</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cross_ref</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_ref_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="n">txobj</span><span class="o">.</span><span class="n">cross_ref</span><span class="o">.</span><span class="n">format_type</span> <span class="o">=</span> <span class="n">txobj</span><span class="o">.</span><span class="n">format_type</span></div></div>
+
+
+<div class="viewcode-block" id="Callback"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback">[docs]</a><span class="k">class</span> <span class="nc">Callback</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Set of callback functions for processing received message</span>
+
+<span class="sd">    If you want to implement your own way to process messages, inherit this class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">log</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_queue</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Callback.set_logger"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.set_logger">[docs]</a>    <span class="k">def</span> <span class="nf">set_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">log</span></div>
+
+<div class="viewcode-block" id="Callback.set_client"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.set_client">[docs]</a>    <span class="k">def</span> <span class="nf">set_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span></div>
+
+<div class="viewcode-block" id="Callback.create_queue"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.create_queue">[docs]</a>    <span class="k">def</span> <span class="nf">create_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_queue</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">query_id</span><span class="p">,</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Callback.get_from_queue"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.get_from_queue">[docs]</a>    <span class="k">def</span> <span class="nf">get_from_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_delete</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_queue</span><span class="p">[</span><span class="n">query_id</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">no_delete</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_queue</span><span class="p">[</span><span class="n">query_id</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">msg</span></div>
+
+<div class="viewcode-block" id="Callback.dispatch"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.dispatch">[docs]</a>    <span class="k">def</span> <span class="nf">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">payload_type</span><span class="p">):</span>
+        <span class="c1">#self.logger.debug(&quot;Received: %s&quot; % dat)</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">command</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No command exists&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span> <span class="ow">in</span> <span class="n">dat</span> <span class="ow">and</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_queue</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">query_queue</span><span class="p">[</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">]]</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SEARCH_TRANSACTION</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_search_transaction</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SEARCH_WITH_CONDITIONS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_search_with_condition</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_TRAVERSE_TRANSACTIONS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_traverse_transactions</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GATHER_SIGNATURE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_gather_signature</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_SIGNATURE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_cmd_sign_request</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SIGNATURE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_sign_request</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_INSERT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_insert</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">NOTIFY_INSERTED</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_notify_inserted</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">NOTIFY_CROSS_REF</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_notify_cross_ref</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">MESSAGE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_user_message</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_CROSS_REF_VERIFY</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_verify_cross_ref</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_CROSS_REF_LIST</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_cross_ref_list</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_REGISTER_HASH_IN_SUBSYS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_register_hash</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_VERIFY_HASH_IN_SUBSYS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_verify_hash</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GET_STATS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_get_stats</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GET_NEIGHBORLIST</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_get_neighborlist</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GET_DOMAINLIST</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_get_domainlist</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GET_USERS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_get_userlist</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GET_FORWARDING_LIST</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_get_forwardinglist</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GET_NOTIFICATION_LIST</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_get_notificationlist</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GET_NODEID</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_get_node_id</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GET_CONFIG</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_get_config</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_MANIP_LEDGER_SUBSYS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_ledger_subsystem</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SETUP_DOMAIN</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_domain_setup</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SET_STATIC_NODE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_set_neighbor</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_CLOSE_DOMAIN</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_domain_close</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_ECDH_KEY_EXCHANGE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_ecdh_key_exchange</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No method to process for command=</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Callback.synchronize"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.synchronize">[docs]</a>    <span class="k">def</span> <span class="nf">synchronize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Wait for receiving message with a common queue</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            timeout (int): timeout for waiting a message in seconds</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: a received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Callback.sync_by_queryid"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.sync_by_queryid">[docs]</a>    <span class="k">def</span> <span class="nf">sync_by_queryid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_delete_q</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Wait for the message with specified query_id</span>
+
+<span class="sd">        This method creates a queue for the query_id and waits for the response</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            query_id (byte): timeout for waiting a message in seconds</span>
+<span class="sd">            timeout (int): timeout for waiting a message in seconds</span>
+<span class="sd">            no_delete_q (bool): If True, the queue for the query_id remains after popping a message</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: a received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">query_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_queue</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_queue</span><span class="p">(</span><span class="n">query_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_from_queue</span><span class="p">(</span><span class="n">query_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Callback.proc_notify_cross_ref"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_notify_cross_ref">[docs]</a>    <span class="k">def</span> <span class="nf">proc_notify_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message NOTIFY_CROSS_REF</span>
+
+<span class="sd">        This method must not be overridden.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cross_ref</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcCrossRef</span><span class="p">(</span><span class="n">domain_id</span><span class="o">=</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">cross_ref</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">transaction_id</span><span class="o">=</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">cross_ref</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">cross_ref_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cross_ref</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_cmd_sign_request"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_cmd_sign_request">[docs]</a>    <span class="k">def</span> <span class="nf">proc_cmd_sign_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message REQUEST_SIGNATURE</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_sign_request"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_sign_request">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_sign_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_SIGNATURE</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_gather_signature"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_gather_signature">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_gather_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_GATHER_SIGNATURE</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span> <span class="ow">or</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">status</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">ESUCCESS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">format_type</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data_format</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
+            <span class="n">sigdata</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sigdata</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">]</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">recover_signature_object</span><span class="p">(</span><span class="n">sigdata</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">format_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">({</span><span class="n">KeyType</span><span class="o">.</span><span class="n">status</span><span class="p">:</span> <span class="n">ESUCCESS</span><span class="p">,</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">result</span><span class="p">:</span> <span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ref_index</span><span class="p">],</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">source_user_id</span><span class="p">],</span> <span class="n">sig</span><span class="p">)})</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_insert"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_insert">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_INSERT</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_notify_inserted"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_notify_inserted">[docs]</a>    <span class="k">def</span> <span class="nf">proc_notify_inserted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message NOTIFY_INSERTED</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_search_with_condition"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_search_with_condition">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_search_with_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_SEARCH_WITH_CONDITIONS</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_search_transaction"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_search_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_search_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_SEARCH_TRANSACTION</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_traverse_transactions"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_traverse_transactions">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_traverse_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_TRAVERSE_TRANSACTIONS</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_user_message"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_user_message">[docs]</a>    <span class="k">def</span> <span class="nf">proc_user_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message MESSAGE</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_verify_cross_ref"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_verify_cross_ref">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_verify_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_CROSS_REF_VERIFY</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_cross_ref_list"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_cross_ref_list">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_cross_ref_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_CROSS_REF_LIST</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_ledger_subsystem"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_ledger_subsystem">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_ledger_subsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_MANIP_LEDGER_SUBSYS</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_register_hash"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_register_hash">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_register_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_REGISTER_HASH_IN_SUBSYS</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_verify_hash"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_verify_hash">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_verify_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_VERIFY_HASH_IN_SUBSYS</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_domain_setup"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_domain_setup">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_domain_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_SETUP_DOMAIN</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_domain_close"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_domain_close">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_domain_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_CLOSE_DOMAIN</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_set_neighbor"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_set_neighbor">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_set_neighbor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_SET_STATIC_NODE</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_get_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_get_config">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_GET_CONFIG</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_get_neighborlist"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_get_neighborlist">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_get_neighborlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_GET_NEIGHBORLIST</span>
+
+<span class="sd">        List of neighbor node info (the first one is that of the connecting core) is queued rather than message itself.</span>
+<span class="sd">        This method must not be overridden.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">neighbor_list</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">neighbor_list</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">neighbor_list</span><span class="p">]</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">neighbor_list</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">i</span><span class="o">*</span><span class="p">(</span><span class="mi">32</span><span class="o">+</span><span class="mi">4</span><span class="o">+</span><span class="mi">16</span><span class="o">+</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="mi">8</span><span class="p">)</span>
+            <span class="n">node_id</span> <span class="o">=</span> <span class="n">neighbor_list</span><span class="p">[</span><span class="n">base</span><span class="p">:</span><span class="n">base</span><span class="o">+</span><span class="mi">32</span><span class="p">]</span>
+            <span class="n">ipv4</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_ntop</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">neighbor_list</span><span class="p">[</span><span class="n">base</span> <span class="o">+</span> <span class="mi">32</span><span class="p">:</span><span class="n">base</span> <span class="o">+</span> <span class="mi">36</span><span class="p">])</span>
+            <span class="n">ipv6</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_ntop</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span><span class="p">,</span> <span class="n">neighbor_list</span><span class="p">[</span><span class="n">base</span> <span class="o">+</span> <span class="mi">36</span><span class="p">:</span><span class="n">base</span> <span class="o">+</span> <span class="mi">52</span><span class="p">])</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">ntohs</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">neighbor_list</span><span class="p">[</span><span class="n">base</span> <span class="o">+</span> <span class="mi">52</span><span class="p">:</span><span class="n">base</span> <span class="o">+</span> <span class="mi">54</span><span class="p">],</span> <span class="s1">&#39;big&#39;</span><span class="p">))</span>
+            <span class="n">domain0</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">neighbor_list</span><span class="p">[</span><span class="n">base</span> <span class="o">+</span> <span class="mi">54</span><span class="p">]</span> <span class="o">==</span> <span class="mh">0x01</span> <span class="k">else</span> <span class="kc">False</span>
+            <span class="n">updated_at</span> <span class="o">=</span> <span class="n">neighbor_list</span><span class="p">[</span><span class="n">base</span><span class="o">+</span><span class="mi">55</span><span class="p">:</span><span class="n">base</span><span class="o">+</span><span class="mi">63</span><span class="p">]</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">domain0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_get_domainlist"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_get_domainlist">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_get_domainlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_GET_DOMAINLIST</span>
+
+<span class="sd">        List of domain_ids is queued rather than message itself.</span>
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">domain_list</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">_parse_one_level_list</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">domain_list</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_get_userlist"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_get_userlist">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_get_userlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_GET_USERS</span>
+
+<span class="sd">        List of user_ids is queued rather than message itself.</span>
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">user_list</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">_parse_one_level_list</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">user_list</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_get_forwardinglist"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_get_forwardinglist">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_get_forwardinglist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_GET_FORWARDING_LIST</span>
+
+<span class="sd">        List of user_ids in other core nodes is queued rather than message itself.</span>
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">forwarding_list</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">_parse_two_level_dict</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">forwarding_list</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_get_notificationlist"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_get_notificationlist">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_get_notificationlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_GET_NOTIFICATION_LIST</span>
+
+<span class="sd">        List of user_ids in other core nodes is queued rather than message itself.</span>
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">notification_list</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">_parse_two_level_dict</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">notification_list</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_get_node_id"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_get_node_id">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_get_node_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_GET_NODEID</span>
+
+<span class="sd">        Node_id is queued rather than message itself.</span>
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">node_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">node_id</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_get_stats"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_get_stats">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_GET_STATS</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_ecdh_key_exchange"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_ecdh_key_exchange">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_ecdh_key_exchange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_ECDH_KEY_EXCHANGE</span>
+
+<span class="sd">        This method must not be overridden.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">shared_key</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">derive_shared_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">privatekey_for_ecdh</span><span class="p">,</span>
+                                                         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ecdh</span><span class="p">],</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">random</span><span class="p">])</span>
+        <span class="n">message_key_types</span><span class="o">.</span><span class="n">set_cipher</span><span class="p">(</span><span class="n">shared_key</span><span class="p">,</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">nonce</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">aes_key_name</span><span class="p">,</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">hint</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">is_secure_connection</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.0',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

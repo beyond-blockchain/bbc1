@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc1.core.key_exchange_manager module &mdash; BBc1 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bbc1.core.logger module" href="bbc1.core.logger.html" />
+    <link rel="prev" title="bbc1.core.domain0_manager module" href="bbc1.core.domain0_manager.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="bbc1.html">bbc1 package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="bbc1.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="bbc1.core.html">bbc1.core package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="bbc1.core.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#module-bbc1.core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bbc1.html#module-bbc1">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BBc1</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="bbc1.html">bbc1 package</a> &raquo;</li>
+        
+          <li><a href="bbc1.core.html">bbc1.core package</a> &raquo;</li>
+        
+      <li>bbc1.core.key_exchange_manager module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/bbc1.core.key_exchange_manager.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-bbc1.core.key_exchange_manager">
+<span id="bbc1-core-key-exchange-manager-module"></span><h1>bbc1.core.key_exchange_manager module<a class="headerlink" href="#module-bbc1.core.key_exchange_manager" title="Permalink to this headline">¶</a></h1>
+<p>Copyright (c) 2017 beyond-blockchain.org.</p>
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an “AS IS” BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<dl class="class">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager">
+<em class="property">class </em><code class="descclassname">bbc1.core.key_exchange_manager.</code><code class="descname">KeyExchangeManager</code><span class="sig-paren">(</span><em>networking</em>, <em>domain_id</em>, <em>counter_node_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>ECDH (Elliptic Curve Diffie-Hellman) key exchange manager</p>
+<dl class="attribute">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.KEY_EXCHANGE_INVOKE_MAX_BACKOFF">
+<code class="descname">KEY_EXCHANGE_INVOKE_MAX_BACKOFF</code><em class="property"> = 6</em><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.KEY_EXCHANGE_INVOKE_MAX_BACKOFF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.KEY_EXCHANGE_RETRY_INTERVAL">
+<code class="descname">KEY_EXCHANGE_RETRY_INTERVAL</code><em class="property"> = 5</em><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.KEY_EXCHANGE_RETRY_INTERVAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.KEY_OBSOLETE_TIMER">
+<code class="descname">KEY_OBSOLETE_TIMER</code><em class="property"> = 10</em><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.KEY_OBSOLETE_TIMER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.KEY_REFRESH_INTERVAL">
+<code class="descname">KEY_REFRESH_INTERVAL</code><em class="property"> = 604800</em><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.KEY_REFRESH_INTERVAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.STATE_CONFIRMING">
+<code class="descname">STATE_CONFIRMING</code><em class="property"> = 2</em><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.STATE_CONFIRMING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.STATE_ESTABLISHED">
+<code class="descname">STATE_ESTABLISHED</code><em class="property"> = 3</em><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.STATE_ESTABLISHED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.STATE_NONE">
+<code class="descname">STATE_NONE</code><em class="property"> = 0</em><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.STATE_NONE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.STATE_REQUESTING">
+<code class="descname">STATE_REQUESTING</code><em class="property"> = 1</em><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.STATE_REQUESTING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.receive_confirmation">
+<code class="descname">receive_confirmation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.receive_confirmation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_confirmation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confirm that the key has been agreed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_request">
+<code class="descname">receive_exchange_request</code><span class="sig-paren">(</span><em>pubkey</em>, <em>nonce</em>, <em>random_val</em>, <em>hint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.receive_exchange_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Procedure when receiving message with BBcNetwork.REQUEST_KEY_EXCHANGE</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pubkey</strong> (<em>bytes</em>) – public key</li>
+<li><strong>nonce</strong> (<em>bytes</em>) – nonce value</li>
+<li><strong>random_val</strong> (<em>bytes</em>) – random value in calculating key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_response">
+<code class="descname">receive_exchange_response</code><span class="sig-paren">(</span><em>pubkey</em>, <em>random_val</em>, <em>hint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.receive_exchange_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process ECDH procedure (receiving response)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.set_cipher">
+<code class="descname">set_cipher</code><span class="sig-paren">(</span><em>key_name</em>, <em>hint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.set_cipher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.set_cipher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set key to the encryptor and decryptor</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.set_invoke_timer">
+<code class="descname">set_invoke_timer</code><span class="sig-paren">(</span><em>timeout</em>, <em>retry_entry=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.set_invoke_timer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.set_invoke_timer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set timer for key refreshment</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.stop_all_timers">
+<code class="descname">stop_all_timers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.stop_all_timers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.stop_all_timers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop all timers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.key_exchange_manager.KeyExchangeManager.unset_cipher">
+<code class="descname">unset_cipher</code><span class="sig-paren">(</span><em>key_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#KeyExchangeManager.unset_cipher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.KeyExchangeManager.unset_cipher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unset key from the encryptor and decryptor</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.key_exchange_manager.remove_old_key">
+<code class="descclassname">bbc1.core.key_exchange_manager.</code><code class="descname">remove_old_key</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/key_exchange_manager.html#remove_old_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.key_exchange_manager.remove_old_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="bbc1.core.logger.html" class="btn btn-neutral float-right" title="bbc1.core.logger module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="bbc1.core.domain0_manager.html" class="btn btn-neutral" title="bbc1.core.domain0_manager module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

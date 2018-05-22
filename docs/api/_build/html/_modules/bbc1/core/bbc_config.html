@@ -1,0 +1,388 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc1.core.bbc_config &mdash; BBc1 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bbc1.html">bbc1 package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BBc1</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>bbc1.core.bbc_config</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bbc1.core.bbc_config</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Copyright (c) 2017 beyond-blockchain.org.</span>
+
+<span class="sd">Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="sd">you may not use this file except in compliance with the License.</span>
+<span class="sd">You may obtain a copy of the License at</span>
+
+<span class="sd">    http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="sd">Unless required by applicable law or agreed to in writing, software</span>
+<span class="sd">distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="sd">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="sd">See the License for the specific language governing permissions and</span>
+<span class="sd">limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">RLock</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Mapping</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;../../&quot;</span><span class="p">])</span>
+<span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">bbclib</span>
+
+
+<span class="n">DEFAULT_WORKING_DIR</span> <span class="o">=</span> <span class="s1">&#39;.bbc1&#39;</span>
+<span class="n">DEFAULT_CONFIG_FILE</span> <span class="o">=</span> <span class="s1">&#39;config.json&#39;</span>
+<span class="n">DEFAULT_CORE_PORT</span> <span class="o">=</span> <span class="mi">9000</span>
+<span class="n">DEFAULT_P2P_PORT</span> <span class="o">=</span> <span class="mi">6641</span>
+<span class="n">DEFAULT_ETHEREUM_LOG_FILE</span> <span class="o">=</span> <span class="s1">&#39;geth.log&#39;</span>
+<span class="n">DEFAULT_ETHEREUM_CHAIN_ID</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">DEFAULT_ETHEREUM_GETH_PORT</span> <span class="o">=</span> <span class="mi">30303</span>
+
+<span class="n">TIMEOUT_TIMER</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">current_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;workingdir&#39;</span><span class="p">:</span> <span class="n">DEFAULT_WORKING_DIR</span><span class="p">,</span>
+    <span class="s1">&#39;client&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="n">DEFAULT_CORE_PORT</span><span class="p">,</span>
+        <span class="s1">&#39;use_node_key&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;network&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;p2p_port&#39;</span><span class="p">:</span> <span class="n">DEFAULT_P2P_PORT</span><span class="p">,</span>
+        <span class="s1">&#39;max_connections&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;domain_key&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;use&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s1">&#39;directory&#39;</span><span class="p">:</span> <span class="n">DEFAULT_WORKING_DIR</span><span class="o">+</span><span class="s2">&quot;/domain_keys&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;obsolete_timeout&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;domains&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;0000000000000000000000000000000000000000000000000000000000000000&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;module&#39;</span><span class="p">:</span> <span class="s1">&#39;p2p_domain0&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;static_nodes&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="c1"># id : [ipv4, ipv6, port]</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;use_ledger_subsystem&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># if this items does not exist or False, ledger_subsystem will not be used</span>
+            <span class="s1">&#39;ledger_subsystem&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;subsystem&#39;</span><span class="p">:</span> <span class="s1">&#39;ethereum&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;max_transactions&#39;</span><span class="p">:</span> <span class="mi">4096</span><span class="p">,</span>
+                <span class="s1">&#39;max_seconds&#39;</span><span class="p">:</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;ethereum&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;chain_id&#39;</span><span class="p">:</span> <span class="n">DEFAULT_ETHEREUM_CHAIN_ID</span><span class="p">,</span>
+        <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="n">DEFAULT_ETHEREUM_GETH_PORT</span><span class="p">,</span>
+        <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="n">DEFAULT_ETHEREUM_LOG_FILE</span><span class="p">,</span>
+        <span class="s1">&#39;account&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;passphrase&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;contract&#39;</span><span class="p">:</span> <span class="s1">&#39;BBcAnchor&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;contract_address&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="update_deep"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.update_deep">[docs]</a><span class="k">def</span> <span class="nf">update_deep</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Utility for updating nested dictionary&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># this condition handles the problem</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">u</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">update_deep</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">v</span><span class="p">)</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">d</span></div>
+
+
+<div class="viewcode-block" id="BBcConfig"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig">[docs]</a><span class="k">class</span> <span class="nc">BBcConfig</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;System configuration&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">directory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">=</span> <span class="n">directory</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;workingdir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;workingdir&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">file</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">DEFAULT_CONFIG_FILE</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">):</span>
+            <span class="n">update_deep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_config</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BBcConfig.read_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.read_config">[docs]</a>    <span class="k">def</span> <span class="nf">read_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read config file&quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;config file must be in JSON format&quot;</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">config</span></div>
+
+<div class="viewcode-block" id="BBcConfig.update_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.update_config">[docs]</a>    <span class="k">def</span> <span class="nf">update_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write config to file (config.json)&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">traceback</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="BBcConfig.get_json_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.get_json_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_json_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get config in json format&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_config</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcConfig.get_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.get_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return config dictionary&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span></div>
+
+<div class="viewcode-block" id="BBcConfig.get_domain_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.get_domain_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_domain_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">create_if_new</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the part of specified domain_id in the config dictionary&quot;&quot;&quot;</span>
+        <span class="n">domain_id_str</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">convert_id_to_string</span><span class="p">(</span><span class="n">domain_id</span><span class="p">)</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;domains&#39;</span> <span class="ow">in</span> <span class="n">conf</span> <span class="ow">and</span> <span class="n">domain_id_str</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">][</span><span class="n">domain_id_str</span><span class="p">]</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">][</span><span class="n">domain_id_str</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">create_if_new</span> <span class="ow">and</span> <span class="n">domain_id_str</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">][</span><span class="n">domain_id_str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;storage&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;internal&quot;</span><span class="p">,</span>  <span class="c1"># or &quot;external&quot;</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;db&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;db_type&quot;</span><span class="p">:</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">,</span>            <span class="c1"># or &quot;mysql&quot;</span>
+                    <span class="s2">&quot;db_name&quot;</span><span class="p">:</span> <span class="s2">&quot;bbc_ledger.sqlite&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;replication_strategy&quot;</span><span class="p">:</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>  <span class="c1"># or &quot;p2p&quot;/&quot;external&quot; (valid only in db_type=mysql)</span>
+                    <span class="s2">&quot;db_servers&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;db_addr&quot;</span><span class="p">:</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="s2">&quot;db_port&quot;</span><span class="p">:</span> <span class="mi">3306</span><span class="p">,</span> <span class="s2">&quot;db_user&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;db_pass&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span><span class="p">}]</span>
+                    <span class="c1"># valid only in the case of db_type=mysql</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;static_nodes&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="c1"># id : [ipv4, ipv6, port]</span>
+                <span class="p">},</span>
+            <span class="p">}</span>
+        <span class="k">if</span> <span class="n">domain_id_str</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">][</span><span class="n">domain_id_str</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="BBcConfig.remove_domain_config"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_config.html#bbc1.core.bbc_config.BBcConfig.remove_domain_config">[docs]</a>    <span class="k">def</span> <span class="nf">remove_domain_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove the part of specified domain_id in the config dictionary&quot;&quot;&quot;</span>
+        <span class="n">domain_id_str</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">convert_id_to_string</span><span class="p">(</span><span class="n">domain_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">domain_id_str</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">]:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">][</span><span class="n">domain_id_str</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_config</span><span class="p">()</span></div></div>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.0',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

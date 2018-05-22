@@ -1,6 +1,15 @@
 Change log
 ======
 
+## v1.0
+* Restructure the whole package
+  * Only bbc1/core/ remains
+  * Ledger_subsystem related codes and libraries are separated into other repositories
+* Support BSON (binary JSON) format for transaction data structure
+* Documents are updated
+* Utilities are re-designed
+* Bug fixes
+
 ## v0.10
 * The core part is totally re-designed
   * user_message_routing.py, data_handler.py, topology_manager.py, key_exchange_manager.py, key_exchange_manager.py are newley added

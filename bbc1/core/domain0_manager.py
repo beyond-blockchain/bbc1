@@ -18,15 +18,15 @@ limitations under the License.
 import time
 import random
 import threading
+import bson
 
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
-from bbc1.core.bbc_types import InfraMessageCategory
-from bbc1.core import query_management, user_message_routing, repair_manager
-from bbc1.common import bbclib, logger
-from bbc1.common.bbclib import MsgType
-from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
+from bbc1.core import query_management, user_message_routing, repair_manager, logger
+from bbc1.core import bbclib
+from bbc1.core.bbclib import MsgType
+from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
 
 
 ticker = query_management.get_ticker()
@@ -35,9 +35,7 @@ domain_global_0 = bytes([0] * 32)
 
 
 class Domain0Manager:
-    """
-    Management for inter-domain collaboration over domain_0
-    """
+    """Management for inter-domain collaboration over domain_global_0"""
     DOMAIN_INFO_ADVERTISE_INTERVAL = 1800  # seconds
     DOMAIN_INFO_LIFETIME = 3600
     INITIAL_ACCEPT_LIMIT = 10
@@ -64,34 +62,37 @@ class Domain0Manager:
         self.requested_cross_refs = dict()
         self.remove_lock = threading.Lock()
         self.advertise_timer_entry = None
-        self.update_advertise_timer_entry()
+        self._update_advertise_timer_entry()
         self.cross_ref_timer_entry = None
-        self.purge_cross_ref_timer_entry()
+        self._update_cross_ref_timer_entry()
 
     def stop_all_timers(self):
-        """
-        Invalidate all running timers
-        :return:
-        """
+        """Invalidate all running timers"""
         if self.advertise_timer_entry is not None:
             self.advertise_timer_entry.deactivate()
         if self.cross_ref_timer_entry is not None:
             self.cross_ref_timer_entry.deactivate()
 
-    def register_node(self, domain_id, node_id):
+    def _register_node(self, domain_id, node_id):
+        """Register node of other domain
+
+        Args:
+            domain_id (bytes): target domain_id
+            node_id (bytes): target node_id
+        """
         self.domain_list.setdefault(domain_id, list())
         if node_id not in self.domain_list[domain_id]:
             self.domain_list[domain_id].append(node_id)
         self.node_domain_list.setdefault(node_id, dict())[domain_id] = int(time.time())
 
-    def remove_node(self, domain_id, node_id):
+    def _remove_node(self, domain_id, node_id):
+        """Remove node from the lists
+
+        Args:
+            domain_id (bytes): target domain_id
+            node_id (bytes): target node_id
         """
-        Remove node from the lists
-        :param domain_id:
-        :param node_id:
-        :return:
-        """
-        #print("*** remove_node at %s:" % self.my_node_id.hex(), node_id.hex(), "in domain", domain_id.hex())
+        #print("*** _remove_node at %s:" % self.my_node_id.hex(), node_id.hex(), "in domain", domain_id.hex())
         #print(" ==> before: len(node_domain_list)=%d" % len(self.node_domain_list.keys()))
         self.remove_lock.acquire()
         if domain_id in self.domain_list:
@@ -109,47 +110,43 @@ class Domain0Manager:
         #print(" ==> after: len(node_domain_list)=%d" % len(self.node_domain_list.keys()))
 
     def update_domain_belong_to(self):
-        """
-        Update the list domain_belong_to
-        :return:
+        """Update the list domain_belong_to
+
+        domain_belong_to holds all domain_ids that this node belongs to
         """
         self.domains_belong_to = set(self.networking.domains.keys())
 
-    def update_advertise_timer_entry(self):
+    def _update_advertise_timer_entry(self):
+        """Update advertisement timer"""
         rand_interval = random.randint(int(Domain0Manager.DOMAIN_INFO_ADVERTISE_INTERVAL * 5 / 6),
                                        int(Domain0Manager.DOMAIN_INFO_ADVERTISE_INTERVAL * 7 / 6))
-        self.logger.debug("update_advertise_timer_entry: %d" % rand_interval)
+        self.logger.debug("_update_advertise_timer_entry: %d" % rand_interval)
         self.advertise_timer_entry = query_management.QueryEntry(
-                expire_after=rand_interval, callback_expire=self.advertise_domain_info, retry_count=0)
+                expire_after=rand_interval, callback_expire=self._advertise_domain_info, retry_count=0)
 
-    def purge_cross_ref_timer_entry(self):
+    def _update_cross_ref_timer_entry(self):
+        """Update cross_ref timer"""
         rand_interval = random.randint(int(Domain0Manager.DOMAIN_ACCEPTANCE_RECOVER_INTERVAL * 5 / 6),
                                        int(Domain0Manager.DOMAIN_ACCEPTANCE_RECOVER_INTERVAL * 7 / 6))
         self.logger.debug("update_cross_ref_timer_entry: %d" % rand_interval)
         self.cross_ref_timer_entry = query_management.QueryEntry(
                 expire_after=rand_interval, callback_expire=self._purge_left_cross_ref, retry_count=0)
 
-    def eliminate_obsoleted_entries(self):
-        """
-        Check expiration of the node_domain_list
-        :return:
-        """
-        #print("eliminate_obsoleted_entries at %s: len(node_domain_list)=%d" % (self.my_node_id.hex(),
+    def _eliminate_obsoleted_entries(self):
+        """Check expiration of the node_domain_list"""
+        #print("_eliminate_obsoleted_entries at %s: len(node_domain_list)=%d" % (self.my_node_id.hex(),
         #                                                                       len(self.node_domain_list.keys())))
         for node_id in list(self.node_domain_list.keys()):
             for domain_id in list(self.node_domain_list[node_id].keys()):
                 prev_time = self.node_domain_list[node_id][domain_id]
                 if int(time.time()) - prev_time > Domain0Manager.DOMAIN_INFO_LIFETIME:
                     #print(" --> expire node_id=%s in domain %s" % (node_id.hex(), domain_id.hex()))
-                    self.remove_node(domain_id, node_id)
+                    self._remove_node(domain_id, node_id)
 
-    def advertise_domain_info(self, query_entry):
-        """
-        Advertise domain list in the domain 0 network
-        :return:
-        """
-        #print("[%s]: advertise_domain_info" % self.my_node_id.hex()[:4])
-        self.eliminate_obsoleted_entries()
+    def _advertise_domain_info(self, query_entry):
+        """Advertise domain list in the domain_global_0 network"""
+        #print("[%s]: _advertise_domain_info" % self.my_node_id.hex()[:4])
+        self._eliminate_obsoleted_entries()
         domain_list = list(filter(lambda d: d != domain_global_0, self.networking.domains.keys()))
         if len(domain_list) > 0:
             msg = {
@@ -162,13 +159,13 @@ class Domain0Manager:
             self.networking.broadcast_message_in_network(domain_id=domain_global_0,
                                                          payload_type=PayloadType.Type_msgpack, msg=msg)
             self.stats.update_stats_increment("domain0", "send_advertisement", 1)
-        self.update_advertise_timer_entry()
+        self._update_advertise_timer_entry()
 
     def _update_domain_list(self, msg):
-        """
-        Parse binary data and update domain_list
-        :param msg:
-        :return: True/False:  True if the received nodeinfo and that the node has is different
+        """Parse binary data and update domain_list
+
+        Args:
+            msg (dict): received message
         """
         src_node_id = msg[KeyType.source_node_id]
         new_domains = set(filter(lambda d: d not in self.domains_belong_to, msg[KeyType.domain_list]))
@@ -180,17 +177,17 @@ class Domain0Manager:
             self.remove_lock.release()
             #print("deleted:", [dm.hex() for dm in deleted])
             for dm in deleted:
-                self.remove_node(dm, src_node_id)
+                self._remove_node(dm, src_node_id)
         for dm in new_domains:
             #print("NEW:", dm.hex())
-            self.register_node(dm, src_node_id)
+            self._register_node(dm, src_node_id)
 
     def distribute_cross_ref_in_domain0(self, domain_id, transaction_id):
-        """
-        Determine if the node distributes the cross_ref (into domain0)
-        :param domain_id:
-        :param transaction_id:
-        :return:
+        """Determine if the node distributes the cross_ref (into domain_global_0)
+
+        Args:
+            domain_id (bytes): target domain_id
+            transaction_id (bytes): target transaction_id
         """
         # TODO: probability calculation needs to be modified
         if random.random() > Domain0Manager.CROSS_REF_PROBABILITY:
@@ -216,6 +213,7 @@ class Domain0Manager:
                                                     domain_id=domain_global_0, msg=msg)
 
     def _assign_cross_ref(self, cross_ref):
+        """Assign cross_ref to core nodes in domains this node belongs to"""
         now = int(time.time())
         if cross_ref[0] not in self.domain_accept_margin:
             count = self._get_acceptance_margin(cross_ref[0])
@@ -262,6 +260,11 @@ class Domain0Manager:
             i -= 1
 
     def _get_acceptance_margin(self, domain_id):
+        """Check how many cross ref will be accepted
+
+        Args:
+            domain_id (bytes): target domain_id
+        """
         if domain_id not in self.networking.domains:
             return 1
         ret = self.networking.domains[domain_id]['data'].count_domain_in_cross_ref(domain_id)
@@ -271,6 +274,7 @@ class Domain0Manager:
         return ret+1
 
     def _purge_left_cross_ref(self, query_entry):
+        """Purge expired cross_ref entries of requested_cross_refs"""
         now = int(time.time())
         for dm in tuple(self.requested_cross_refs.keys()):
             for txid in tuple(self.requested_cross_refs[dm].keys()):
@@ -278,12 +282,12 @@ class Domain0Manager:
                     del self.requested_cross_refs[dm][txid]
 
     def cross_ref_registered(self, domain_id, transaction_id, cross_ref):
-        """
-        Notify cross_ref inclusion in a transaction of the outer domain and insert the info into DB
-        :param domain_id:
-        :param transaction_id:
-        :param cross_ref:
-        :return:
+        """Notify cross_ref inclusion in a transaction of the outer domain and insert the info into DB
+
+        Args:
+            domain_id (bytes): domain_id where the cross_ref is from
+            transaction_id (bytes): transaction_id that the cross_ref proves
+            cross_ref (bytes): the registered cross_ref in other domain
         """
         cross_ref_domain_id = cross_ref[0]
         cross_ref_txid = cross_ref[1]
@@ -309,6 +313,7 @@ class Domain0Manager:
             return
 
     def _get_transaction_data_for_verification(self, domain_id, transaction_id):
+        """Get transaction object and verify it"""
         txobjs, asts = self.networking.domains[domain_id]['data'].search_transaction(transaction_id=transaction_id)
         if transaction_id not in txobjs:
             return None
@@ -322,13 +327,19 @@ class Domain0Manager:
             self.networking.domains[domain_id]['repair'].put_message(msg)
             return None
         txobj.digest()
-        return txobj.transaction_base_digest, txobj.cross_ref.serialize(), txobj.signatures[0].serialize()
+        if txobj.format_type in [bbclib.BBcFormat.FORMAT_BSON, bbclib.BBcFormat.FORMAT_BSON_COMPRESS_BZ2]:
+            cross_ref_dat = bson.dumps(txobj.cross_ref.serialize())
+            sigdata = bson.dumps(txobj.signatures[0].serialize())
+        else:
+            cross_ref_dat = txobj.cross_ref.serialize()
+            sigdata = txobj.signatures[0].serialize()
+        return txobj.transaction_base_digest, cross_ref_dat, sigdata, txobj.format_type
 
     def process_message(self, msg):
-        """
-        (internal use) process received message
-        :param msg:
-        :return:
+        """Process received message
+
+        Args:
+            msg (dict): received message
         """
         if KeyType.command not in msg:
             return

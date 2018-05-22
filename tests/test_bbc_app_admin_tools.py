@@ -3,16 +3,13 @@ import pytest
 
 import binascii
 import time
-import copy
-import pprint
 
 import sys
 sys.path.extend(["../"])
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import KeyType
-from bbc1.app import bbc_app
-from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility, get_stats, get_stat_diffs
-
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType
+from bbc1.core import bbc_app
+from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 
 LOGLEVEL = 'debug'
 #LOGLEVEL = 'none'
@@ -105,7 +102,7 @@ class TestBBcAppClient(object):
         global msg_processor
         prepare(core_num=core_num, client_num=client_num, loglevel=LOGLEVEL)
         for i in range(core_num):
-            start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i)
+            start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i, use_nodekey=False)
             time.sleep(0.1)
             domain_setup_utility(i, domain_id)  # system administrator
         time.sleep(1)

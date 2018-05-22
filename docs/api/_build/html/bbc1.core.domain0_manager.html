@@ -1,0 +1,383 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc1.core.domain0_manager module &mdash; BBc1 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bbc1.core.key_exchange_manager module" href="bbc1.core.key_exchange_manager.html" />
+    <link rel="prev" title="bbc1.core.data_handler module" href="bbc1.core.data_handler.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="bbc1.html">bbc1 package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="bbc1.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="bbc1.core.html">bbc1.core package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="bbc1.core.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#module-bbc1.core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bbc1.html#module-bbc1">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BBc1</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="bbc1.html">bbc1 package</a> &raquo;</li>
+        
+          <li><a href="bbc1.core.html">bbc1.core package</a> &raquo;</li>
+        
+      <li>bbc1.core.domain0_manager module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/bbc1.core.domain0_manager.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-bbc1.core.domain0_manager">
+<span id="bbc1-core-domain0-manager-module"></span><h1>bbc1.core.domain0_manager module<a class="headerlink" href="#module-bbc1.core.domain0_manager" title="Permalink to this headline">¶</a></h1>
+<p>Copyright (c) 2017 beyond-blockchain.org.</p>
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an “AS IS” BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<dl class="class">
+<dt id="bbc1.core.domain0_manager.Domain0Manager">
+<em class="property">class </em><code class="descclassname">bbc1.core.domain0_manager.</code><code class="descname">Domain0Manager</code><span class="sig-paren">(</span><em>networking=None</em>, <em>node_id=None</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/domain0_manager.html#Domain0Manager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Management for inter-domain collaboration over domain_global_0</p>
+<dl class="attribute">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.ADV_DOMAIN_LIST">
+<code class="descname">ADV_DOMAIN_LIST</code><em class="property"> = b'\x00\x00'</em><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.ADV_DOMAIN_LIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.CROSS_REF_PROBABILITY">
+<code class="descname">CROSS_REF_PROBABILITY</code><em class="property"> = 0.1</em><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.CROSS_REF_PROBABILITY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.DISTRIBUTE_CROSS_REF">
+<code class="descname">DISTRIBUTE_CROSS_REF</code><em class="property"> = b'\x00\x01'</em><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.DISTRIBUTE_CROSS_REF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.DOMAIN_ACCEPTANCE_RECOVER_INTERVAL">
+<code class="descname">DOMAIN_ACCEPTANCE_RECOVER_INTERVAL</code><em class="property"> = 600</em><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.DOMAIN_ACCEPTANCE_RECOVER_INTERVAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.DOMAIN_INFO_ADVERTISE_INTERVAL">
+<code class="descname">DOMAIN_INFO_ADVERTISE_INTERVAL</code><em class="property"> = 1800</em><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.DOMAIN_INFO_ADVERTISE_INTERVAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.DOMAIN_INFO_LIFETIME">
+<code class="descname">DOMAIN_INFO_LIFETIME</code><em class="property"> = 3600</em><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.DOMAIN_INFO_LIFETIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.INITIAL_ACCEPT_LIMIT">
+<code class="descname">INITIAL_ACCEPT_LIMIT</code><em class="property"> = 10</em><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.INITIAL_ACCEPT_LIMIT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.NOTIFY_CROSS_REF_REGISTERED">
+<code class="descname">NOTIFY_CROSS_REF_REGISTERED</code><em class="property"> = b'\x00\x02'</em><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.NOTIFY_CROSS_REF_REGISTERED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.NUM_OF_COPIES">
+<code class="descname">NUM_OF_COPIES</code><em class="property"> = 3</em><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.NUM_OF_COPIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.REQUEST_VERIFY">
+<code class="descname">REQUEST_VERIFY</code><em class="property"> = b'\x00\x04'</em><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.REQUEST_VERIFY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.REQUEST_VERIFY_FROM_OUTER_DOMAIN">
+<code class="descname">REQUEST_VERIFY_FROM_OUTER_DOMAIN</code><em class="property"> = b'\x00\x05'</em><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.REQUEST_VERIFY_FROM_OUTER_DOMAIN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.RESPONSE_VERIFY_FROM_OUTER_DOMAIN">
+<code class="descname">RESPONSE_VERIFY_FROM_OUTER_DOMAIN</code><em class="property"> = b'\x00\x06'</em><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.RESPONSE_VERIFY_FROM_OUTER_DOMAIN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.cross_ref_registered">
+<code class="descname">cross_ref_registered</code><span class="sig-paren">(</span><em>domain_id</em>, <em>transaction_id</em>, <em>cross_ref</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/domain0_manager.html#Domain0Manager.cross_ref_registered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.cross_ref_registered" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notify cross_ref inclusion in a transaction of the outer domain and insert the info into DB</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – domain_id where the cross_ref is from</li>
+<li><strong>transaction_id</strong> (<em>bytes</em>) – transaction_id that the cross_ref proves</li>
+<li><strong>cross_ref</strong> (<em>bytes</em>) – the registered cross_ref in other domain</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.distribute_cross_ref_in_domain0">
+<code class="descname">distribute_cross_ref_in_domain0</code><span class="sig-paren">(</span><em>domain_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/domain0_manager.html#Domain0Manager.distribute_cross_ref_in_domain0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.distribute_cross_ref_in_domain0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the node distributes the cross_ref (into domain_global_0)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
+<li><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.process_message">
+<code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/domain0_manager.html#Domain0Manager.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.process_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process received message</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.stop_all_timers">
+<code class="descname">stop_all_timers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/domain0_manager.html#Domain0Manager.stop_all_timers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.stop_all_timers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invalidate all running timers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.domain0_manager.Domain0Manager.update_domain_belong_to">
+<code class="descname">update_domain_belong_to</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/domain0_manager.html#Domain0Manager.update_domain_belong_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.domain0_manager.Domain0Manager.update_domain_belong_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the list domain_belong_to</p>
+<p>domain_belong_to holds all domain_ids that this node belongs to</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="bbc1.core.key_exchange_manager.html" class="btn btn-neutral float-right" title="bbc1.core.key_exchange_manager module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="bbc1.core.data_handler.html" class="btn btn-neutral" title="bbc1.core.data_handler module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

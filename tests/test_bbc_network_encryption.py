@@ -2,22 +2,17 @@
 import pytest
 
 import shutil
-import binascii
 import queue
-import random
 import time
 
 import os
 import sys
 sys.path.extend(["../"])
 
-from bbc1.common import bbclib, message_key_types
-from bbc1.common.message_key_types import KeyType
-from bbc1.core import bbc_network, bbc_config, query_management, bbc_stats
+from bbc1.core import bbclib
+from bbc1.core import bbc_network, bbc_config, query_management, bbc_stats, message_key_types
 from bbc1.core import key_exchange_manager
 from bbc1.core.topology_manager import TopologyManagerBase
-from bbc1.core.bbc_types import ResourceType
-
 
 LOGLEVEL = 'debug'
 LOGLEVEL = 'info'

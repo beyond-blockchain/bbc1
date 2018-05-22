@@ -7,9 +7,8 @@ import time
 
 import sys
 sys.path.extend(["../"])
-from bbc1.core.bbc_types import ResourceType
-from bbc1.common import bbclib
-from bbc1.common.message_key_types import KeyType
+from bbc1.core import bbclib
+from bbc1.core.message_key_types import KeyType
 from testutils import prepare, start_core_thread, get_core_client, make_client
 
 LOGLEVEL = 'debug'
@@ -79,13 +78,16 @@ class TestBBcCore(object):
         global transaction
         print("-- insert transaction only at core_node_1 --")
         user1 = clients[1]['user_id']
-        transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
-        transaction.events[0].asset.add(user_id=user1, asset_body=b'123456')
-        transaction.events[1].asset.add(user_id=user1, asset_file=b'abcdefg')
-        transaction.get_sig_index(user1)
+        transaction = bbclib.make_transaction(event_num=2, witness=True)
+        transaction.events[0].add(mandatory_approver=clients[1]['user_id'])
+        bbclib.add_event_asset(transaction, event_idx=0, asset_group_id=asset_group_id,
+                               user_id=user1, asset_body=b'123456')
+        bbclib.add_event_asset(transaction, event_idx=1, asset_group_id=asset_group_id,
+                               user_id=user1, asset_file=b'abcdefg')
+        transaction.witness.add_witness(user_id=user1)
 
         sig = transaction.sign(keypair=clients[1]['keypair'])
-        transaction.add_signature(user_id=user1, signature=sig)
+        transaction.witness.add_signature(user_id=user1, signature=sig)
         transaction.digest()
         print(transaction)
         print("register transaction=", binascii.b2a_hex(transaction.transaction_id))
@@ -94,9 +96,9 @@ class TestBBcCore(object):
         ret = cores[1].insert_transaction(domain_id, transaction.serialize(), asset_file)
         assert ret[KeyType.transaction_id] == transaction.transaction_id
 
-    def test_04_1_search_transaction_by_txid(self):
+    def test_04_1__search_transaction_by_txid(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = cores[1].search_transaction_by_txid(domain_id, transaction.transaction_id)
+        ret = cores[1]._search_transaction_by_txid(domain_id, transaction.transaction_id)
         assert ret is not None
 
     def test_04_2_search_asset_by_asid(self):
@@ -114,28 +116,33 @@ class TestBBcCore(object):
         assert ret is not None
         assert asid in ret[KeyType.all_asset_files]
 
-    def test_05_1_search_transaction_by_txid_other_node_not_found(self):
+    def test_05_1__search_transaction_by_txid_other_node_not_found(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
 
         print("-- insert transaction only at core_node_2 --")
         global transaction
         user1 = clients[2]['user_id']
-        transaction = bbclib.make_transaction_for_base_asset(asset_group_id=asset_group_id, event_num=2)
-        transaction.events[0].asset.add(user_id=user1, asset_body=b'aaddbbdd')
-        transaction.events[1].asset.add(user_id=user1, asset_file=b'112423')
-
+        transaction = bbclib.make_transaction(event_num=2, witness=True)
+        bbclib.add_event_asset(transaction, event_idx=0, asset_group_id=asset_group_id,
+                               user_id=user1, asset_body=b'aaddbbdd')
+        bbclib.add_event_asset(transaction, event_idx=1, asset_group_id=asset_group_id,
+                               user_id=user1, asset_file=b'112423')
+        for i, user in enumerate(clients):
+            transaction.witness.add_witness(user_id=clients[i]['user_id'])
         for i, user in enumerate(clients):
             sig = transaction.sign(keypair=clients[i]['keypair'])
-            transaction.add_signature(user_id=clients[i]['user_id'], signature=sig)
+            transaction.witness.add_signature(user_id=clients[i]['user_id'], signature=sig)
         transaction.digest()
+        print(transaction)
         print("register transaction=", binascii.b2a_hex(transaction.transaction_id))
         asset_file = dict()
         asset_file[transaction.events[1].asset.asset_id] = transaction.events[1].asset.asset_file
         ret = cores[2].insert_transaction(domain_id, transaction.serialize(), asset_file)
+        assert KeyType.transaction_id in ret
         assert ret[KeyType.transaction_id] == transaction.transaction_id
 
         # -- search the transaction at core_node_0
-        ret = cores[0].search_transaction_by_txid(domain_id, transaction.transaction_id)
+        ret = cores[0]._search_transaction_by_txid(domain_id, transaction.transaction_id)
         print(ret)
         assert ret is None
 
@@ -183,7 +190,7 @@ class TestBBcCore(object):
         ret = cores[0].insert_transaction(domain_id, transaction.serialize(), asset_files)
         assert ret[KeyType.transaction_id] == transaction.transaction_id
 
-        ret = cores[0].search_transaction_by_txid(domain_id, transaction.transaction_id)
+        ret = cores[0]._search_transaction_by_txid(domain_id, transaction.transaction_id)
         assert ret is not None
         assert len(ret[KeyType.all_asset_files]) == 1
         print(ret)
@@ -191,10 +198,10 @@ class TestBBcCore(object):
         print("-- wait 2 seconds --")
         time.sleep(2)
 
-    def test_07_2_search_transaction_by_txid_other_node(self):
+    def test_07_2__search_transaction_by_txid_other_node(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         # -- search the transaction at core_node_1
-        ret = cores[1].search_transaction_by_txid(domain_id, transaction.transaction_id)
+        ret = cores[1]._search_transaction_by_txid(domain_id, transaction.transaction_id)
         assert ret is not None
         assert len(ret[KeyType.all_asset_files]) == 1
         print(ret)

@@ -1,0 +1,398 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc1.core.key_exchange_manager &mdash; BBc1 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bbc1.html">bbc1 package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BBc1</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>bbc1.core.key_exchange_manager</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bbc1.core.key_exchange_manager</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Copyright (c) 2017 beyond-blockchain.org.</span>
+
+<span class="sd">Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="sd">you may not use this file except in compliance with the License.</span>
+<span class="sd">You may obtain a copy of the License at</span>
+
+<span class="sd">    http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="sd">Unless required by applicable law or agreed to in writing, software</span>
+<span class="sd">distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="sd">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="sd">See the License for the specific language governing permissions and</span>
+<span class="sd">limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;../../&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))])</span>
+<span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">query_management</span><span class="p">,</span> <span class="n">message_key_types</span>
+<span class="kn">from</span> <span class="nn">bbc1.core.message_key_types</span> <span class="k">import</span> <span class="n">KeyType</span>
+
+
+<div class="viewcode-block" id="remove_old_key"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.remove_old_key">[docs]</a><span class="k">def</span> <span class="nf">remove_old_key</span><span class="p">(</span><span class="n">query_entry</span><span class="p">):</span>
+    <span class="c1">#print(&quot;===&gt;&quot;, query_entry.data[KeyType.hint].hex()[:10])</span>
+    <span class="n">message_key_types</span><span class="o">.</span><span class="n">unset_cipher</span><span class="p">(</span><span class="n">query_entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">hint</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="KeyExchangeManager"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager">[docs]</a><span class="k">class</span> <span class="nc">KeyExchangeManager</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;ECDH (Elliptic Curve Diffie-Hellman) key exchange manager&quot;&quot;&quot;</span>
+    <span class="n">KEY_EXCHANGE_INVOKE_MAX_BACKOFF</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">KEY_EXCHANGE_RETRY_INTERVAL</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">KEY_REFRESH_INTERVAL</span> <span class="o">=</span> <span class="mi">604800</span>
+    <span class="n">KEY_OBSOLETE_TIMER</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="n">STATE_NONE</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">STATE_REQUESTING</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">STATE_CONFIRMING</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">STATE_ESTABLISHED</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">networking</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">counter_node_id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">networking</span> <span class="o">=</span> <span class="n">networking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span> <span class="o">=</span> <span class="n">domain_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counter_node_id</span> <span class="o">=</span> <span class="n">counter_node_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">STATE_NONE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secret_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">peer_public_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set state of key exchange process&quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;** set state from %d to %d&quot; % (self.state, state))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+
+<div class="viewcode-block" id="KeyExchangeManager.set_cipher"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.set_cipher">[docs]</a>    <span class="k">def</span> <span class="nf">set_cipher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">hint</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set key to the encryptor and decryptor&quot;&quot;&quot;</span>
+        <span class="n">message_key_types</span><span class="o">.</span><span class="n">set_cipher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shared_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">hint</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KeyExchangeManager.unset_cipher"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.unset_cipher">[docs]</a>    <span class="k">def</span> <span class="nf">unset_cipher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Unset key from the encryptor and decryptor&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">message_key_types</span><span class="o">.</span><span class="n">unset_cipher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">message_key_types</span><span class="o">.</span><span class="n">unset_cipher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message_key_types</span><span class="o">.</span><span class="n">unset_cipher</span><span class="p">(</span><span class="n">key_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KeyExchangeManager.stop_all_timers"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.stop_all_timers">[docs]</a>    <span class="k">def</span> <span class="nf">stop_all_timers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stop all timers&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="KeyExchangeManager.set_invoke_timer"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.set_invoke_timer">[docs]</a>    <span class="k">def</span> <span class="nf">set_invoke_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">retry_entry</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set timer for key refreshment&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
+        <span class="c1">#print(&quot;(%d) set_invoke_timer:&quot; % int(time.time()), timeout)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span> <span class="o">=</span> <span class="n">query_management</span><span class="o">.</span><span class="n">QueryEntry</span><span class="p">(</span><span class="n">expire_after</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                                                       <span class="n">callback_expire</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_perform_key_exchange</span><span class="p">,</span>
+                                                       <span class="n">retry_count</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">retry_entry</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">retry_timer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_delete_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">timeout</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set timer for key revocation&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#print(&quot;(%d) _set_delete_timer:&quot; % int(time.time()), key_name.hex()[:10], timeout)</span>
+            <span class="n">query_management</span><span class="o">.</span><span class="n">QueryEntry</span><span class="p">(</span><span class="n">expire_after</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">callback_expire</span><span class="o">=</span><span class="n">remove_old_key</span><span class="p">,</span>
+                                        <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="n">KeyType</span><span class="o">.</span><span class="n">hint</span><span class="p">:</span> <span class="n">key_name</span><span class="p">},</span> <span class="n">retry_count</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_perform_key_exchange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_entry</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform ECDH key exhange to establish secure channel to the node&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">retry_timer</span> <span class="ow">in</span> <span class="n">query_entry</span><span class="o">.</span><span class="n">data</span> <span class="ow">and</span> <span class="n">query_entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">retry_timer</span><span class="p">]:</span>
+            <span class="n">message_key_types</span><span class="o">.</span><span class="n">unset_cipher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_state</span><span class="p">(</span><span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">STATE_REQUESTING</span><span class="p">)</span>
+        <span class="c1">#print(&quot;# (%d) _perform_key_exchange: to&quot; % int(time.time()), self.counter_node_id.hex())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secret_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">peer_public_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">get_ECDH_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">send_key_exchange_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">counter_node_id</span><span class="p">,</span> <span class="s2">&quot;request&quot;</span><span class="p">,</span>
+                                                        <span class="bp">self</span><span class="o">.</span><span class="n">peer_public_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random</span><span class="p">,</span>
+                                                        <span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_state</span><span class="p">(</span><span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">STATE_NONE</span><span class="p">)</span>
+            <span class="n">message_key_types</span><span class="o">.</span><span class="n">unset_cipher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span><span class="p">)</span>
+            <span class="n">message_key_types</span><span class="o">.</span><span class="n">unset_cipher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secret_key</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">peer_public_key</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">random</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+        <span class="n">rand_time</span> <span class="o">=</span> <span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">KEY_EXCHANGE_RETRY_INTERVAL</span><span class="o">*</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_invoke_timer</span><span class="p">(</span><span class="n">rand_time</span><span class="p">,</span> <span class="n">retry_entry</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="KeyExchangeManager.receive_exchange_request"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_request">[docs]</a>    <span class="k">def</span> <span class="nf">receive_exchange_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pubkey</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">random_val</span><span class="p">,</span> <span class="n">hint</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Procedure when receiving message with BBcNetwork.REQUEST_KEY_EXCHANGE</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pubkey (bytes): public key</span>
+<span class="sd">            nonce (bytes): nonce value</span>
+<span class="sd">            random_val (bytes): random value in calculating key</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">STATE_REQUESTING</span><span class="p">:</span>
+            <span class="c1">#print(&quot;(%d) receive_exchange_request: processing&quot; % int(time.time()))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">peer_public_key</span> <span class="o">=</span> <span class="n">pubkey</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span> <span class="o">=</span> <span class="n">nonce</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">random</span> <span class="o">=</span> <span class="n">random_val</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secret_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">peer_public_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">get_ECDH_parameters</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shared_key</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">derive_shared_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secret_key</span><span class="p">,</span> <span class="n">pubkey</span><span class="p">,</span> <span class="n">random_val</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_state</span><span class="p">(</span><span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">STATE_CONFIRMING</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">send_key_exchange_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">counter_node_id</span><span class="p">,</span> <span class="s2">&quot;response&quot;</span><span class="p">,</span>
+                                                     <span class="bp">self</span><span class="o">.</span><span class="n">peer_public_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random</span><span class="p">,</span>
+                                                     <span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_cipher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span><span class="p">,</span> <span class="n">hint</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#print(&quot;(%d) receive_exchange_request: ignoring&quot; % int(time.time()))</span>
+            <span class="n">message_key_types</span><span class="o">.</span><span class="n">unset_cipher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_state</span><span class="p">(</span><span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">STATE_NONE</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_state</span><span class="p">(</span><span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">STATE_ESTABLISHED</span><span class="p">)</span>
+        <span class="n">rand_time</span> <span class="o">=</span> <span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">KEY_EXCHANGE_RETRY_INTERVAL</span> <span class="o">*</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span><span class="o">.</span><span class="n">update_expiration_time</span><span class="p">(</span><span class="n">rand_time</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">retry_timer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_invoke_timer</span><span class="p">(</span><span class="n">rand_time</span><span class="p">,</span> <span class="n">retry_entry</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KeyExchangeManager.receive_exchange_response"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_response">[docs]</a>    <span class="k">def</span> <span class="nf">receive_exchange_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pubkey</span><span class="p">,</span> <span class="n">random_val</span><span class="p">,</span> <span class="n">hint</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Process ECDH procedure (receiving response)&quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;(%d) receive_exchange_response:&quot; % int(time.time()))</span>
+        <span class="c1">#print(&quot; **&gt; state:&quot;, self.state)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">STATE_REQUESTING</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">rand_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">KEY_REFRESH_INTERVAL</span><span class="o">*</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_invoke_timer</span><span class="p">(</span><span class="n">rand_time</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared_key</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">derive_shared_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secret_key</span><span class="p">,</span> <span class="n">pubkey</span><span class="p">,</span> <span class="n">random_val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_delete_timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key_name</span><span class="p">,</span> <span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">KEY_OBSOLETE_TIMER</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">send_key_exchange_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">counter_node_id</span><span class="p">,</span> <span class="s2">&quot;confirm&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">peer_public_key</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_cipher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key_name</span><span class="p">,</span> <span class="n">hint</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_state</span><span class="p">(</span><span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">STATE_ESTABLISHED</span><span class="p">)</span></div>
+        <span class="c1">#print(&quot;*STATE_ESTABLISHED&quot;)</span>
+
+<div class="viewcode-block" id="KeyExchangeManager.receive_confirmation"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_confirmation">[docs]</a>    <span class="k">def</span> <span class="nf">receive_confirmation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Confirm that the key has been agreed&quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;(%d) receive_confirmation:&quot; % int(time.time()))</span>
+        <span class="c1">#print(&quot; **&gt; state:&quot;, self.state)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">STATE_CONFIRMING</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">rand_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">KEY_REFRESH_INTERVAL</span><span class="o">*</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_invoke_timer</span><span class="p">(</span><span class="n">rand_time</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_delete_timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key_name</span><span class="p">,</span> <span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">KEY_OBSOLETE_TIMER</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pending_key_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_state</span><span class="p">(</span><span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">STATE_ESTABLISHED</span><span class="p">)</span></div></div>
+        <span class="c1">#print(&quot;*STATE_ESTABLISHED&quot;)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.0',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

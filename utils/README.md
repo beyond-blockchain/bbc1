@@ -1,126 +1,178 @@
 Utilities
 =========
-Scripts in this directory are utilities for managing bbc_core.
+Scripts in this directory are utilities for managing bbc_core, namely domain configuration.
 
-## common
-All scripts take "-4", "-6" and "-p" options. They specify which bbc_core you connect to. Omitting them results in applying the default settings as follows: "127.0.0.1" and 9000. You can also use IPv6 by using "-6" option.
+*bbc\_domain\_config.py* is a edit tool of config.json for bbc_core.py. *bbc\_domain\_update.py* is a live config update tool. *bbc\_info.py* shows the statistics of a core node. *bbc\_ping.py* is a network configuration tool to establish a neighbor relationship with anothor core node. *domain\_key\_setup.py* is a secret key setup tool to secure admin message within a domain. *id\_create.py* is a utility to generate 256-bit ID in HEX string.
 
-## bbc_system_conf.py
-This script is a configuration tool to create a domain. JSON file is used for the configuration.
 
-* Calculate ID from a given string
-    ```
-    python bbc_system_conf.py -i "some string"
-    ```
-    The above command always returns the same result as long as the parameter "some string" is the same.
-    The following command creates a different ID because it appends a timestamp internally.
-    ```
-    python bbc_system_conf.py -t "some string"
-    ```
+## common parameters
 
-* Get all socket information of all domains
-    ```
-    python bbc_system_conf.py -m
-    ```
-    You will get a dictionary data including {"domain_id": {"node_id": (ipv4, ipv6, port)}}. You will need the node_id to configure JSON file.
+For bbc\_domain\_update.py, bbc\_info.py, bbc\_ping.py and domain\_key\_setup.py have same parameters to connect to a bbc\_core.py.
 
-* Get all peer nodes of all domains the connecting bbc_core is joining
-    ```
-    python bbc_system_conf.py -l
-    ```
+* -4: IPv4 address of the node running bbc\_core.py
+* -6: IPv6 address of the node running bbc\_core.py
+* -p: TCP port number where bbc_core.py is waiting for new connections
 
-* Get config file of the connecting bbc_core
-    ```
-    python bbc_system_conf.py -g
-    ```
-    You will get the config file of the bbc_core (typically in .bbc1/config.json.)
+If these parameters are omitted, the default values, 127.0.0.1 for IPv4, ::1 for IPv6 and 9000 for TCP port, are used.
 
-* Show sample config JSON file
-    ```
-    python bbc_system_conf.py -c
-    ```
-    Please save the result as a json file and edit it. The following is the sample json:
-    ```
-    {
-        "*domain_id": {
-            "module": "simple_cluster",
-            "static_nodes": {
-                "*node_id": "[*ipv4, *ipv6, *port]"
-            },
-            "asset_group_ids": {
-                "*asset_group_id1": {
-                    "storage_type": 1,
-                    "storage_path": null,
-                    "advertise_in_domain0": false
-                },
-                "*asset_group_id2": {
-                    "storage_type": 1,
-                    "storage_path": null,
-                    "advertise_in_domain0": false
-                }
-            }
-        }
-    }
-    ```
-    *module* takes "simple_cluster" only at this point. This is a driver for composing a P2P network.
-    *static_nodes* are the neighboring nodes that the bbc_core node tries to connect to.
-    *storage_type* in asset_group_id entry takes 0 or 1, currently. This is from StorageType class in bbclib.py. If 0, asset files are never stored in bbc_core nodes.
-    *storage_path* specifies the path in the bbc_core node to store asset files.
-    *advertise_in_domain0* has not been supported yet. It is for cross_ref exchange for proof of existence.
+Furthermore, a node\_key would be required for the communication between bbc_core.py and a utility. In such a case, -k option designates a key file of node key.
 
-* Send configuration
-    ```
-    python bbc_system_conf.py json_file_name
-    ```
-    Send and apply the configuration to the bbc_core node.
+## bbc\_domain\_config.py
 
-## bbc_ping.py
-This script is a simplified tool to setup domain and static connection between two core_nodes.
+bbc\_domain\_config.py creates and updates the config file of bbc_core.py, i.e., config.json.
 
-* Create a domain and send domain_ping
-    ```
-    python bbc_ping.py domain_id dst_address dst_port
-    ```
-    If you use "-6" in addition, dst_address must be also IPv6 address. The same thing goes for "-4" or default.
-    As a result of this command, the bbc_core creates a domain with the given domain_id. After creating the domain, the core sends *domain_ping* to the specified destination. When the receiver of domain_ping is joining the domain, the receiver adds the sender node as the peer node. Then, the receiver sends back a normal bbc ping message, so that the sender can find the receiver node as the peer node. Note that the receiver must have the specified domain_id. If not, nothing happens.
+-t option specifies the operation mode from generate, write and delete. The following command generate a new config 
+file in the working directory .bbc1/.
+```
+python bbc_domain_config.py -t generate -w .bbc1/
+```
+Note that if there is no config file in the working directory, bbc\_core.py will generate the default config file, of
+ which content is the same as the result above.
 
-## bbc_setup.py
-This script is for creating domain and updating peer list of the connecting bbc_core.
+In the existence of config file in the working directory, "-t write" and "-t delete" edit the config file, i.e., 
+config.json. The following command add a default domain config in config.json. 
+```
+python bbc_domain_config.py -t write -w .bbc1/ -d ffe65f1d98fafedea3514adc956c8ada5980c6c5d2552fd61f48401aefd5c00e 
+``` 
+The content of the comand result is like following:
+```python
+ 'ffe65f1d98fafedea3514adc956c8ada5980c6c5d2552fd61f48401aefd5c00e': {
+    'db': {
+         'db_name': 'bbc_ledger.sqlite',
+         'db_servers': [{'db_addr': '127.0.0.1',
+                         'db_pass': 'pass',
+                         'db_port': 3306,
+                         'db_user': 'user'}],
+         'db_type': 'sqlite',
+         'replication_strategy': 'all'
+    },
+    'node_id': '',
+    'static_nodes': {},
+    'storage': {'type': 'internal'}
+ },
+```
 
-* Create a new domain
-    ```
-    python -d [domain_id_string]
-    ```
-    [domain_id_string] is a hex string of the domain ID.
-    By default, the bbc_setup.py connects to the bbc_core at port 9000 on the localhost.
-    If you want to specify the bbc_core, -4, -6 and -p options configures the IPv4, IPv6 and TCP port number to connect, respectively.
+In write mode, -k1 and -v options can add or update the item. For example by the following command:
+```
+python bbc_domain_config.py -t write -w .bbc1/ -d ffe6...(snip)...c00e -k1 db -k2 db_name -v test.db
+```
+the config of the domain will be changed as follows:
+```python
+ 'ffe65f1d98fafedea3514adc956c8ada5980c6c5d2552fd61f48401aefd5c00e': {
+    'db': {
+         'db_name': 'test.db',
+         'db_servers': [{'db_addr': '127.0.0.1',
+                         'db_pass': 'pass',
+                         'db_port': 3306,
+                         'db_user': 'user'}],
+         'db_type': 'sqlite',
+         'replication_strategy': 'all'
+    },
+    'node_id': '',
+    'static_nodes': {},
+    'storage': {'type': 'internal'}
+ },
+```
+-k1 is for the first level in the domain part, such as 'db', 'node_id', 'static_nodes' and 'storage', and -k2 is for 
+the second level, such as 'db_name', 'db_servers' and so on. You can also set json style object value as follows:
+```
+python bbc_domain_config.py -t write -w .bbc1/ -d ffe6...(snip)...c00e -k1 db -v '{"db_type": "sqlite", "db_name": "test2.sqlite"}'
+```
+The command rewrites the part of 'db' only. The result is as follows:
+```python
+ 'ffe65f1d98fafedea3514adc956c8ada5980c6c5d2552fd61f48401aefd5c00e': {
+    'db': {
+         'db_name': 'test2.db',
+         'db_type': 'sqlite',
+    },
+    'node_id': '',
+    'static_nodes': {},
+    'storage': {'type': 'internal'}
+ },
+```
 
-* Make the bbc_core send ping to its neighbors to update its peer list
-    ```
-    python -d [domain_id_string] --ping_to_neighbors
-    ```
+"-t delete" mode is for deleting the specified item. For example, if you want to delete 'node_id', the command is as 
+follows:
+```
+python bbc_domain_config.py -t delete -w .bbc1/ -d ffe6...(snip)...c00e -k1 node_id
+```
 
-## subsystem_tool.py
-This script is for the ledger_subsystem. You can enable/disable ledger_subsystem, and register/verify transaction_id in the ledger subsystem.
+After editing the config file by this command, you need to notify bbc\_core.py of the modification.
 
-* Enable the subsystem
-    ```
-    python subsystem_tool.py --start
-    ```
 
-* Disable the subsystem
-    ```
-    python subsystem_tool.py --stop
-    ```
+## bbc\_domain\_update.py
 
-* Register a transaction_id
-    ```
-    python subsystem_tool.py -a "hex string of asset_group_id" -t "hex string of transaction_id" --register
-    ```
-    asset_group_id and transaction_id are like the following: *e59c553504ca7a54f888eb47e61b773a221ae1311bd58ec4c0912d71c443d715*
+The config file "config.json" is loaded only at the bootstrap of bbc_core.py. bbc\_domain\_update.py performs the 
+online update of the configuration of the specified domain.
 
-* Verify a transaction_id
-    ```
-    python subsystem_tool.py -a "hex string of asset_group_id" -t "hex string of transaction_id" --verify
-    ```
-    You will get a result (and Markle subtree) in a JSON form. (Please modify how to retrieve/treat the result by yourself.)
+The following command notifies bbc_core.py of creating a new domain (ffe65f1....d5c00e) which has newly added in the 
+config file. (-a is for addition)
+```
+python bbc_domain_update.py -d ffe65f1d98fafedea3514adc956c8ada5980c6c5d2552fd61f48401aefd5c00e -a
+```
+
+-r option is for removing a domain, which results in removing the part for the domain in config.json.
+```
+python bbc_domain_update.py -d ffe65f1d98fafedea3514adc956c8ada5980c6c5d2552fd61f48401aefd5c00e -r
+```
+
+
+## bbc\_info.py
+
+The following command obtains the statistics information in the core node.
+
+```
+python bbc_info.py
+```
+The information is in a json format.
+
+
+## bbc\_ping.py
+
+When you send a ping message from a core node to another, each node recognizes each other and registers it in the neighbor list.
+```
+python bbc_ping.py domain_id dst_address dst_port
+```
+
+An example case is as follows:
+There are two nodes with IPv4 addresses, 192.168.10.5 (node_A) and 192.168.10.6 (node_B). The port for inter connection between core nodes is 6641 by default. Assume that the following command is executed on node_A.
+```
+python bbc_ping.py -4 localhost -p 9000 ffe65f1d98fafedea3514adc956c8ada5980c6c5d2552fd61f48401aefd5c00e 192.168.10.6 6641
+```
+
+By this command, a ping message is sent to node_B, which automatically responds with ping responce message to node_A. As a result, both node_A and node_B registeres a new entry in their neighbor list, so that they recognize each other.
+
+## domain\_key\_setup.py
+
+A domain key is a AES256 encryption key for securing admin message with in a domain. The same key must be shared by all core nodes in the domain. Messages for setting up network configuration and so on are admin ones. A core node requires to include the signature by the domain key in the admin messages.
+The domain key file should be placed in the directory specified in "domain_key" section in the config file. domain\_key\_setup.py generates a domain key by the following command:
+```
+python domain_key_setup.py -g -d ffe65f1d98fafedea3514adc956c8ada5980c6c5d2552fd61f48401aefd5c00e --dir domain_dir/
+```
+-g is for generating a key and -d specifies domain_id. --dir is for the key directory. Note that this command just generate a key file. To load the new key in bbc_core.py process, we have two ways as follows:
+* Restarting bbc_core.py reloads all config files including domain key files.
+* Sending notification to bbc_core.py (by the command below) triggers to reload domain_keys.
+```
+python domain_key_setup.py -n
+```
+Of course, -4, -6, -p and -k need to be given if needed.
+
+
+## id\_create.py
+
+Seed string is required to generate 256-bit ID string.
+```
+python id_create.py -s test-string
+```
+You will get the HEX string "ffe65f1d98fafedea3514adc956c8ada5980c6c5d2552fd61f48401aefd5c00e".
+
+By adding -t option, timestamp of the current time is appended to the seed string.
+```
+python id_create.py -s test-string -t
+```
+You will see a different result at every trial.
+
+If you want to get random ID string, -r generate such a string.
+```
+python id_create.py -r
+```

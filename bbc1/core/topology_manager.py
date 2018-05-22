@@ -22,18 +22,14 @@ import binascii
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
-from bbc1.core.bbc_types import InfraMessageCategory
-from bbc1.core import query_management
-from bbc1.common.message_key_types import to_2byte, PayloadType, KeyType
-from bbc1.common import logger
-
+from bbc1.core import query_management, logger
+from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
 
 ticker = query_management.get_ticker()
 
 
 class TopologyManagerBase:
-    """
-    Network topology management for a domain
+    """Network topology management for a domain
 
     This class defines how to create topology, meaning that who should be neighbors and provides very simple topology
     management, that is full mesh topology. If P2P routing algorithm is needed, you should override this class
@@ -58,33 +54,18 @@ class TopologyManagerBase:
         self.update_refresh_timer_entry()
 
     def stop_all_timers(self):
-        """
-        Invalidate all running timers
-        :return:
-        """
+        """Invalidate all running timers"""
         if self.advertise_wait_entry is not None:
             self.advertise_wait_entry.deactivate()
         if self.neighbor_refresh_timer_entry is not None:
             self.neighbor_refresh_timer_entry.deactivate()
 
-    def resolve_next_hop(self, destination_id):
-        """
-        Determine next hop node to forward message
-        :param destination_id:
-        :return:
-        """
-        if destination_id in self.neighbors.nodeinfo_list:
-            return destination_id
-        else:
-            return None
-        pass
-
     def notify_neighbor_update(self, node_id, is_new=True):
-        """
-        Notified when neighbor node info is updated
-        :param node_id:
-        :param is_new:
-        :return:
+        """Update expiration timer for the notified node_id
+
+        Args:
+            node_id (bytes): target node_id
+            is_new (bool): If True, this node is a new comer node
         """
         if node_id is not None:
             self.logger.debug("[%s] notify_neighbor_update: node_id=%s, is_new=%s" % (self.my_node_id.hex()[:4],
@@ -95,12 +76,13 @@ class TopologyManagerBase:
         rand_time = random.uniform(0.5, 1) * 5 / (len(self.neighbors.nodeinfo_list) + 1)
         if self.advertise_wait_entry is None:
             self.advertise_wait_entry = query_management.QueryEntry(expire_after=rand_time,
-                                                                    callback_expire=self.advertise_neighbor_info,
+                                                                    callback_expire=self._advertise_neighbor_info,
                                                                     retry_count=0)
         else:
             self.advertise_wait_entry.update_expiration_time(rand_time)
 
     def update_refresh_timer_entry(self, new_entry=True, force_refresh_time=None):
+        """Update expiration timer"""
         if force_refresh_time is None:
             rand_interval = random.randint(int(TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL * 2 / 3),
                                            int(TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL * 4 / 3))
@@ -110,16 +92,13 @@ class TopologyManagerBase:
         if new_entry:
             self.neighbor_refresh_timer_entry = query_management.QueryEntry(
                 expire_after=rand_interval, data={"is_refresh": True},
-                callback_expire=self.advertise_neighbor_info, retry_count=0)
+                callback_expire=self._advertise_neighbor_info, retry_count=0)
         else:
             self.neighbor_refresh_timer_entry.update_expiration_time(rand_interval)
 
-    def advertise_neighbor_info(self, query_entry):
-        """
-        Broadcast nodeinfo list
-        :return:
-        """
-        #print("[%s]: advertise_neighbor_info" % self.my_node_id.hex()[:4])
+    def _advertise_neighbor_info(self, query_entry):
+        """Broadcast nodeinfo list"""
+        #print("[%s]: _advertise_neighbor_info" % self.my_node_id.hex()[:4])
         self.advertise_wait_entry = None
         msg = {
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_TOPOLOGY,
@@ -136,10 +115,7 @@ class TopologyManagerBase:
             self.update_refresh_timer_entry()
 
     def make_neighbor_list(self):
-        """
-        make nodelist binary for advertising
-        :return:
-        """
+        """make nodelist binary for advertising"""
         nodeinfo = bytearray()
 
         # the node itself
@@ -158,11 +134,13 @@ class TopologyManagerBase:
         nodes.extend(nodeinfo)
         return bytes(nodes)
 
-    def update_neighbor_list(self, binary_data):
-        """
-        Parse binary data and update neighbors
-        :param binary_data:
-        :return: True/False:  True if the received nodeinfo and that the node has is different
+    def _update_neighbor_list(self, binary_data):
+        """Parse binary data and update neighbors
+
+        Args:
+            binary_data (bytes): received data
+        Returns:
+            bool: True if the received nodeinfo has changed
         """
         count_originally = len(list(filter(lambda nd: nd.is_alive, self.neighbors.nodeinfo_list.values())))
         count_unchanged = 0
@@ -186,14 +164,11 @@ class TopologyManagerBase:
         else:
             return True
 
-    def process_message(self, ipv4, ipv6, port, msg):
-        """
-        (internal use) process received message
-        :param ipv4:      sender ipv4 address
-        :param ipv6:      sender ipv6 address
-        :param port:      sender address and port (None if TCP)
-        :param msg:
-        :return:
+    def process_message(self, msg):
+        """Process received message
+
+        Args:
+            msg (dict): received message
         """
         if KeyType.destination_node_id not in msg or KeyType.command not in msg:
             return
@@ -205,7 +180,7 @@ class TopologyManagerBase:
         if msg[KeyType.command] == TopologyManagerBase.NOTIFY_NEIGHBOR_LIST:
             self.stats.update_stats_increment("topology_manager", "NOTIFY_NEIGHBOR_LIST", 1)
             self.update_refresh_timer_entry(new_entry=False)
-            diff_flag = self.update_neighbor_list(msg[KeyType.neighbor_list])
+            diff_flag = self._update_neighbor_list(msg[KeyType.neighbor_list])
             if diff_flag:
                 if self.advertise_wait_entry is None:
                     self.notify_neighbor_update(None)

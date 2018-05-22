@@ -1,0 +1,1022 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc1.core.data_handler &mdash; BBc1 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bbc1.html">bbc1 package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BBc1</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>bbc1.core.data_handler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bbc1.core.data_handler</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Copyright (c) 2017 beyond-blockchain.org.</span>
+
+<span class="sd">Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="sd">you may not use this file except in compliance with the License.</span>
+<span class="sd">You may obtain a copy of the License at</span>
+
+<span class="sd">    http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="sd">Unless required by applicable law or agreed to in writing, software</span>
+<span class="sd">distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="sd">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="sd">See the License for the specific language governing permissions and</span>
+<span class="sd">limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">binascii</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;../../&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))])</span>
+<span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">bbclib</span>
+<span class="kn">from</span> <span class="nn">bbc1.core.message_key_types</span> <span class="k">import</span> <span class="n">to_2byte</span><span class="p">,</span> <span class="n">PayloadType</span><span class="p">,</span> <span class="n">KeyType</span><span class="p">,</span> <span class="n">InfraMessageCategory</span>
+<span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">logger</span>
+
+<span class="n">transaction_tbl_definition</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;transaction_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;transaction_data&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="n">asset_info_definition</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;transaction_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;asset_group_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;asset_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="n">topology_info_definition</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;point_to&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">]</span>
+<span class="p">]</span>
+
+<span class="n">cross_ref_tbl_definition</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;transaction_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;outer_domain_id&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;txid_having_cross_ref&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="c1">#--- for anchoring ethereum/bitcoin blockchain ---</span>
+<span class="n">merkle_branch_db_definition</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;digest&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;leaf_left&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;leaf_right&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="n">merkle_leaf_db_definition</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;digest&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;leaf_left&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;leaf_right&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;prev&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="n">merkle_root_db_definition</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;root&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;spec&quot;</span><span class="p">,</span> <span class="s2">&quot;BLOB&quot;</span><span class="p">],</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="DataHandler"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler">[docs]</a><span class="k">class</span> <span class="nc">DataHandler</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;DB and storage handler&quot;&quot;&quot;</span>
+    <span class="n">REPLICATION_ALL</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">REPLICATION_P2P</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">REPLICATION_EXT</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">REQUEST_REPLICATION_INSERT</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">RESPONSE_REPLICATION_INSERT</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">REQUEST_SEARCH</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">RESPONSE_SEARCH</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">NOTIFY_INSERTED</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">REPAIR_TRANSACTION_DATA</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">REPLICATION_CROSS_REF</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">networking</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">workingdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">networking</span> <span class="o">=</span> <span class="n">networking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">core</span> <span class="o">=</span> <span class="n">networking</span><span class="o">.</span><span class="n">core</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">networking</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">stats</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;data_handler&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">loglevel</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="n">logname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span> <span class="o">=</span> <span class="n">domain_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain_id_str</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">convert_id_to_string</span><span class="p">(</span><span class="n">domain_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">=</span> <span class="n">workingdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage_root</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage_root</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_external_storage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage_setup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replication_strategy</span> <span class="o">=</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPLICATION_ALL</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_db_setup</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_db_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Setup DB&quot;&quot;&quot;</span>
+        <span class="n">dbconf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;db&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">dbconf</span><span class="p">[</span><span class="s1">&#39;replication_strategy&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">replication_strategy</span> <span class="o">=</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPLICATION_ALL</span>
+        <span class="k">elif</span> <span class="n">dbconf</span><span class="p">[</span><span class="s1">&#39;replication_strategy&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;p2p&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">replication_strategy</span> <span class="o">=</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPLICATION_P2P</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">replication_strategy</span> <span class="o">=</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPLICATION_EXT</span>
+        <span class="n">db_type</span> <span class="o">=</span> <span class="n">dbconf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;db_type&quot;</span><span class="p">,</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">)</span>
+        <span class="n">db_name</span> <span class="o">=</span> <span class="n">dbconf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;db_name&quot;</span><span class="p">,</span> <span class="s2">&quot;bbc1_db.sqlite&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SqliteAdaptor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage_root</span><span class="p">,</span> <span class="n">db_name</span><span class="p">)))</span>
+        <span class="k">elif</span> <span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;mysql&quot;</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dbconf</span><span class="p">[</span><span class="s1">&#39;db_servers&#39;</span><span class="p">]:</span>
+                <span class="n">db_addr</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;db_addr&quot;</span><span class="p">,</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">)</span>
+                <span class="n">db_port</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;db_port&quot;</span><span class="p">,</span> <span class="mi">3306</span><span class="p">)</span>
+                <span class="n">db_user</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;db_user&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">)</span>
+                <span class="n">db_pass</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;db_pass&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MysqlAdaptor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_name</span><span class="o">=</span><span class="n">db_name</span><span class="p">,</span> <span class="n">db_num</span><span class="o">=</span><span class="n">count</span><span class="p">,</span>
+                                                     <span class="n">server_info</span><span class="o">=</span><span class="p">(</span><span class="n">db_addr</span><span class="p">,</span> <span class="n">db_port</span><span class="p">,</span> <span class="n">db_user</span><span class="p">,</span> <span class="n">db_pass</span><span class="p">)))</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">open_db</span><span class="p">()</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="s1">&#39;transaction_table&#39;</span><span class="p">,</span> <span class="n">transaction_tbl_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="s1">&#39;asset_info_table&#39;</span><span class="p">,</span> <span class="n">asset_info_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="s1">&#39;topology_table&#39;</span><span class="p">,</span> <span class="n">topology_info_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="s1">&#39;cross_ref_table&#39;</span><span class="p">,</span> <span class="n">cross_ref_tbl_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="s1">&#39;merkle_branch_table&#39;</span><span class="p">,</span> <span class="n">merkle_branch_db_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="s1">&#39;merkle_leaf_table&#39;</span><span class="p">,</span> <span class="n">merkle_leaf_db_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="s1">&#39;merkle_root_table&#39;</span><span class="p">,</span> <span class="n">merkle_root_db_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_storage_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Setup storage&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;storage&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;external&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="s1">&#39;root&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;storage&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;storage&#39;</span><span class="p">][</span><span class="s1">&#39;root&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">storage_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;storage&#39;</span><span class="p">][</span><span class="s1">&#39;root&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id_str</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">storage_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id_str</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage_root</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="DataHandler.exec_sql"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.exec_sql">[docs]</a>    <span class="k">def</span> <span class="nf">exec_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_num</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fetch_one</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute sql sentence</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            db_num (int): index of DB if multiple DBs are used</span>
+<span class="sd">            sql (str): SQL string</span>
+<span class="sd">            args (list): Args for the SQL</span>
+<span class="sd">            commit (bool): If True, commit is performed</span>
+<span class="sd">            fetch_one (bool): If True, fetch just one record</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: list of records</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;data_handler&quot;</span><span class="p">,</span> <span class="s2">&quot;exec_sql&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="c1">#print(&quot;sql=&quot;, sql)</span>
+        <span class="c1">#if len(args) &gt; 0:</span>
+        <span class="c1">#    print(&quot;args=&quot;, args)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">db_num</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">db_num</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">)</span> <span class="k">else</span> <span class="n">db_num</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="n">db_num</span><span class="p">]</span><span class="o">.</span><span class="n">db_cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="n">db_num</span><span class="p">]</span><span class="o">.</span><span class="n">db_cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">commit</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="n">db_num</span><span class="p">]</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fetch_one</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="n">db_num</span><span class="p">]</span><span class="o">.</span><span class="n">db_cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="n">db_num</span><span class="p">]</span><span class="o">.</span><span class="n">db_cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;data_handler&quot;</span><span class="p">,</span> <span class="s2">&quot;fail_exec_sql&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_asset_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve asset information from transaction object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            txobj (BBcTransaction): transaction object to analyze</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: list of list [asset_group_id, asset_id, user_id, file_size, file_digest]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">evt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">txobj</span><span class="o">.</span><span class="n">events</span><span class="p">):</span>
+            <span class="n">ast</span> <span class="o">=</span> <span class="n">evt</span><span class="o">.</span><span class="n">asset</span>
+            <span class="k">if</span> <span class="n">ast</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">info</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">evt</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">asset_id</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">asset_file_size</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span>
+                             <span class="n">ast</span><span class="o">.</span><span class="n">asset_file_digest</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">rtn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">txobj</span><span class="o">.</span><span class="n">relations</span><span class="p">):</span>
+            <span class="n">ast</span> <span class="o">=</span> <span class="n">rtn</span><span class="o">.</span><span class="n">asset</span>
+            <span class="k">if</span> <span class="n">rtn</span><span class="o">.</span><span class="n">asset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">info</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rtn</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">asset_id</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">asset_file_size</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span>
+                             <span class="n">ast</span><span class="o">.</span><span class="n">asset_file_digest</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">info</span>
+
+    <span class="k">def</span> <span class="nf">_get_topology_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve topology information from transaction object</span>
+
+<span class="sd">        This method returns (from, to) list that describe the topology of transactions</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            txobj (BBcTransaction): transaction object to analyze</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: list of tuple (base transaction_id, pointing transaction_id)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">reference</span> <span class="ow">in</span> <span class="n">txobj</span><span class="o">.</span><span class="n">references</span><span class="p">:</span>
+            <span class="n">info</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">reference</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">))</span>  <span class="c1"># (base, point_to)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">rtn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">txobj</span><span class="o">.</span><span class="n">relations</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">rtn</span><span class="o">.</span><span class="n">pointers</span><span class="p">:</span>
+                <span class="n">info</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">pt</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">))</span>  <span class="c1"># (base, point_to)</span>
+        <span class="k">return</span> <span class="n">info</span>
+
+<div class="viewcode-block" id="DataHandler.insert_transaction"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.insert_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">insert_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txdata</span><span class="p">,</span> <span class="n">txobj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_replication</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Insert transaction data and its asset files</span>
+
+<span class="sd">        Either txdata or txobj must be given to insert the transaction.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            txdata (bytes): serialized transaction data</span>
+<span class="sd">            txobj (BBcTransaction): transaction object to insert</span>
+<span class="sd">            asset_files (dict): asset files in the transaction</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            set: set of asset_group_ids in the transaction</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;data_handler&quot;</span><span class="p">,</span> <span class="s2">&quot;insert_transaction&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">txobj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">txobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">validate_transaction</span><span class="p">(</span><span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="n">asset_files</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">txobj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">inserted_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_insert_transaction_into_a_db</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">txobj</span><span class="p">):</span>
+                <span class="n">inserted_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">inserted_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">asset_group_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_store_asset_files</span><span class="p">(</span><span class="n">txobj</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">no_replication</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">replication_strategy</span> <span class="o">!=</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPLICATION_EXT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_replication_to_other_cores</span><span class="p">(</span><span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domain0manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domain0manager</span><span class="o">.</span><span class="n">distribute_cross_ref_in_domain0</span><span class="p">(</span><span class="n">domain_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
+                                                                           <span class="n">transaction_id</span><span class="o">=</span><span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">txobj</span><span class="o">.</span><span class="n">cross_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domain0manager</span><span class="o">.</span><span class="n">cross_ref_registered</span><span class="p">(</span><span class="n">domain_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
+                                                                    <span class="n">transaction_id</span><span class="o">=</span><span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">,</span>
+                                                                    <span class="n">cross_ref</span><span class="o">=</span><span class="p">(</span><span class="n">txobj</span><span class="o">.</span><span class="n">cross_ref</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
+                                                                               <span class="n">txobj</span><span class="o">.</span><span class="n">cross_ref</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">asset_group_ids</span></div>
+
+    <span class="k">def</span> <span class="nf">_insert_transaction_into_a_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_num</span><span class="p">,</span> <span class="n">txobj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Insert transaction data into the transaction table of the specified DB</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            db_num (int): index of DB if multiple DBs are used</span>
+<span class="sd">            txobj (BBcTransaction): transaction object to insert</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;_insert_transaction_into_a_db: for txid =&quot;, txobj.transaction_id.hex())</span>
+        <span class="k">if</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">txobj</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="n">db_num</span><span class="p">,</span>
+                            <span class="n">sql</span><span class="o">=</span><span class="s2">&quot;INSERT INTO transaction_table VALUES (</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span>
+                                                                                  <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">),</span>
+                            <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">),</span> <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">fileflag</span><span class="p">,</span> <span class="n">filedigest</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_asset_info</span><span class="p">(</span><span class="n">txobj</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="n">db_num</span><span class="p">,</span>
+                          <span class="n">sql</span><span class="o">=</span><span class="s2">&quot;INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id) &quot;</span>
+                              <span class="s2">&quot;VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">),</span>
+                          <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">),</span> <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">base</span><span class="p">,</span> <span class="n">point_to</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_topology_info</span><span class="p">(</span><span class="n">txobj</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="n">db_num</span><span class="p">,</span>
+                          <span class="n">sql</span><span class="o">=</span><span class="s2">&quot;INSERT INTO topology_table(base, point_to) VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span>
+                              <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">),</span>
+                          <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">point_to</span><span class="p">),</span> <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1">#print(&quot;topology: base:%s, point_to:%s&quot; % (base.hex(), point_to.hex()))</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="DataHandler.insert_cross_ref"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.insert_cross_ref">[docs]</a>    <span class="k">def</span> <span class="nf">insert_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">outer_domain_id</span><span class="p">,</span> <span class="n">txid_having_cross_ref</span><span class="p">,</span> <span class="n">no_replication</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Insert cross_ref information into cross_ref_table</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transaction_id (bytes): target transaction_id</span>
+<span class="sd">            outer_domain_id (bytes): domain_id that holds cross_ref about the transaction_id</span>
+<span class="sd">            txid_having_cross_ref (bytes): transaction_id in the outer_domain that includes the cross_ref</span>
+<span class="sd">            no_replication (bool): If False, the replication is sent to other nodes in the domain</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;data_handler&quot;</span><span class="p">,</span> <span class="s2">&quot;insert_cross_ref&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;INSERT INTO cross_ref_table (transaction_id, outer_domain_id, txid_having_cross_ref) &quot;</span> <span class="o">+</span> \
+              <span class="s2">&quot;VALUES (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">outer_domain_id</span><span class="p">,</span> <span class="n">txid_having_cross_ref</span><span class="p">),</span> <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">no_replication</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_cross_ref_replication_to_other_cores</span><span class="p">(</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">outer_domain_id</span><span class="p">,</span> <span class="n">txid_having_cross_ref</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataHandler.count_domain_in_cross_ref"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.count_domain_in_cross_ref">[docs]</a>    <span class="k">def</span> <span class="nf">count_domain_in_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outer_domain_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Count the number of domains in the cross_ref table&quot;&quot;&quot;</span>
+        <span class="c1"># TODO: need to consider registered_time</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;SELECT count(*) FROM cross_ref_table WHERE outer_domain = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">outer_domain_id</span><span class="p">,))</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="DataHandler.search_domain_having_cross_ref"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.search_domain_having_cross_ref">[docs]</a>    <span class="k">def</span> <span class="nf">search_domain_having_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Search domain_id that holds cross_ref about the specified transaction_id</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transaction_id (bytes): target transaction_id</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: records of cross_ref_tables [&quot;id&quot;,&quot;transaction_id&quot;, &quot;outer_domain_id&quot;, &quot;txid_having_cross_ref&quot;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">transaction_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM cross_ref_table WHERE transaction_id = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">transaction_id</span><span class="p">,))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">sql</span><span class="o">=</span><span class="s2">&quot;SELECT * FROM cross_ref_table&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_store_asset_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store all asset_files related to the transaction_object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            txobj (BBcTransaction): transaction object to insert</span>
+<span class="sd">            asset_files (dict): dictionary of {asset_id: content} for the transaction</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            set: set of asset_group_ids in the transaction</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;_store_asset_files: for txid =&quot;, txobj.transaction_id.hex())</span>
+        <span class="n">asset_group_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">fileflag</span><span class="p">,</span> <span class="n">filedigest</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_asset_info</span><span class="p">(</span><span class="n">txobj</span><span class="p">):</span>
+            <span class="n">asset_group_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_external_storage</span> <span class="ow">and</span> <span class="n">asset_files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">asset_id</span> <span class="ow">in</span> <span class="n">asset_files</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">store_in_storage</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">[</span><span class="n">asset_id</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">asset_group_ids</span>
+
+<div class="viewcode-block" id="DataHandler.restore_transaction_data"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.restore_transaction_data">[docs]</a>    <span class="k">def</span> <span class="nf">restore_transaction_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_num</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">txobj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove and insert a transaction&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">txobj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">txobj</span><span class="o">=</span><span class="n">txobj</span><span class="p">,</span> <span class="n">db_num</span><span class="o">=</span><span class="n">db_num</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_insert_transaction_into_a_db</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="n">db_num</span><span class="p">,</span> <span class="n">txobj</span><span class="o">=</span><span class="n">txobj</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_send_replication_to_other_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Broadcast replication of transaction data&quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">infra_msg_type</span><span class="p">:</span> <span class="n">InfraMessageCategory</span><span class="o">.</span><span class="n">CATEGORY_DATA</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">infra_command</span><span class="p">:</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REQUEST_REPLICATION_INSERT</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">:</span> <span class="n">txdata</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">asset_files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_files</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">replication_strategy</span> <span class="o">==</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPLICATION_ALL</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">broadcast_message_in_network</span><span class="p">(</span><span class="n">domain_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
+                                                         <span class="n">payload_type</span><span class="o">=</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_any</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">replication_strategy</span> <span class="o">==</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPLICATION_P2P</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># TODO: implement (destinations determined by TopologyManager)</span>
+
+    <span class="k">def</span> <span class="nf">_send_cross_ref_replication_to_other_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">outer_domain_id</span><span class="p">,</span> <span class="n">txid_having_cross_ref</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Broadcast replication of cross_ref</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transaction_id (bytes): target transaction_id</span>
+<span class="sd">            outer_domain_id (bytes): domain_id that holds cross_ref about the transaction_id</span>
+<span class="sd">            txid_having_cross_ref (bytes): transaction_id in the outer_domain that includes the cross_ref</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">infra_msg_type</span><span class="p">:</span> <span class="n">InfraMessageCategory</span><span class="o">.</span><span class="n">CATEGORY_DATA</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">infra_command</span><span class="p">:</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPLICATION_CROSS_REF</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">:</span> <span class="n">transaction_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">outer_domain_id</span><span class="p">:</span> <span class="n">outer_domain_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">txid_having_cross_ref</span><span class="p">:</span> <span class="n">txid_having_cross_ref</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">replication_strategy</span> <span class="o">==</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPLICATION_ALL</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">broadcast_message_in_network</span><span class="p">(</span><span class="n">domain_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
+                                                         <span class="n">payload_type</span><span class="o">=</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_any</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">replication_strategy</span> <span class="o">==</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPLICATION_P2P</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># TODO: implement (destinations determined by TopologyManager)</span>
+
+<div class="viewcode-block" id="DataHandler.remove"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">txobj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_num</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete all data regarding the specified transaction_id</span>
+
+<span class="sd">        This method requires either transaction_id or txobj.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transaction_id (bytes): target transaction_id</span>
+<span class="sd">            txobj (BBcTransaction): transaction object to remove</span>
+<span class="sd">            db_num (int): index of DB if multiple DBs are used</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">transaction_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">txobj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">txdata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">sql</span><span class="o">=</span><span class="s2">&quot;SELECT * FROM transaction_table WHERE transaction_id = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">transaction_id</span><span class="p">,))</span>
+            <span class="n">txobj</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcTransaction</span><span class="p">(</span><span class="n">deserialize</span><span class="o">=</span><span class="n">txdata</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span> <span class="o">!=</span> <span class="n">transaction_id</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">db_num</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">db_num</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_remove_transaction</span><span class="p">(</span><span class="n">txobj</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remove_transaction</span><span class="p">(</span><span class="n">txobj</span><span class="p">,</span> <span class="n">db_num</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_remove_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">,</span> <span class="n">db_num</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove transaction from DB&quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;_remove_transaction: for txid =&quot;, txobj.transaction_id.hex())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span>
+            <span class="n">db_num</span><span class="o">=</span><span class="n">db_num</span><span class="p">,</span>
+            <span class="n">sql</span><span class="o">=</span><span class="s2">&quot;DELETE FROM transaction_table WHERE transaction_id = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">,),</span> <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">base</span><span class="p">,</span> <span class="n">point_to</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_topology_info</span><span class="p">(</span><span class="n">txobj</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span>
+                <span class="n">db_num</span><span class="o">=</span><span class="n">db_num</span><span class="p">,</span>
+                <span class="n">sql</span><span class="o">=</span><span class="s2">&quot;DELETE FROM topology_table WHERE base = </span><span class="si">%s</span><span class="s2"> AND point_to = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">),</span>
+                <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">point_to</span><span class="p">),</span> <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_remove_asset_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove all asset files related to the transaction</span>
+
+<span class="sd">        If asset_files is given, only asset files in given param are removed</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            txobj (BBcTransaction): transaction object that includes the asset to be removed</span>
+<span class="sd">            asset_files (dict): dictionary of {asset_id: content} for the transaction</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;_remove_asset_files: for txid =&quot;, txobj.transaction_id.hex())</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_external_storage</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">for</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">fileflag</span><span class="p">,</span> <span class="n">filedigest</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_asset_info</span><span class="p">(</span><span class="n">txobj</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">asset_files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">asset_id</span> <span class="ow">in</span> <span class="n">asset_files</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_remove_in_storage</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_remove_in_storage</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DataHandler.search_transaction"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.search_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">db_num</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Search transaction data</span>
+
+<span class="sd">        When Multiple conditions are given, they are considered as AND condition.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transaction_id (bytes): target transaction_id</span>
+<span class="sd">            asset_group_id (bytes): asset_group_id that target transactions should have</span>
+<span class="sd">            asset_id (bytes): asset_id that target transactions should have</span>
+<span class="sd">            user_id (bytes): user_id that target transactions should have</span>
+<span class="sd">            count (int): The maximum number of transactions to retrieve</span>
+<span class="sd">            db_num (int): index of DB if multiple DBs are used</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: mapping from transaction_id to serialized transaction data</span>
+<span class="sd">            dict: dictionary of {asset_id: content} for the transaction</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">transaction_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">txinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span>
+                <span class="n">db_num</span><span class="o">=</span><span class="n">db_num</span><span class="p">,</span>
+                <span class="n">sql</span><span class="o">=</span><span class="s2">&quot;SELECT * FROM transaction_table WHERE transaction_id = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">transaction_id</span><span class="p">,))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">txinfo</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;SELECT * from asset_info_table WHERE &quot;</span>
+            <span class="n">conditions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">asset_group_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;asset_group_id = </span><span class="si">%s</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">asset_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;asset_id = </span><span class="si">%s</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;user_id = </span><span class="si">%s</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">)</span>
+            <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;AND &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">conditions</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;ORDER BY id DESC&quot;</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">:</span>
+                    <span class="n">count</span> <span class="o">=</span> <span class="mi">20</span>
+                <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot; limit </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">count</span>
+            <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;;&quot;</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)))</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="n">db_num</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">txinfo</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="n">tx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span>
+                    <span class="n">db_num</span><span class="o">=</span><span class="n">db_num</span><span class="p">,</span>
+                    <span class="n">sql</span><span class="o">=</span><span class="s2">&quot;SELECT * FROM transaction_table WHERE transaction_id = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span>
+                    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="mi">1</span><span class="p">],))</span>
+                <span class="k">if</span> <span class="n">tx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">txinfo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tx</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">result_txobj</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">result_asset_files</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">txid</span><span class="p">,</span> <span class="n">txdata</span> <span class="ow">in</span> <span class="n">txinfo</span><span class="p">:</span>
+            <span class="n">txobj</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcTransaction</span><span class="p">(</span><span class="n">deserialize</span><span class="o">=</span><span class="n">txdata</span><span class="p">)</span>
+            <span class="n">result_txobj</span><span class="p">[</span><span class="n">txid</span><span class="p">]</span> <span class="o">=</span> <span class="n">txobj</span>
+            <span class="k">for</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">fileflag</span><span class="p">,</span> <span class="n">filedigest</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_asset_info</span><span class="p">(</span><span class="n">txobj</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">fileflag</span><span class="p">:</span>
+                    <span class="n">result_asset_files</span><span class="p">[</span><span class="n">asset_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_in_storage</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result_txobj</span><span class="p">,</span> <span class="n">result_asset_files</span></div>
+
+<div class="viewcode-block" id="DataHandler.search_transaction_topology"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.search_transaction_topology">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">traverse_to_past</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Search in topology info</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transaction_id (bytes): base transaction_id</span>
+<span class="sd">            traverse_to_past (bool): True: search backward (to past), False: search forward (to future)</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: list of records of topology table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">transaction_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">traverse_to_past</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">sql</span><span class="o">=</span><span class="s2">&quot;SELECT * FROM topology_table WHERE base = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">transaction_id</span><span class="p">,))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">sql</span><span class="o">=</span><span class="s2">&quot;SELECT * FROM topology_table WHERE point_to = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">transaction_id</span><span class="p">,))</span></div>
+
+<div class="viewcode-block" id="DataHandler.store_in_storage"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.store_in_storage">[docs]</a>    <span class="k">def</span> <span class="nf">store_in_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">do_overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store asset file in local storage</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            asset_group_id (bytes): asset_group_id of the asset</span>
+<span class="sd">            asset_id (bytes): asset_id of the asset</span>
+<span class="sd">            content (bytes): the content of the asset file</span>
+<span class="sd">            do_overwrite (bool): If True, file is overwritten</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;store_in_storage: for asset_id =&quot;, asset_id.hex())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;data_handler&quot;</span><span class="p">,</span> <span class="s2">&quot;store_in_storage&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">asset_group_id_str</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">storage_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage_root</span><span class="p">,</span> <span class="n">asset_group_id_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">storage_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">storage_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">storage_path</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asset_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">do_overwrite</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataHandler.get_in_storage"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.get_in_storage">[docs]</a>    <span class="k">def</span> <span class="nf">get_in_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the asset file with the asset_id from local storage</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            asset_group_id (bytes): asset_group_id of the asset</span>
+<span class="sd">            asset_id (bytes): asset_id of the asset</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes or None: the file content</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">asset_group_id_str</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">storage_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage_root</span><span class="p">,</span> <span class="n">asset_group_id_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">storage_path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">storage_path</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asset_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">content</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">_remove_in_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete asset file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            asset_group_id (bytes): asset_group_id of the asset</span>
+<span class="sd">            asset_id (bytes): asset_id of the asset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;_remove_in_storage: for asset_id =&quot;, asset_id.hex())</span>
+        <span class="n">asset_group_id_str</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">storage_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage_root</span><span class="p">,</span> <span class="n">asset_group_id_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">storage_path</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">storage_path</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">asset_id</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DataHandler.process_message"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler.process_message">[docs]</a>    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Process received message</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">infra_command</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">infra_command</span><span class="p">]</span> <span class="o">==</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REQUEST_REPLICATION_INSERT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;data_handler&quot;</span><span class="p">,</span> <span class="s2">&quot;REQUEST_REPLICATION_INSERT&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">insert_transaction</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">],</span>
+                                    <span class="n">asset_files</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">no_replication</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">infra_command</span><span class="p">]</span> <span class="o">==</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">RESPONSE_REPLICATION_INSERT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;data_handler&quot;</span><span class="p">,</span> <span class="s2">&quot;RESPONSE_REPLICATION_INSERT&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">pass</span>
+
+        <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">infra_command</span><span class="p">]</span> <span class="o">==</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REQUEST_SEARCH</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;data_handler&quot;</span><span class="p">,</span> <span class="s2">&quot;REQUEST_SEARCH&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_transaction</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">])</span>
+            <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">infra_command</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">RESPONSE_SEARCH</span>
+            <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">result</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">reason</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Not found&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">result</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">send_message_in_network</span><span class="p">(</span><span class="n">nodeinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">payload_type</span><span class="o">=</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_any</span><span class="p">,</span>
+                                                    <span class="n">domain_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">infra_command</span><span class="p">]</span> <span class="o">==</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">RESPONSE_SEARCH</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;data_handler&quot;</span><span class="p">,</span> <span class="s2">&quot;RESPONSE_SEARCH&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">result</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">insert_transaction</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">])</span>
+
+        <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">infra_command</span><span class="p">]</span> <span class="o">==</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">NOTIFY_INSERTED</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;data_handler&quot;</span><span class="p">,</span> <span class="s2">&quot;NOTIFY_INSERTED&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_ids</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="n">transaction_id</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span>
+            <span class="n">asset_group_ids</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_ids</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">send_inserted_notification</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_ids</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span>
+                                                 <span class="n">only_registered_user</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">infra_command</span><span class="p">]</span> <span class="o">==</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPAIR_TRANSACTION_DATA</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;repair&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">put_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">infra_command</span><span class="p">]</span> <span class="o">==</span> <span class="n">DataHandler</span><span class="o">.</span><span class="n">REPLICATION_CROSS_REF</span><span class="p">:</span>
+            <span class="n">transaction_id</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span>
+            <span class="n">outer_domain_id</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">outer_domain_id</span><span class="p">]</span>
+            <span class="n">txid_having_cross_ref</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">txid_having_cross_ref</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">insert_cross_ref</span><span class="p">(</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">outer_domain_id</span><span class="p">,</span> <span class="n">txid_having_cross_ref</span><span class="p">,</span> <span class="n">no_replication</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DataHandlerDomain0"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandlerDomain0">[docs]</a><span class="k">class</span> <span class="nc">DataHandlerDomain0</span><span class="p">(</span><span class="n">DataHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Data handler for domain_global_0&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">networking</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">workingdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="DataHandlerDomain0.exec_sql"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandlerDomain0.exec_sql">[docs]</a>    <span class="k">def</span> <span class="nf">exec_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_asset_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_get_topology_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="DataHandlerDomain0.insert_transaction"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandlerDomain0.insert_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">insert_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txdata</span><span class="p">,</span> <span class="n">txobj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_replication</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="k">def</span> <span class="nf">_send_replication_to_other_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="DataHandlerDomain0.remove"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandlerDomain0.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="DataHandlerDomain0.search_transaction"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandlerDomain0.search_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="DataHandlerDomain0.search_transaction_topology"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandlerDomain0.search_transaction_topology">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">reverse_link</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="DataHandlerDomain0.store_in_storage"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandlerDomain0.store_in_storage">[docs]</a>    <span class="k">def</span> <span class="nf">store_in_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="DataHandlerDomain0.get_in_storage"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandlerDomain0.get_in_storage">[docs]</a>    <span class="k">def</span> <span class="nf">get_in_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">_remove_in_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="DataHandlerDomain0.process_message"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandlerDomain0.process_message">[docs]</a>    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="DbAdaptor"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DbAdaptor">[docs]</a><span class="k">class</span> <span class="nc">DbAdaptor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Base class for DB adaptor&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_num</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handler</span> <span class="o">=</span> <span class="n">handler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_cur</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_name</span> <span class="o">=</span> <span class="n">db_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_num</span> <span class="o">=</span> <span class="n">db_num</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">placeholder</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;db_adaptor&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">loglevel</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="n">logname</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DbAdaptor.open_db"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DbAdaptor.open_db">[docs]</a>    <span class="k">def</span> <span class="nf">open_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open the DB&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="DbAdaptor.create_table"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DbAdaptor.create_table">[docs]</a>    <span class="k">def</span> <span class="nf">create_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Create a table&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="DbAdaptor.check_table_existence"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DbAdaptor.check_table_existence">[docs]</a>    <span class="k">def</span> <span class="nf">check_table_existence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tblname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check whether the table exists or not&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="SqliteAdaptor"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.SqliteAdaptor">[docs]</a><span class="k">class</span> <span class="nc">SqliteAdaptor</span><span class="p">(</span><span class="n">DbAdaptor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;DB adaptor for SQLite3&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SqliteAdaptor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">handler</span><span class="o">=</span><span class="n">handler</span><span class="p">,</span> <span class="n">db_name</span><span class="o">=</span><span class="n">db_name</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="n">loglevel</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="n">logname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">placeholder</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span>
+
+<div class="viewcode-block" id="SqliteAdaptor.open_db"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.SqliteAdaptor.open_db">[docs]</a>    <span class="k">def</span> <span class="nf">open_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open the DB (create DB file if not exists)&quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">sqlite3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="p">,</span> <span class="n">isolation_level</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SqliteAdaptor.create_table"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.SqliteAdaptor.create_table">[docs]</a>    <span class="k">def</span> <span class="nf">create_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Create a table</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tbl (str): table name</span>
+<span class="sd">            tbl_definition (list): schema of the table [[&quot;column_name&quot;, &quot;data type&quot;],[&quot;colmun_name&quot;, &quot;data type&quot;],,]</span>
+<span class="sd">            primary_key (int): index (column) of the primary key of the table</span>
+<span class="sd">            indices (list): list of indices to create index</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_table_existence</span><span class="p">(</span><span class="n">tbl</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;CREATE TABLE </span><span class="si">%s</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="n">tbl</span>
+        <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;(&quot;</span>
+        <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">tbl_definition</span><span class="p">])</span>
+        <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;, PRIMARY KEY (&quot;</span><span class="o">+</span><span class="n">tbl_definition</span><span class="p">[</span><span class="n">primary_key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;)&quot;</span>
+        <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;);&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">sql</span><span class="o">=</span><span class="s2">&quot;CREATE INDEX </span><span class="si">%s</span><span class="s2">_idx_</span><span class="si">%d</span><span class="s2"> ON </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">);&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tbl</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span>
+                                  <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SqliteAdaptor.check_table_existence"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.SqliteAdaptor.check_table_existence">[docs]</a>    <span class="k">def</span> <span class="nf">check_table_existence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tblname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check whether the table exists or not&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">sql</span><span class="o">=</span><span class="s2">&quot;SELECT * FROM sqlite_master WHERE type=&#39;table&#39; AND name=?&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">tblname</span><span class="p">,))</span></div></div>
+
+
+<div class="viewcode-block" id="MysqlAdaptor"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.MysqlAdaptor">[docs]</a><span class="k">class</span> <span class="nc">MysqlAdaptor</span><span class="p">(</span><span class="n">DbAdaptor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;DB adaptor for MySQL&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_num</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">server_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MysqlAdaptor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">db_name</span><span class="p">,</span> <span class="n">db_num</span><span class="p">,</span> <span class="n">loglevel</span><span class="p">,</span> <span class="n">logname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">placeholder</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_addr</span> <span class="o">=</span> <span class="n">server_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_port</span> <span class="o">=</span> <span class="n">server_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_user</span> <span class="o">=</span> <span class="n">server_info</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_pass</span> <span class="o">=</span> <span class="n">server_info</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+<div class="viewcode-block" id="MysqlAdaptor.open_db"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.MysqlAdaptor.open_db">[docs]</a>    <span class="k">def</span> <span class="nf">open_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open the DB&quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">mysql.connector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">mysql</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db_addr</span><span class="p">,</span>
+            <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db_port</span><span class="p">,</span>
+            <span class="n">db</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="p">,</span>
+            <span class="n">user</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db_user</span><span class="p">,</span>
+            <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db_pass</span><span class="p">,</span>
+            <span class="n">charset</span><span class="o">=</span><span class="s1">&#39;utf8&#39;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">cursor</span><span class="p">(</span><span class="n">buffered</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MysqlAdaptor.create_table"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.MysqlAdaptor.create_table">[docs]</a>    <span class="k">def</span> <span class="nf">create_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Create a table</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tbl (str): table name</span>
+<span class="sd">            tbl_definition (list): schema of the table [[&quot;column_name&quot;, &quot;data type&quot;],[&quot;colmun_name&quot;, &quot;data type&quot;],,]</span>
+<span class="sd">            primary_key (int): index (column) of the primary key of the table</span>
+<span class="sd">            indices (list): list of indices to create index</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_table_existence</span><span class="p">(</span><span class="n">tbl</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;CREATE TABLE </span><span class="si">%s</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="n">tbl</span>
+        <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;(&quot;</span>
+        <span class="n">defs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">tbl_definition</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span>
+                <span class="n">defs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> AUTO_INCREMENT NOT NULL&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">defs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">defs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tbl_definition</span><span class="p">[</span><span class="n">primary_key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;BLOB&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">]:</span>
+            <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;, PRIMARY KEY (</span><span class="si">%s</span><span class="s2">(32))&quot;</span> <span class="o">%</span> <span class="n">tbl_definition</span><span class="p">[</span><span class="n">primary_key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;, PRIMARY KEY (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">tbl_definition</span><span class="p">[</span><span class="n">primary_key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sql</span> <span class="o">+=</span> <span class="s2">&quot;) CHARSET=utf8;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db_num</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tbl_definition</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;BLOB&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db_num</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="s2">&quot;ALTER TABLE </span><span class="si">%s</span><span class="s2"> ADD INDEX (</span><span class="si">%s</span><span class="s2">(32));&quot;</span>
+                                                              <span class="o">%</span> <span class="p">(</span><span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db_num</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="s2">&quot;ALTER TABLE </span><span class="si">%s</span><span class="s2"> ADD INDEX (</span><span class="si">%s</span><span class="s2">);&quot;</span>
+                                                              <span class="o">%</span> <span class="p">(</span><span class="n">tbl</span><span class="p">,</span> <span class="n">tbl_definition</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MysqlAdaptor.check_table_existence"><a class="viewcode-back" href="../../../orig/bbc1.core.data_handler.html#bbc1.core.data_handler.MysqlAdaptor.check_table_existence">[docs]</a>    <span class="k">def</span> <span class="nf">check_table_existence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tblname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check whether the table exists or not&quot;&quot;&quot;</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;show tables from </span><span class="si">%s</span><span class="s2"> like &#39;</span><span class="si">%s</span><span class="s2">&#39;;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="p">,</span> <span class="n">tblname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="o">.</span><span class="n">exec_sql</span><span class="p">(</span><span class="n">db_num</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db_num</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.0',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

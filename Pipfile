@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+requests = ">=2.12.4"
+gevent = ">=1.2.1"
+greenlet = "*"
+cryptography = "*"
+pytest = "<=3.2.*,>=3.0.5"
+msgpack-python = ">=0.4.8"
+mysql-connector-python = "==8.0.5"
+bson = "*"
+pyOpenSSL = ">=16.2.0"
+"Jinja2" = ">=2.8.1"
+sphinx = "*"
+sphinx-rtd-theme = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"

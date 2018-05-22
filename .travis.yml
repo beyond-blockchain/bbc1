@@ -2,7 +2,7 @@ language: python
 matrix:
   include:
     - os: linux
-      python: 3.6
+      python: 3.5
 before_install:
   - pip install --upgrade pip
 install:
@@ -13,14 +13,19 @@ script:
   - pytest test_bbc_app.py
   - pytest test_bbc_app_multi_core.py
   - pytest test_bbc_app_multi_core_many_transactions.py
+  - pytest test_bbc_app_multi_core_many_transactions_bson.py
   - pytest test_bbc_app_multi_core_notification_with_cancelation.py
   - pytest test_bbc_app_multi_core_notification_with_disconnection.py
   - pytest test_bbc_app_multiclient.py
+  - pytest test_bbc_app_multiclient_traverse.py
+  - pytest test_bbc_app_multiclient_traverse_bson.py
   - pytest test_bbc_app_multi_core_domain_key.py
   - pytest test_bbc_app_admin_tools.py
   - pytest test_bbc_app_multi_core_compromising_data.py
   - pytest test_bbc_app_multi_core_anycast.py
   - pytest test_domain_info_adv.py
+  - pytest test_cross_ref.py
+  - pytest test_cross_ref_bson.py
   - pytest test_cross_ref_multi_domain0nodes.py
   - pytest test_fileproof_multi_core.py
   - pytest test_bbc_config.py
@@ -34,5 +39,3 @@ script:
   - pytest test_pending_request.py
   - pytest test_bbc_ping.py
   - pytest test_bbc_stats.py
-  #- pytest test_bbc_ethereum.py
-  #- pytest test_ledger_subsystem.py

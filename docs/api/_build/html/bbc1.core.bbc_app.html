@@ -1,0 +1,1529 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc1.core.bbc_app module &mdash; BBc1 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bbc1.core.bbc_config module" href="bbc1.core.bbc_config.html" />
+    <link rel="prev" title="bbc1.core.libbbcsig.test_pybbcsig module" href="bbc1.core.libbbcsig.test_pybbcsig.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="bbc1.html">bbc1 package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="bbc1.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="bbc1.core.html">bbc1.core package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="bbc1.core.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#module-bbc1.core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bbc1.html#module-bbc1">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BBc1</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="bbc1.html">bbc1 package</a> &raquo;</li>
+        
+          <li><a href="bbc1.core.html">bbc1.core package</a> &raquo;</li>
+        
+      <li>bbc1.core.bbc_app module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/bbc1.core.bbc_app.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-bbc1.core.bbc_app">
+<span id="bbc1-core-bbc-app-module"></span><h1>bbc1.core.bbc_app module<a class="headerlink" href="#module-bbc1.core.bbc_app" title="Permalink to this headline">¶</a></h1>
+<p>Copyright (c) 2017 beyond-blockchain.org.</p>
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an “AS IS” BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<dl class="class">
+<dt id="bbc1.core.bbc_app.BBcAppClient">
+<em class="property">class </em><code class="descclassname">bbc1.core.bbc_app.</code><code class="descname">BBcAppClient</code><span class="sig-paren">(</span><em>host='127.0.0.1'</em>, <em>port=9000</em>, <em>multiq=True</em>, <em>logname='-'</em>, <em>loglevel='none'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Basic functions for a client of bbc_core</p>
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.cancel_insert_completion_notification">
+<code class="descname">cancel_insert_completion_notification</code><span class="sig-paren">(</span><em>asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.cancel_insert_completion_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.cancel_insert_completion_notification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cancel notification when a transaction has been inserted (as a copy of transaction)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id for requesting notification about insertion</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.domain_close">
+<code class="descname">domain_close</code><span class="sig-paren">(</span><em>domain_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.domain_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.domain_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close domain leading to remove_domain in the core</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> (<em>bytes</em>) – domain_id to delete</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.domain_setup">
+<code class="descname">domain_setup</code><span class="sig-paren">(</span><em>domain_id</em>, <em>config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.domain_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.domain_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up domain with the specified network module and storage</p>
+<p>This method should be used by a system administrator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – domain_id to create</li>
+<li><strong>config</strong> (<em>str</em>) – system config in json format</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.exchange_key">
+<code class="descname">exchange_key</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.exchange_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.exchange_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform ECDH (key exchange algorithm)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.gather_signatures">
+<code class="descname">gather_signatures</code><span class="sig-paren">(</span><em>txobj</em>, <em>reference_obj=None</em>, <em>asset_files=None</em>, <em>destinations=None</em>, <em>anycast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.gather_signatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.gather_signatures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request to gather signatures from the specified user_ids</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>txobj</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – </li>
+<li><strong>reference_obj</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcReference" title="bbc1.core.bbclib.BBcReference"><em>BBcReference</em></a>) – BBcReference object that includes the information about destinations</li>
+<li><strong>asset_files</strong> (<em>dict</em>) – mapping from asset_id to its file content</li>
+<li><strong>destinations</strong> (<em>list</em>) – list of destination user_ids</li>
+<li><strong>anycast</strong> (<em>bool</em>) – True if this message is for anycasting</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.get_bbc_config">
+<code class="descname">get_bbc_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_bbc_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_bbc_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get config file of bbc_core</p>
+<p>This method should be used by a system administrator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.get_domain_list">
+<code class="descname">get_domain_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_domain_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_domain_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get domain_id list in bbc_core</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.get_domain_neighborlist">
+<code class="descname">get_domain_neighborlist</code><span class="sig-paren">(</span><em>domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_domain_neighborlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_domain_neighborlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get peer list of the domain from the core node</p>
+<p>This method should be used by a system administrator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> (<em>bytes</em>) – domain_id of the neighbor list</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.get_forwarding_list">
+<code class="descname">get_forwarding_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_forwarding_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_forwarding_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get forwarding_list of the domain in the core node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.get_node_id">
+<code class="descname">get_node_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_node_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_node_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get node_id of the connecting core node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.get_notification_list">
+<code class="descname">get_notification_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_notification_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_notification_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get notification_list of the core node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.get_stats">
+<code class="descname">get_stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get statistics of bbc_core</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.get_user_list">
+<code class="descname">get_user_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_user_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_user_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get user_ids in the domain that are connecting to the core node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.include_admin_info">
+<code class="descname">include_admin_info</code><span class="sig-paren">(</span><em>dat</em>, <em>admin_info</em>, <em>keypair</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.include_admin_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.include_admin_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.include_cross_ref">
+<code class="descname">include_cross_ref</code><span class="sig-paren">(</span><em>txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.include_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.include_cross_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Include BBcCrossRef from other domains in the transaction</p>
+<p>If the client object has one or more cross_ref objects, one of them is included in the given transaction.
+This method should be voluntarily called for inter-domain weak collaboration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>txobj</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – Transaction object to include cross_ref</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.insert_transaction">
+<code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>tx_obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.insert_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request to insert a legitimate transaction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tx_obj</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – Transaction object to insert</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.manipulate_ledger_subsystem">
+<code class="descname">manipulate_ledger_subsystem</code><span class="sig-paren">(</span><em>enable=False</em>, <em>domain_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.manipulate_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.manipulate_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start/stop ledger_subsystem on the bbc_core</p>
+<p>This method should be used by a system administrator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>enable</strong> (<em>bool</em>) – True-&gt;start, False-&gt;stop</li>
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id to enable/disable ledger_subsystem</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.notify_domain_key_update">
+<code class="descname">notify_domain_key_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.notify_domain_key_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.notify_domain_key_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notify update of bbc_core</p>
+<p>This method should be used by a system administrator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.receiver_loop">
+<code class="descname">receiver_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.receiver_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.receiver_loop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.register_in_ledger_subsystem">
+<code class="descname">register_in_ledger_subsystem</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.register_in_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.register_in_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register transaction_id in the ledger_subsystem</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – </li>
+<li><strong>transaction_id</strong> (<em>bytes</em>) – the target transaction_id</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.register_to_core">
+<code class="descname">register_to_core</code><span class="sig-paren">(</span><em>on_multiple_nodes=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.register_to_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.register_to_core" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register the client (user_id) to the core node</p>
+<p>After that, the client can communicate with the core node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>on_multiple_nodes</strong> (<em>bool</em>) – True if this user_id is for multicast address</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.request_cross_ref_holders_list">
+<code class="descname">request_cross_ref_holders_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_cross_ref_holders_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_cross_ref_holders_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request the list of transaction_ids that are registered as cross_ref in outer domains</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.request_insert_completion_notification">
+<code class="descname">request_insert_completion_notification</code><span class="sig-paren">(</span><em>asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_insert_completion_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_insert_completion_notification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request notification when a transaction has been inserted (as a copy of transaction)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id for requesting notification about insertion</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.request_to_repair_asset">
+<code class="descname">request_to_repair_asset</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_to_repair_asset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_to_repair_asset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request to repair compromised asset file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – the asset_group_id of the target asset</li>
+<li><strong>asset_id</strong> (<em>bytes</em>) – the target asset_id</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.request_to_repair_transaction">
+<code class="descname">request_to_repair_transaction</code><span class="sig-paren">(</span><em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_to_repair_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_to_repair_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request to repair compromised transaction data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transaction_id</strong> (<em>bytes</em>) – the target transaction to repair</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.request_verify_by_cross_ref">
+<code class="descname">request_verify_by_cross_ref</code><span class="sig-paren">(</span><em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_verify_by_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_verify_by_cross_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request to verify the transaction by Cross_ref in transaction of outer domain</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transaction_id</strong> (<em>bytes</em>) – the target transaction_id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.search_transaction">
+<code class="descname">search_transaction</code><span class="sig-paren">(</span><em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.search_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search request for a transaction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transaction_id</strong> (<em>bytes</em>) – the target transaction to retrieve</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.search_transaction_with_condition">
+<code class="descname">search_transaction_with_condition</code><span class="sig-paren">(</span><em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>count=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.search_transaction_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.search_transaction_with_condition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search transaction data by asset_group_id/asset_id/user_id</p>
+<p>If multiple conditions are specified, they are considered as AND condition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id in BBcEvent and BBcRelations</li>
+<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id in BBcAsset</li>
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id in BBcAsset that means the owner of the asset</li>
+<li><strong>count</strong> (<em>int</em>) – the number of transactions to retrieve</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.send_domain_ping">
+<code class="descname">send_domain_ping</code><span class="sig-paren">(</span><em>domain_id</em>, <em>ipv4=None</em>, <em>ipv6=None</em>, <em>port=6641</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.send_domain_ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.send_domain_ping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send domain ping to notify the existence of the node</p>
+<p>This method should be used by a system administrator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id to send ping</li>
+<li><strong>ipv4</strong> (<em>str</em>) – IPv4 address of the node</li>
+<li><strong>ipv6</strong> (<em>str</em>) – IPv6 address of the node</li>
+<li><strong>port</strong> (<em>int</em>) – Port number to wait messages UDP</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.send_message">
+<code class="descname">send_message</code><span class="sig-paren">(</span><em>msg</em>, <em>dst_user_id</em>, <em>is_anycast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.send_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.send_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a message to the specified user_id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>msg</strong> (<em>dict</em>) – message to send</li>
+<li><strong>dst_user_id</strong> (<em>bytes</em>) – destination user_id</li>
+<li><strong>is_anycast</strong> (<em>bool</em>) – If true, the message is treated as an anycast message.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.sendback_denial_of_sign">
+<code class="descname">sendback_denial_of_sign</code><span class="sig-paren">(</span><em>dest_user_id=None</em>, <em>transaction_id=None</em>, <em>reason_text=None</em>, <em>query_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.sendback_denial_of_sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.sendback_denial_of_sign" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send back the denial of sign the transaction</p>
+<p>This method is called if the receiver (signer) denies the transaction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dest_user_id</strong> (<em>bytes</em>) – destination user_id to send back</li>
+<li><strong>transaction_id</strong> (<em>bytes</em>) – </li>
+<li><strong>reason_text</strong> (<em>str</em>) – message to the requester about why the node denies the transaction</li>
+<li><strong>query_id</strong> – The query_id that was in the received SIGN_REQUEST message</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.sendback_signature">
+<code class="descname">sendback_signature</code><span class="sig-paren">(</span><em>dest_user_id=None</em>, <em>transaction_id=None</em>, <em>ref_index=-1</em>, <em>signature=None</em>, <em>query_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.sendback_signature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.sendback_signature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send back the signed transaction to the source</p>
+<p>This method is called if the receiver (signer) approves the transaction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dest_user_id</strong> (<em>bytes</em>) – destination user_id to send back</li>
+<li><strong>transaction_id</strong> (<em>bytes</em>) – </li>
+<li><strong>ref_index</strong> (<em>int</em>) – (optional) which reference in transaction the signature is for</li>
+<li><strong>signature</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcSignature" title="bbc1.core.bbclib.BBcSignature"><em>BBcSignature</em></a>) – Signature that expresses approval of the transaction with transaction_id</li>
+<li><strong>query_id</strong> – The query_id that was in the received SIGN_REQUEST message</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.set_callback">
+<code class="descname">set_callback</code><span class="sig-paren">(</span><em>callback_obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set callback object that implements message processing functions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>callback_obj</strong> (<em>obj</em>) – callback method object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.set_domain_id">
+<code class="descname">set_domain_id</code><span class="sig-paren">(</span><em>domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_domain_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_domain_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set domain_id to this client to include it in all messages</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain_id</strong> (<em>bytes</em>) – domain_id to join in</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.set_domain_static_node">
+<code class="descname">set_domain_static_node</code><span class="sig-paren">(</span><em>domain_id</em>, <em>node_id</em>, <em>ipv4</em>, <em>ipv6</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_domain_static_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_domain_static_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set static node to the core node</p>
+<p>IPv6 is used for socket communication if both IPv4 and IPv6 is specified.
+This method should be used by a system administrator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id to set static neighbor entry</li>
+<li><strong>node_id</strong> (<em>bytes</em>) – node_id to register</li>
+<li><strong>ipv4</strong> (<em>str</em>) – IPv4 address of the node</li>
+<li><strong>ipv6</strong> (<em>str</em>) – IPv6 address of the node</li>
+<li><strong>port</strong> (<em>int</em>) – Port number to wait messages (UDP/TCP)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.set_keypair">
+<code class="descname">set_keypair</code><span class="sig-paren">(</span><em>keypair</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_keypair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_keypair" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set keypair for the user</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keypair</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.KeyPair" title="bbc1.core.bbclib.KeyPair"><em>KeyPair</em></a>) – KeyPair object for signing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.set_node_key">
+<code class="descname">set_node_key</code><span class="sig-paren">(</span><em>pem_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_node_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_node_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set node_key to this client</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pem_file</strong> (<em>str</em>) – path string for the pem file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.set_user_id">
+<code class="descname">set_user_id</code><span class="sig-paren">(</span><em>identifier</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_user_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_user_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set user_id of the object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>identifier</strong> (<em>bytes</em>) – user_id of this clients</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.start_receiver_loop">
+<code class="descname">start_receiver_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.start_receiver_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.start_receiver_loop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.traverse_transactions">
+<code class="descname">traverse_transactions</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>direction=1</em>, <em>hop_count=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.traverse_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.traverse_transactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search request for transactions</p>
+<p>The method traverses the transaction graph in the ledger.
+The response from the bbc_core includes the list of transactions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>transaction_id</strong> (<em>bytes</em>) – the target transaction to retrieve</li>
+<li><strong>direction</strong> (<em>int</em>) – 1:backforward, non-1:forward</li>
+<li><strong>hop_count</strong> (<em>int</em>) – hop count to traverse from the specified origin point</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.unregister_from_core">
+<code class="descname">unregister_from_core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.unregister_from_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.unregister_from_core" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unregister and disconnect from the core node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.verify_in_ledger_subsystem">
+<code class="descname">verify_in_ledger_subsystem</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.verify_in_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.verify_in_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verify transaction_id in the ledger_subsystem</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – </li>
+<li><strong>transaction_id</strong> (<em>bytes</em>) – the target transaction_id</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query_id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbc1.core.bbc_app.Callback">
+<em class="property">class </em><code class="descclassname">bbc1.core.bbc_app.</code><code class="descname">Callback</code><span class="sig-paren">(</span><em>log=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Set of callback functions for processing received message</p>
+<p>If you want to implement your own way to process messages, inherit this class.</p>
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.create_queue">
+<code class="descname">create_queue</code><span class="sig-paren">(</span><em>query_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.create_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.create_queue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.dispatch">
+<code class="descname">dispatch</code><span class="sig-paren">(</span><em>dat</em>, <em>payload_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.dispatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.dispatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.get_from_queue">
+<code class="descname">get_from_queue</code><span class="sig-paren">(</span><em>query_id</em>, <em>timeout=None</em>, <em>no_delete=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.get_from_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.get_from_queue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_cmd_sign_request">
+<code class="descname">proc_cmd_sign_request</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_cmd_sign_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_cmd_sign_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message REQUEST_SIGNATURE</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_notify_cross_ref">
+<code class="descname">proc_notify_cross_ref</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_notify_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_notify_cross_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message NOTIFY_CROSS_REF</p>
+<p>This method must not be overridden.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_notify_inserted">
+<code class="descname">proc_notify_inserted</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_notify_inserted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_notify_inserted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message NOTIFY_INSERTED</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_cross_ref_list">
+<code class="descname">proc_resp_cross_ref_list</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_cross_ref_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_cross_ref_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_CROSS_REF_LIST</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_domain_close">
+<code class="descname">proc_resp_domain_close</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_domain_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_domain_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_CLOSE_DOMAIN</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_domain_setup">
+<code class="descname">proc_resp_domain_setup</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_domain_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_domain_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_SETUP_DOMAIN</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_ecdh_key_exchange">
+<code class="descname">proc_resp_ecdh_key_exchange</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_ecdh_key_exchange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_ecdh_key_exchange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_ECDH_KEY_EXCHANGE</p>
+<p>This method must not be overridden.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_gather_signature">
+<code class="descname">proc_resp_gather_signature</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_gather_signature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_gather_signature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_GATHER_SIGNATURE</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_get_config">
+<code class="descname">proc_resp_get_config</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_GET_CONFIG</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_get_domainlist">
+<code class="descname">proc_resp_get_domainlist</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_domainlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_domainlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_GET_DOMAINLIST</p>
+<p>List of domain_ids is queued rather than message itself.
+This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_get_forwardinglist">
+<code class="descname">proc_resp_get_forwardinglist</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_forwardinglist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_forwardinglist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_GET_FORWARDING_LIST</p>
+<p>List of user_ids in other core nodes is queued rather than message itself.
+This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_get_neighborlist">
+<code class="descname">proc_resp_get_neighborlist</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_neighborlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_neighborlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_GET_NEIGHBORLIST</p>
+<p>List of neighbor node info (the first one is that of the connecting core) is queued rather than message itself.
+This method must not be overridden.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_get_node_id">
+<code class="descname">proc_resp_get_node_id</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_node_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_node_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_GET_NODEID</p>
+<p>Node_id is queued rather than message itself.
+This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_get_notificationlist">
+<code class="descname">proc_resp_get_notificationlist</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_notificationlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_notificationlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_GET_NOTIFICATION_LIST</p>
+<p>List of user_ids in other core nodes is queued rather than message itself.
+This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_get_stats">
+<code class="descname">proc_resp_get_stats</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_GET_STATS</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_get_userlist">
+<code class="descname">proc_resp_get_userlist</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_userlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_userlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_GET_USERS</p>
+<p>List of user_ids is queued rather than message itself.
+This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_insert">
+<code class="descname">proc_resp_insert</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_INSERT</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_ledger_subsystem">
+<code class="descname">proc_resp_ledger_subsystem</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_MANIP_LEDGER_SUBSYS</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_register_hash">
+<code class="descname">proc_resp_register_hash</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_register_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_register_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_REGISTER_HASH_IN_SUBSYS</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_search_transaction">
+<code class="descname">proc_resp_search_transaction</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_search_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_SEARCH_TRANSACTION</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_search_with_condition">
+<code class="descname">proc_resp_search_with_condition</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_search_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_search_with_condition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_SEARCH_WITH_CONDITIONS</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_set_neighbor">
+<code class="descname">proc_resp_set_neighbor</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_set_neighbor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_set_neighbor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_SET_STATIC_NODE</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_sign_request">
+<code class="descname">proc_resp_sign_request</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_sign_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_sign_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_SIGNATURE</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_traverse_transactions">
+<code class="descname">proc_resp_traverse_transactions</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_traverse_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_traverse_transactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_TRAVERSE_TRANSACTIONS</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_verify_cross_ref">
+<code class="descname">proc_resp_verify_cross_ref</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_verify_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_verify_cross_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_CROSS_REF_VERIFY</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_verify_hash">
+<code class="descname">proc_resp_verify_hash</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_verify_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_verify_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_VERIFY_HASH_IN_SUBSYS</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_user_message">
+<code class="descname">proc_user_message</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_user_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_user_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message MESSAGE</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.set_client">
+<code class="descname">set_client</code><span class="sig-paren">(</span><em>client</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.set_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.set_client" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.set_logger">
+<code class="descname">set_logger</code><span class="sig-paren">(</span><em>log</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.set_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.set_logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.sync_by_queryid">
+<code class="descname">sync_by_queryid</code><span class="sig-paren">(</span><em>query_id</em>, <em>timeout=None</em>, <em>no_delete_q=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.sync_by_queryid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.sync_by_queryid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for the message with specified query_id</p>
+<p>This method creates a queue for the query_id and waits for the response</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>query_id</strong> (<em>byte</em>) – timeout for waiting a message in seconds</li>
+<li><strong>timeout</strong> (<em>int</em>) – timeout for waiting a message in seconds</li>
+<li><strong>no_delete_q</strong> (<em>bool</em>) – If True, the queue for the query_id remains after popping a message</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a received message</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.synchronize">
+<code class="descname">synchronize</code><span class="sig-paren">(</span><em>timeout=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.synchronize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.synchronize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for receiving message with a common queue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>int</em>) – timeout for waiting a message in seconds</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a received message</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="bbc1.core.bbc_config.html" class="btn btn-neutral float-right" title="bbc1.core.bbc_config module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="bbc1.core.libbbcsig.test_pybbcsig.html" class="btn btn-neutral" title="bbc1.core.libbbcsig.test_pybbcsig module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

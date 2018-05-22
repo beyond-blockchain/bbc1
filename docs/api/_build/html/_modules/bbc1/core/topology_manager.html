@@ -1,0 +1,401 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc1.core.topology_manager &mdash; BBc1 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bbc1.html">bbc1 package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BBc1</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>bbc1.core.topology_manager</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bbc1.core.topology_manager</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Copyright (c) 2017 beyond-blockchain.org.</span>
+
+<span class="sd">Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="sd">you may not use this file except in compliance with the License.</span>
+<span class="sd">You may obtain a copy of the License at</span>
+
+<span class="sd">    http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="sd">Unless required by applicable law or agreed to in writing, software</span>
+<span class="sd">distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="sd">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="sd">See the License for the specific language governing permissions and</span>
+<span class="sd">limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">binascii</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;../../&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))])</span>
+<span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">query_management</span><span class="p">,</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">bbc1.core.message_key_types</span> <span class="k">import</span> <span class="n">to_2byte</span><span class="p">,</span> <span class="n">PayloadType</span><span class="p">,</span> <span class="n">KeyType</span><span class="p">,</span> <span class="n">InfraMessageCategory</span>
+
+<span class="n">ticker</span> <span class="o">=</span> <span class="n">query_management</span><span class="o">.</span><span class="n">get_ticker</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="TopologyManagerBase"><a class="viewcode-back" href="../../../orig/bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase">[docs]</a><span class="k">class</span> <span class="nc">TopologyManagerBase</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Network topology management for a domain</span>
+
+<span class="sd">    This class defines how to create topology, meaning that who should be neighbors and provides very simple topology</span>
+<span class="sd">    management, that is full mesh topology. If P2P routing algorithm is needed, you should override this class</span>
+<span class="sd">    to upgrade functions.</span>
+<span class="sd">    This class does not manage the neighbor list itself (It&#39;s in BBcNetwork)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NOTIFY_NEIGHBOR_LIST</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">NEIGHBOR_LIST_REFRESH_INTERVAL</span> <span class="o">=</span> <span class="mi">300</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">network</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">stats</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;neighbor&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span> <span class="o">=</span> <span class="n">domain_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;topology_manager:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">domain_id</span><span class="p">[:</span><span class="mi">4</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
+                                        <span class="n">level</span><span class="o">=</span><span class="n">loglevel</span><span class="p">,</span> <span class="n">logname</span><span class="o">=</span><span class="n">logname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_node_id</span> <span class="o">=</span> <span class="n">node_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_refresh_timer_entry</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_refresh_timer_entry</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TopologyManagerBase.stop_all_timers"><a class="viewcode-back" href="../../../orig/bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.stop_all_timers">[docs]</a>    <span class="k">def</span> <span class="nf">stop_all_timers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Invalidate all running timers&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_refresh_timer_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_refresh_timer_entry</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TopologyManagerBase.notify_neighbor_update"><a class="viewcode-back" href="../../../orig/bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.notify_neighbor_update">[docs]</a>    <span class="k">def</span> <span class="nf">notify_neighbor_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">is_new</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update expiration timer for the notified node_id</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            node_id (bytes): target node_id</span>
+<span class="sd">            is_new (bool): If True, this node is a new comer node</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">node_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] notify_neighbor_update: node_id=</span><span class="si">%s</span><span class="s2">, is_new=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_node_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()[:</span><span class="mi">4</span><span class="p">],</span>
+                                                                                      <span class="n">node_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()[:</span><span class="mi">4</span><span class="p">],</span> <span class="n">is_new</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] notify_neighbor_update&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_node_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()[:</span><span class="mi">4</span><span class="p">])</span>
+
+        <span class="n">rand_time</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span> <span class="o">=</span> <span class="n">query_management</span><span class="o">.</span><span class="n">QueryEntry</span><span class="p">(</span><span class="n">expire_after</span><span class="o">=</span><span class="n">rand_time</span><span class="p">,</span>
+                                                                    <span class="n">callback_expire</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_advertise_neighbor_info</span><span class="p">,</span>
+                                                                    <span class="n">retry_count</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span><span class="o">.</span><span class="n">update_expiration_time</span><span class="p">(</span><span class="n">rand_time</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TopologyManagerBase.update_refresh_timer_entry"><a class="viewcode-back" href="../../../orig/bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.update_refresh_timer_entry">[docs]</a>    <span class="k">def</span> <span class="nf">update_refresh_timer_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_entry</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">force_refresh_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update expiration timer&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">force_refresh_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rand_interval</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">TopologyManagerBase</span><span class="o">.</span><span class="n">NEIGHBOR_LIST_REFRESH_INTERVAL</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">),</span>
+                                           <span class="nb">int</span><span class="p">(</span><span class="n">TopologyManagerBase</span><span class="o">.</span><span class="n">NEIGHBOR_LIST_REFRESH_INTERVAL</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rand_interval</span> <span class="o">=</span> <span class="n">force_refresh_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;update_refresh_timer_entry: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rand_interval</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_entry</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_refresh_timer_entry</span> <span class="o">=</span> <span class="n">query_management</span><span class="o">.</span><span class="n">QueryEntry</span><span class="p">(</span>
+                <span class="n">expire_after</span><span class="o">=</span><span class="n">rand_interval</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;is_refresh&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+                <span class="n">callback_expire</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_advertise_neighbor_info</span><span class="p">,</span> <span class="n">retry_count</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_refresh_timer_entry</span><span class="o">.</span><span class="n">update_expiration_time</span><span class="p">(</span><span class="n">rand_interval</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_advertise_neighbor_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_entry</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Broadcast nodeinfo list&quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;[%s]: _advertise_neighbor_info&quot; % self.my_node_id.hex()[:4])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">infra_msg_type</span><span class="p">:</span> <span class="n">InfraMessageCategory</span><span class="o">.</span><span class="n">CATEGORY_TOPOLOGY</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">:</span> <span class="n">TopologyManagerBase</span><span class="o">.</span><span class="n">NOTIFY_NEIGHBOR_LIST</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">admin_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">KeyType</span><span class="o">.</span><span class="n">neighbor_list</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_neighbor_list</span><span class="p">(),</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">include_admin_info_into_message_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">broadcast_message_in_network</span><span class="p">(</span><span class="n">domain_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
+                                                  <span class="n">payload_type</span><span class="o">=</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_msgpack</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;is_refresh&quot;</span> <span class="ow">in</span> <span class="n">query_entry</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_refresh_timer_entry</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TopologyManagerBase.make_neighbor_list"><a class="viewcode-back" href="../../../orig/bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.make_neighbor_list">[docs]</a>    <span class="k">def</span> <span class="nf">make_neighbor_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;make nodelist binary for advertising&quot;&quot;&quot;</span>
+        <span class="n">nodeinfo</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+
+        <span class="c1"># the node itself</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">my_info</span><span class="o">.</span><span class="n">get_nodeinfo</span><span class="p">():</span>
+            <span class="n">nodeinfo</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># neighboring node</span>
+        <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="p">[</span><span class="n">nd</span><span class="p">]</span><span class="o">.</span><span class="n">is_alive</span><span class="p">:</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="p">[</span><span class="n">nd</span><span class="p">]</span><span class="o">.</span><span class="n">get_nodeinfo</span><span class="p">():</span>
+                    <span class="n">nodeinfo</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="n">nodes</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">count</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">))</span>
+        <span class="n">nodes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">nodeinfo</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_update_neighbor_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">binary_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse binary data and update neighbors</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            binary_data (bytes): received data</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the received nodeinfo has changed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">count_originally</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">nd</span><span class="p">:</span> <span class="n">nd</span><span class="o">.</span><span class="n">is_alive</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>
+        <span class="n">count_unchanged</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">binary_data</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="p">(</span><span class="mi">32</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">16</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">8</span><span class="p">)</span>
+            <span class="n">node_id</span> <span class="o">=</span> <span class="n">binary_data</span><span class="p">[</span><span class="n">base</span><span class="p">:</span><span class="n">base</span> <span class="o">+</span> <span class="mi">32</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">node_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_node_id</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">ipv4</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_ntop</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">binary_data</span><span class="p">[</span><span class="n">base</span> <span class="o">+</span> <span class="mi">32</span><span class="p">:</span><span class="n">base</span> <span class="o">+</span> <span class="mi">36</span><span class="p">])</span>
+            <span class="n">ipv6</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_ntop</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span><span class="p">,</span> <span class="n">binary_data</span><span class="p">[</span><span class="n">base</span> <span class="o">+</span> <span class="mi">36</span><span class="p">:</span><span class="n">base</span> <span class="o">+</span> <span class="mi">52</span><span class="p">])</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">ntohs</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">binary_data</span><span class="p">[</span><span class="n">base</span> <span class="o">+</span> <span class="mi">52</span><span class="p">:</span><span class="n">base</span> <span class="o">+</span> <span class="mi">54</span><span class="p">],</span> <span class="s1">&#39;big&#39;</span><span class="p">))</span>
+            <span class="n">domain0</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">binary_data</span><span class="p">[</span><span class="n">base</span> <span class="o">+</span> <span class="mi">54</span><span class="p">]</span> <span class="o">==</span> <span class="mh">0x01</span> <span class="k">else</span> <span class="kc">False</span>
+            <span class="n">updated_at</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">binary_data</span><span class="p">[</span><span class="n">base</span> <span class="o">+</span> <span class="mi">55</span><span class="p">:</span><span class="n">base</span> <span class="o">+</span> <span class="mi">63</span><span class="p">],</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node_id</span><span class="o">=</span><span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="o">=</span><span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">domain0</span><span class="o">=</span><span class="n">domain0</span><span class="p">):</span>
+                <span class="n">count_unchanged</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] update_neighbor_list: orig=</span><span class="si">%d</span><span class="s2">, unchanged=</span><span class="si">%d</span><span class="s2">, recv=</span><span class="si">%d</span><span class="s2">, need_advertise=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+              <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_node_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()[:</span><span class="mi">4</span><span class="p">],</span> <span class="n">count_originally</span><span class="p">,</span> <span class="n">count_unchanged</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">count_originally</span> <span class="o">!=</span> <span class="n">count_unchanged</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">count_originally</span> <span class="o">==</span> <span class="n">count_unchanged</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="TopologyManagerBase.process_message"><a class="viewcode-back" href="../../../orig/bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.process_message">[docs]</a>    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Process received message</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">destination_node_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">command</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="s2">&quot;keypair&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">][</span><span class="s2">&quot;keypair&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">check_admin_signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Illegal access to domain </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="o">.</span><span class="n">hex</span><span class="p">())</span>
+                <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">TopologyManagerBase</span><span class="o">.</span><span class="n">NOTIFY_NEIGHBOR_LIST</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;topology_manager&quot;</span><span class="p">,</span> <span class="s2">&quot;NOTIFY_NEIGHBOR_LIST&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_refresh_timer_entry</span><span class="p">(</span><span class="n">new_entry</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">diff_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_neighbor_list</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">neighbor_list</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">diff_flag</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">notify_neighbor_update</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.0',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

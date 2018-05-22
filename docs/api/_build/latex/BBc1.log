@@ -1,0 +1,3360 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.5.1)  22 MAY 2018 09:19
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**BBc1.tex
+(./BBc1.tex
+LaTeX2e <2018-04-01> patch level 2
+Babel <3.18> and hyphenation patterns for 84 language(s) loaded.
+(./sphinxmanual.cls
+Document Class: sphinxmanual 2017/03/26 v1.6 Document class (Sphinx manual)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/report.cls
+Document Class: report 2014/09/29 v1.4h Standard LaTeX document class
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count80
+\c@chapter=\count81
+\c@section=\count82
+\c@subsection=\count83
+\c@subsubsection=\count84
+\c@paragraph=\count85
+\c@subparagraph=\count86
+\c@figure=\count87
+\c@table=\count88
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+))
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2018/04/06 v1.3b Input encoding file
+\inpenc@prehook=\toks14
+\inpenc@posthook=\toks15
+)
+   defining Unicode char U+00A0 (decimal 160)
+   defining Unicode char U+2500 (decimal 9472)
+   defining Unicode char U+2502 (decimal 9474)
+   defining Unicode char U+2514 (decimal 9492)
+   defining Unicode char U+251C (decimal 9500)
+   defining Unicode char U+2572 (decimal 9586)
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/cmap/cmap.sty
+Package: cmap 2008/03/06 v1.0h CMap support: searchable PDF
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2017/04/05 v2.0i Standard LaTeX package
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/t1enc.def
+File: t1enc.def 2017/04/05 v2.0i Standard LaTeX file
+LaTeX Font Info:    Redeclaring font encoding T1 on input line 48.
+)<<t1.cmap>>)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2017/09/02 v2.17a AMS math features
+\@mathmargin=\skip43
+
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks16
+\ex@=\dimen103
+))
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen104
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count89
+LaTeX Info: Redefining \frac on input line 213.
+\uproot@=\count90
+\leftroot@=\count91
+LaTeX Info: Redefining \overline on input line 375.
+\classnum@=\count92
+\DOTSCASE@=\count93
+LaTeX Info: Redefining \ldots on input line 472.
+LaTeX Info: Redefining \dots on input line 475.
+LaTeX Info: Redefining \cdots on input line 596.
+\Mathstrutbox@=\box26
+\strutbox@=\box27
+\big@size=\dimen105
+LaTeX Font Info:    Redeclaring font encoding OML on input line 712.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 713.
+\macc@depth=\count94
+\c@MaxMatrixCols=\count95
+\dotsspace@=\muskip10
+\c@parentequation=\count96
+\dspbrk@lvl=\count97
+\tag@help=\toks17
+\row@=\count98
+\column@=\count99
+\maxfields@=\count100
+\andhelp@=\toks18
+\eqnshift@=\dimen106
+\alignsep@=\dimen107
+\tagshift@=\dimen108
+\tagwidth@=\dimen109
+\totwidth@=\dimen110
+\lineht@=\dimen111
+\@envbody=\toks19
+\multlinegap=\skip44
+\multlinetaggap=\skip45
+\mathdisplay@stack=\toks20
+LaTeX Info: Redefining \[ on input line 2817.
+LaTeX Info: Redefining \] on input line 2818.
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+))
+(/usr/local/texlive/2018/texmf-dist/tex/generic/babel/babel.sty
+Package: babel 2018/02/14 3.18 The Babel package
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/babel/switch.def
+File: switch.def 2018/02/14 3.18 Babel switching mechanism
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/babel-english/english.ldf
+Language: english 2017/06/06 v3.3r English support from the babel system
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/babel/babel.def
+File: babel.def 2018/02/14 3.18 Babel common definitions
+\babel@savecnt=\count101
+\U@D=\dimen112
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/babel/txtbabel.def)
+\bbl@dirlevel=\count102
+)
+\l@canadian = a dialect from \language\l@american 
+\l@australian = a dialect from \language\l@british 
+\l@newzealand = a dialect from \language\l@british 
+))
+(/usr/local/texlive/2018/texmf-dist/tex/latex/psnfss/times.sty
+Package: times 2005/04/12 PSNFSS-v9.2a (SPQR) 
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/fncychap/fncychap.sty
+Package: fncychap 2007/07/30 v1.34 LaTeX package (Revised chapters)
+\RW=\skip46
+\mylen=\skip47
+\myhi=\skip48
+\px=\skip49
+\py=\skip50
+\pyy=\skip51
+\pxx=\skip52
+)
+(./sphinx.sty
+Package: sphinx 2018/03/11 v1.7.2 LaTeX package (Sphinx markup)
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2016/05/16 v1.23 LaTeX kernel commands for general use (HO)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks21
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2017/06/25 v1.2c Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 99.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen113
+\Gin@req@width=\dimen114
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+Package: fancyhdr 2017/06/30 v3.9a Extensive control of page headers and footer
+s
+\f@nch@headwidth=\skip53
+\f@nch@O@elh=\skip54
+\f@nch@O@erh=\skip55
+\f@nch@O@olh=\skip56
+\f@nch@O@orh=\skip57
+\f@nch@O@elf=\skip58
+\f@nch@O@erf=\skip59
+\f@nch@O@olf=\skip60
+\f@nch@O@orf=\skip61
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/textcomp.sty
+Package: textcomp 2017/04/05 v2.0i Standard LaTeX package
+Package textcomp Info: Sub-encoding information:
+(textcomp)               5 = only ISO-Adobe without \textcurrency
+(textcomp)               4 = 5 + \texteuro
+(textcomp)               3 = 4 + \textohm
+(textcomp)               2 = 3 + \textestimated + \textcurrency
+(textcomp)               1 = TS1 - \textcircled - \t
+(textcomp)               0 = TS1 (full)
+(textcomp)             Font families with sub-encoding setting implement
+(textcomp)             only a restricted character set as indicated.
+(textcomp)             Family '?' is the default used for unknown fonts.
+(textcomp)             See the documentation for details.
+Package textcomp Info: Setting ? sub-encoding to TS1/1 on input line 79.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/ts1enc.def
+File: ts1enc.def 2001/06/05 v3.0e (jk/car/fm) Standard LaTeX file
+Now handling font encoding TS1 ...
+... processing UTF-8 mapping file for font encoding TS1
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/ts1enc.dfu
+File: ts1enc.dfu 2018/04/05 v1.2c UTF-8 support for inputenc
+   defining Unicode char U+00A2 (decimal 162)
+   defining Unicode char U+00A3 (decimal 163)
+   defining Unicode char U+00A4 (decimal 164)
+   defining Unicode char U+00A5 (decimal 165)
+   defining Unicode char U+00A6 (decimal 166)
+   defining Unicode char U+00A7 (decimal 167)
+   defining Unicode char U+00A8 (decimal 168)
+   defining Unicode char U+00A9 (decimal 169)
+   defining Unicode char U+00AA (decimal 170)
+   defining Unicode char U+00AC (decimal 172)
+   defining Unicode char U+00AE (decimal 174)
+   defining Unicode char U+00AF (decimal 175)
+   defining Unicode char U+00B0 (decimal 176)
+   defining Unicode char U+00B1 (decimal 177)
+   defining Unicode char U+00B2 (decimal 178)
+   defining Unicode char U+00B3 (decimal 179)
+   defining Unicode char U+00B4 (decimal 180)
+   defining Unicode char U+00B5 (decimal 181)
+   defining Unicode char U+00B6 (decimal 182)
+   defining Unicode char U+00B7 (decimal 183)
+   defining Unicode char U+00B9 (decimal 185)
+   defining Unicode char U+00BA (decimal 186)
+   defining Unicode char U+00BC (decimal 188)
+   defining Unicode char U+00BD (decimal 189)
+   defining Unicode char U+00BE (decimal 190)
+   defining Unicode char U+00D7 (decimal 215)
+   defining Unicode char U+00F7 (decimal 247)
+   defining Unicode char U+0192 (decimal 402)
+   defining Unicode char U+02C7 (decimal 711)
+   defining Unicode char U+02D8 (decimal 728)
+   defining Unicode char U+02DD (decimal 733)
+   defining Unicode char U+0E3F (decimal 3647)
+   defining Unicode char U+2016 (decimal 8214)
+   defining Unicode char U+2020 (decimal 8224)
+   defining Unicode char U+2021 (decimal 8225)
+   defining Unicode char U+2022 (decimal 8226)
+   defining Unicode char U+2030 (decimal 8240)
+   defining Unicode char U+2031 (decimal 8241)
+   defining Unicode char U+203B (decimal 8251)
+   defining Unicode char U+203D (decimal 8253)
+   defining Unicode char U+2044 (decimal 8260)
+   defining Unicode char U+204E (decimal 8270)
+   defining Unicode char U+2052 (decimal 8274)
+   defining Unicode char U+20A1 (decimal 8353)
+   defining Unicode char U+20A4 (decimal 8356)
+   defining Unicode char U+20A6 (decimal 8358)
+   defining Unicode char U+20A9 (decimal 8361)
+   defining Unicode char U+20AB (decimal 8363)
+   defining Unicode char U+20AC (decimal 8364)
+   defining Unicode char U+20B1 (decimal 8369)
+   defining Unicode char U+2103 (decimal 8451)
+   defining Unicode char U+2116 (decimal 8470)
+   defining Unicode char U+2117 (decimal 8471)
+   defining Unicode char U+211E (decimal 8478)
+   defining Unicode char U+2120 (decimal 8480)
+   defining Unicode char U+2122 (decimal 8482)
+   defining Unicode char U+2126 (decimal 8486)
+   defining Unicode char U+2127 (decimal 8487)
+   defining Unicode char U+212E (decimal 8494)
+   defining Unicode char U+2190 (decimal 8592)
+   defining Unicode char U+2191 (decimal 8593)
+   defining Unicode char U+2192 (decimal 8594)
+   defining Unicode char U+2193 (decimal 8595)
+   defining Unicode char U+2329 (decimal 9001)
+   defining Unicode char U+232A (decimal 9002)
+   defining Unicode char U+2422 (decimal 9250)
+   defining Unicode char U+25E6 (decimal 9702)
+   defining Unicode char U+25EF (decimal 9711)
+   defining Unicode char U+266A (decimal 9834)
+   defining Unicode char U+FEFF (decimal 65279)
+))
+LaTeX Info: Redefining \oldstylenums on input line 334.
+Package textcomp Info: Setting cmr sub-encoding to TS1/0 on input line 349.
+Package textcomp Info: Setting cmss sub-encoding to TS1/0 on input line 350.
+Package textcomp Info: Setting cmtt sub-encoding to TS1/0 on input line 351.
+Package textcomp Info: Setting cmvtt sub-encoding to TS1/0 on input line 352.
+Package textcomp Info: Setting cmbr sub-encoding to TS1/0 on input line 353.
+Package textcomp Info: Setting cmtl sub-encoding to TS1/0 on input line 354.
+Package textcomp Info: Setting ccr sub-encoding to TS1/0 on input line 355.
+Package textcomp Info: Setting ptm sub-encoding to TS1/4 on input line 356.
+Package textcomp Info: Setting pcr sub-encoding to TS1/4 on input line 357.
+Package textcomp Info: Setting phv sub-encoding to TS1/4 on input line 358.
+Package textcomp Info: Setting ppl sub-encoding to TS1/3 on input line 359.
+Package textcomp Info: Setting pag sub-encoding to TS1/4 on input line 360.
+Package textcomp Info: Setting pbk sub-encoding to TS1/4 on input line 361.
+Package textcomp Info: Setting pnc sub-encoding to TS1/4 on input line 362.
+Package textcomp Info: Setting pzc sub-encoding to TS1/4 on input line 363.
+Package textcomp Info: Setting bch sub-encoding to TS1/4 on input line 364.
+Package textcomp Info: Setting put sub-encoding to TS1/5 on input line 365.
+Package textcomp Info: Setting uag sub-encoding to TS1/5 on input line 366.
+Package textcomp Info: Setting ugq sub-encoding to TS1/5 on input line 367.
+Package textcomp Info: Setting ul8 sub-encoding to TS1/4 on input line 368.
+Package textcomp Info: Setting ul9 sub-encoding to TS1/4 on input line 369.
+Package textcomp Info: Setting augie sub-encoding to TS1/5 on input line 370.
+Package textcomp Info: Setting dayrom sub-encoding to TS1/3 on input line 371.
+Package textcomp Info: Setting dayroms sub-encoding to TS1/3 on input line 372.
+
+Package textcomp Info: Setting pxr sub-encoding to TS1/0 on input line 373.
+Package textcomp Info: Setting pxss sub-encoding to TS1/0 on input line 374.
+Package textcomp Info: Setting pxtt sub-encoding to TS1/0 on input line 375.
+Package textcomp Info: Setting txr sub-encoding to TS1/0 on input line 376.
+Package textcomp Info: Setting txss sub-encoding to TS1/0 on input line 377.
+Package textcomp Info: Setting txtt sub-encoding to TS1/0 on input line 378.
+Package textcomp Info: Setting lmr sub-encoding to TS1/0 on input line 379.
+Package textcomp Info: Setting lmdh sub-encoding to TS1/0 on input line 380.
+Package textcomp Info: Setting lmss sub-encoding to TS1/0 on input line 381.
+Package textcomp Info: Setting lmssq sub-encoding to TS1/0 on input line 382.
+Package textcomp Info: Setting lmvtt sub-encoding to TS1/0 on input line 383.
+Package textcomp Info: Setting lmtt sub-encoding to TS1/0 on input line 384.
+Package textcomp Info: Setting qhv sub-encoding to TS1/0 on input line 385.
+Package textcomp Info: Setting qag sub-encoding to TS1/0 on input line 386.
+Package textcomp Info: Setting qbk sub-encoding to TS1/0 on input line 387.
+Package textcomp Info: Setting qcr sub-encoding to TS1/0 on input line 388.
+Package textcomp Info: Setting qcs sub-encoding to TS1/0 on input line 389.
+Package textcomp Info: Setting qpl sub-encoding to TS1/0 on input line 390.
+Package textcomp Info: Setting qtm sub-encoding to TS1/0 on input line 391.
+Package textcomp Info: Setting qzc sub-encoding to TS1/0 on input line 392.
+Package textcomp Info: Setting qhvc sub-encoding to TS1/0 on input line 393.
+Package textcomp Info: Setting futs sub-encoding to TS1/4 on input line 394.
+Package textcomp Info: Setting futx sub-encoding to TS1/4 on input line 395.
+Package textcomp Info: Setting futj sub-encoding to TS1/4 on input line 396.
+Package textcomp Info: Setting hlh sub-encoding to TS1/3 on input line 397.
+Package textcomp Info: Setting hls sub-encoding to TS1/3 on input line 398.
+Package textcomp Info: Setting hlst sub-encoding to TS1/3 on input line 399.
+Package textcomp Info: Setting hlct sub-encoding to TS1/5 on input line 400.
+Package textcomp Info: Setting hlx sub-encoding to TS1/5 on input line 401.
+Package textcomp Info: Setting hlce sub-encoding to TS1/5 on input line 402.
+Package textcomp Info: Setting hlcn sub-encoding to TS1/5 on input line 403.
+Package textcomp Info: Setting hlcw sub-encoding to TS1/5 on input line 404.
+Package textcomp Info: Setting hlcf sub-encoding to TS1/5 on input line 405.
+Package textcomp Info: Setting pplx sub-encoding to TS1/3 on input line 406.
+Package textcomp Info: Setting pplj sub-encoding to TS1/3 on input line 407.
+Package textcomp Info: Setting ptmx sub-encoding to TS1/4 on input line 408.
+Package textcomp Info: Setting ptmj sub-encoding to TS1/4 on input line 409.
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/titlesec/titlesec.sty
+Package: titlesec 2016/03/21 v2.10.2 Sectioning titles
+\ttl@box=\box28
+\beforetitleunit=\skip62
+\aftertitleunit=\skip63
+\ttl@plus=\dimen115
+\ttl@minus=\dimen116
+\ttl@toksa=\toks22
+\titlewidth=\dimen117
+\titlewidthlast=\dimen118
+\titlewidthfirst=\dimen119
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/tabulary/tabulary.sty
+Package: tabulary 2014/06/11 v0.10 tabulary package (DPC)
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/tools/array.sty
+Package: array 2018/04/07 v2.4g Tabular extension package (FMi)
+\col@sep=\dimen120
+\ar@mcellbox=\box29
+\extrarowheight=\dimen121
+\NC@list=\toks23
+\extratabsurround=\skip64
+\backup@length=\skip65
+\ar@cellbox=\box30
+)
+\TY@count=\count103
+\TY@linewidth=\dimen122
+\tymin=\dimen123
+\tymax=\dimen124
+\TY@tablewidth=\dimen125
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/tools/longtable.sty
+Package: longtable 2014/10/28 v4.11 Multi-page Table package (DPC)
+\LTleft=\skip66
+\LTright=\skip67
+\LTpre=\skip68
+\LTpost=\skip69
+\LTchunksize=\count104
+\LTcapwidth=\dimen126
+\LT@head=\box31
+\LT@firsthead=\box32
+\LT@foot=\box33
+\LT@lastfoot=\box34
+\LT@cols=\count105
+\LT@rows=\count106
+\c@LT@tables=\count107
+\c@LT@chunks=\count108
+\LT@p@ftn=\toks24
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/varwidth/varwidth.sty
+Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
+\@vwid@box=\box35
+\sift@deathcycles=\count109
+\@vwid@loff=\dimen127
+\@vwid@roff=\dimen128
+)
+(./sphinxmulticell.sty
+Package: sphinxmulticell 2017/02/23 v1.6 better span rows and columns of a tabl
+e (Sphinx team)
+\sphinx@TY@tablewidth=\dimen129
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/makeidx.sty
+Package: makeidx 2014/09/29 v1.0m Standard LaTeX package
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/framed/framed.sty
+Package: framed 2011/10/22 v 0.96: framed or shaded text with page breaks
+\OuterFrameSep=\skip70
+\fb@frw=\dimen130
+\fb@frh=\dimen131
+\FrameRule=\dimen132
+\FrameSep=\dimen133
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 225.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1352.
+Package xcolor Info: Model `RGB' extended on input line 1364.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1366.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1367.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/fancyvrb/fancyvrb.sty
+Package: fancyvrb 2008/02/07
+
+Style option: `fancyvrb' v2.7a, with DG/SPQR fixes, and firstline=lastline fix 
+<2008/02/07> (tvz)
+\FV@CodeLineNo=\count110
+\FV@InFile=\read1
+\FV@TabBox=\box36
+\c@FancyVerbLine=\count111
+\FV@StepNumber=\count112
+\FV@OutFile=\write3
+) (./footnotehyper-sphinx.sty
+Package: footnotehyper-sphinx 2017/10/27 v1.7 hyperref aware footnote.sty for s
+phinx (JFB)
+\FNH@notes=\box37
+\FNH@width=\dimen134
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count113
+\float@exts=\toks25
+\float@box=\box38
+\@float@everytoks=\toks26
+\@floatcapt=\box39
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/wrapfig/wrapfig.sty
+\wrapoverhang=\dimen135
+\WF@size=\dimen136
+\c@WF@wrappedlines=\count114
+\WF@box=\box40
+\WF@everypar=\toks27
+Package: wrapfig 2003/01/31  v 3.6
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/parskip/parskip.sty
+Package: parskip 2001/04/09 non-zero parskip adjustments
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/alltt.sty
+Package: alltt 1997/06/16 v2.0g defines alltt environment
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/upquote/upquote.sty
+Package: upquote 2012/04/19 v1.3 upright-quote and grave-accent glyphs in verba
+tim
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/capt-of/capt-of.sty
+Package: capt-of 2009/12/29 v0.2 standard captions outside of floats
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/needspace/needspace.sty
+Package: needspace 2010/09/12 v1.3d reserve vertical space
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/carlisle/remreset.sty)
+(./sphinxhighlight.sty
+Package: sphinxhighlight 2016/05/29 stylesheet for highlighting with pygments
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2016/05/16 v1.17 Key value parser (HO)
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2016/05/16 v1.4 Providing info/warning/error messages (HO)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/etexcmds.sty
+Package: etexcmds 2016/05/16 v1.6 Avoid name clashes with e-TeX commands (HO)
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2016/05/16 v1.4 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+)))
+\sphinxverbatimsep=\dimen137
+\sphinxverbatimborder=\dimen138
+\sphinxshadowsep=\dimen139
+\sphinxshadowsize=\dimen140
+\sphinxshadowrule=\dimen141
+\spx@notice@border=\dimen142
+\spx@image@box=\box41
+\c@literalblock=\count115
+\sphinxcontinuationbox=\box42
+\sphinxvisiblespacebox=\box43
+\sphinxVerbatim@TitleBox=\box44
+\py@argswidth=\skip71
+\lineblockindentation=\skip72
+\DUlineblockindent=\skip73
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/geometry/geometry.sty
+Package: geometry 2018/03/24 v5.7 Page Geometry
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2017/03/15 v3.2 Provides the ifpdf switch
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/ifvtex.sty
+Package: ifvtex 2016/05/16 v1.6 Detect VTeX and its facilities (HO)
+Package ifvtex Info: VTeX not detected.
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/ifxetex/ifxetex.sty
+Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
+)
+\Gm@cnth=\count116
+\Gm@cntv=\count117
+\c@Gm@tempcnt=\count118
+\Gm@bindingoffset=\dimen143
+\Gm@wd@mp=\dimen144
+\Gm@odd@mp=\dimen145
+\Gm@even@mp=\dimen146
+\Gm@layoutwidth=\dimen147
+\Gm@layoutheight=\dimen148
+\Gm@layouthoffset=\dimen149
+\Gm@layoutvoffset=\dimen150
+\Gm@dimlist=\toks28
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2018/02/06 v6.86b Hypertext links for LaTeX
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
+Package: hobsub-hyperref 2016/05/16 v1.14 Bundle oberdiek, subset hyperref (HO)
+
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty
+Package: hobsub-generic 2016/05/16 v1.14 Bundle oberdiek, subset generic (HO)
+Package: hobsub 2016/05/16 v1.14 Construct package bundles (HO)
+Package hobsub Info: Skipping package `infwarerr' (already loaded).
+Package hobsub Info: Skipping package `ltxcmds' (already loaded).
+Package hobsub Info: Skipping package `ifluatex' (already loaded).
+Package hobsub Info: Skipping package `ifvtex' (already loaded).
+Package: intcalc 2016/05/16 v1.2 Expandable calculations with integers (HO)
+Package hobsub Info: Skipping package `ifpdf' (already loaded).
+Package hobsub Info: Skipping package `etexcmds' (already loaded).
+Package hobsub Info: Skipping package `kvsetkeys' (already loaded).
+Package: kvdefinekeys 2016/05/16 v1.4 Define keys (HO)
+Package: pdftexcmds 2018/01/30 v0.27 Utility functions of pdfTeX for LuaTeX (HO
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+Package: pdfescape 2016/05/16 v1.14 Implements pdfTeX's escape features (HO)
+Package: bigintcalc 2016/05/16 v1.4 Expandable calculations on big integers (HO
+)
+Package: bitset 2016/05/16 v1.2 Handle bit-vector datatype (HO)
+Package: uniquecounter 2016/05/16 v1.3 Provide unlimited unique counter (HO)
+)
+Package hobsub Info: Skipping package `hobsub' (already loaded).
+Package: letltxmacro 2016/05/16 v1.5 Let assignment for LaTeX macros (HO)
+Package: hopatch 2016/05/16 v1.3 Wrapper for package hooks (HO)
+Package: xcolor-patch 2016/05/16 xcolor patch
+Package: atveryend 2016/05/16 v1.9 Hooks at the very end of document (HO)
+Package atveryend Info: \enddocument detected (standard20110627).
+Package: atbegshi 2016/06/09 v1.18 At begin shipout hook (HO)
+Package: refcount 2016/05/16 v3.5 Data extraction from label references (HO)
+Package: hycolor 2016/05/16 v1.8 Color options for hyperref/bookmark (HO)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/oberdiek/auxhook.sty
+Package: auxhook 2016/05/16 v1.4 Hooks for auxiliary files (HO)
+)
+\@linkdim=\dimen151
+\Hy@linkcounter=\count119
+\Hy@pagecounter=\count120
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2018/02/06 v6.86b Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
+)
+\Hy@SavedSpaceFactor=\count121
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/latexconfig/hyperref.cfg
+File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
+)
+Package hyperref Info: Option `unicode' set `true' on input line 4383.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2018/02/06 v6.86b Hyperref: PDF Unicode definition (HO)
+Now handling font encoding PU ...
+... no UTF-8 mapping file for font encoding PU
+)
+Package hyperref Info: Option `colorlinks' set `true' on input line 4383.
+Package hyperref Info: Option `breaklinks' set `true' on input line 4383.
+Package hyperref Info: Hyper figures OFF on input line 4509.
+Package hyperref Info: Link nesting OFF on input line 4514.
+Package hyperref Info: Hyper index ON on input line 4517.
+Package hyperref Info: Plain pages OFF on input line 4524.
+Package hyperref Info: Backreferencing OFF on input line 4529.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4762.
+\c@Hy@tempcnt=\count122
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip11
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 5115.
+\XeTeXLinkMargin=\dimen152
+\Fld@menulength=\count123
+\Field@Width=\dimen153
+\Fld@charsize=\dimen154
+Package hyperref Info: Hyper figures OFF on input line 6369.
+Package hyperref Info: Link nesting OFF on input line 6374.
+Package hyperref Info: Hyper index ON on input line 6377.
+Package hyperref Info: backreferencing OFF on input line 6384.
+Package hyperref Info: Link coloring ON on input line 6387.
+Package hyperref Info: Link coloring with OCG OFF on input line 6394.
+Package hyperref Info: PDF/A mode OFF on input line 6399.
+LaTeX Info: Redefining \ref on input line 6439.
+LaTeX Info: Redefining \pageref on input line 6443.
+\Hy@abspage=\count124
+\c@Item=\count125
+\c@Hfootnote=\count126
+)
+Package hyperref Info: Driver (autodetected): hpdftex.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2018/02/06 v6.86b Hyperref driver for pdfTeX
+\Fld@listcount=\count127
+\c@bookmark@seq@number=\count128
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty
+Package: rerunfilecheck 2016/05/16 v1.8 Rerun checks for auxiliary files (HO)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+82.
+)
+\Hy@SectionHShift=\skip74
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/oberdiek/hypcap.sty
+Package: hypcap 2016/05/16 v1.12 Adjusting the anchors of captions (HO)
+)
+\@indexfile=\write4
+\openout4 = `BBc1.idx'.
+
+
+Writing index file BBc1.idx
+(./BBc1.aux)
+\openout1 = `BBc1.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 68.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 68.
+ (/usr/local/texlive/2018/texmf-dist/tex/latex/base/ts1cmr.fd
+File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Try loading font information for T1+ptm on input line 68.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/psnfss/t1ptm.fd
+File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
+)
+(/usr/local/texlive/2018/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count129
+\scratchdimen=\dimen155
+\scratchbox=\box45
+\nofMPsegments=\count130
+\nofMParguments=\count131
+\everyMPshowfont=\toks29
+\MPscratchCnt=\count132
+\MPscratchDim=\dimen156
+\MPnumerator=\count133
+\makeMPintoPDFobject=\count134
+\everyMPtoPDFconversion=\toks30
+) (/usr/local/texlive/2018/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
+)
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+38.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 456.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: letterpaper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: twoside 
+* h-part:(L,W,R)=(72.26999pt, 469.75502pt, 72.26999pt)
+* v-part:(T,H,B)=(72.26999pt, 650.43001pt, 72.26999pt)
+* \paperwidth=614.295pt
+* \paperheight=794.96999pt
+* \textwidth=469.75502pt
+* \textheight=650.43001pt
+* \oddsidemargin=0.0pt
+* \evensidemargin=0.0pt
+* \topmargin=-37.0pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=10.0pt
+* \footskip=30.0pt
+* \marginparwidth=36.135pt
+* \marginparsep=11.0pt
+* \columnsep=10.0pt
+* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidetrue
+* \@mparswitchtrue
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+\AtBeginShipoutBox=\box46
+Package hyperref Info: Link coloring ON on input line 68.
+(/usr/local/texlive/2018/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
+Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
+)
+\c@section@level=\count135
+)
+LaTeX Info: Redefining \ref on input line 68.
+LaTeX Info: Redefining \pageref on input line 68.
+LaTeX Info: Redefining \nameref on input line 68.
+
+(./BBc1.out) (./BBc1.out)
+\@outlinefile=\write5
+\openout5 = `BBc1.out'.
+
+Package hyperref Info: Option `pageanchor' set `false' on input line 71.
+LaTeX Font Info:    Try loading font information for T1+phv on input line 71.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/psnfss/t1phv.fd
+File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
+)
+LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <10> not available
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 71.
+LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <24.88> not available
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 71.
+LaTeX Font Info:    Font shape `T1/phv/bx/it' in size <10> not available
+(Font)              Font shape `T1/phv/b/it' tried instead on input line 71.
+LaTeX Font Info:    Font shape `T1/phv/b/it' in size <10> not available
+(Font)              Font shape `T1/phv/b/sl' tried instead on input line 71.
+LaTeX Font Info:    Font shape `T1/phv/bx/it' in size <17.28> not available
+(Font)              Font shape `T1/phv/b/it' tried instead on input line 71.
+LaTeX Font Info:    Font shape `T1/phv/b/it' in size <17.28> not available
+(Font)              Font shape `T1/phv/b/sl' tried instead on input line 71.
+LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <17.28> not available
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 71.
+<<ot1.cmap>><<oml.cmap>><<oms.cmap>><<omx.cmap>>
+LaTeX Font Info:    Try loading font information for U+msa on input line 71.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 71.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <12> not available
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 71.
+ [1
+
+{/usr/local/texlive/2018/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2
+
+] (./BBc1.toc
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 2.
+)
+\tf@toc=\write6
+\openout6 = `BBc1.toc'.
+
+
+[1
+
+] [2
+
+]
+Chapter 1.
+LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <14.4> not available
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 79.
+LaTeX Font Info:    Try loading font information for T1+pcr on input line 98.
+(/usr/local/texlive/2018/texmf-dist/tex/latex/psnfss/t1pcr.fd
+File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
+)
+LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <10> not available
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 98.
+ [1
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 191--191
+[]\T1/ptm/m/it/10 host='127.0.0.1'\T1/ptm/m/n/10 , \T1/ptm/m/it/10 port=9000\T1
+/ptm/m/n/10 , \T1/ptm/m/it/10 mul-tiq=True\T1/ptm/m/n/10 ,
+ []
+
+LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
+(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 202.
+LaTeX Font Info:    Try loading font information for TS1+ptm on input line 242.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/psnfss/ts1ptm.fd
+File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
+) [2]
+Underfull \hbox (badness 5862) in paragraph at lines 279--279
+[]\T1/ptm/m/it/10 txobj\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ref-er-ence_obj=None\T1
+/ptm/m/n/10 , \T1/ptm/m/it/10 as-set_files=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10
+ des-ti-na-tions=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 any-
+ []
+
+[3] [4] [5]
+Underfull \hbox (badness 10000) in paragraph at lines 703--703
+[]\T1/ptm/m/it/10 asset_group_id=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 as-set_id
+=None\T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 797--797
+[]\T1/ptm/m/it/10 dest_user_id=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 trans-ac-ti
+on_id=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 rea-son_text=None\T1/ptm/m/n/10 ,
+ []
+
+[6] [7] [8] [9] [10] [11]
+Underfull \hbox (badness 10000) in paragraph at lines 1643--1643
+[]\T1/ptm/m/it/10 p2p_port=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 core_port=None\
+T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1643--1643
+\T1/ptm/m/it/10 use_domain0=False\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ip4addr=None\
+T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1643--1643
+\T1/ptm/m/it/10 ip6addr=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 work-ingdir='.bbc1
+'\T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1643--1643
+\T1/ptm/m/it/10 con-fig-file=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 use_nodekey=N
+one\T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1643--1643
+\T1/ptm/m/it/10 use_ledger_subsystem=False\T1/ptm/m/n/10 , \T1/ptm/m/it/10 logl
+evel='all'\T1/ptm/m/n/10 ,
+ []
+
+[12]
+Underfull \hbox (badness 10000) in paragraph at lines 1746--1746
+[]\T1/ptm/m/it/10 domain_id\T1/ptm/m/n/10 , \T1/ptm/m/it/10 as-set_group_ids\T1
+/ptm/m/n/10 , \T1/ptm/m/it/10 trans-ac-tion_id\T1/ptm/m/n/10 ,
+ []
+
+[13]
+Underfull \hbox (badness 10000) in paragraph at lines 1853--1853
+[]\T1/ptm/m/it/10 config\T1/ptm/m/n/10 , \T1/ptm/m/it/10 core=None\T1/ptm/m/n/1
+0 , \T1/ptm/m/it/10 p2p_port=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ex-ter-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1853--1853
+\T1/ptm/m/it/10 nal_ip4addr=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ex-ter-nal_ip6
+addr=None\T1/ptm/m/n/10 ,
+ []
+
+LaTeX Font Info:    Try loading font information for TS1+pcr on input line 1.
+(/usr/local/texlive/2018/texmf-dist/tex/latex/psnfss/ts1pcr.fd
+File: ts1pcr.fd 2001/06/04 font definitions for TS1/pcr.
+)
+LaTeX Font Info:    Font shape `TS1/pcr/bx/n' in size <10> not available
+(Font)              Font shape `TS1/pcr/b/n' tried instead on input line 1.
+ [14]
+Overfull \hbox (275.96935pt too wide) in paragraph at lines 1974--1974
+[]\T1/ptm/m/it/10 domain_id=b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\
+x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
+'\T1/ptm/m/n/10 ,
+ []
+
+[15]
+Overfull \hbox (279.46935pt too wide) in paragraph at lines 2020--2020
+[]\T1/ptm/m/it/10 domain_id=b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\
+x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
+'\T1/pcr/m/n/10 ) 
+ []
+
+[16]
+Underfull \hbox (badness 10000) in paragraph at lines 2174--2174
+[]\T1/ptm/m/it/10 network=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 do-main_id=None\
+T1/ptm/m/n/10 ,
+ []
+
+[17]
+Underfull \hbox (badness 10000) in paragraph at lines 2434--2434
+[]\T1/ptm/m/it/10 user_id=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 as-set_file=None
+\T1/ptm/m/n/10 , \T1/ptm/m/it/10 as-set_body=None\T1/ptm/m/n/10 , \T1/ptm/m/it/
+10 for-
+ []
+
+[18]
+Underfull \hbox (badness 10000) in paragraph at lines 2549--2549
+[]\T1/ptm/m/it/10 domain_id=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 trans-ac-tion_
+id=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 de-se-ri-al-
+ []
+
+[19]
+Underfull \hbox (badness 10000) in paragraph at lines 2620--2620
+[]\T1/ptm/m/it/10 asset_group_id=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ref-er-en
+ce_index=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 manda-tory_approver=None\T1/ptm/m
+/n/10 , \T1/ptm/m/it/10 op-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2620--2620
+\T1/ptm/m/it/10 tion_approver_num_numerator=0\T1/ptm/m/n/10 , \T1/ptm/m/it/10 o
+p-tion_approver_num_denominator=0\T1/ptm/m/n/10 , \T1/ptm/m/it/10 op-
+ []
+
+[20]
+Underfull \hbox (badness 10000) in paragraph at lines 2783--2783
+[]\T1/ptm/m/it/10 asset_group_id\T1/ptm/m/n/10 , \T1/ptm/m/it/10 trans-ac-tion\
+T1/ptm/m/n/10 , \T1/ptm/m/it/10 ref_transaction=None\T1/ptm/m/n/10 ,
+ []
+
+[21] [22] [23]
+Underfull \hbox (badness 10000) in paragraph at lines 3205--3206
+[]\T1/pcr/b/n/10 key_type \T1/ptm/m/n/10 (\T1/pcr/m/sl/10 int\T1/ptm/m/n/10 ) ^
+^U Type of en-cryp-tion key al-go-righm (cur-rently, Key-
+ []
+
+[24] [25] [26]
+Underfull \hbox (badness 10000) in paragraph at lines 3782--3782
+[]\T1/ptm/m/it/10 transaction\T1/ptm/m/n/10 , \T1/ptm/m/it/10 event_idx\T1/ptm/
+m/n/10 , \T1/ptm/m/it/10 as-set_group_id\T1/ptm/m/n/10 , \T1/ptm/m/it/10 user_i
+d\T1/ptm/m/n/10 , \T1/ptm/m/it/10 as-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3790--3790
+[]\T1/ptm/m/it/10 transaction\T1/ptm/m/n/10 , \T1/ptm/m/it/10 as-set_group_id\T
+1/ptm/m/n/10 ,
+ []
+
+[27]
+Underfull \hbox (badness 10000) in paragraph at lines 3911--3911
+[]\T1/ptm/m/it/10 event_num=0\T1/ptm/m/n/10 , \T1/ptm/m/it/10 re-la-tion_num=0\
+T1/ptm/m/n/10 , \T1/ptm/m/it/10 wit-ness=False\T1/ptm/m/n/10 , \T1/ptm/m/it/10 
+for-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4025--4025
+[]\T1/ptm/m/it/10 domain_id\T1/ptm/m/n/10 , \T1/ptm/m/it/10 trans-ac-tion_id\T1
+/ptm/m/n/10 , \T1/ptm/m/it/10 trans-ac-
+ []
+
+[28]
+Underfull \hbox (badness 10000) in paragraph at lines 4106--4106
+[]\T1/ptm/m/it/10 networking=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 con-fig=None\
+T1/ptm/m/n/10 , \T1/ptm/m/it/10 work-
+ []
+
+[29]
+Underfull \hbox (badness 10000) in paragraph at lines 4240--4240
+[]\T1/ptm/m/it/10 transaction_id\T1/ptm/m/n/10 , \T1/ptm/m/it/10 outer_domain_i
+d\T1/ptm/m/n/10 , \T1/ptm/m/it/10 txid_having_cross_ref\T1/ptm/m/n/10 ,
+ []
+
+[30]
+Underfull \hbox (badness 10000) in paragraph at lines 4346--4348
+[]\T1/ptm/m/n/10 records of cross_ref_tables [^^Pid^^Q,^^Qtransaction_id^^Q, ^^
+Pouter_domain_id^^Q,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4359--4359
+[]\T1/ptm/m/it/10 transaction_id=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 as-set_gr
+oup_id=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 as-set_id=None\T1/ptm/m/n/10 ,
+ []
+
+[31]
+Underfull \hbox (badness 10000) in paragraph at lines 4458--4458
+[]\T1/ptm/m/it/10 networking=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 con-fig=None\
+T1/ptm/m/n/10 ,
+ []
+
+[32]
+Underfull \hbox (badness 10000) in paragraph at lines 4591--4591
+[]\T1/ptm/m/it/10 transaction_id=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 as-set_gr
+oup_id=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 as-set_id=None\T1/ptm/m/n/10 ,
+ []
+
+[33]
+Underfull \hbox (badness 10000) in paragraph at lines 4690--4690
+[]\T1/ptm/m/it/10 handler=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 db_name=None\T1/
+ptm/m/n/10 , \T1/ptm/m/it/10 db_num=0\T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4724--4724
+[]\T1/ptm/m/it/10 handler=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 db_name=None\T1/
+ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4724--4724
+\T1/ptm/m/it/10 db_num=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 server_info=None\T1
+/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 7814) in paragraph at lines 4747--4748
+[]\T1/pcr/b/n/10 tbl_definition \T1/ptm/m/n/10 (\T1/pcr/m/sl/10 list\T1/ptm/m/n
+/10 ) ^^U schema of the ta-ble [[^^Pcol-umn_name^^Q, ^^Pdata
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4775--4775
+[]\T1/ptm/m/it/10 handler=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 db_name=None\T1/
+ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 7814) in paragraph at lines 4798--4799
+[]\T1/pcr/b/n/10 tbl_definition \T1/ptm/m/n/10 (\T1/pcr/m/sl/10 list\T1/ptm/m/n
+/10 ) ^^U schema of the ta-ble [[^^Pcol-umn_name^^Q, ^^Pdata
+ []
+
+[34]
+Underfull \hbox (badness 10000) in paragraph at lines 4845--4845
+[]\T1/ptm/m/it/10 networking=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 node_id=None\
+T1/ptm/m/n/10 ,
+ []
+
+[35]
+Underfull \hbox (badness 10000) in paragraph at lines 5018--5018
+[]\T1/ptm/m/it/10 networking\T1/ptm/m/n/10 , \T1/ptm/m/it/10 do-main_id\T1/ptm/
+m/n/10 ,
+ []
+
+[36] [37] [38] [39]
+Underfull \hbox (badness 10000) in paragraph at lines 5750--5750
+[]\T1/ptm/m/it/10 private_key\T1/ptm/m/n/10 , \T1/ptm/m/it/10 se-ri-al-ized_pub
+key\T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 5800--5800
+[]\T1/ptm/m/it/10 payload_type\T1/ptm/m/n/10 , \T1/ptm/m/it/10 msg\T1/ptm/m/n/1
+0 , \T1/ptm/m/it/10 pay-load_version=0\T1/ptm/m/n/10 ,
+ []
+
+[40]
+Underfull \hbox (badness 10000) in paragraph at lines 5855--5855
+[]\T1/ptm/m/it/10 expire_after=30\T1/ptm/m/n/10 , \T1/ptm/m/it/10 call-back_exp
+ire=None\T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 5855--5855
+\T1/ptm/m/it/10 call-back=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 call-back_error=
+None\T1/ptm/m/n/10 ,
+ []
+
+[41]
+Underfull \hbox (badness 10000) in paragraph at lines 6062--6062
+[]\T1/ptm/m/it/10 network=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 con-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6062--6062
+\T1/ptm/m/it/10 fig=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 do-main_id=None\T1/ptm
+/m/n/10 ,
+ []
+
+[42]
+Underfull \hbox (badness 10000) in paragraph at lines 6164--6164
+[]\T1/ptm/m/it/10 networking\T1/ptm/m/n/10 , \T1/ptm/m/it/10 do-main_id\T1/ptm/
+m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6164--6164
+\T1/ptm/m/it/10 loglevel='all'\T1/ptm/m/n/10 , \T1/ptm/m/it/10 log-
+ []
+
+[43]
+Underfull \hbox (badness 10000) in paragraph at lines 6344--6344
+[]\T1/ptm/m/it/10 networking\T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6344--6344
+\T1/ptm/m/it/10 do-main_id\T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6344--6344
+\T1/ptm/m/it/10 loglevel='all'\T1/ptm/m/n/10 ,
+ []
+
+[44] [45] [46
+
+]
+Chapter 2.
+[47] [48
+
+] [49
+
+
+] (./BBc1.ind [50
+
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 5--6
+[]\T1/ptm/m/n/10 activate_ledgersubsystem() (in mod-ule
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 14--15
+[]\T1/ptm/m/n/10 add_neighbor() (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 15--16
+[]\T1/ptm/m/n/10 add_reference_to_transaction() (in mod-ule
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 18--19
+[]\T1/ptm/m/n/10 add_signature() (bbc1.core.bbclib.BBcReference
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--20
+[]\T1/ptm/m/n/10 add_signature() (bbc1.core.bbclib.BBcTransaction
+ []
+
+
+Overfull \hbox (59.61009pt too wide) in paragraph at lines 23--24
+[]\T1/ptm/m/n/10 ADV_DOMAIN_LIST (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 24--25
+[]\T1/ptm/m/n/10 all_asset_files (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 27--28
+[]\T1/ptm/m/n/10 asset_file (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 30--31
+[]\T1/ptm/m/n/10 asset_id (bbc1.core.message_key_types.KeyType at-
+ []
+
+
+Overfull \hbox (7.46103pt too wide) in paragraph at lines 56--57
+[]\T1/ptm/m/n/10 bbc_configuration (bbc1.core.message_key_types.KeyType
+ []
+
+[51
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 73--75
+[]\T1/ptm/m/n/10 broadcast_message_in_network()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 73--75
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 79--80
+[]\T1/ptm/m/n/10 callback() (bbc1.core.query_management.QueryEntry
+ []
+
+
+Overfull \hbox (9.99057pt too wide) in paragraph at lines 80--81
+[]\T1/ptm/m/n/10 callback_error() (bbc1.core.query_management.QueryEntry
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 81--83
+[]\T1/ptm/m/n/10 cancel_insert_completion_notification()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 83--84
+[]\T1/ptm/m/n/10 CANCEL_INSERT_NOTIFICATION
+ []
+
+
+Overfull \hbox (72.61984pt too wide) in paragraph at lines 84--86
+[]\T1/ptm/m/n/10 CATEGORY_DATA (bbc1.core.message_key_types.InfraMessageCategor
+y
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 86--88
+[]\T1/ptm/m/n/10 CATEGORY_DOMAIN0
+ []
+
+
+Overfull \hbox (27.71057pt too wide) in paragraph at lines 86--88
+\T1/ptm/m/n/10 (bbc1.core.message_key_types.InfraMessageCategory
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 88--90
+[]\T1/ptm/m/n/10 CATEGORY_NETWORK
+ []
+
+
+Overfull \hbox (27.71057pt too wide) in paragraph at lines 88--90
+\T1/ptm/m/n/10 (bbc1.core.message_key_types.InfraMessageCategory
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 90--92
+[]\T1/ptm/m/n/10 CATEGORY_TOPOLOGY
+ []
+
+
+Overfull \hbox (27.71057pt too wide) in paragraph at lines 90--92
+\T1/ptm/m/n/10 (bbc1.core.message_key_types.InfraMessageCategory
+ []
+
+
+Overfull \hbox (72.84961pt too wide) in paragraph at lines 92--94
+[]\T1/ptm/m/n/10 CATEGORY_USER (bbc1.core.message_key_types.InfraMessageCategor
+y
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 94--95
+[]\T1/ptm/m/n/10 check_admin_signature()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 94--95
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Overfull \hbox (12.07051pt too wide) in paragraph at lines 95--96
+[]\T1/ptm/m/n/10 check_table_existence() (bbc1.core.data_handler.DbAdaptor
+ []
+
+
+Overfull \hbox (25.41022pt too wide) in paragraph at lines 96--97
+[]\T1/ptm/m/n/10 check_table_existence() (bbc1.core.data_handler.MysqlAdaptor
+ []
+
+
+Overfull \hbox (23.1901pt too wide) in paragraph at lines 97--98
+[]\T1/ptm/m/n/10 check_table_existence() (bbc1.core.data_handler.SqliteAdaptor
+ []
+
+
+Underfull \hbox (badness 6741) in paragraph at lines 99--100
+[]\T1/ptm/m/n/10 command (bbc1.core.message_key_types.KeyType at-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 100--101
+[]\T1/ptm/m/n/10 compromised_asset_files
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 100--101
+\T1/ptm/m/n/10 (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 101--103
+[]\T1/ptm/m/n/10 compromised_transaction_data
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 101--103
+\T1/ptm/m/n/10 (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--104
+[]\T1/ptm/m/n/10 compromised_transactions
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--104
+\T1/ptm/m/n/10 (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 104--105
+[]\T1/ptm/m/n/10 CONFIRM_KEY_EXCHANGE
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 104--105
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.BBcNetwork at-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--106
+[]\T1/ptm/m/n/10 convert_from_binary() (in mod-ule
+ []
+
+
+Overfull \hbox (59.1104pt too wide) in paragraph at lines 106--107
+[]\T1/ptm/m/n/10 convert_from_der() (bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp2
+56k1
+ []
+
+
+Overfull \hbox (63.56033pt too wide) in paragraph at lines 107--108
+[]\T1/ptm/m/n/10 convert_from_pem() (bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp2
+56k1
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--113
+[]\T1/ptm/m/n/10 count_domain_in_cross_ref()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 113--114
+[]\T1/ptm/m/n/10 create_domain() (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 115--116
+[]\T1/ptm/m/n/10 create_table() (bbc1.core.data_handler.DbAdaptor
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 116--117
+[]\T1/ptm/m/n/10 create_table() (bbc1.core.data_handler.MysqlAdaptor
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 117--118
+[]\T1/ptm/m/n/10 create_table() (bbc1.core.data_handler.SqliteAdaptor
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 118--119
+[]\T1/ptm/m/n/10 cross_ref (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 119--121
+[]\T1/ptm/m/n/10 CROSS_REF_ASSIGNMENT
+ []
+
+
+Overfull \hbox (33.13023pt too wide) in paragraph at lines 119--121
+\T1/ptm/m/n/10 (bbc1.core.user_message_routing.UserMessageRouting
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 121--123
+[]\T1/ptm/m/n/10 CROSS_REF_PROBABILITY
+ []
+
+
+Overfull \hbox (4.24107pt too wide) in paragraph at lines 121--123
+\T1/ptm/m/n/10 (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Overfull \hbox (53.73006pt too wide) in paragraph at lines 123--124
+[]\T1/ptm/m/n/10 cross_ref_registered() (bbc1.core.domain0_manager.Domain0Manag
+er
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 124--126
+[]\T1/ptm/m/n/10 cross_ref_verification_info
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 124--126
+\T1/ptm/m/n/10 (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 133--134
+[]\T1/ptm/m/n/10 deactivate() (bbc1.core.query_management.QueryEntry
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--135
+[]\T1/ptm/m/n/10 del_entry() (bbc1.core.query_management.Ticker
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 135--136
+[]\T1/ptm/m/n/10 derive_shared_key() (in mod-ule
+ []
+
+[52]
+Underfull \hbox (badness 10000) in paragraph at lines 146--147
+[]\T1/ptm/m/n/10 deserialize_bson() (bbc1.core.bbclib.BBcCrossRef
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 148--149
+[]\T1/ptm/m/n/10 deserialize_bson() (bbc1.core.bbclib.BBcPointer
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 149--150
+[]\T1/ptm/m/n/10 deserialize_bson() (bbc1.core.bbclib.BBcReference
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 150--151
+[]\T1/ptm/m/n/10 deserialize_bson() (bbc1.core.bbclib.BBcRelation
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 151--152
+[]\T1/ptm/m/n/10 deserialize_bson() (bbc1.core.bbclib.BBcSignature
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 152--153
+[]\T1/ptm/m/n/10 deserialize_bson() (bbc1.core.bbclib.BBcTransaction
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 153--154
+[]\T1/ptm/m/n/10 deserialize_bson() (bbc1.core.bbclib.BBcWitness
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 154--155
+[]\T1/ptm/m/n/10 deserialize_data() (in mod-ule
+ []
+
+
+Overfull \hbox (15.8007pt too wide) in paragraph at lines 155--156
+[]\T1/ptm/m/n/10 destination_node_id (bbc1.core.message_key_types.KeyType
+ []
+
+
+Overfull \hbox (13.02055pt too wide) in paragraph at lines 156--157
+[]\T1/ptm/m/n/10 destination_user_id (bbc1.core.message_key_types.KeyType
+ []
+
+
+Overfull \hbox (16.91045pt too wide) in paragraph at lines 157--158
+[]\T1/ptm/m/n/10 destination_user_ids (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 160--161
+[]\T1/ptm/m/n/10 direct_send_to_user() (in mod-ule
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 161--162
+[]\T1/ptm/m/n/10 direction (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 163--165
+[]\T1/ptm/m/n/10 DISTRIBUTE_CROSS_REF
+ []
+
+
+Overfull \hbox (4.24107pt too wide) in paragraph at lines 163--165
+\T1/ptm/m/n/10 (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 165--167
+[]\T1/ptm/m/n/10 distribute_cross_ref_in_domain0()
+ []
+
+
+Overfull \hbox (4.24107pt too wide) in paragraph at lines 165--167
+\T1/ptm/m/n/10 (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 167--168
+[]\T1/ptm/m/n/10 Domain0Manager (class in
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 168--170
+[]\T1/ptm/m/n/10 DOMAIN_ACCEPTANCE_RECOVER_INTERVAL
+ []
+
+
+Overfull \hbox (4.24107pt too wide) in paragraph at lines 168--170
+\T1/ptm/m/n/10 (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 170--171
+[]\T1/ptm/m/n/10 domain_close() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 172--174
+[]\T1/ptm/m/n/10 DOMAIN_INFO_ADVERTISE_INTERVAL
+ []
+
+
+Overfull \hbox (4.24107pt too wide) in paragraph at lines 172--174
+\T1/ptm/m/n/10 (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 174--176
+[]\T1/ptm/m/n/10 DOMAIN_INFO_LIFETIME
+ []
+
+
+Overfull \hbox (4.24107pt too wide) in paragraph at lines 174--176
+\T1/ptm/m/n/10 (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 179--180
+[]\T1/ptm/m/n/10 domain_setup() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 184--185
+[]\T1/ptm/m/n/10 ECDSA_SECP256k1 (bbc1.core.bbclib.KeyType at-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 185--186
+[]\T1/ptm/m/n/10 exchange_key() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 186--187
+[]\T1/ptm/m/n/10 exec_sql() (bbc1.core.data_handler.DataHandler
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 188--189
+[]\T1/ptm/m/n/10 exit_loop() (bbc1.core.repair_manager.RepairManager
+ []
+
+
+Overfull \hbox (2.30098pt too wide) in paragraph at lines 189--190
+[]\T1/ptm/m/n/10 external_ip4addr (bbc1.core.message_key_types.KeyType
+ []
+
+
+Overfull \hbox (2.30098pt too wide) in paragraph at lines 190--191
+[]\T1/ptm/m/n/10 external_ip6addr (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 7832) in paragraph at lines 194--195
+[]\T1/ptm/m/n/10 FORMAT_BINARY (bbc1.core.bbclib.BBcFormat at-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 195--196
+[]\T1/ptm/m/n/10 FORMAT_BSON (bbc1.core.bbclib.BBcFormat at-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--197
+[]\T1/ptm/m/n/10 FORMAT_BSON_COMPRESS_BZ2
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--197
+\T1/ptm/m/n/10 (bbc1.core.bbclib.BBcFormat at-tribute),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 201--202
+[]\T1/ptm/m/n/10 gather_signatures() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Overfull \hbox (56.07024pt too wide) in paragraph at lines 203--204
+[]\T1/ptm/m/n/10 generate_keypair() (bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp2
+56k1
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 205--206
+[]\T1/ptm/m/n/10 get_bbc_config() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+[53]
+Underfull \hbox (badness 10000) in paragraph at lines 208--209
+[]\T1/ptm/m/n/10 get_destinations() (bbc1.core.bbclib.BBcReference
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 209--210
+[]\T1/ptm/m/n/10 get_domain_config() (bbc1.core.bbc_config.BBcConfig
+ []
+
+
+Overfull \hbox (12.9008pt too wide) in paragraph at lines 210--211
+[]\T1/ptm/m/n/10 get_domain_keypair() (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 211--212
+[]\T1/ptm/m/n/10 get_domain_list() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 212--213
+[]\T1/ptm/m/n/10 get_domain_neighborlist()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 213--214
+[]\T1/ptm/m/n/10 get_ECDH_parameters() (in mod-ule
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 214--215
+[]\T1/ptm/m/n/10 get_entry() (bbc1.core.query_management.Ticker
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 217--218
+[]\T1/ptm/m/n/10 get_in_storage() (bbc1.core.data_handler.DataHandler
+ []
+
+
+Overfull \hbox (24.45024pt too wide) in paragraph at lines 218--219
+[]\T1/ptm/m/n/10 get_in_storage() (bbc1.core.data_handler.DataHandlerDomain0
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 219--220
+[]\T1/ptm/m/n/10 get_json_config() (bbc1.core.bbc_config.BBcConfig
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 224--225
+[]\T1/ptm/m/n/10 get_node_id() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 225--226
+[]\T1/ptm/m/n/10 get_nodeinfo() (bbc1.core.bbc_network.NodeInfo
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 227--228
+[]\T1/ptm/m/n/10 get_private_key_in_der() (bbc1.core.bbclib.KeyPair
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 228--229
+[]\T1/ptm/m/n/10 get_private_key_in_pem() (bbc1.core.bbclib.KeyPair
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 229--231
+[]\T1/ptm/m/n/10 get_public_key_compressed()
+ []
+
+
+Overfull \hbox (18.90085pt too wide) in paragraph at lines 229--231
+\T1/ptm/m/n/10 (bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 231--233
+[]\T1/ptm/m/n/10 get_public_key_uncompressed()
+ []
+
+
+Overfull \hbox (18.90085pt too wide) in paragraph at lines 231--233
+\T1/ptm/m/n/10 (bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 235--236
+[]\T1/ptm/m/n/10 get_referred_transaction()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 235--236
+\T1/ptm/m/n/10 (bbc1.core.bbclib.BBcReference method),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 236--237
+[]\T1/ptm/m/n/10 get_sig_index() (bbc1.core.bbclib.BBcTransaction
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 240--241
+[]\T1/ptm/m/n/10 get_user_list() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 251--253
+[]\T1/ptm/m/n/10 include_admin_info_into_message_if_needed()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 251--253
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 253--254
+[]\T1/ptm/m/n/10 include_cross_ref() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 256--257
+[]\T1/ptm/m/n/10 InfraMessageCategory (class in
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 257--259
+[]\T1/ptm/m/n/10 INITIAL_ACCEPT_LIMIT
+ []
+
+
+Overfull \hbox (4.24107pt too wide) in paragraph at lines 257--259
+\T1/ptm/m/n/10 (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 259--260
+[]\T1/ptm/m/n/10 insert_cross_ref() (bbc1.core.data_handler.DataHandler
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 260--261
+[]\T1/ptm/m/n/10 insert_transaction() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Overfull \hbox (1.12009pt too wide) in paragraph at lines 261--262
+[]\T1/ptm/m/n/10 insert_transaction() (bbc1.core.bbc_core.BBcCoreService
+ []
+
+
+Overfull \hbox (36.66982pt too wide) in paragraph at lines 263--264
+[]\T1/ptm/m/n/10 insert_transaction() (bbc1.core.data_handler.DataHandlerDomain
+0
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 268--269
+[]\T1/ptm/m/n/10 is_replication (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 272--274
+[]\T1/ptm/m/n/10 JOIN_MULTICAST_RECEIVER
+ []
+
+
+Overfull \hbox (33.13023pt too wide) in paragraph at lines 272--274
+\T1/ptm/m/n/10 (bbc1.core.user_message_routing.UserMessageRouting
+ []
+
+[54]
+Underfull \hbox (badness 10000) in paragraph at lines 279--281
+[]\T1/ptm/m/n/10 KEY_EXCHANGE_INVOKE_MAX_BACKOFF
+ []
+
+
+Overfull \hbox (44.51138pt too wide) in paragraph at lines 279--281
+\T1/ptm/m/n/10 (bbc1.core.key_exchange_manager.KeyExchangeManager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 281--283
+[]\T1/ptm/m/n/10 KEY_EXCHANGE_RETRY_INTERVAL
+ []
+
+
+Overfull \hbox (44.51138pt too wide) in paragraph at lines 281--283
+\T1/ptm/m/n/10 (bbc1.core.key_exchange_manager.KeyExchangeManager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 283--285
+[]\T1/ptm/m/n/10 KEY_OBSOLETE_TIMER
+ []
+
+
+Overfull \hbox (44.51138pt too wide) in paragraph at lines 283--285
+\T1/ptm/m/n/10 (bbc1.core.key_exchange_manager.KeyExchangeManager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 285--287
+[]\T1/ptm/m/n/10 KEY_REFRESH_INTERVAL
+ []
+
+
+Overfull \hbox (44.51138pt too wide) in paragraph at lines 285--287
+\T1/ptm/m/n/10 (bbc1.core.key_exchange_manager.KeyExchangeManager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 287--288
+[]\T1/ptm/m/n/10 KeyExchangeManager (class in
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 294--296
+[]\T1/ptm/m/n/10 LEAVE_MULTICAST_RECEIVER
+ []
+
+
+Overfull \hbox (33.13023pt too wide) in paragraph at lines 294--296
+\T1/ptm/m/n/10 (bbc1.core.user_message_routing.UserMessageRouting
+ []
+
+
+Overfull \hbox (21.35066pt too wide) in paragraph at lines 296--297
+[]\T1/ptm/m/n/10 ledger_subsys_manip (bbc1.core.message_key_types.KeyType
+ []
+
+
+Overfull \hbox (26.1905pt too wide) in paragraph at lines 297--298
+[]\T1/ptm/m/n/10 ledger_subsys_register (bbc1.core.message_key_types.KeyType
+ []
+
+
+Overfull \hbox (20.08078pt too wide) in paragraph at lines 298--299
+[]\T1/ptm/m/n/10 ledger_subsys_verify (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 302--303
+[]\T1/ptm/m/n/10 make_binary() (in mod-ule
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 303--305
+[]\T1/ptm/m/n/10 make_dictionary_from_TLV_format() (in mod-ule
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 305--306
+[]\T1/ptm/m/n/10 make_message() (in mod-ule
+ []
+
+
+Overfull \hbox (73.01015pt too wide) in paragraph at lines 306--308
+[]\T1/ptm/m/n/10 make_neighbor_list() (bbc1.core.topology_manager.TopologyManag
+erBase
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 308--309
+[]\T1/ptm/m/n/10 make_TLV_formatted_message() (in mod-ule
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 310--311
+[]\T1/ptm/m/n/10 manipulate_ledger_subsystem()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 311--313
+[]\T1/ptm/m/n/10 MAX_CROSS_REF_STOCK
+ []
+
+
+Overfull \hbox (33.13023pt too wide) in paragraph at lines 311--313
+\T1/ptm/m/n/10 (bbc1.core.user_message_routing.UserMessageRouting
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 315--316
+[]\T1/ptm/m/n/10 message (bbc1.core.message_key_types.KeyType at-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 318--319
+[]\T1/ptm/m/n/10 mk_keyobj_from_private_key()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 319--320
+[]\T1/ptm/m/n/10 mk_keyobj_from_private_key_der()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 320--321
+[]\T1/ptm/m/n/10 mk_keyobj_from_private_key_pem()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 327--329
+[]\T1/ptm/m/n/10 NEIGHBOR_LIST_REFRESH_INTERVAL
+ []
+
+
+Overfull \hbox (25.11107pt too wide) in paragraph at lines 327--329
+\T1/ptm/m/n/10 (bbc1.core.topology_manager.TopologyManagerBase
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 330--331
+[]\T1/ptm/m/n/10 node_id (bbc1.core.message_key_types.KeyType at-
+ []
+
+
+Underfull \hbox (badness 5064) in paragraph at lines 331--332
+[]\T1/ptm/m/n/10 node_info (bbc1.core.message_key_types.KeyType at-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 333--334
+[]\T1/ptm/m/n/10 NODEINFO_LIFETIME
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 333--334
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.NeighborInfo at-
+ []
+
+
+Overfull \hbox (9.98103pt too wide) in paragraph at lines 334--335
+[]\T1/ptm/m/n/10 nodekey_signature (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 338--340
+[]\T1/ptm/m/n/10 NOTIFY_CROSS_REF_REGISTERED
+ []
+
+
+Overfull \hbox (4.24107pt too wide) in paragraph at lines 338--340
+\T1/ptm/m/n/10 (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 340--341
+[]\T1/ptm/m/n/10 NOTIFY_DOMAIN_KEY_UPDATE
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 341--342
+[]\T1/ptm/m/n/10 notify_domain_key_update()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 342--343
+[]\T1/ptm/m/n/10 NOTIFY_INSERTED (bbc1.core.bbclib.MsgType
+ []
+
+
+Overfull \hbox (10.68028pt too wide) in paragraph at lines 343--344
+[]\T1/ptm/m/n/10 NOTIFY_INSERTED (bbc1.core.data_handler.DataHandler
+ []
+
+[55]
+Underfull \hbox (badness 10000) in paragraph at lines 345--347
+[]\T1/ptm/m/n/10 NOTIFY_NEIGHBOR_LIST
+ []
+
+
+Overfull \hbox (25.11107pt too wide) in paragraph at lines 345--347
+\T1/ptm/m/n/10 (bbc1.core.topology_manager.TopologyManagerBase
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 347--349
+[]\T1/ptm/m/n/10 notify_neighbor_update()
+ []
+
+
+Overfull \hbox (25.11107pt too wide) in paragraph at lines 347--349
+\T1/ptm/m/n/10 (bbc1.core.topology_manager.TopologyManagerBase
+ []
+
+
+Overfull \hbox (46.69995pt too wide) in paragraph at lines 349--350
+[]\T1/ptm/m/n/10 NUM_OF_COPIES (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 355--356
+[]\T1/ptm/m/n/10 open_db() (bbc1.core.data_handler.MysqlAdaptor
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 356--357
+[]\T1/ptm/m/n/10 open_db() (bbc1.core.data_handler.SqliteAdaptor
+ []
+
+
+Overfull \hbox (3.02094pt too wide) in paragraph at lines 357--358
+[]\T1/ptm/m/n/10 outer_domain_id (bbc1.core.message_key_types.KeyType
+ []
+
+
+Overfull \hbox (30.79047pt too wide) in paragraph at lines 358--359
+[]\T1/ptm/m/n/10 output_der() (bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1
+ []
+
+
+Overfull \hbox (35.2404pt too wide) in paragraph at lines 359--360
+[]\T1/ptm/m/n/10 output_pem() (bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 367--368
+[]\T1/ptm/m/n/10 prepare_reference() (bbc1.core.bbclib.BBcReference
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 368--369
+[]\T1/ptm/m/n/10 proc_cmd_sign_request() (bbc1.core.bbc_app.Callback
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 369--370
+[]\T1/ptm/m/n/10 proc_notify_cross_ref() (bbc1.core.bbc_app.Callback
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 370--371
+[]\T1/ptm/m/n/10 proc_notify_inserted() (bbc1.core.bbc_app.Callback
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 374--375
+[]\T1/ptm/m/n/10 proc_resp_ecdh_key_exchange()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 375--376
+[]\T1/ptm/m/n/10 proc_resp_gather_signature()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 376--377
+[]\T1/ptm/m/n/10 proc_resp_get_config() (bbc1.core.bbc_app.Callback
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 378--379
+[]\T1/ptm/m/n/10 proc_resp_get_forwardinglist()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 379--380
+[]\T1/ptm/m/n/10 proc_resp_get_neighborlist()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 380--381
+[]\T1/ptm/m/n/10 proc_resp_get_node_id() (bbc1.core.bbc_app.Callback
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 381--382
+[]\T1/ptm/m/n/10 proc_resp_get_notificationlist()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 382--383
+[]\T1/ptm/m/n/10 proc_resp_get_stats() (bbc1.core.bbc_app.Callback
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 383--384
+[]\T1/ptm/m/n/10 proc_resp_get_userlist() (bbc1.core.bbc_app.Callback
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 385--386
+[]\T1/ptm/m/n/10 proc_resp_ledger_subsystem()
+ []
+
+
+Underfull \hbox (badness 7081) in paragraph at lines 386--387
+[]\T1/ptm/m/n/10 proc_resp_register_hash() (bbc1.core.bbc_app.Callback
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 387--388
+[]\T1/ptm/m/n/10 proc_resp_search_transaction()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 388--389
+[]\T1/ptm/m/n/10 proc_resp_search_with_condition()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 389--390
+[]\T1/ptm/m/n/10 proc_resp_set_neighbor() (bbc1.core.bbc_app.Callback
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 390--391
+[]\T1/ptm/m/n/10 proc_resp_sign_request() (bbc1.core.bbc_app.Callback
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 391--392
+[]\T1/ptm/m/n/10 proc_resp_traverse_transactions()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 392--393
+[]\T1/ptm/m/n/10 proc_resp_verify_cross_ref()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 393--394
+[]\T1/ptm/m/n/10 proc_resp_verify_hash() (bbc1.core.bbc_app.Callback
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 394--395
+[]\T1/ptm/m/n/10 proc_user_message() (bbc1.core.bbc_app.Callback
+ []
+
+
+Overfull \hbox (34.44002pt too wide) in paragraph at lines 396--397
+[]\T1/ptm/m/n/10 process_message() (bbc1.core.data_handler.DataHandlerDomain0
+ []
+
+
+Overfull \hbox (41.67014pt too wide) in paragraph at lines 397--398
+[]\T1/ptm/m/n/10 process_message() (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Overfull \hbox (62.54013pt too wide) in paragraph at lines 398--399
+[]\T1/ptm/m/n/10 process_message() (bbc1.core.topology_manager.TopologyManagerB
+ase
+ []
+
+
+Overfull \hbox (70.5593pt too wide) in paragraph at lines 399--401
+[]\T1/ptm/m/n/10 process_message() (bbc1.core.user_message_routing.UserMessageR
+outing
+ []
+
+
+Overfull \hbox (103.33905pt too wide) in paragraph at lines 401--403
+[]\T1/ptm/m/n/10 process_message() (bbc1.core.user_message_routing.UserMessageR
+outingDummy
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 404--405
+[]\T1/ptm/m/n/10 PURGE_INTERVAL_SEC
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 404--405
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.NeighborInfo at-
+ []
+
+
+Overfull \hbox (2.22032pt too wide) in paragraph at lines 405--406
+[]\T1/ptm/m/n/10 put_message() (bbc1.core.repair_manager.RepairManager
+ []
+
+[56]
+Underfull \hbox (badness 10000) in paragraph at lines 406--407
+[]\T1/ptm/m/n/10 PyBBcSigSecp256k1 (class in
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 410--411
+[]\T1/ptm/m/n/10 query_id (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 412--413
+[]\T1/ptm/m/n/10 quit_program() (bbc1.core.bbc_core.BBcCoreService
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 416--417
+[]\T1/ptm/m/n/10 random (bbc1.core.message_key_types.KeyType at-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 417--418
+[]\T1/ptm/m/n/10 read_config() (bbc1.core.bbc_config.BBcConfig
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 418--419
+[]\T1/ptm/m/n/10 reason (bbc1.core.message_key_types.KeyType at-
+ []
+
+
+Overfull \hbox (97.65048pt too wide) in paragraph at lines 419--421
+[]\T1/ptm/m/n/10 receive_confirmation() (bbc1.core.key_exchange_manager.KeyExch
+angeManager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 421--423
+[]\T1/ptm/m/n/10 receive_exchange_request()
+ []
+
+
+Overfull \hbox (44.51138pt too wide) in paragraph at lines 421--423
+\T1/ptm/m/n/10 (bbc1.core.key_exchange_manager.KeyExchangeManager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 423--425
+[]\T1/ptm/m/n/10 receive_exchange_response()
+ []
+
+
+Overfull \hbox (44.51138pt too wide) in paragraph at lines 423--425
+\T1/ptm/m/n/10 (bbc1.core.key_exchange_manager.KeyExchangeManager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 425--426
+[]\T1/ptm/m/n/10 receiver_loop() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 426--427
+[]\T1/ptm/m/n/10 recover_asset_file() (bbc1.core.bbclib.BBcAsset
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 429--430
+[]\T1/ptm/m/n/10 ref_index (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 430--432
+[]\T1/ptm/m/n/10 REFRESH_FORWARDING_LIST_INTERVAL
+ []
+
+
+Overfull \hbox (33.13023pt too wide) in paragraph at lines 430--432
+\T1/ptm/m/n/10 (bbc1.core.user_message_routing.UserMessageRouting
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--434
+[]\T1/ptm/m/n/10 register_in_ledger_subsystem()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 434--435
+[]\T1/ptm/m/n/10 register_to_core() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Overfull \hbox (53.18953pt too wide) in paragraph at lines 435--437
+[]\T1/ptm/m/n/10 register_user() (bbc1.core.user_message_routing.UserMessageRou
+ting
+ []
+
+
+Overfull \hbox (85.96928pt too wide) in paragraph at lines 437--439
+[]\T1/ptm/m/n/10 register_user() (bbc1.core.user_message_routing.UserMessageRou
+tingDummy
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 439--440
+[]\T1/ptm/m/n/10 remove() (bbc1.core.bbc_network.NeighborInfo
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 443--444
+[]\T1/ptm/m/n/10 remove_domain_config()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 444--446
+[]\T1/ptm/m/n/10 remove_from_notification_list()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 446--447
+[]\T1/ptm/m/n/10 remove_old_key() (in mod-ule
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 447--448
+[]\T1/ptm/m/n/10 remove_stat_category() (bbc1.core.bbc_stats.BBcStats
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 448--449
+[]\T1/ptm/m/n/10 remove_stat_item() (bbc1.core.bbc_stats.BBcStats
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 449--450
+[]\T1/ptm/m/n/10 REPAIR_TRANSACTION_DATA
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 449--450
+\T1/ptm/m/n/10 (bbc1.core.data_handler.DataHandler at-
+ []
+
+
+Overfull \hbox (10.57019pt too wide) in paragraph at lines 451--452
+[]\T1/ptm/m/n/10 REPLICATION_ALL (bbc1.core.data_handler.DataHandler
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 452--453
+[]\T1/ptm/m/n/10 REPLICATION_CROSS_REF
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 452--453
+\T1/ptm/m/n/10 (bbc1.core.data_handler.DataHandler at-
+ []
+
+
+Overfull \hbox (10.57019pt too wide) in paragraph at lines 453--454
+[]\T1/ptm/m/n/10 REPLICATION_EXT (bbc1.core.data_handler.DataHandler
+ []
+
+
+Overfull \hbox (7.25012pt too wide) in paragraph at lines 454--455
+[]\T1/ptm/m/n/10 REPLICATION_P2P (bbc1.core.data_handler.DataHandler
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 455--456
+[]\T1/ptm/m/n/10 REQUEST_CLOSE_DOMAIN
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 456--458
+[]\T1/ptm/m/n/10 request_cross_ref_holders_list()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 458--459
+[]\T1/ptm/m/n/10 REQUEST_CROSS_REF_LIST
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 459--460
+[]\T1/ptm/m/n/10 REQUEST_CROSS_REF_VERIFY
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 460--461
+[]\T1/ptm/m/n/10 REQUEST_ECDH_KEY_EXCHANGE
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 461--462
+[]\T1/ptm/m/n/10 REQUEST_GATHER_SIGNATURE
+ []
+
+
+Underfull \hbox (badness 7099) in paragraph at lines 462--463
+[]\T1/ptm/m/n/10 REQUEST_GET_CONFIG (bbc1.core.bbclib.MsgType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 463--464
+[]\T1/ptm/m/n/10 REQUEST_GET_DOMAINLIST
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 464--465
+[]\T1/ptm/m/n/10 REQUEST_GET_FORWARDING_LIST
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 465--466
+[]\T1/ptm/m/n/10 REQUEST_GET_NEIGHBORLIST
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 467--468
+[]\T1/ptm/m/n/10 REQUEST_GET_NOTIFICATION_LIST
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 470--471
+[]\T1/ptm/m/n/10 REQUEST_INSERT (bbc1.core.bbclib.MsgType at-
+ []
+
+[57]
+Underfull \hbox (badness 10000) in paragraph at lines 471--473
+[]\T1/ptm/m/n/10 request_insert_completion_notification()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 473--474
+[]\T1/ptm/m/n/10 REQUEST_INSERT_NOTIFICATION
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 474--475
+[]\T1/ptm/m/n/10 REQUEST_KEY_EXCHANGE
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 474--475
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.BBcNetwork at-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 475--476
+[]\T1/ptm/m/n/10 REQUEST_MANIP_LEDGER_SUBSYS
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 476--477
+[]\T1/ptm/m/n/10 REQUEST_REGISTER_HASH_IN_SUBSYS
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 477--478
+[]\T1/ptm/m/n/10 REQUEST_REPAIR (bbc1.core.bbclib.MsgType at-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 478--480
+[]\T1/ptm/m/n/10 REQUEST_REPAIR_ASSET_FILE
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 478--480
+\T1/ptm/m/n/10 (bbc1.core.repair_manager.RepairManager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 480--482
+[]\T1/ptm/m/n/10 REQUEST_REPAIR_TRANSACTION
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 480--482
+\T1/ptm/m/n/10 (bbc1.core.repair_manager.RepairManager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 482--484
+[]\T1/ptm/m/n/10 REQUEST_REPLICATION_INSERT
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 482--484
+\T1/ptm/m/n/10 (bbc1.core.data_handler.DataHandler at-
+ []
+
+
+Overfull \hbox (11.04016pt too wide) in paragraph at lines 484--485
+[]\T1/ptm/m/n/10 REQUEST_SEARCH (bbc1.core.data_handler.DataHandler
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 485--486
+[]\T1/ptm/m/n/10 REQUEST_SEARCH_TRANSACTION
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 486--487
+[]\T1/ptm/m/n/10 REQUEST_SEARCH_WITH_CONDITIONS
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 487--488
+[]\T1/ptm/m/n/10 REQUEST_SET_STATIC_NODE
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 488--489
+[]\T1/ptm/m/n/10 REQUEST_SETUP_DOMAIN
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 490--491
+[]\T1/ptm/m/n/10 request_to_repair_asset()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 491--492
+[]\T1/ptm/m/n/10 request_to_repair_transaction()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 492--494
+[]\T1/ptm/m/n/10 REQUEST_TO_SEND_ASSET_FILE
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 492--494
+\T1/ptm/m/n/10 (bbc1.core.repair_manager.RepairManager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 494--496
+[]\T1/ptm/m/n/10 REQUEST_TO_SEND_TRANSACTION_DATA
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 494--496
+\T1/ptm/m/n/10 (bbc1.core.repair_manager.RepairManager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 496--497
+[]\T1/ptm/m/n/10 REQUEST_TRAVERSE_TRANSACTIONS
+ []
+
+
+Overfull \hbox (52.15001pt too wide) in paragraph at lines 497--498
+[]\T1/ptm/m/n/10 REQUEST_VERIFY (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 498--499
+[]\T1/ptm/m/n/10 request_verify_by_cross_ref()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 499--501
+[]\T1/ptm/m/n/10 REQUEST_VERIFY_FROM_OUTER_DOMAIN
+ []
+
+
+Overfull \hbox (4.24107pt too wide) in paragraph at lines 499--501
+\T1/ptm/m/n/10 (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 501--502
+[]\T1/ptm/m/n/10 REQUEST_VERIFY_HASH_IN_SUBSYS
+ []
+
+
+Overfull \hbox (89.01915pt too wide) in paragraph at lines 503--505
+[]\T1/ptm/m/n/10 RESOLVE_TIMEOUT (bbc1.core.user_message_routing.UserMessageRou
+ting
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 505--507
+[]\T1/ptm/m/n/10 RESOLVE_USER_LOCATION
+ []
+
+
+Overfull \hbox (33.13023pt too wide) in paragraph at lines 505--507
+\T1/ptm/m/n/10 (bbc1.core.user_message_routing.UserMessageRouting
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 507--508
+[]\T1/ptm/m/n/10 RESPONSE_ASSET_FILE
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 507--508
+\T1/ptm/m/n/10 (bbc1.core.repair_manager.RepairManager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 508--509
+[]\T1/ptm/m/n/10 RESPONSE_CLOSE_DOMAIN
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 509--510
+[]\T1/ptm/m/n/10 RESPONSE_CROSS_REF_LIST
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 510--511
+[]\T1/ptm/m/n/10 RESPONSE_CROSS_REF_VERIFY
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 511--512
+[]\T1/ptm/m/n/10 RESPONSE_ECDH_KEY_EXCHANGE
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 512--513
+[]\T1/ptm/m/n/10 RESPONSE_GATHER_SIGNATURE
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 514--515
+[]\T1/ptm/m/n/10 RESPONSE_GET_DOMAINLIST
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 515--516
+[]\T1/ptm/m/n/10 RESPONSE_GET_FORWARDING_LIST
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 516--517
+[]\T1/ptm/m/n/10 RESPONSE_GET_NEIGHBORLIST
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 518--519
+[]\T1/ptm/m/n/10 RESPONSE_GET_NOTIFICATION_LIST
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 519--520
+[]\T1/ptm/m/n/10 RESPONSE_GET_STATS (bbc1.core.bbclib.MsgType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 520--521
+[]\T1/ptm/m/n/10 RESPONSE_GET_USERS (bbc1.core.bbclib.MsgType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 521--522
+[]\T1/ptm/m/n/10 RESPONSE_INSERT (bbc1.core.bbclib.MsgType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 522--523
+[]\T1/ptm/m/n/10 RESPONSE_KEY_EXCHANGE
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 522--523
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.BBcNetwork at-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 523--524
+[]\T1/ptm/m/n/10 RESPONSE_MANIP_LEDGER_SUBSYS
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 524--526
+[]\T1/ptm/m/n/10 RESPONSE_NO_SUCH_USER
+ []
+
+
+Overfull \hbox (33.13023pt too wide) in paragraph at lines 524--526
+\T1/ptm/m/n/10 (bbc1.core.user_message_routing.UserMessageRouting
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 526--527
+[]\T1/ptm/m/n/10 RESPONSE_REGISTER_HASH_IN_SUBSYS
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 527--529
+[]\T1/ptm/m/n/10 RESPONSE_REPLICATION_INSERT
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 527--529
+\T1/ptm/m/n/10 (bbc1.core.data_handler.DataHandler at-
+ []
+
+
+Overfull \hbox (16.15004pt too wide) in paragraph at lines 529--530
+[]\T1/ptm/m/n/10 RESPONSE_SEARCH (bbc1.core.data_handler.DataHandler
+ []
+
+[58]
+Underfull \hbox (badness 10000) in paragraph at lines 530--531
+[]\T1/ptm/m/n/10 RESPONSE_SEARCH_TRANSACTION
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 531--532
+[]\T1/ptm/m/n/10 RESPONSE_SEARCH_WITH_CONDITIONS
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 532--533
+[]\T1/ptm/m/n/10 RESPONSE_SET_STATIC_NODE
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 533--534
+[]\T1/ptm/m/n/10 RESPONSE_SETUP_DOMAIN
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 534--535
+[]\T1/ptm/m/n/10 RESPONSE_SIGNATURE (bbc1.core.bbclib.MsgType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 535--537
+[]\T1/ptm/m/n/10 RESPONSE_TRANSACTION_DATA
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 535--537
+\T1/ptm/m/n/10 (bbc1.core.repair_manager.RepairManager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 537--538
+[]\T1/ptm/m/n/10 RESPONSE_TRAVERSE_TRANSACTIONS
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 538--540
+[]\T1/ptm/m/n/10 RESPONSE_USER_LOCATION
+ []
+
+
+Overfull \hbox (33.13023pt too wide) in paragraph at lines 538--540
+\T1/ptm/m/n/10 (bbc1.core.user_message_routing.UserMessageRouting
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 540--542
+[]\T1/ptm/m/n/10 RESPONSE_VERIFY_FROM_OUTER_DOMAIN
+ []
+
+
+Overfull \hbox (4.24107pt too wide) in paragraph at lines 540--542
+\T1/ptm/m/n/10 (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 542--543
+[]\T1/ptm/m/n/10 RESPONSE_VERIFY_HASH_IN_SUBSYS
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 543--544
+[]\T1/ptm/m/n/10 restore_transaction_data()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 549--550
+[]\T1/ptm/m/n/10 save_all_static_node_list()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 549--550
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 550--552
+[]\T1/ptm/m/n/10 search_domain_having_cross_ref()
+ []
+
+
+Overfull \hbox (2.77022pt too wide) in paragraph at lines 553--554
+[]\T1/ptm/m/n/10 search_transaction() (bbc1.core.data_handler.DataHandler
+ []
+
+
+Overfull \hbox (39.98991pt too wide) in paragraph at lines 554--555
+[]\T1/ptm/m/n/10 search_transaction() (bbc1.core.data_handler.DataHandlerDomain
+0
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 555--557
+[]\T1/ptm/m/n/10 search_transaction_topology()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 557--559
+[]\T1/ptm/m/n/10 search_transaction_topology()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 557--559
+\T1/ptm/m/n/10 (bbc1.core.data_handler.DataHandlerDomain0
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 559--561
+[]\T1/ptm/m/n/10 search_transaction_with_condition()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 561--563
+[]\T1/ptm/m/n/10 search_transaction_with_condition()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 563--564
+[]\T1/ptm/m/n/10 SECURITY_STATE_CONFIRMING
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 563--564
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.NodeInfo at-tribute),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 564--565
+[]\T1/ptm/m/n/10 SECURITY_STATE_ESTABLISHED
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 564--565
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.NodeInfo at-tribute),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 565--566
+[]\T1/ptm/m/n/10 SECURITY_STATE_NONE
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 565--566
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.NodeInfo at-tribute),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 566--567
+[]\T1/ptm/m/n/10 SECURITY_STATE_REQUESTING
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 566--567
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.NodeInfo at-tribute),
+ []
+
+
+Overfull \hbox (7.05086pt too wide) in paragraph at lines 568--569
+[]\T1/ptm/m/n/10 send_domain_ping() (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 569--570
+[]\T1/ptm/m/n/10 send_inserted_notification()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 570--571
+[]\T1/ptm/m/n/10 send_key_exchange_message()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 570--571
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 571--572
+[]\T1/ptm/m/n/10 send_message() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 572--573
+[]\T1/ptm/m/n/10 send_message_in_network()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 572--573
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 573--575
+[]\T1/ptm/m/n/10 send_message_to_a_domain0_manager()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 573--575
+\T1/ptm/m/n/10 (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Overfull \hbox (93.33919pt too wide) in paragraph at lines 575--577
+[]\T1/ptm/m/n/10 send_message_to_user() (bbc1.core.user_message_routing.UserMes
+sageRouting
+ []
+
+
+Overfull \hbox (126.11894pt too wide) in paragraph at lines 577--579
+[]\T1/ptm/m/n/10 send_message_to_user() (bbc1.core.user_message_routing.UserMes
+sageRoutingDummy
+ []
+
+
+Overfull \hbox (82.24902pt too wide) in paragraph at lines 579--581
+[]\T1/ptm/m/n/10 send_multicast_join() (bbc1.core.user_message_routing.UserMess
+ageRouting
+ []
+
+
+Overfull \hbox (115.02878pt too wide) in paragraph at lines 581--583
+[]\T1/ptm/m/n/10 send_multicast_join() (bbc1.core.user_message_routing.UserMess
+ageRoutingDummy
+ []
+
+
+Overfull \hbox (87.4391pt too wide) in paragraph at lines 583--585
+[]\T1/ptm/m/n/10 send_multicast_leave() (bbc1.core.user_message_routing.UserMes
+sageRouting
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 585--586
+[]\T1/ptm/m/n/10 sendback_denial_of_sign()
+ []
+
+[59]
+Underfull \hbox (badness 10000) in paragraph at lines 597--598
+[]\T1/ptm/m/n/10 serialize_bson() (bbc1.core.bbclib.BBcCrossRef
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 600--601
+[]\T1/ptm/m/n/10 serialize_bson() (bbc1.core.bbclib.BBcReference
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 602--603
+[]\T1/ptm/m/n/10 serialize_bson() (bbc1.core.bbclib.BBcSignature
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 603--604
+[]\T1/ptm/m/n/10 serialize_bson() (bbc1.core.bbclib.BBcTransaction
+ []
+
+
+Overfull \hbox (57.22945pt too wide) in paragraph at lines 605--607
+[]\T1/ptm/m/n/10 set_aes_name() (bbc1.core.user_message_routing.UserMessageRout
+ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 607--608
+[]\T1/ptm/m/n/10 set_callback() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Overfull \hbox (54.17078pt too wide) in paragraph at lines 608--609
+[]\T1/ptm/m/n/10 set_cipher() (bbc1.core.key_exchange_manager.KeyExchangeManage
+r
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 611--612
+[]\T1/ptm/m/n/10 set_domain_id() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 612--613
+[]\T1/ptm/m/n/10 set_domain_static_node()
+ []
+
+
+Overfull \hbox (81.8106pt too wide) in paragraph at lines 614--616
+[]\T1/ptm/m/n/10 set_invoke_timer() (bbc1.core.key_exchange_manager.KeyExchange
+Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 616--617
+[]\T1/ptm/m/n/10 set_keypair() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 618--619
+[]\T1/ptm/m/n/10 set_node_key() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 619--620
+[]\T1/ptm/m/n/10 set_user_id() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Overfull \hbox (2.50081pt too wide) in paragraph at lines 621--622
+[]\T1/ptm/m/n/10 setup_udp_socket() (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 622--623
+[]\T1/ptm/m/n/10 show_list() (bbc1.core.bbc_network.NeighborInfo
+ []
+
+
+Overfull \hbox (4.13057pt too wide) in paragraph at lines 625--626
+[]\T1/ptm/m/n/10 sign() (bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 626--627
+[]\T1/ptm/m/n/10 signature (bbc1.core.message_key_types.KeyType
+ []
+
+
+Overfull \hbox (8.57088pt too wide) in paragraph at lines 627--628
+[]\T1/ptm/m/n/10 source_domain_id (bbc1.core.message_key_types.KeyType
+ []
+
+
+Overfull \hbox (103.81021pt too wide) in paragraph at lines 632--634
+[]\T1/ptm/m/n/10 STATE_CONFIRMING (bbc1.core.key_exchange_manager.KeyExchangeMa
+nager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 634--636
+[]\T1/ptm/m/n/10 STATE_ESTABLISHED
+ []
+
+
+Overfull \hbox (44.51138pt too wide) in paragraph at lines 634--636
+\T1/ptm/m/n/10 (bbc1.core.key_exchange_manager.KeyExchangeManager
+ []
+
+
+Overfull \hbox (68.25064pt too wide) in paragraph at lines 636--637
+[]\T1/ptm/m/n/10 STATE_NONE (bbc1.core.key_exchange_manager.KeyExchangeManager
+ []
+
+
+Overfull \hbox (103.1504pt too wide) in paragraph at lines 637--639
+[]\T1/ptm/m/n/10 STATE_REQUESTING (bbc1.core.key_exchange_manager.KeyExchangeMa
+nager
+ []
+
+
+Overfull \hbox (34.46999pt too wide) in paragraph at lines 642--643
+[]\T1/ptm/m/n/10 stop_all_timers() (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Overfull \hbox (74.7403pt too wide) in paragraph at lines 643--645
+[]\T1/ptm/m/n/10 stop_all_timers() (bbc1.core.key_exchange_manager.KeyExchangeM
+anager
+ []
+
+
+Overfull \hbox (55.33998pt too wide) in paragraph at lines 645--647
+[]\T1/ptm/m/n/10 stop_all_timers() (bbc1.core.topology_manager.TopologyManagerB
+ase
+ []
+
+
+Overfull \hbox (63.35915pt too wide) in paragraph at lines 647--649
+[]\T1/ptm/m/n/10 stop_all_timers() (bbc1.core.user_message_routing.UserMessageR
+outing
+ []
+
+
+Overfull \hbox (96.1389pt too wide) in paragraph at lines 649--651
+[]\T1/ptm/m/n/10 stop_all_timers() (bbc1.core.user_message_routing.UserMessageR
+outingDummy
+ []
+
+
+Overfull \hbox (31.67009pt too wide) in paragraph at lines 652--653
+[]\T1/ptm/m/n/10 store_in_storage() (bbc1.core.data_handler.DataHandlerDomain0
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 654--655
+[]\T1/ptm/m/n/10 sync_by_queryid() (bbc1.core.bbc_app.Callback
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 659--660
+[]\T1/ptm/m/n/10 tcpserver_loop() (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 670--671
+[]\T1/ptm/m/n/10 TopologyManagerBase (class in
+ []
+
+[60]
+Overfull \hbox (31.89029pt too wide) in paragraph at lines 673--674
+[]\T1/ptm/m/n/10 transaction_data_format (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 674--675
+[]\T1/ptm/m/n/10 transaction_id (bbc1.core.message_key_types.KeyType
+ []
+
+
+Overfull \hbox (8.58034pt too wide) in paragraph at lines 675--676
+[]\T1/ptm/m/n/10 transaction_id_list (bbc1.core.message_key_types.KeyType
+ []
+
+
+Overfull \hbox (3.56026pt too wide) in paragraph at lines 678--679
+[]\T1/ptm/m/n/10 traverse_transactions() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Overfull \hbox (23.92073pt too wide) in paragraph at lines 679--680
+[]\T1/ptm/m/n/10 txid_having_cross_ref (bbc1.core.message_key_types.KeyType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 680--681
+[]\T1/ptm/m/n/10 Type_any (bbc1.core.message_key_types.PayloadType
+ []
+
+
+Overfull \hbox (0.8011pt too wide) in paragraph at lines 681--682
+[]\T1/ptm/m/n/10 Type_binary (bbc1.core.message_key_types.PayloadType
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 682--684
+[]\T1/ptm/m/n/10 Type_encrypted_msgpack
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 682--684
+\T1/ptm/m/n/10 (bbc1.core.message_key_types.PayloadType
+ []
+
+
+Overfull \hbox (10.80098pt too wide) in paragraph at lines 684--685
+[]\T1/ptm/m/n/10 Type_msgpack (bbc1.core.message_key_types.PayloadType
+ []
+
+
+Overfull \hbox (7.6008pt too wide) in paragraph at lines 688--689
+[]\T1/ptm/m/n/10 udp_message_loop() (bbc1.core.bbc_network.BBcNetwork
+ []
+
+
+Overfull \hbox (5.98056pt too wide) in paragraph at lines 690--691
+[]\T1/ptm/m/n/10 unregister_from_core() (bbc1.core.bbc_app.BBcAppClient
+ []
+
+
+Overfull \hbox (63.18953pt too wide) in paragraph at lines 691--693
+[]\T1/ptm/m/n/10 unregister_user() (bbc1.core.user_message_routing.UserMessageR
+outing
+ []
+
+
+Overfull \hbox (95.96928pt too wide) in paragraph at lines 693--695
+[]\T1/ptm/m/n/10 unregister_user() (bbc1.core.user_message_routing.UserMessageR
+outingDummy
+ []
+
+
+Overfull \hbox (64.17078pt too wide) in paragraph at lines 695--697
+[]\T1/ptm/m/n/10 unset_cipher() (bbc1.core.key_exchange_manager.KeyExchangeMana
+ger
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 697--698
+[]\T1/ptm/m/n/10 unset_cipher() (in mod-ule
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 699--700
+[]\T1/ptm/m/n/10 update() (bbc1.core.query_management.QueryEntry
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 700--701
+[]\T1/ptm/m/n/10 update_config() (bbc1.core.bbc_config.BBcConfig
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 702--704
+[]\T1/ptm/m/n/10 update_domain_belong_to()
+ []
+
+
+Overfull \hbox (4.24107pt too wide) in paragraph at lines 702--704
+\T1/ptm/m/n/10 (bbc1.core.domain0_manager.Domain0Manager
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 704--705
+[]\T1/ptm/m/n/10 update_expiration_time()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 704--705
+\T1/ptm/m/n/10 (bbc1.core.query_management.QueryEntry
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 705--707
+[]\T1/ptm/m/n/10 update_refresh_timer_entry()
+ []
+
+
+Overfull \hbox (25.11107pt too wide) in paragraph at lines 705--707
+\T1/ptm/m/n/10 (bbc1.core.topology_manager.TopologyManagerBase
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 710--711
+[]\T1/ptm/m/n/10 user_id (bbc1.core.message_key_types.KeyType at-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 711--712
+[]\T1/ptm/m/n/10 user_list (bbc1.core.message_key_types.KeyType at-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 712--713
+[]\T1/ptm/m/n/10 UserMessageRouting (class in
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 713--714
+[]\T1/ptm/m/n/10 UserMessageRoutingDummy (class in
+ []
+
+
+Overfull \hbox (10.31001pt too wide) in paragraph at lines 717--718
+[]\T1/ptm/m/n/10 validate_transaction() (bbc1.core.bbc_core.BBcCoreService
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 718--719
+[]\T1/ptm/m/n/10 validate_transaction_object() (in mod-ule
+ []
+
+
+Overfull \hbox (11.19063pt too wide) in paragraph at lines 721--722
+[]\T1/ptm/m/n/10 verify() (bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 722--723
+[]\T1/ptm/m/n/10 verify_in_ledger_subsystem()
+ []
+
+[61])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 6479.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 6479.
+ (./BBc1.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 6479.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 6479.
+
+Package rerunfilecheck Info: File `BBc1.out' has not changed.
+(rerunfilecheck)             Checksum: 29C2EACA25663C2D8251A43700BEC2DC;1250.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 6479.
+ ) 
+Here is how much of TeX's memory you used:
+ 14546 strings out of 492649
+ 236843 string characters out of 6129623
+ 322135 words of memory out of 5000000
+ 17481 multiletter control sequences out of 15000+600000
+ 50894 words of font info for 70 fonts, out of 8000000 for 9000
+ 1142 hyphenation exceptions out of 8191
+ 37i,12n,60p,870b,641s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
+exlive/2018/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/local/texlive/2
+018/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2018/texm
+f-dist/fonts/type1/urw/courier/ucrro8a.pfb></usr/local/texlive/2018/texmf-dist/
+fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2018/texmf-dist/fonts/t
+ype1/urw/helvetic/uhvbo8a.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/u
+rw/helvetic/uhvr8a.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/urw/time
+s/utmb8a.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/urw/times/utmr8a.p
+fb></usr/local/texlive/2018/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on BBc1.pdf (65 pages, 245299 bytes).
+PDF statistics:
+ 1706 PDF objects out of 1728 (max. 8388607)
+ 1608 compressed objects within 17 object streams
+ 650 named destinations out of 1000 (max. 500000)
+ 101 words of extra memory for PDF output out of 10000 (max. 10000000)
+

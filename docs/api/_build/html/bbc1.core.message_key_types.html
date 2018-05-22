@@ -1,0 +1,772 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bbc1.core.message_key_types module &mdash; BBc1 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bbc1.core.query_management module" href="bbc1.core.query_management.html" />
+    <link rel="prev" title="bbc1.core.logger module" href="bbc1.core.logger.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> BBc1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="bbc1.html">bbc1 package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="bbc1.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="bbc1.core.html">bbc1.core package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="bbc1.core.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#module-bbc1.core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bbc1.html#module-bbc1">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BBc1</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="bbc1.html">bbc1 package</a> &raquo;</li>
+        
+          <li><a href="bbc1.core.html">bbc1.core package</a> &raquo;</li>
+        
+      <li>bbc1.core.message_key_types module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/bbc1.core.message_key_types.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-bbc1.core.message_key_types">
+<span id="bbc1-core-message-key-types-module"></span><h1>bbc1.core.message_key_types module<a class="headerlink" href="#module-bbc1.core.message_key_types" title="Permalink to this headline">¶</a></h1>
+<p>Copyright (c) 2017 beyond-blockchain.org.</p>
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an “AS IS” BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<dl class="class">
+<dt id="bbc1.core.message_key_types.InfraMessageCategory">
+<em class="property">class </em><code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">InfraMessageCategory</code><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#InfraMessageCategory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.InfraMessageCategory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Types of message for inter-core nodes messaging</p>
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.InfraMessageCategory.CATEGORY_DATA">
+<code class="descname">CATEGORY_DATA</code><em class="property"> = b'\x00\x03'</em><a class="headerlink" href="#bbc1.core.message_key_types.InfraMessageCategory.CATEGORY_DATA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.InfraMessageCategory.CATEGORY_DOMAIN0">
+<code class="descname">CATEGORY_DOMAIN0</code><em class="property"> = b'\x00\x04'</em><a class="headerlink" href="#bbc1.core.message_key_types.InfraMessageCategory.CATEGORY_DOMAIN0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.InfraMessageCategory.CATEGORY_NETWORK">
+<code class="descname">CATEGORY_NETWORK</code><em class="property"> = b'\x00\x00'</em><a class="headerlink" href="#bbc1.core.message_key_types.InfraMessageCategory.CATEGORY_NETWORK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.InfraMessageCategory.CATEGORY_TOPOLOGY">
+<code class="descname">CATEGORY_TOPOLOGY</code><em class="property"> = b'\x00\x01'</em><a class="headerlink" href="#bbc1.core.message_key_types.InfraMessageCategory.CATEGORY_TOPOLOGY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.InfraMessageCategory.CATEGORY_USER">
+<code class="descname">CATEGORY_USER</code><em class="property"> = b'\x00\x02'</em><a class="headerlink" href="#bbc1.core.message_key_types.InfraMessageCategory.CATEGORY_USER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbc1.core.message_key_types.KeyType">
+<em class="property">class </em><code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">KeyType</code><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#KeyType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.KeyType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Types of items in a message</p>
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.admin_info">
+<code class="descname">admin_info</code><em class="property"> = b'\x00\x00\x00\x17'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.admin_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.all_asset_files">
+<code class="descname">all_asset_files</code><em class="property"> = b'\x00\x00\x00u'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.all_asset_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.all_included">
+<code class="descname">all_included</code><em class="property"> = b'\x00\x00\x00h'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.all_included" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.anycast_ttl">
+<code class="descname">anycast_ttl</code><em class="property"> = b'\x00\x00\x00\x1a'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.anycast_ttl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.asset_file">
+<code class="descname">asset_file</code><em class="property"> = b'\x00\x00\x00t'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.asset_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.asset_group_id">
+<code class="descname">asset_group_id</code><em class="property"> = b'\x00\x00\x00c'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.asset_group_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.asset_group_ids">
+<code class="descname">asset_group_ids</code><em class="property"> = b'\x00\x00\x00d'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.asset_group_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.asset_id">
+<code class="descname">asset_id</code><em class="property"> = b'\x00\x00\x00e'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.asset_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.bbc_configuration">
+<code class="descname">bbc_configuration</code><em class="property"> = b'\x00\x00\x00&lt;'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.bbc_configuration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.command">
+<code class="descname">command</code><em class="property"> = b'\x00\x00\x00\t'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.command" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.compromised_asset_files">
+<code class="descname">compromised_asset_files</code><em class="property"> = b'\x00\x00\x00\x92'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.compromised_asset_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.compromised_transaction_data">
+<code class="descname">compromised_transaction_data</code><em class="property"> = b'\x00\x00\x00\x90'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.compromised_transaction_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.compromised_transactions">
+<code class="descname">compromised_transactions</code><em class="property"> = b'\x00\x00\x00\x91'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.compromised_transactions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.count">
+<code class="descname">count</code><em class="property"> = b'\x00\x00\x00\x0e'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.cross_ref">
+<code class="descname">cross_ref</code><em class="property"> = b'\x00\x00\x00w'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.cross_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.cross_ref_verification_info">
+<code class="descname">cross_ref_verification_info</code><em class="property"> = b'\x00\x00\x00{'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.cross_ref_verification_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.destination_node_id">
+<code class="descname">destination_node_id</code><em class="property"> = b'\x00\x00\x00V'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.destination_node_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.destination_user_id">
+<code class="descname">destination_user_id</code><em class="property"> = b'\x00\x00\x00R'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.destination_user_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.destination_user_ids">
+<code class="descname">destination_user_ids</code><em class="property"> = b'\x00\x00\x00S'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.destination_user_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.direction">
+<code class="descname">direction</code><em class="property"> = b'\x00\x00\x00f'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.direction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.domain_id">
+<code class="descname">domain_id</code><em class="property"> = b'\x00\x00\x00P'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.domain_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.domain_list">
+<code class="descname">domain_list</code><em class="property"> = b'\x00\x00\x007'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.domain_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.domain_ping">
+<code class="descname">domain_ping</code><em class="property"> = b'\x00\x00\x00\x15'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.domain_ping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.ecdh">
+<code class="descname">ecdh</code><em class="property"> = b'\x00\x00\x00\x11'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.ecdh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.external_ip4addr">
+<code class="descname">external_ip4addr</code><em class="property"> = b'\x00\x00\x004'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.external_ip4addr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.external_ip6addr">
+<code class="descname">external_ip6addr</code><em class="property"> = b'\x00\x00\x005'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.external_ip6addr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.forwarding_list">
+<code class="descname">forwarding_list</code><em class="property"> = b'\x00\x00\x008'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.forwarding_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.hint">
+<code class="descname">hint</code><em class="property"> = b'\x00\x00\x00\x10'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.hint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.hop_count">
+<code class="descname">hop_count</code><em class="property"> = b'\x00\x00\x00g'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.hop_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.infra_command">
+<code class="descname">infra_command</code><em class="property"> = b'\x00\x00\x00\n'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.infra_command" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.infra_msg_type">
+<code class="descname">infra_msg_type</code><em class="property"> = b'\x00\x00\x00\x08'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.infra_msg_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.ipv4_address">
+<code class="descname">ipv4_address</code><em class="property"> = b'\x00\x00\x001'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.ipv4_address" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.ipv6_address">
+<code class="descname">ipv6_address</code><em class="property"> = b'\x00\x00\x002'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.ipv6_address" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.is_anycast">
+<code class="descname">is_anycast</code><em class="property"> = b'\x00\x00\x00\x19'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.is_anycast" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.is_replication">
+<code class="descname">is_replication</code><em class="property"> = b'\x00\x00\x00\x1b'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.is_replication" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.ledger_subsys_manip">
+<code class="descname">ledger_subsys_manip</code><em class="property"> = b'\x00\x00\x00\xa0'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.ledger_subsys_manip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.ledger_subsys_register">
+<code class="descname">ledger_subsys_register</code><em class="property"> = b'\x00\x00\x00\xa1'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.ledger_subsys_register" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.ledger_subsys_verify">
+<code class="descname">ledger_subsys_verify</code><em class="property"> = b'\x00\x00\x00\xa2'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.ledger_subsys_verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.merkle_tree">
+<code class="descname">merkle_tree</code><em class="property"> = b'\x00\x00\x00\xa3'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.merkle_tree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.message">
+<code class="descname">message</code><em class="property"> = b'\x00\x00\x00\x0c'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.message_seq">
+<code class="descname">message_seq</code><em class="property"> = b'\x00\x00\x00\x14'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.message_seq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.neighbor_list">
+<code class="descname">neighbor_list</code><em class="property"> = b'\x00\x00\x00:'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.neighbor_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.node_id">
+<code class="descname">node_id</code><em class="property"> = b'\x00\x00\x00T'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.node_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.node_info">
+<code class="descname">node_info</code><em class="property"> = b'\x00\x00\x006'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.node_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.nodekey_signature">
+<code class="descname">nodekey_signature</code><em class="property"> = b'\x00\x00\x00\x16'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.nodekey_signature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.nonce">
+<code class="descname">nonce</code><em class="property"> = b'\x00\x00\x00\r'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.nonce" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.notification_list">
+<code class="descname">notification_list</code><em class="property"> = b'\x00\x00\x00;'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.notification_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.on_multinodes">
+<code class="descname">on_multinodes</code><em class="property"> = b'\x00\x00\x00\x18'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.on_multinodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.outer_domain_id">
+<code class="descname">outer_domain_id</code><em class="property"> = b'\x00\x00\x00x'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.outer_domain_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.port_number">
+<code class="descname">port_number</code><em class="property"> = b'\x00\x00\x003'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.port_number" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.query_id">
+<code class="descname">query_id</code><em class="property"> = b'\x00\x00\x00\x0b'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.query_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.random">
+<code class="descname">random</code><em class="property"> = b'\x00\x00\x00\x12'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.random" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.reason">
+<code class="descname">reason</code><em class="property"> = b'\x00\x00\x00\x01'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.ref_index">
+<code class="descname">ref_index</code><em class="property"> = b'\x00\x00\x00s'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.ref_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.result">
+<code class="descname">result</code><em class="property"> = b'\x00\x00\x00\x02'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.result" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.retry_timer">
+<code class="descname">retry_timer</code><em class="property"> = b'\x00\x00\x00\x13'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.retry_timer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.signature">
+<code class="descname">signature</code><em class="property"> = b'\x00\x00\x00v'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.signature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.source_domain_id">
+<code class="descname">source_domain_id</code><em class="property"> = b'\x00\x00\x00y'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.source_domain_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.source_node_id">
+<code class="descname">source_node_id</code><em class="property"> = b'\x00\x00\x00U'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.source_node_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.source_user_id">
+<code class="descname">source_user_id</code><em class="property"> = b'\x00\x00\x00Q'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.source_user_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.static_entry">
+<code class="descname">static_entry</code><em class="property"> = b'\x00\x00\x000'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.static_entry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.stats">
+<code class="descname">stats</code><em class="property"> = b'\x00\x00\x00\x0f'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.stats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.status">
+<code class="descname">status</code><em class="property"> = b'\x00\x00\x00\x00'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.transaction_data">
+<code class="descname">transaction_data</code><em class="property"> = b'\x00\x00\x00p'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.transaction_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.transaction_data_format">
+<code class="descname">transaction_data_format</code><em class="property"> = b'\x00\x00\x00|'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.transaction_data_format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.transaction_id">
+<code class="descname">transaction_id</code><em class="property"> = b'\x00\x00\x00a'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.transaction_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.transaction_id_list">
+<code class="descname">transaction_id_list</code><em class="property"> = b'\x00\x00\x00b'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.transaction_id_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.transaction_tree">
+<code class="descname">transaction_tree</code><em class="property"> = b'\x00\x00\x00r'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.transaction_tree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.transactions">
+<code class="descname">transactions</code><em class="property"> = b'\x00\x00\x00q'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.transactions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.txid_having_cross_ref">
+<code class="descname">txid_having_cross_ref</code><em class="property"> = b'\x00\x00\x00z'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.txid_having_cross_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.user_id">
+<code class="descname">user_id</code><em class="property"> = b'\x00\x00\x00`'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.user_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.KeyType.user_list">
+<code class="descname">user_list</code><em class="property"> = b'\x00\x00\x009'</em><a class="headerlink" href="#bbc1.core.message_key_types.KeyType.user_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbc1.core.message_key_types.Message">
+<em class="property">class </em><code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">Message</code><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#Message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.Message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Message parser</p>
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.Message.HEADER_LEN">
+<code class="descname">HEADER_LEN</code><em class="property"> = 8</em><a class="headerlink" href="#bbc1.core.message_key_types.Message.HEADER_LEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.message_key_types.Message.parse">
+<code class="descname">parse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#Message.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.Message.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the message in the buffer</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.message_key_types.Message.recv">
+<code class="descname">recv</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#Message.recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.Message.recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append message to the buffer</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbc1.core.message_key_types.PayloadType">
+<em class="property">class </em><code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">PayloadType</code><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#PayloadType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.PayloadType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.PayloadType.Type_any">
+<code class="descname">Type_any</code><em class="property"> = 1</em><a class="headerlink" href="#bbc1.core.message_key_types.PayloadType.Type_any" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.PayloadType.Type_binary">
+<code class="descname">Type_binary</code><em class="property"> = 0</em><a class="headerlink" href="#bbc1.core.message_key_types.PayloadType.Type_binary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.PayloadType.Type_encrypted_msgpack">
+<code class="descname">Type_encrypted_msgpack</code><em class="property"> = 3</em><a class="headerlink" href="#bbc1.core.message_key_types.PayloadType.Type_encrypted_msgpack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.message_key_types.PayloadType.Type_msgpack">
+<code class="descname">Type_msgpack</code><em class="property"> = 2</em><a class="headerlink" href="#bbc1.core.message_key_types.PayloadType.Type_msgpack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.message_key_types.convert_from_binary">
+<code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">convert_from_binary</code><span class="sig-paren">(</span><em>data_type</em>, <em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#convert_from_binary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.convert_from_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialization from simple serialization</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.message_key_types.derive_shared_key">
+<code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">derive_shared_key</code><span class="sig-paren">(</span><em>private_key</em>, <em>serialized_pubkey</em>, <em>shared_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#derive_shared_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.derive_shared_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility for deriving shared key in ECDH procedure</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.message_key_types.deserialize_data">
+<code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">deserialize_data</code><span class="sig-paren">(</span><em>payload_type</em>, <em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#deserialize_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.deserialize_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility for deserializing the received message</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.message_key_types.get_ECDH_parameters">
+<code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">get_ECDH_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#get_ECDH_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.get_ECDH_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility for initialization of ECDH parameters</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.message_key_types.make_TLV_formatted_message">
+<code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">make_TLV_formatted_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#make_TLV_formatted_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.make_TLV_formatted_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility for simple serialization function</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.message_key_types.make_binary">
+<code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">make_binary</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#make_binary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.make_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple serialize function</p>
+<p>Basically, Type-Length-Value format is created for each item.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.message_key_types.make_dictionary_from_TLV_format">
+<code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">make_dictionary_from_TLV_format</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#make_dictionary_from_TLV_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.make_dictionary_from_TLV_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility for simple deserialization function</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.message_key_types.make_message">
+<code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">make_message</code><span class="sig-paren">(</span><em>payload_type</em>, <em>msg</em>, <em>payload_version=0</em>, <em>key_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#make_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.make_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility for making serialized message data</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.message_key_types.set_cipher">
+<code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">set_cipher</code><span class="sig-paren">(</span><em>shared_key</em>, <em>nonce</em>, <em>key_name</em>, <em>hint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#set_cipher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.set_cipher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set shared key to the encryptor and decryptor</p>
+<p>Encryptor and Decryptor are created for each inter-node connection</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.message_key_types.to_2byte">
+<code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">to_2byte</code><span class="sig-paren">(</span><em>val</em>, <em>offset=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#to_2byte"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.to_2byte" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.message_key_types.to_4byte">
+<code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">to_4byte</code><span class="sig-paren">(</span><em>val</em>, <em>offset=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#to_4byte"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.to_4byte" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bbc1.core.message_key_types.unset_cipher">
+<code class="descclassname">bbc1.core.message_key_types.</code><code class="descname">unset_cipher</code><span class="sig-paren">(</span><em>key_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/message_key_types.html#unset_cipher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.message_key_types.unset_cipher" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="bbc1.core.query_management.html" class="btn btn-neutral float-right" title="bbc1.core.query_management module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="bbc1.core.logger.html" class="btn btn-neutral" title="bbc1.core.logger module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, beyond-blockchain.org.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

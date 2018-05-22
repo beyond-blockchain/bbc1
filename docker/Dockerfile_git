@@ -1,12 +1,10 @@
-# for alpine
-#FROM sickp/alpine-sshd:latest
 # for ubuntu
-FROM ubuntu:latest
+FROM ubuntu:bionic
 
 LABEL maintainer "Michihito Kato <mkato@zettant.com>"
 
+ENV DEBIAN_FRONTEND noninteractive
 ENV PASSWORD=bbc1 PYTHONIOENCODING="utf-8"
-
 ENV SHARE_DIR=/root/.bbc1 VENV_DIR=/root/.pythonenv
 
 VOLUME ${SHARE_DIR}
@@ -16,12 +14,8 @@ ADD requirements.txt /tmp/
 ADD entrypoint.sh /
 WORKDIR /root/
 
-# for apline
-#RUN apk --update --no-cache add openrc bash openssh sudo g++ git tzdata musl-dev linux-headers python3 python3-dev zlib-dev libjpeg-turbo-dev libffi-dev openssl-dev && python3 -m ensurepip
 # for ubuntu
-RUN apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:jonathonf/python-3.6
-
-RUN apt-get update && apt-get install -y git tzdata openssh-server python3.6 python3.6-dev python3-pip python3.6-venv libffi-dev net-tools autoconf automake libtool libssl-dev make pkg-config
+RUN apt-get update && apt-get install -y git tzdata openssh-server python3.6 python3.6-dev python3-pip python3-distutils python3.6-venv libffi-dev net-tools autoconf automake libtool libssl-dev make pkg-config
 
 RUN mkdir -p ${SHARE_DIR} && echo "root:${PASSWORD}" | chpasswd
 
@@ -39,5 +33,6 @@ ADD bbc1.tar.gz /root/
 WORKDIR /root/bbc1/
 
 RUN sh prepare.sh
+RUN cp -R /root/bbc1/libs/* /root/bbc1/bbc1/core/
 
 CMD bash /entrypoint.sh
