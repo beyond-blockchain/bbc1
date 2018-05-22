@@ -31,10 +31,12 @@ bbc1_requires = [
                  'pytest<=3.2.*,>=3.0.5',
                  'msgpack-python>=0.4.8',
                  'mysql-connector-python==8.0.5',
+                 'greenlet',
+                 'bson',
                  'Flask>=0.10.1,<=1.0.1'
                 ]
 
-bbc1_packages = ['bbc1', 'bbc1.core', 'bbc1.core.libbbcsig']
+bbc1_packages = ['bbc1', 'bbc1.core']
 
 bbc1_commands = [
                  'bbc1/core/bbc_core.py',

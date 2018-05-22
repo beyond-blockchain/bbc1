@@ -33,5 +33,6 @@ ADD bbc1.tar.gz /root/
 WORKDIR /root/bbc1/
 
 RUN sh prepare.sh
+RUN cp -R /root/bbc1/libs/* /root/bbc1/bbc1/core/
 
 CMD bash /entrypoint.sh
