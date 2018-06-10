@@ -1,6 +1,5 @@
 Core system of BBc-1 (Beyond Blockchain One)
 ===========================================
-![travisCI](https://travis-ci.org/beyond-blockchain/bbc1.svg?branch=develop)
 
 This project is a Python-based reference implementation of BBc-1, a trustable system of record keeping beyond blockchains.
 
@@ -49,8 +48,10 @@ Some documents are available in docs/.
 
 * Python
     - Python 3.5.0 or later
-    - [pipenv](https://docs.pipenv.org) is recommended
-        - add ```export PIPENV_VENV_IN_PROJECT=true``` in .bash_profile
+    - virtualenv is recommended
+        - ```python -mvenv venv```
+    - In some environment, [pipenv](https://docs.pipenv.org) does not work well.
+        - Some bugs seems to be in the installation scripts. So, please do not use pipenv now.
 
 * tools for macOS by Homebrew
     ```
@@ -76,13 +77,9 @@ Some documents are available in docs/.
     ```
 5. Install dependencies by the following command (in the case of python 3.6)
     ```
-    pipenv install
-    pipenv shell
-    ```
-    Because Pipfile is configured for python version 3.6, use the following if your python version is not 3.6:
-    ```
-    pipenv install -r requirements.txt
-    pipenv shell
+    python -mvenv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
     ```
 
 6. Start bbc_core.py on a terminal
@@ -103,7 +100,9 @@ Some documents are available in docs/.
 2. Install python and pip
 3. Install BBc1 by pip
     ```
-    pipenv install bbc1
+    python -mvenv venv
+    source venv/bin/activate
+    pip install bbc1
     ```
 
 ## Use docker (See README.md in docker/)
@@ -157,8 +156,6 @@ The working directory of BBc-1 on the docker container is mounted on docker/data
     - default working directory name of bbc_core.py
 * requirements.txt
     - python modules to be required
-* Pipfile, Pipfile.lock
-    - python modules info for pipenv
 * setup.py
 * MANIFEST.in
 * prepare.py
