@@ -45,7 +45,7 @@ def test_keypair_generate():
 def test_keypair_pubkey():
     """
     """
-    keypair = bbclib.KeyPair(type=bbclib.KeyType.ECDSA_SECP256k1, privkey=in_privkey)
+    keypair = bbclib.KeyPair(curvetype=bbclib.KeyType.ECDSA_SECP256k1, privkey=in_privkey)
     keypair.mk_keyobj_from_private_key()
     assert (keypair.public_key_len.value == 65)
     assert (bytes(keypair.public_key)[:keypair.public_key_len.value] == in_pubkey)
@@ -54,7 +54,7 @@ def test_keypair_pubkey():
 def test_keypair_der():
     """
     """
-    keypair = bbclib.KeyPair(type=bbclib.KeyType.ECDSA_SECP256k1, privkey=in_privkey, pubkey=in_pubkey)
+    keypair = bbclib.KeyPair(curvetype=bbclib.KeyType.ECDSA_SECP256k1, privkey=in_privkey, pubkey=in_pubkey)
 
     der = keypair.get_private_key_in_der()
     assert (der == in_der)
@@ -67,7 +67,7 @@ def test_keypair_der():
 def test_keypair_pem():
     """
     """
-    keypair = bbclib.KeyPair(type=bbclib.KeyType.ECDSA_SECP256k1, privkey=in_privkey, pubkey=in_pubkey)
+    keypair = bbclib.KeyPair(curvetype=bbclib.KeyType.ECDSA_SECP256k1, privkey=in_privkey, pubkey=in_pubkey)
 
     pem = keypair.get_private_key_in_pem()
     assert (bytes(pem) == in_pem[:(len(in_pem) - 1)])  # ヌル終端を取り除いて比較する。
@@ -82,7 +82,7 @@ def test_keypair_sign_and_verify():
     """
     digest = binascii.a2b_hex("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 
-    keypair = bbclib.KeyPair(type=bbclib.KeyType.ECDSA_SECP256k1, privkey=in_privkey, pubkey=in_pubkey)
+    keypair = bbclib.KeyPair(curvetype=bbclib.KeyType.ECDSA_SECP256k1, privkey=in_privkey, pubkey=in_pubkey)
     signature = keypair.sign(digest)
     print("signature = {}".format(signature))
 
