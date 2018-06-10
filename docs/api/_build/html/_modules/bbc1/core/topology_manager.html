@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -177,7 +176,7 @@
 <span class="n">ticker</span> <span class="o">=</span> <span class="n">query_management</span><span class="o">.</span><span class="n">get_ticker</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="TopologyManagerBase"><a class="viewcode-back" href="../../../orig/bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase">[docs]</a><span class="k">class</span> <span class="nc">TopologyManagerBase</span><span class="p">:</span>
+<div class="viewcode-block" id="TopologyManagerBase"><a class="viewcode-back" href="../../../bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase">[docs]</a><span class="k">class</span> <span class="nc">TopologyManagerBase</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Network topology management for a domain</span>
 
 <span class="sd">    This class defines how to create topology, meaning that who should be neighbors and provides very simple topology</span>
@@ -202,14 +201,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_refresh_timer_entry</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_refresh_timer_entry</span><span class="p">()</span>
 
-<div class="viewcode-block" id="TopologyManagerBase.stop_all_timers"><a class="viewcode-back" href="../../../orig/bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.stop_all_timers">[docs]</a>    <span class="k">def</span> <span class="nf">stop_all_timers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TopologyManagerBase.stop_all_timers"><a class="viewcode-back" href="../../../bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.stop_all_timers">[docs]</a>    <span class="k">def</span> <span class="nf">stop_all_timers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Invalidate all running timers&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_refresh_timer_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">neighbor_refresh_timer_entry</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TopologyManagerBase.notify_neighbor_update"><a class="viewcode-back" href="../../../orig/bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.notify_neighbor_update">[docs]</a>    <span class="k">def</span> <span class="nf">notify_neighbor_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">is_new</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="TopologyManagerBase.notify_neighbor_update"><a class="viewcode-back" href="../../../bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.notify_neighbor_update">[docs]</a>    <span class="k">def</span> <span class="nf">notify_neighbor_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">is_new</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update expiration timer for the notified node_id</span>
 
 <span class="sd">        Args:</span>
@@ -230,7 +229,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">advertise_wait_entry</span><span class="o">.</span><span class="n">update_expiration_time</span><span class="p">(</span><span class="n">rand_time</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TopologyManagerBase.update_refresh_timer_entry"><a class="viewcode-back" href="../../../orig/bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.update_refresh_timer_entry">[docs]</a>    <span class="k">def</span> <span class="nf">update_refresh_timer_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_entry</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">force_refresh_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="TopologyManagerBase.update_refresh_timer_entry"><a class="viewcode-back" href="../../../bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.update_refresh_timer_entry">[docs]</a>    <span class="k">def</span> <span class="nf">update_refresh_timer_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_entry</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">force_refresh_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update expiration timer&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">force_refresh_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">rand_interval</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">TopologyManagerBase</span><span class="o">.</span><span class="n">NEIGHBOR_LIST_REFRESH_INTERVAL</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">),</span>
@@ -263,7 +262,7 @@
         <span class="k">if</span> <span class="s2">&quot;is_refresh&quot;</span> <span class="ow">in</span> <span class="n">query_entry</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_refresh_timer_entry</span><span class="p">()</span>
 
-<div class="viewcode-block" id="TopologyManagerBase.make_neighbor_list"><a class="viewcode-back" href="../../../orig/bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.make_neighbor_list">[docs]</a>    <span class="k">def</span> <span class="nf">make_neighbor_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TopologyManagerBase.make_neighbor_list"><a class="viewcode-back" href="../../../bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.make_neighbor_list">[docs]</a>    <span class="k">def</span> <span class="nf">make_neighbor_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;make nodelist binary for advertising&quot;&quot;&quot;</span>
         <span class="n">nodeinfo</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
 
@@ -313,7 +312,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 
-<div class="viewcode-block" id="TopologyManagerBase.process_message"><a class="viewcode-back" href="../../../orig/bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.process_message">[docs]</a>    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<div class="viewcode-block" id="TopologyManagerBase.process_message"><a class="viewcode-back" href="../../../bbc1.core.topology_manager.html#bbc1.core.topology_manager.TopologyManagerBase.process_message">[docs]</a>    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Process received message</span>
 
 <span class="sd">        Args:</span>
@@ -386,10 +385,7 @@
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

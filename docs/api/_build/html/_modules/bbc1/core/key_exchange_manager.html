@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -172,12 +171,12 @@
 <span class="kn">from</span> <span class="nn">bbc1.core.message_key_types</span> <span class="k">import</span> <span class="n">KeyType</span>
 
 
-<div class="viewcode-block" id="remove_old_key"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.remove_old_key">[docs]</a><span class="k">def</span> <span class="nf">remove_old_key</span><span class="p">(</span><span class="n">query_entry</span><span class="p">):</span>
+<div class="viewcode-block" id="remove_old_key"><a class="viewcode-back" href="../../../bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.remove_old_key">[docs]</a><span class="k">def</span> <span class="nf">remove_old_key</span><span class="p">(</span><span class="n">query_entry</span><span class="p">):</span>
     <span class="c1">#print(&quot;===&gt;&quot;, query_entry.data[KeyType.hint].hex()[:10])</span>
     <span class="n">message_key_types</span><span class="o">.</span><span class="n">unset_cipher</span><span class="p">(</span><span class="n">query_entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">hint</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="KeyExchangeManager"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager">[docs]</a><span class="k">class</span> <span class="nc">KeyExchangeManager</span><span class="p">:</span>
+<div class="viewcode-block" id="KeyExchangeManager"><a class="viewcode-back" href="../../../bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager">[docs]</a><span class="k">class</span> <span class="nc">KeyExchangeManager</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;ECDH (Elliptic Curve Diffie-Hellman) key exchange manager&quot;&quot;&quot;</span>
     <span class="n">KEY_EXCHANGE_INVOKE_MAX_BACKOFF</span> <span class="o">=</span> <span class="mi">6</span>
     <span class="n">KEY_EXCHANGE_RETRY_INTERVAL</span> <span class="o">=</span> <span class="mi">5</span>
@@ -208,11 +207,11 @@
         <span class="c1">#print(&quot;** set state from %d to %d&quot; % (self.state, state))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
 
-<div class="viewcode-block" id="KeyExchangeManager.set_cipher"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.set_cipher">[docs]</a>    <span class="k">def</span> <span class="nf">set_cipher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">hint</span><span class="p">):</span>
+<div class="viewcode-block" id="KeyExchangeManager.set_cipher"><a class="viewcode-back" href="../../../bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.set_cipher">[docs]</a>    <span class="k">def</span> <span class="nf">set_cipher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">hint</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Set key to the encryptor and decryptor&quot;&quot;&quot;</span>
         <span class="n">message_key_types</span><span class="o">.</span><span class="n">set_cipher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shared_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nonce</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">hint</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="KeyExchangeManager.unset_cipher"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.unset_cipher">[docs]</a>    <span class="k">def</span> <span class="nf">unset_cipher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="KeyExchangeManager.unset_cipher"><a class="viewcode-back" href="../../../bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.unset_cipher">[docs]</a>    <span class="k">def</span> <span class="nf">unset_cipher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Unset key from the encryptor and decryptor&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">key_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -222,12 +221,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">message_key_types</span><span class="o">.</span><span class="n">unset_cipher</span><span class="p">(</span><span class="n">key_name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="KeyExchangeManager.stop_all_timers"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.stop_all_timers">[docs]</a>    <span class="k">def</span> <span class="nf">stop_all_timers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="KeyExchangeManager.stop_all_timers"><a class="viewcode-back" href="../../../bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.stop_all_timers">[docs]</a>    <span class="k">def</span> <span class="nf">stop_all_timers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Stop all timers&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="KeyExchangeManager.set_invoke_timer"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.set_invoke_timer">[docs]</a>    <span class="k">def</span> <span class="nf">set_invoke_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">retry_entry</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="KeyExchangeManager.set_invoke_timer"><a class="viewcode-back" href="../../../bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.set_invoke_timer">[docs]</a>    <span class="k">def</span> <span class="nf">set_invoke_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">retry_entry</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Set timer for key refreshment&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">timer_entry</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
@@ -271,7 +270,7 @@
         <span class="n">rand_time</span> <span class="o">=</span> <span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">KEY_EXCHANGE_RETRY_INTERVAL</span><span class="o">*</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_invoke_timer</span><span class="p">(</span><span class="n">rand_time</span><span class="p">,</span> <span class="n">retry_entry</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<div class="viewcode-block" id="KeyExchangeManager.receive_exchange_request"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_request">[docs]</a>    <span class="k">def</span> <span class="nf">receive_exchange_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pubkey</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">random_val</span><span class="p">,</span> <span class="n">hint</span><span class="p">):</span>
+<div class="viewcode-block" id="KeyExchangeManager.receive_exchange_request"><a class="viewcode-back" href="../../../bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_request">[docs]</a>    <span class="k">def</span> <span class="nf">receive_exchange_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pubkey</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">random_val</span><span class="p">,</span> <span class="n">hint</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Procedure when receiving message with BBcNetwork.REQUEST_KEY_EXCHANGE</span>
 
 <span class="sd">        Args:</span>
@@ -306,7 +305,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_invoke_timer</span><span class="p">(</span><span class="n">rand_time</span><span class="p">,</span> <span class="n">retry_entry</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="KeyExchangeManager.receive_exchange_response"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_response">[docs]</a>    <span class="k">def</span> <span class="nf">receive_exchange_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pubkey</span><span class="p">,</span> <span class="n">random_val</span><span class="p">,</span> <span class="n">hint</span><span class="p">):</span>
+<div class="viewcode-block" id="KeyExchangeManager.receive_exchange_response"><a class="viewcode-back" href="../../../bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_exchange_response">[docs]</a>    <span class="k">def</span> <span class="nf">receive_exchange_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pubkey</span><span class="p">,</span> <span class="n">random_val</span><span class="p">,</span> <span class="n">hint</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Process ECDH procedure (receiving response)&quot;&quot;&quot;</span>
         <span class="c1">#print(&quot;(%d) receive_exchange_response:&quot; % int(time.time()))</span>
         <span class="c1">#print(&quot; **&gt; state:&quot;, self.state)</span>
@@ -323,7 +322,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_state</span><span class="p">(</span><span class="n">KeyExchangeManager</span><span class="o">.</span><span class="n">STATE_ESTABLISHED</span><span class="p">)</span></div>
         <span class="c1">#print(&quot;*STATE_ESTABLISHED&quot;)</span>
 
-<div class="viewcode-block" id="KeyExchangeManager.receive_confirmation"><a class="viewcode-back" href="../../../orig/bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_confirmation">[docs]</a>    <span class="k">def</span> <span class="nf">receive_confirmation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="KeyExchangeManager.receive_confirmation"><a class="viewcode-back" href="../../../bbc1.core.key_exchange_manager.html#bbc1.core.key_exchange_manager.KeyExchangeManager.receive_confirmation">[docs]</a>    <span class="k">def</span> <span class="nf">receive_confirmation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Confirm that the key has been agreed&quot;&quot;&quot;</span>
         <span class="c1">#print(&quot;(%d) receive_confirmation:&quot; % int(time.time()))</span>
         <span class="c1">#print(&quot; **&gt; state:&quot;, self.state)</span>
@@ -383,10 +382,7 @@
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

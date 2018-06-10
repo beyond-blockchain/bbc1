@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -322,7 +321,7 @@ limitations under the License.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</li>
-<li><strong>txobj</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</li>
+<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</li>
 <li><strong>asset_files</strong> (<em>dict</em>) – asset files in the transaction</li>
 </ul>
 </td>
@@ -362,7 +361,7 @@ limitations under the License.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</li>
-<li><strong>txobj</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</li>
+<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</li>
 <li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
 </ul>
 </td>
@@ -480,7 +479,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dl class="class">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0">
 <em class="property">class </em><code class="descclassname">bbc1.core.data_handler.</code><code class="descname">DataHandlerDomain0</code><span class="sig-paren">(</span><em>networking=None</em>, <em>config=None</em>, <em>workingdir=None</em>, <em>domain_id=None</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DataHandler" title="bbc1.core.data_handler.DataHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbc1.core.data_handler.DataHandler</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#bbc1.core.data_handler.DataHandler" title="bbc1.core.data_handler.DataHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbc1.core.data_handler.DataHandler</span></code></a></p>
 <p>Data handler for domain_global_0</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.exec_sql">
@@ -544,7 +543,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</li>
-<li><strong>txobj</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</li>
+<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</li>
 <li><strong>asset_files</strong> (<em>dict</em>) – asset files in the transaction</li>
 </ul>
 </td>
@@ -584,7 +583,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</li>
-<li><strong>txobj</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</li>
+<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</li>
 <li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
 </ul>
 </td>
@@ -703,7 +702,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dl class="class">
 <dt id="bbc1.core.data_handler.MysqlAdaptor">
 <em class="property">class </em><code class="descclassname">bbc1.core.data_handler.</code><code class="descname">MysqlAdaptor</code><span class="sig-paren">(</span><em>handler=None</em>, <em>db_name=None</em>, <em>db_num=None</em>, <em>server_info=None</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#MysqlAdaptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.MysqlAdaptor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DbAdaptor" title="bbc1.core.data_handler.DbAdaptor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbc1.core.data_handler.DbAdaptor</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#bbc1.core.data_handler.DbAdaptor" title="bbc1.core.data_handler.DbAdaptor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbc1.core.data_handler.DbAdaptor</span></code></a></p>
 <p>DB adaptor for MySQL</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.MysqlAdaptor.check_table_existence">
@@ -742,7 +741,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dl class="class">
 <dt id="bbc1.core.data_handler.SqliteAdaptor">
 <em class="property">class </em><code class="descclassname">bbc1.core.data_handler.</code><code class="descname">SqliteAdaptor</code><span class="sig-paren">(</span><em>handler=None</em>, <em>db_name=None</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#SqliteAdaptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.SqliteAdaptor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="orig/bbc1.core.data_handler.html#bbc1.core.data_handler.DbAdaptor" title="bbc1.core.data_handler.DbAdaptor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbc1.core.data_handler.DbAdaptor</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#bbc1.core.data_handler.DbAdaptor" title="bbc1.core.data_handler.DbAdaptor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbc1.core.data_handler.DbAdaptor</span></code></a></p>
 <p>DB adaptor for SQLite3</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.SqliteAdaptor.check_table_existence">
@@ -836,10 +835,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

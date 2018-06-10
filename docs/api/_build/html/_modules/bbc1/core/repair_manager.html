@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -179,7 +178,7 @@
 <span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">logger</span>
 
 
-<div class="viewcode-block" id="RepairManager"><a class="viewcode-back" href="../../../orig/bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager">[docs]</a><span class="k">class</span> <span class="nc">RepairManager</span><span class="p">:</span>
+<div class="viewcode-block" id="RepairManager"><a class="viewcode-back" href="../../../bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager">[docs]</a><span class="k">class</span> <span class="nc">RepairManager</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Data repair manager for forged transaction/asset&quot;&quot;&quot;</span>
     <span class="n">REQUEST_REPAIR_TRANSACTION</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">REQUEST_REPAIR_ASSET_FILE</span> <span class="o">=</span> <span class="mi">1</span>
@@ -211,7 +210,7 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repair_log</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">repair_info</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="RepairManager.exit_loop"><a class="viewcode-back" href="../../../orig/bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager.exit_loop">[docs]</a>    <span class="k">def</span> <span class="nf">exit_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RepairManager.exit_loop"><a class="viewcode-back" href="../../../bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager.exit_loop">[docs]</a>    <span class="k">def</span> <span class="nf">exit_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Exit the manager loop&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">put_message</span><span class="p">()</span></div>
@@ -235,7 +234,7 @@
             <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">RepairManager</span><span class="o">.</span><span class="n">RESPONSE_ASSET_FILE</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_receive_asset_file_from_others</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="RepairManager.put_message"><a class="viewcode-back" href="../../../orig/bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager.put_message">[docs]</a>    <span class="k">def</span> <span class="nf">put_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="RepairManager.put_message"><a class="viewcode-back" href="../../../bbc1.core.repair_manager.html#bbc1.core.repair_manager.RepairManager.put_message">[docs]</a>    <span class="k">def</span> <span class="nf">put_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;append a message to the queue&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 
@@ -487,10 +486,7 @@
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {
