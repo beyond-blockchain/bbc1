@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -179,6 +178,14 @@ distributed under the License is distributed on an “AS IS” BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+</tbody>
+</table>
 <dl class="class">
 <dt id="bbc1.core.bbclib.BBcAsset">
 <em class="property">class </em><code class="descclassname">bbc1.core.bbclib.</code><code class="descname">BBcAsset</code><span class="sig-paren">(</span><em>user_id=None</em>, <em>asset_file=None</em>, <em>asset_body=None</em>, <em>format_type=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#BBcAsset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.BBcAsset" title="Permalink to this definition">¶</a></dt>
@@ -270,6 +277,18 @@ bytes: the file content</td>
 <dt id="bbc1.core.bbclib.BBcAsset.serialize">
 <code class="descname">serialize</code><span class="sig-paren">(</span><em>for_digest_calculation=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#BBcAsset.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.BBcAsset.serialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize this object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>for_digest_calculation</strong> (<em>bool</em>) – True if digest calculation</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">serialized binary data</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -325,6 +344,16 @@ bytes: the file content</td>
 <dt id="bbc1.core.bbclib.BBcCrossRef.serialize">
 <code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#BBcCrossRef.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.BBcCrossRef.serialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize this object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">serialized binary data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -386,6 +415,16 @@ bytes: the file content</td>
 <dt id="bbc1.core.bbclib.BBcEvent.serialize">
 <code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#BBcEvent.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.BBcEvent.serialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize this object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">serialized binary data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -468,6 +507,16 @@ bytes: the file content</td>
 <dt id="bbc1.core.bbclib.BBcPointer.serialize">
 <code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#BBcPointer.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.BBcPointer.serialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize this object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">serialized binary data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -493,7 +542,7 @@ bytes: the file content</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>user_id</strong> (<em>bytes</em>) – user_id of the signature owner</li>
-<li><strong>signature</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcSignature" title="bbc1.core.bbclib.BBcSignature"><em>BBcSignature</em></a>) – signature</li>
+<li><strong>signature</strong> (<a class="reference internal" href="#bbc1.core.bbclib.BBcSignature" title="bbc1.core.bbclib.BBcSignature"><em>BBcSignature</em></a>) – signature</li>
 </ul>
 </td>
 </tr>
@@ -559,6 +608,16 @@ bytes: the file content</td>
 <dt id="bbc1.core.bbclib.BBcReference.serialize">
 <code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#BBcReference.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.BBcReference.serialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize this object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">serialized binary data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -620,6 +679,16 @@ bytes: the file content</td>
 <dt id="bbc1.core.bbclib.BBcRelation.serialize">
 <code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#BBcRelation.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.BBcRelation.serialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize this object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">serialized binary data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -730,7 +799,7 @@ bytes: the file content</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>user_id</strong> (<em>bytes</em>) – user_id of the signature owner</li>
-<li><strong>signature</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcSignature" title="bbc1.core.bbclib.BBcSignature"><em>BBcSignature</em></a>) – signature</li>
+<li><strong>signature</strong> (<a class="reference internal" href="#bbc1.core.bbclib.BBcSignature" title="bbc1.core.bbclib.BBcSignature"><em>BBcSignature</em></a>) – signature</li>
 </ul>
 </td>
 </tr>
@@ -835,7 +904,7 @@ bytes: the file content</td>
 
 <dl class="method">
 <dt id="bbc1.core.bbclib.BBcTransaction.serialize_bson">
-<code class="descname">serialize_bson</code><span class="sig-paren">(</span><em>for_id=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#BBcTransaction.serialize_bson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.BBcTransaction.serialize_bson" title="Permalink to this definition">¶</a></dt>
+<code class="descname">serialize_bson</code><span class="sig-paren">(</span><em>for_id=False</em>, <em>no_header=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#BBcTransaction.serialize_bson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.BBcTransaction.serialize_bson" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize the whole parts</p>
 </dd></dl>
 
@@ -851,14 +920,14 @@ bytes: the file content</td>
 <li><strong>key_type</strong> (<em>int</em>) – Type of encryption key algorighm (currently, KeyType.ECDSA_SECP256k1 only)</li>
 <li><strong>private_key</strong> (<em>bytes</em>) – </li>
 <li><strong>public_key</strong> (<em>bytes</em>) – </li>
-<li><strong>keypair</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.KeyPair" title="bbc1.core.bbclib.KeyPair"><em>KeyPair</em></a>) – keypair or set of private_key and public_key needs to be given</li>
+<li><strong>keypair</strong> (<a class="reference internal" href="#bbc1.core.bbclib.KeyPair" title="bbc1.core.bbclib.KeyPair"><em>KeyPair</em></a>) – keypair or set of private_key and public_key needs to be given</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcSignature" title="bbc1.core.bbclib.BBcSignature">BBcSignature</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#bbc1.core.bbclib.BBcSignature" title="bbc1.core.bbclib.BBcSignature">BBcSignature</a></p>
 </td>
 </tr>
 </tbody>
@@ -936,6 +1005,16 @@ bytes: the file content</td>
 <dt id="bbc1.core.bbclib.BBcWitness.serialize">
 <code class="descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#BBcWitness.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.BBcWitness.serialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize this object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">serialized binary data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -948,7 +1027,7 @@ bytes: the file content</td>
 
 <dl class="class">
 <dt id="bbc1.core.bbclib.KeyPair">
-<em class="property">class </em><code class="descclassname">bbc1.core.bbclib.</code><code class="descname">KeyPair</code><span class="sig-paren">(</span><em>type=1</em>, <em>privkey=None</em>, <em>pubkey=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#KeyPair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.KeyPair" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bbc1.core.bbclib.</code><code class="descname">KeyPair</code><span class="sig-paren">(</span><em>curvetype=1</em>, <em>privkey=None</em>, <em>pubkey=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#KeyPair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.KeyPair" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Key pair container</p>
 <dl class="method">
@@ -1030,6 +1109,11 @@ bytes: the file content</td>
 <dl class="attribute">
 <dt id="bbc1.core.bbclib.KeyType.ECDSA_SECP256k1">
 <code class="descname">ECDSA_SECP256k1</code><em class="property"> = 1</em><a class="headerlink" href="#bbc1.core.bbclib.KeyType.ECDSA_SECP256k1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbc1.core.bbclib.KeyType.NOT_INITIALIZED">
+<code class="descname">NOT_INITIALIZED</code><em class="property"> = 0</em><a class="headerlink" href="#bbc1.core.bbclib.KeyType.NOT_INITIALIZED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1337,7 +1421,7 @@ bytes: the file content</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcReference" title="bbc1.core.bbclib.BBcReference">BBcReference</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#bbc1.core.bbclib.BBcReference" title="bbc1.core.bbclib.BBcReference">BBcReference</a></td>
 </tr>
 </tbody>
 </table>
@@ -1452,7 +1536,7 @@ bytes: the file content</td>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction">BBcTransaction</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction">BBcTransaction</a></p>
 </td>
 </tr>
 </tbody>
@@ -1514,7 +1598,7 @@ bytes: the file content</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>txobj</strong> (<a class="reference internal" href="orig/bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – target transaction object</li>
+<li><strong>txobj</strong> (<a class="reference internal" href="#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – target transaction object</li>
 <li><strong>asset_files</strong> (<em>dict</em>) – dictionary containing the asset file contents</li>
 </ul>
 </td>
@@ -1617,10 +1701,7 @@ tuple: list of invalid assets</p>
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

@@ -24,12 +24,11 @@
 
   
 
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="bbc1.core.libbbcsig.test_ecdsa module" href="bbc1.core.libbbcsig.test_ecdsa.html" />
+    <link rel="next" title="bbc1.core.bbc_app module" href="bbc1.core.bbc_app.html" />
     <link rel="prev" title="bbc1.core.libbbcsig package" href="bbc1.core.libbbcsig.html" /> 
 
   
@@ -168,59 +167,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-bbc1.core.libbbcsig.pybbcsig">
-<span id="bbc1-core-libbbcsig-pybbcsig-module"></span><h1>bbc1.core.libbbcsig.pybbcsig module<a class="headerlink" href="#module-bbc1.core.libbbcsig.pybbcsig" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1">
-<em class="property">class </em><code class="descclassname">bbc1.core.libbbcsig.pybbcsig.</code><code class="descname">PyBBcSigSecp256k1</code><a class="reference internal" href="_modules/bbc1/core/libbbcsig/pybbcsig.html#PyBBcSigSecp256k1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.convert_from_der">
-<code class="descname">convert_from_der</code><span class="sig-paren">(</span><em>der_data</em>, <em>pubkey_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/libbbcsig/pybbcsig.html#PyBBcSigSecp256k1.convert_from_der"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.convert_from_der" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.convert_from_pem">
-<code class="descname">convert_from_pem</code><span class="sig-paren">(</span><em>pem_data</em>, <em>pubkey_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/libbbcsig/pybbcsig.html#PyBBcSigSecp256k1.convert_from_pem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.convert_from_pem" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.generate_keypair">
-<code class="descname">generate_keypair</code><span class="sig-paren">(</span><em>pubkey_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/libbbcsig/pybbcsig.html#PyBBcSigSecp256k1.generate_keypair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.generate_keypair" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.get_public_key_compressed">
-<code class="descname">get_public_key_compressed</code><span class="sig-paren">(</span><em>privkey</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/libbbcsig/pybbcsig.html#PyBBcSigSecp256k1.get_public_key_compressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.get_public_key_compressed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.get_public_key_uncompressed">
-<code class="descname">get_public_key_uncompressed</code><span class="sig-paren">(</span><em>privkey</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/libbbcsig/pybbcsig.html#PyBBcSigSecp256k1.get_public_key_uncompressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.get_public_key_uncompressed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.output_der">
-<code class="descname">output_der</code><span class="sig-paren">(</span><em>privkey</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/libbbcsig/pybbcsig.html#PyBBcSigSecp256k1.output_der"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.output_der" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.output_pem">
-<code class="descname">output_pem</code><span class="sig-paren">(</span><em>privkey</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/libbbcsig/pybbcsig.html#PyBBcSigSecp256k1.output_pem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.output_pem" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.sign">
-<code class="descname">sign</code><span class="sig-paren">(</span><em>privkey</em>, <em>digest</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/libbbcsig/pybbcsig.html#PyBBcSigSecp256k1.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.sign" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.verify">
-<code class="descname">verify</code><span class="sig-paren">(</span><em>pubkey</em>, <em>digest</em>, <em>signature</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/libbbcsig/pybbcsig.html#PyBBcSigSecp256k1.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.libbbcsig.pybbcsig.PyBBcSigSecp256k1.verify" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="bbc1-core-libbbcsig-pybbcsig-module">
+<h1>bbc1.core.libbbcsig.pybbcsig module<a class="headerlink" href="#bbc1-core-libbbcsig-pybbcsig-module" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -231,7 +179,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="bbc1.core.libbbcsig.test_ecdsa.html" class="btn btn-neutral float-right" title="bbc1.core.libbbcsig.test_ecdsa module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="bbc1.core.bbc_app.html" class="btn btn-neutral float-right" title="bbc1.core.bbc_app module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="bbc1.core.libbbcsig.html" class="btn btn-neutral" title="bbc1.core.libbbcsig package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -279,10 +227,7 @@
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

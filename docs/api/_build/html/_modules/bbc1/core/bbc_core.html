@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -221,7 +220,7 @@
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="activate_ledgersubsystem"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_core.html#bbc1.core.bbc_core.activate_ledgersubsystem">[docs]</a><span class="k">def</span> <span class="nf">activate_ledgersubsystem</span><span class="p">():</span>
+<div class="viewcode-block" id="activate_ledgersubsystem"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.activate_ledgersubsystem">[docs]</a><span class="k">def</span> <span class="nf">activate_ledgersubsystem</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Load module of ledger_subsystem if installed&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">ledger_subsystem_module</span>
     <span class="k">if</span> <span class="n">ledger_subsystem_module</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -275,7 +274,7 @@
     <span class="k">return</span> <span class="n">response_info</span>
 
 
-<div class="viewcode-block" id="BBcCoreService"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService">[docs]</a><span class="k">class</span> <span class="nc">BBcCoreService</span><span class="p">:</span>
+<div class="viewcode-block" id="BBcCoreService"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService">[docs]</a><span class="k">class</span> <span class="nc">BBcCoreService</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Base service object of BBc-1&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p2p_port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">core_port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_domain0</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ip4addr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ip6addr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">workingdir</span><span class="o">=</span><span class="s2">&quot;.bbc1&quot;</span><span class="p">,</span> <span class="n">configfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_nodekey</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_ledger_subsystem</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -327,7 +326,7 @@
         <span class="k">if</span> <span class="n">server_start</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_start_server</span><span class="p">(</span><span class="n">core_port</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BBcCoreService.quit_program"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.quit_program">[docs]</a>    <span class="k">def</span> <span class="nf">quit_program</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcCoreService.quit_program"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.quit_program">[docs]</a>    <span class="k">def</span> <span class="nf">quit_program</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Processes when quiting program&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">save_all_static_node_list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">()</span>
@@ -849,7 +848,7 @@
         <span class="n">umr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;user&#39;</span><span class="p">]</span>
         <span class="n">umr</span><span class="o">.</span><span class="n">send_multicast_join</span><span class="p">(</span><span class="n">asset_group_id</span><span class="p">,</span> <span class="n">permanent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BBcCoreService.remove_from_notification_list"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.remove_from_notification_list">[docs]</a>    <span class="k">def</span> <span class="nf">remove_from_notification_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcCoreService.remove_from_notification_list"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.remove_from_notification_list">[docs]</a>    <span class="k">def</span> <span class="nf">remove_from_notification_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Remove entry from insert completion notification list</span>
 
 <span class="sd">        This method checks validation only.</span>
@@ -884,7 +883,7 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span><span class="p">[</span><span class="n">domain_id</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BBcCoreService.validate_transaction"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.validate_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">validate_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcCoreService.validate_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.validate_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">validate_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Validate transaction by verifying signature</span>
 
 <span class="sd">        Args:</span>
@@ -911,7 +910,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="BBcCoreService.insert_transaction"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.insert_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">insert_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcCoreService.insert_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.insert_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">insert_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Insert transaction into ledger</span>
 
 <span class="sd">        Args:</span>
@@ -949,7 +948,7 @@
 
         <span class="k">return</span> <span class="p">{</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">:</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="BBcCoreService.send_inserted_notification"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.send_inserted_notification">[docs]</a>    <span class="k">def</span> <span class="nf">send_inserted_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_ids</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">only_registered_user</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcCoreService.send_inserted_notification"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.send_inserted_notification">[docs]</a>    <span class="k">def</span> <span class="nf">send_inserted_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_ids</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">only_registered_user</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Broadcast NOTIFY_INSERTED</span>
 
 <span class="sd">        Args:</span>
@@ -1049,7 +1048,7 @@
             <span class="k">del</span> <span class="n">response_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">compromised_transactions</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">response_info</span>
 
-<div class="viewcode-block" id="BBcCoreService.search_transaction_with_condition"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction_with_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcCoreService.search_transaction_with_condition"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction_with_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search transactions that match given conditions</span>
 
 <span class="sd">        When Multiple conditions are given, they are considered as AND condition.</span>
@@ -1146,7 +1145,7 @@
         <span class="k">return</span> <span class="n">include_all_flag</span><span class="p">,</span> <span class="n">txtree</span><span class="p">,</span> <span class="n">asset_files</span></div>
 
 
-<div class="viewcode-block" id="daemonize"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_core.html#bbc1.core.bbc_core.daemonize">[docs]</a><span class="k">def</span> <span class="nf">daemonize</span><span class="p">(</span><span class="n">pidfile</span><span class="o">=</span><span class="n">PID_FILE</span><span class="p">):</span>
+<div class="viewcode-block" id="daemonize"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.daemonize">[docs]</a><span class="k">def</span> <span class="nf">daemonize</span><span class="p">(</span><span class="n">pidfile</span><span class="o">=</span><span class="n">PID_FILE</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Run in background&quot;&quot;&quot;</span>
     <span class="n">pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">pid</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -1237,10 +1236,7 @@
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

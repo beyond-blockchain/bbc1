@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -247,7 +246,7 @@
     <span class="k">return</span> <span class="n">array</span>
 
 
-<div class="viewcode-block" id="is_less_than"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.is_less_than">[docs]</a><span class="k">def</span> <span class="nf">is_less_than</span><span class="p">(</span><span class="n">val_a</span><span class="p">,</span> <span class="n">val_b</span><span class="p">):</span>
+<div class="viewcode-block" id="is_less_than"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.is_less_than">[docs]</a><span class="k">def</span> <span class="nf">is_less_than</span><span class="p">(</span><span class="n">val_a</span><span class="p">,</span> <span class="n">val_b</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return True if val_a is less than val_b (evaluate as integer)&quot;&quot;&quot;</span>
     <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">val_a</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">size</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">val_b</span><span class="p">):</span>
@@ -260,7 +259,7 @@
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
-<div class="viewcode-block" id="BBcNetwork"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork">[docs]</a><span class="k">class</span> <span class="nc">BBcNetwork</span><span class="p">:</span>
+<div class="viewcode-block" id="BBcNetwork"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork">[docs]</a><span class="k">class</span> <span class="nc">BBcNetwork</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Socket and thread management for infrastructure layers&quot;&quot;&quot;</span>
     <span class="n">NOTIFY_LEAVE</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">REQUEST_KEY_EXCHANGE</span> <span class="o">=</span> <span class="n">to_2byte</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -324,7 +323,7 @@
         <span class="n">domain0</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain0manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">NodeInfo</span><span class="p">(</span><span class="n">node_id</span><span class="o">=</span><span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="o">=</span><span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">domain0</span><span class="o">=</span><span class="n">domain0</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BBcNetwork.include_admin_info_into_message_if_needed"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.include_admin_info_into_message_if_needed">[docs]</a>    <span class="k">def</span> <span class="nf">include_admin_info_into_message_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.include_admin_info_into_message_if_needed"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.include_admin_info_into_message_if_needed">[docs]</a>    <span class="k">def</span> <span class="nf">include_admin_info_into_message_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Serialize admin info into one binary object and add signature&quot;&quot;&quot;</span>
         <span class="n">admin_info</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">message_seq</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s2">&quot;neighbor&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">admin_sequence_number</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s2">&quot;neighbor&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">admin_sequence_number</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -335,7 +334,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">msg</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">admin_info</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BBcNetwork.send_key_exchange_message"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.send_key_exchange_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_key_exchange_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">pubkey</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">random_val</span><span class="p">,</span> <span class="n">key_name</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.send_key_exchange_message"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.send_key_exchange_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_key_exchange_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">pubkey</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">random_val</span><span class="p">,</span> <span class="n">key_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send ECDH key exchange message&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">command</span> <span class="o">==</span> <span class="s2">&quot;request&quot;</span><span class="p">:</span>
             <span class="n">command</span> <span class="o">=</span> <span class="n">BBcNetwork</span><span class="o">.</span><span class="n">REQUEST_KEY_EXCHANGE</span>
@@ -359,7 +358,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">include_admin_info_into_message_if_needed</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">admin_info</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message_in_network</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_msgpack</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BBcNetwork.create_domain"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.create_domain">[docs]</a>    <span class="k">def</span> <span class="nf">create_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="n">ZEROS</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.create_domain"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.create_domain">[docs]</a>    <span class="k">def</span> <span class="nf">create_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="n">ZEROS</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create domain and register user in the domain</span>
 
 <span class="sd">        Args:</span>
@@ -415,7 +414,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Domain </span><span class="si">%s</span><span class="s2"> is created&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">domain_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()))</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="BBcNetwork.remove_domain"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.remove_domain">[docs]</a>    <span class="k">def</span> <span class="nf">remove_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="n">ZEROS</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.remove_domain"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.remove_domain">[docs]</a>    <span class="k">def</span> <span class="nf">remove_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="n">ZEROS</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Leave the domain and remove it</span>
 
 <span class="sd">        Args:</span>
@@ -457,7 +456,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Domain </span><span class="si">%s</span><span class="s2"> is removed&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">domain_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()))</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="BBcNetwork.save_all_static_node_list"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.save_all_static_node_list">[docs]</a>    <span class="k">def</span> <span class="nf">save_all_static_node_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.save_all_static_node_list"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.save_all_static_node_list">[docs]</a>    <span class="k">def</span> <span class="nf">save_all_static_node_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Save all static nodes in the config file&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Saving the neighbor list&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">domain_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -471,7 +470,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done...&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BBcNetwork.send_message_to_a_domain0_manager"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.send_message_to_a_domain0_manager">[docs]</a>    <span class="k">def</span> <span class="nf">send_message_to_a_domain0_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.send_message_to_a_domain0_manager"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.send_message_to_a_domain0_manager">[docs]</a>    <span class="k">def</span> <span class="nf">send_message_to_a_domain0_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Choose one of domain0_managers and send msg to it</span>
 
 <span class="sd">        Args:</span>
@@ -489,7 +488,7 @@
         <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">infra_msg_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">InfraMessageCategory</span><span class="o">.</span><span class="n">CATEGORY_DOMAIN0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_message_in_network</span><span class="p">(</span><span class="n">dst_manager</span><span class="p">,</span> <span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_msgpack</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BBcNetwork.get_domain_keypair"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.get_domain_keypair">[docs]</a>    <span class="k">def</span> <span class="nf">get_domain_keypair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.get_domain_keypair"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.get_domain_keypair">[docs]</a>    <span class="k">def</span> <span class="nf">get_domain_keypair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get domain_keys (private key and public key)</span>
 
 <span class="sd">        Args:</span>
@@ -529,7 +528,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;keypair&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;keypair&#39;</span><span class="p">][</span><span class="s1">&#39;keys&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;keypair&#39;</span><span class="p">][</span><span class="s1">&#39;keys&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
 
-<div class="viewcode-block" id="BBcNetwork.send_domain_ping"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.send_domain_ping">[docs]</a>    <span class="k">def</span> <span class="nf">send_domain_ping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">is_static</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.send_domain_ping"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.send_domain_ping">[docs]</a>    <span class="k">def</span> <span class="nf">send_domain_ping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">is_static</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send domain ping to the specified node</span>
 
 <span class="sd">        Args:</span>
@@ -656,7 +655,7 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
-<div class="viewcode-block" id="BBcNetwork.send_message_in_network"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.send_message_in_network">[docs]</a>    <span class="k">def</span> <span class="nf">send_message_in_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodeinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">payload_type</span><span class="o">=</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_any</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.send_message_in_network"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.send_message_in_network">[docs]</a>    <span class="k">def</span> <span class="nf">send_message_in_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodeinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">payload_type</span><span class="o">=</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_any</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send message over a domain network</span>
 
 <span class="sd">        Args:</span>
@@ -709,7 +708,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;network&quot;</span><span class="p">,</span> <span class="s2">&quot;sent_data_size&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_to_send</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="BBcNetwork.broadcast_message_in_network"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.broadcast_message_in_network">[docs]</a>    <span class="k">def</span> <span class="nf">broadcast_message_in_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">payload_type</span><span class="o">=</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_any</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.broadcast_message_in_network"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.broadcast_message_in_network">[docs]</a>    <span class="k">def</span> <span class="nf">broadcast_message_in_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">payload_type</span><span class="o">=</span><span class="n">PayloadType</span><span class="o">.</span><span class="n">Type_any</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send message to all neighbor nodes</span>
 
 <span class="sd">        Args:</span>
@@ -726,7 +725,7 @@
             <span class="c1">#print(&quot;broadcast:&quot;, node_id.hex(), node_id)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send_message_in_network</span><span class="p">(</span><span class="n">nodeinfo</span><span class="p">,</span> <span class="n">payload_type</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BBcNetwork.add_neighbor"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.add_neighbor">[docs]</a>    <span class="k">def</span> <span class="nf">add_neighbor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_static</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.add_neighbor"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.add_neighbor">[docs]</a>    <span class="k">def</span> <span class="nf">add_neighbor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_static</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add node in the neighbor list</span>
 
 <span class="sd">        Args:</span>
@@ -749,7 +748,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats</span><span class="p">(</span><span class="s2">&quot;network&quot;</span><span class="p">,</span> <span class="s2">&quot;neighbor_nodes&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodelist</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">is_new</span></div>
 
-<div class="viewcode-block" id="BBcNetwork.check_admin_signature"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.check_admin_signature">[docs]</a>    <span class="k">def</span> <span class="nf">check_admin_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.check_admin_signature"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.check_admin_signature">[docs]</a>    <span class="k">def</span> <span class="nf">check_admin_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check admin signature in the message</span>
 
 <span class="sd">        Args:</span>
@@ -855,7 +854,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;topology&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">notify_neighbor_update</span><span class="p">(</span><span class="n">source_node_id</span><span class="p">,</span> <span class="n">is_new</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;neighbor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">source_node_id</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BBcNetwork.setup_udp_socket"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.setup_udp_socket">[docs]</a>    <span class="k">def</span> <span class="nf">setup_udp_socket</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.setup_udp_socket"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.setup_udp_socket">[docs]</a>    <span class="k">def</span> <span class="nf">setup_udp_socket</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Setup UDP socket&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">socket_udp</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">)</span>
@@ -878,7 +877,7 @@
         <span class="n">th_nw_loop</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="BBcNetwork.udp_message_loop"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.udp_message_loop">[docs]</a>    <span class="k">def</span> <span class="nf">udp_message_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.udp_message_loop"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.udp_message_loop">[docs]</a>    <span class="k">def</span> <span class="nf">udp_message_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Message loop for UDP socket&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Start udp_message_loop&quot;</span><span class="p">)</span>
         <span class="n">msg_parser</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">Message</span><span class="p">()</span>
@@ -914,7 +913,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">socket_udp</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">socket_udp6</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="BBcNetwork.setup_tcp_server"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.setup_tcp_server">[docs]</a>    <span class="k">def</span> <span class="nf">setup_tcp_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.setup_tcp_server"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.setup_tcp_server">[docs]</a>    <span class="k">def</span> <span class="nf">setup_tcp_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Start tcp server&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">listen_socket</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
@@ -939,7 +938,7 @@
         <span class="n">th_tcp_loop</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="BBcNetwork.tcpserver_loop"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.tcpserver_loop">[docs]</a>    <span class="k">def</span> <span class="nf">tcpserver_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcNetwork.tcpserver_loop"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.BBcNetwork.tcpserver_loop">[docs]</a>    <span class="k">def</span> <span class="nf">tcpserver_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Message loop for TCP socket&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Start tcpserver_loop&quot;</span><span class="p">)</span>
         <span class="n">msg_parsers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -989,7 +988,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">listen_socket6</span> <span class="o">=</span> <span class="kc">None</span></div></div>
 
 
-<div class="viewcode-block" id="NeighborInfo"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.NeighborInfo">[docs]</a><span class="k">class</span> <span class="nc">NeighborInfo</span><span class="p">:</span>
+<div class="viewcode-block" id="NeighborInfo"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.NeighborInfo">[docs]</a><span class="k">class</span> <span class="nc">NeighborInfo</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Manage information of neighbor nodes&quot;&quot;&quot;</span>
     <span class="n">PURGE_INTERVAL_SEC</span> <span class="o">=</span> <span class="mi">300</span>
     <span class="n">NODEINFO_LIFETIME</span> <span class="o">=</span> <span class="mi">900</span>
@@ -1004,7 +1003,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">purge_timer</span> <span class="o">=</span> <span class="n">query_management</span><span class="o">.</span><span class="n">QueryEntry</span><span class="p">(</span><span class="n">expire_after</span><span class="o">=</span><span class="n">NeighborInfo</span><span class="o">.</span><span class="n">PURGE_INTERVAL_SEC</span><span class="p">,</span>
                                                        <span class="n">callback_expire</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">purge</span><span class="p">,</span> <span class="n">retry_count</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
-<div class="viewcode-block" id="NeighborInfo.purge"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.NeighborInfo.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_entry</span><span class="p">):</span>
+<div class="viewcode-block" id="NeighborInfo.purge"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.NeighborInfo.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_entry</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Purge obsoleted entry in nodeinfo_list&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span><span class="o">.</span><span class="n">is_alive</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span><span class="o">.</span><span class="n">updated_at</span> <span class="o">+</span> \
@@ -1013,7 +1012,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">purge_timer</span> <span class="o">=</span> <span class="n">query_management</span><span class="o">.</span><span class="n">QueryEntry</span><span class="p">(</span><span class="n">expire_after</span><span class="o">=</span><span class="n">NeighborInfo</span><span class="o">.</span><span class="n">PURGE_INTERVAL_SEC</span><span class="p">,</span>
                                                        <span class="n">callback_expire</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">purge</span><span class="p">,</span> <span class="n">retry_count</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="NeighborInfo.add"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.NeighborInfo.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_static</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">domain0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="NeighborInfo.add"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.NeighborInfo.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_static</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">domain0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add or update an neighbor node entry&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">node_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">NodeInfo</span><span class="p">(</span><span class="n">node_id</span><span class="o">=</span><span class="n">node_id</span><span class="p">,</span> <span class="n">ipv4</span><span class="o">=</span><span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span>
@@ -1026,14 +1025,14 @@
             <span class="n">change_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ipv4</span><span class="o">=</span><span class="n">ipv4</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="n">ipv6</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">domain0</span><span class="o">=</span><span class="n">domain0</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">change_flag</span></div>
 
-<div class="viewcode-block" id="NeighborInfo.remove"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.NeighborInfo.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+<div class="viewcode-block" id="NeighborInfo.remove"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.NeighborInfo.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Remove entry in the nodeinfo_list&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span><span class="o">.</span><span class="n">key_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span><span class="o">.</span><span class="n">key_manager</span><span class="o">.</span><span class="n">stop_all_timers</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span><span class="o">.</span><span class="n">key_manager</span><span class="o">.</span><span class="n">unset_cipher</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="NeighborInfo.show_list"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.NeighborInfo.show_list">[docs]</a>    <span class="k">def</span> <span class="nf">show_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NeighborInfo.show_list"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.NeighborInfo.show_list">[docs]</a>    <span class="k">def</span> <span class="nf">show_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return nodeinfo list in human readable format&quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;========= node list of [</span><span class="si">%s</span><span class="s2">] ==========</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_node_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">nodeinfo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeinfo_list</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
@@ -1041,7 +1040,7 @@
         <span class="k">return</span> <span class="n">result</span></div></div>
 
 
-<div class="viewcode-block" id="NodeInfo"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.NodeInfo">[docs]</a><span class="k">class</span> <span class="nc">NodeInfo</span><span class="p">:</span>
+<div class="viewcode-block" id="NodeInfo"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.NodeInfo">[docs]</a><span class="k">class</span> <span class="nc">NodeInfo</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Node information entry&quot;&quot;&quot;</span>
     <span class="n">SECURITY_STATE_NONE</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">SECURITY_STATE_REQUESTING</span> <span class="o">=</span> <span class="mi">1</span>
@@ -1100,11 +1099,11 @@
                   <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_static</span><span class="p">,</span> <span class="n">security_state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_domain0_node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">updated_at</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output</span>
 
-<div class="viewcode-block" id="NodeInfo.touch"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.NodeInfo.touch">[docs]</a>    <span class="k">def</span> <span class="nf">touch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeInfo.touch"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.NodeInfo.touch">[docs]</a>    <span class="k">def</span> <span class="nf">touch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">updated_at</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="NodeInfo.update"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.NodeInfo.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipv4</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeInfo.update"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.NodeInfo.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipv4</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the entry</span>
 
 <span class="sd">        Args:</span>
@@ -1143,7 +1142,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">change_flag</span></div>
 
-<div class="viewcode-block" id="NodeInfo.get_nodeinfo"><a class="viewcode-back" href="../../../orig/bbc1.core.bbc_network.html#bbc1.core.bbc_network.NodeInfo.get_nodeinfo">[docs]</a>    <span class="k">def</span> <span class="nf">get_nodeinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeInfo.get_nodeinfo"><a class="viewcode-back" href="../../../bbc1.core.bbc_network.html#bbc1.core.bbc_network.NodeInfo.get_nodeinfo">[docs]</a>    <span class="k">def</span> <span class="nf">get_nodeinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a list of node info</span>
 
 <span class="sd">        Returns:</span>
@@ -1207,10 +1206,7 @@
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

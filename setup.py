@@ -27,10 +27,10 @@ bbc1_requires = [
                  'jinja2>=2.8.1',
                  'requests>=2.12.4',
                  'gevent>=1.2.1',
-                 'cryptography==2.1.4',
+                 'cryptography>=2.1.4',
                  'pytest<=3.2.*,>=3.0.5',
                  'msgpack-python>=0.4.8',
-                 'mysql-connector-python==8.0.5',
+                 'mysql-connector-python>=8.0.5',
                  'greenlet',
                  'bson',
                  'Flask>=0.10.1,<=1.0.1'
@@ -56,7 +56,7 @@ bbc1_classifiers = [
 
 setup(
     name='bbc1',
-    version='1.0',
+    version='1.0.1',
     description='A core system of Beyond Blockchain One',
     long_description=readme,
     url='https://github.com/beyond-blockchain/bbc1',
