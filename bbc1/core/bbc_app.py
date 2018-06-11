@@ -597,7 +597,7 @@ class BBcAppClient:
         dat[KeyType.all_asset_files] = ast
         return self._send_msg(dat)
 
-    def search_transaction_with_condition(self, asset_group_id=None, asset_id=None, user_id=None, count=1):
+    def search_transaction_with_condition(self, asset_group_id=None, asset_id=None, user_id=None, direction=0, count=1):
         """Search transaction data by asset_group_id/asset_id/user_id
 
         If multiple conditions are specified, they are considered as AND condition.
@@ -606,6 +606,7 @@ class BBcAppClient:
             asset_group_id (bytes): asset_group_id in BBcEvent and BBcRelations
             asset_id (bytes): asset_id in BBcAsset
             user_id (bytes): user_id in BBcAsset that means the owner of the asset
+            direction (int): 0: descend, 1: ascend
             count (int): the number of transactions to retrieve
         Returns:
             bytes: query_id
@@ -617,6 +618,7 @@ class BBcAppClient:
             dat[KeyType.asset_id] = asset_id
         if user_id is not None:
             dat[KeyType.user_id] = user_id
+        dat[KeyType.direction] = direction
         dat[KeyType.count] = count
         return self._send_msg(dat)
 

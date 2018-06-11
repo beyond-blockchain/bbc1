@@ -444,7 +444,8 @@ class DataHandler:
             else:
                 self._remove_in_storage(asset_group_id, asset_id)
 
-    def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None, count=1, db_num=0):
+    def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None,
+                           direction=0, count=1, db_num=0):
         """Search transaction data
 
         When Multiple conditions are given, they are considered as AND condition.
@@ -454,6 +455,7 @@ class DataHandler:
             asset_group_id (bytes): asset_group_id that target transactions should have
             asset_id (bytes): asset_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
+            direction (int): 0: descend, 1: ascend
             count (int): The maximum number of transactions to retrieve
             db_num (int): index of DB if multiple DBs are used
         Returns:
@@ -468,6 +470,9 @@ class DataHandler:
             if len(txinfo) == 0:
                 return None, None
         else:
+            dire = "DESC"
+            if direction == 1:
+                dire = "ASC"
             sql = "SELECT * from asset_info_table WHERE "
             conditions = list()
             if asset_group_id is not None:
@@ -476,7 +481,7 @@ class DataHandler:
                 conditions.append("asset_id = %s " % self.db_adaptors[0].placeholder)
             if user_id is not None:
                 conditions.append("user_id = %s " % self.db_adaptors[0].placeholder)
-            sql += "AND ".join(conditions) + "ORDER BY id DESC"
+            sql += "AND ".join(conditions) + "ORDER BY id %s" % dire
             if count > 0:
                 if count > 20:
                     count = 20

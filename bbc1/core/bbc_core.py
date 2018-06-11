@@ -368,6 +368,7 @@ class BBcCoreService:
                                                             asset_group_id=dat.get(KeyType.asset_group_id, None),
                                                             asset_id=dat.get(KeyType.asset_id, None),
                                                             user_id=dat.get(KeyType.user_id, None),
+                                                            direction=dat.get(KeyType.direction, 0),
                                                             count=dat.get(KeyType.count, 1))
             if txinfo is None or KeyType.transactions not in txinfo:
                 if not self._error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
@@ -912,7 +913,8 @@ class BBcCoreService:
             del response_info[KeyType.compromised_transactions]
         return response_info
 
-    def search_transaction_with_condition(self, domain_id, asset_group_id=None, asset_id=None, user_id=None, count=1):
+    def search_transaction_with_condition(self, domain_id, asset_group_id=None, asset_id=None, user_id=None,
+                                          direction=0, count=1):
         """Search transactions that match given conditions
 
         When Multiple conditions are given, they are considered as AND condition.
@@ -922,6 +924,7 @@ class BBcCoreService:
             asset_group_id (bytes): asset_group_id that target transactions should have
             asset_id (bytes): asset_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
+            direction (int): 0: descend, 1: ascend
             count (int): The maximum number of transactions to retrieve
         Returns:
             dict: dictionary having transaction_id, serialized transaction data, asset files
@@ -931,8 +934,8 @@ class BBcCoreService:
             return None
 
         dh = self.networking.domains[domain_id]['data']
-        ret_txobj, ret_asset_files = dh.search_transaction(asset_group_id=asset_group_id,
-                                                           asset_id=asset_id, user_id=user_id, count=count)
+        ret_txobj, ret_asset_files = dh.search_transaction(asset_group_id=asset_group_id, asset_id=asset_id,
+                                                           user_id=user_id, direction=direction, count=count)
         if ret_txobj is None or len(ret_txobj) == 0:
             return None
 
