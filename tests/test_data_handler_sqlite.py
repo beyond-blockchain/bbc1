@@ -152,6 +152,16 @@ class TestDataHandler(object):
         assert len(ret) == 1
         assert ret[0][1] == transactions[2].transaction_id
 
+    def test_10_count_transactions(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        ret = data_handler.count_transactions(asset_group_id=asset_group_id1)
+        print("(asset_group_id1) count=", ret)
+        assert ret == 10
+
+        ret = data_handler.count_transactions(user_id=user_id1)
+        print("(user_id1) count=", ret)
+        assert ret == 10
+
 
 if __name__ == '__main__':
     pytest.main()

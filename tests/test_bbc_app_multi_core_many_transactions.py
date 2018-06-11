@@ -147,6 +147,26 @@ class TestBBcAppClient(object):
             assert dat[KeyType.transaction_id] == txobj.transaction_id
             transactions[i] = txobj
 
+    def test_14_count_transactions(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        clients[0]['app'].count_transactions(asset_group_id=asset_group_id)
+        dat = msg_processor[0].synchronize()
+        assert dat[KeyType.status] == ESUCCESS
+        count = dat[KeyType.count]
+        print("(asset_group_id) count=", count)
+
+        clients[2]['app'].count_transactions(user_id=clients[1]['user_id'])
+        dat = msg_processor[2].synchronize()
+        assert dat[KeyType.status] == ESUCCESS
+        count = dat[KeyType.count]
+        print("(user_id1) count=", count)
+
+        clients[4]['app'].count_transactions(asset_group_id=asset_group_id, user_id=clients[2]['user_id'])
+        dat = msg_processor[4].synchronize()
+        assert dat[KeyType.status] == ESUCCESS
+        count = dat[KeyType.count]
+        print("(user_id2) count=", count)
+
     @pytest.mark.unregister
     def test_98_unregister(self):
         for cl in clients:

@@ -632,6 +632,27 @@ class BBcAppClient:
         dat[KeyType.transaction_id] = transaction_id
         return self._send_msg(dat)
 
+    def count_transactions(self, asset_group_id=None, asset_id=None, user_id=None):
+        """Count transactions that matches the given conditions
+
+        If multiple conditions are specified, they are considered as AND condition.
+
+        Args:
+            asset_group_id (bytes): asset_group_id in BBcEvent and BBcRelations
+            asset_id (bytes): asset_id in BBcAsset
+            user_id (bytes): user_id in BBcAsset that means the owner of the asset
+        Returns:
+            int: the number of transactions
+        """
+        dat = self._make_message_structure(MsgType.REQUEST_COUNT_TRANSACTIONS)
+        if asset_group_id is not None:
+            dat[KeyType.asset_group_id] = asset_group_id
+        if asset_id is not None:
+            dat[KeyType.asset_id] = asset_id
+        if user_id is not None:
+            dat[KeyType.user_id] = user_id
+        return self._send_msg(dat)
+
     def traverse_transactions(self, transaction_id, direction=1, hop_count=3):
         """Search request for transactions
 
@@ -832,6 +853,8 @@ class Callback:
             self.proc_resp_search_transaction(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_WITH_CONDITIONS:
             self.proc_resp_search_with_condition(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_COUNT_TRANSACTIONS:
+            self.proc_resp_count_transactions(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_TRAVERSE_TRANSACTIONS:
             self.proc_resp_traverse_transactions(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GATHER_SIGNATURE:
@@ -999,6 +1022,16 @@ class Callback:
 
     def proc_resp_search_transaction(self, dat):
         """Callback for message RESPONSE_SEARCH_TRANSACTION
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
+        self.queue.put(dat)
+
+    def proc_resp_count_transactions(self, dat):
+        """Callback for message RESPONSE_COUNT_TRANSACTIONS
 
         This method should be overridden if you want to process the message asynchronously.
 
