@@ -107,7 +107,8 @@ class TestBBcAppClient(object):
 
     def test_04_search_transaction_direction_backward(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        clients[0]['app'].traverse_transactions(transactions1[1].transaction_id, direction=1, hop_count=3)
+        clients[0]['app'].traverse_transactions(transactions1[1].transaction_id, asset_group_id=asset_group_id,
+                                                direction=1, hop_count=3)
         dat = clients[0]['app'].callback.synchronize()
         assert dat[KeyType.status] == 0
         assert KeyType.transaction_tree in dat
@@ -174,6 +175,13 @@ class TestBBcAppClient(object):
                 asset_body = txobj.events[0].asset.asset_body
                 print("[%d] asset=%s" % (i, asset_body))
                 asset_bodies.append(asset_body)
+
+    def test_08_search_transaction_invalid_group(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        clients[0]['app'].traverse_transactions(transactions2[4].transaction_id, asset_group_id=clients[0]['user_id'],
+                                                direction=1, hop_count=3)
+        dat = clients[0]['app'].callback.synchronize()
+        assert dat[KeyType.status] < 0
 
     @pytest.mark.unregister
     def test_98_unregister(self):

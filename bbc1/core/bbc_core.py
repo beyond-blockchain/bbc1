@@ -397,8 +397,13 @@ class BBcCoreService:
             retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_TRAVERSE_TRANSACTIONS,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.transaction_id] = dat[KeyType.transaction_id]
+            asset_group_id = dat.get(KeyType.asset_group_id, None)
+            user_id = dat.get(KeyType.user_id, None)
             all_included, txtree, asset_files = self._traverse_transactions(domain_id, dat[KeyType.transaction_id],
-                                                                           dat[KeyType.direction], dat[KeyType.hop_count])
+                                                                            asset_group_id=asset_group_id,
+                                                                            user_id=user_id,
+                                                                            direction=dat[KeyType.direction],
+                                                                            hop_count=dat[KeyType.hop_count])
             if txtree is None or len(txtree) == 0:
                 if not self._error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
                     user_message_routing.direct_send_to_user(socket, retmsg)
@@ -961,15 +966,18 @@ class BBcCoreService:
         dh = self.networking.domains[domain_id]['data']
         return dh.count_transactions(asset_group_id=asset_group_id, asset_id=asset_id, user_id=user_id)
 
-    def _traverse_transactions(self, domain_id, transaction_id, direction=1, hop_count=3):
-        """Get transaction tree from the specified transaction_id
+    def _traverse_transactions(self, domain_id, transaction_id, asset_group_id=None, user_id=None, direction=1, hop_count=3):
+        """Get transaction tree from the specified transaction_id with given condition
 
+        If both asset_group_id and user_id are specified, they are treated as AND condition.
         Transaction tree in the return values are in the following format:
         [ [list of serialized transactions in 1-hop from the base], [list of serialized transactions in 2-hop from the base],,,,
 
         Args:
             domain_id (bytes): target domain_id
             transaction_id (bytes): the base transaction_id from which traverse starts
+            asset_group_id (bytes): asset_group_id that target transactions should have
+            user_id (bytes): user_id that target transactions should have
             direction (int): 1:backward, non-1:forward
             hop_count (bytes): hop count to traverse
         Returns:
@@ -1011,6 +1019,18 @@ class BBcCoreService:
                 ret_txobj, ret_asset_files = dh.search_transaction(transaction_id=txid)
                 if ret_txobj is None or len(ret_txobj) == 0:
                     continue
+                if asset_group_id is not None or user_id is not None:
+                    flag = False
+                    for asgid, asset_id, uid, fileflag, filedigest in dh.get_asset_info(ret_txobj[txid]):
+                        flag = True
+                        if asset_group_id is not None and asgid != asset_group_id:
+                            flag = False
+                        if user_id is not None and uid != user_id:
+                            flag = False
+                        if flag:
+                            break
+                    if not flag:
+                        continue
                 tx_brothers.append(ret_txobj[txid].transaction_data)
                 if len(ret_asset_files) > 0:
                     asset_files.update(ret_asset_files)
