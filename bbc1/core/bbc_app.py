@@ -162,17 +162,17 @@ class BBcAppClient:
             cmd (bytes): command type defined in bbclib.MsgType class
         """
         self.query_id = ((int.from_bytes(self.query_id, 'little') + 1) % 65536).to_bytes(2, 'little')
-        if cmd not in MESSAGE_WITH_NO_RESPONSE:
-            if self.use_query_id_based_message_wait:
-                if self.query_id not in self.callback.query_queue:
-                    self.callback.create_queue(self.query_id)
         msg = {
             KeyType.command: cmd,
             KeyType.domain_id: self.domain_id,
             KeyType.source_user_id: self.user_id,
-            KeyType.query_id: self.query_id,
             KeyType.status: ESUCCESS,
         }
+        if cmd not in MESSAGE_WITH_NO_RESPONSE:
+            msg[KeyType.query_id] = self.query_id
+            if self.use_query_id_based_message_wait:
+                if self.query_id not in self.callback.query_queue:
+                    self.callback.create_queue(self.query_id)
         return msg
 
     def _send_msg(self, dat):
