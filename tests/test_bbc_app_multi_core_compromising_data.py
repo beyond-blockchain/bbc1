@@ -38,7 +38,7 @@ def make_transaction(user_id, keypair):
                               asset_body="data=%d" % random.randint(1, 10000),
                               asset_file=asset_file_content)
     txobj.witness.add_witness(user_id)
-    sig = txobj.sign(keypair)
+    sig = txobj.sign(keypair=keypair)
     txobj.add_signature(user_id, sig)
     txobj.digest()
     return txobj
@@ -136,7 +136,7 @@ class TestBBcAppClient(object):
         print("* forge transaction[0] and update the data in node 0")
         txobj = transactions[0]
         txdata = bytearray(txobj.serialize())
-        txdata[int(len(txdata)/2)] = txdata[int(len(txdata)/2)] + 0x01
+        txdata[int(len(txdata)/3)] = txdata[int(len(txdata)/3)] + 0x01
         data_handler = cores[0].networking.domains[domain_id]['data']
         sql = "UPDATE transaction_table SET transaction_data = %s WHERE transaction_id = %s" % \
               (data_handler.db_adaptors[0].placeholder, data_handler.db_adaptors[0].placeholder)

@@ -1,6 +1,11 @@
 Change log
 ======
 
+## v1.0.1
+* Bug fixes
+  * pip install bug is fixed but pipenv install still has some troubles.
+  * Bug of serialization/deserialization of BBcSignature in some cases is fixed
+
 ## v1.0
 * Restructure the whole package
   * Only bbc1/core/ remains
