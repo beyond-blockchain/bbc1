@@ -119,7 +119,8 @@ class TestBBcAppClient(object):
     def test_07_search_asset_event0(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         clients[0]['app'].search_transaction_with_condition(asset_group_id=asset_group_id,
-                                                            asset_id=transactions[0].events[0].asset.asset_id)
+                                                            asset_id=transactions[0].events[0].asset.asset_id,
+                                                            direction=1)
         dat = msg_processor[0].synchronize()
         assert dat[KeyType.status] == 0
         assert KeyType.transactions in dat

@@ -162,17 +162,17 @@ class BBcAppClient:
             cmd (bytes): command type defined in bbclib.MsgType class
         """
         self.query_id = ((int.from_bytes(self.query_id, 'little') + 1) % 65536).to_bytes(2, 'little')
-        if cmd not in MESSAGE_WITH_NO_RESPONSE:
-            if self.use_query_id_based_message_wait:
-                if self.query_id not in self.callback.query_queue:
-                    self.callback.create_queue(self.query_id)
         msg = {
             KeyType.command: cmd,
             KeyType.domain_id: self.domain_id,
             KeyType.source_user_id: self.user_id,
-            KeyType.query_id: self.query_id,
             KeyType.status: ESUCCESS,
         }
+        if cmd not in MESSAGE_WITH_NO_RESPONSE:
+            msg[KeyType.query_id] = self.query_id
+            if self.use_query_id_based_message_wait:
+                if self.query_id not in self.callback.query_queue:
+                    self.callback.create_queue(self.query_id)
         return msg
 
     def _send_msg(self, dat):
@@ -597,7 +597,7 @@ class BBcAppClient:
         dat[KeyType.all_asset_files] = ast
         return self._send_msg(dat)
 
-    def search_transaction_with_condition(self, asset_group_id=None, asset_id=None, user_id=None, count=1):
+    def search_transaction_with_condition(self, asset_group_id=None, asset_id=None, user_id=None, direction=0, count=1):
         """Search transaction data by asset_group_id/asset_id/user_id
 
         If multiple conditions are specified, they are considered as AND condition.
@@ -606,6 +606,7 @@ class BBcAppClient:
             asset_group_id (bytes): asset_group_id in BBcEvent and BBcRelations
             asset_id (bytes): asset_id in BBcAsset
             user_id (bytes): user_id in BBcAsset that means the owner of the asset
+            direction (int): 0: descend, 1: ascend
             count (int): the number of transactions to retrieve
         Returns:
             bytes: query_id
@@ -617,6 +618,7 @@ class BBcAppClient:
             dat[KeyType.asset_id] = asset_id
         if user_id is not None:
             dat[KeyType.user_id] = user_id
+        dat[KeyType.direction] = direction
         dat[KeyType.count] = count
         return self._send_msg(dat)
 
@@ -632,7 +634,28 @@ class BBcAppClient:
         dat[KeyType.transaction_id] = transaction_id
         return self._send_msg(dat)
 
-    def traverse_transactions(self, transaction_id, direction=1, hop_count=3):
+    def count_transactions(self, asset_group_id=None, asset_id=None, user_id=None):
+        """Count transactions that matches the given conditions
+
+        If multiple conditions are specified, they are considered as AND condition.
+
+        Args:
+            asset_group_id (bytes): asset_group_id in BBcEvent and BBcRelations
+            asset_id (bytes): asset_id in BBcAsset
+            user_id (bytes): user_id in BBcAsset that means the owner of the asset
+        Returns:
+            int: the number of transactions
+        """
+        dat = self._make_message_structure(MsgType.REQUEST_COUNT_TRANSACTIONS)
+        if asset_group_id is not None:
+            dat[KeyType.asset_group_id] = asset_group_id
+        if asset_id is not None:
+            dat[KeyType.asset_id] = asset_id
+        if user_id is not None:
+            dat[KeyType.user_id] = user_id
+        return self._send_msg(dat)
+
+    def traverse_transactions(self, transaction_id, asset_group_id=None, user_id=None, direction=1, hop_count=3):
         """Search request for transactions
 
         The method traverses the transaction graph in the ledger.
@@ -640,6 +663,8 @@ class BBcAppClient:
 
         Args:
             transaction_id (bytes): the target transaction to retrieve
+            asset_group_id (bytes): asset_group_id that target transactions should have
+            user_id (bytes): user_id that target transactions should have
             direction (int): 1:backforward, non-1:forward
             hop_count (int): hop count to traverse from the specified origin point
         Returns:
@@ -647,6 +672,10 @@ class BBcAppClient:
         """
         dat = self._make_message_structure(MsgType.REQUEST_TRAVERSE_TRANSACTIONS)
         dat[KeyType.transaction_id] = transaction_id
+        if asset_group_id is not None:
+            dat[KeyType.asset_group_id] = asset_group_id
+        if user_id is not None:
+            dat[KeyType.user_id] = user_id
         dat[KeyType.direction] = direction
         dat[KeyType.hop_count] = hop_count
         return self._send_msg(dat)
@@ -832,6 +861,8 @@ class Callback:
             self.proc_resp_search_transaction(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_SEARCH_WITH_CONDITIONS:
             self.proc_resp_search_with_condition(dat)
+        elif dat[KeyType.command] == MsgType.RESPONSE_COUNT_TRANSACTIONS:
+            self.proc_resp_count_transactions(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_TRAVERSE_TRANSACTIONS:
             self.proc_resp_traverse_transactions(dat)
         elif dat[KeyType.command] == MsgType.RESPONSE_GATHER_SIGNATURE:
@@ -999,6 +1030,16 @@ class Callback:
 
     def proc_resp_search_transaction(self, dat):
         """Callback for message RESPONSE_SEARCH_TRANSACTION
+
+        This method should be overridden if you want to process the message asynchronously.
+
+        Args:
+            dat (dict): received message
+        """
+        self.queue.put(dat)
+
+    def proc_resp_count_transactions(self, dat):
+        """Callback for message RESPONSE_COUNT_TRANSACTIONS
 
         This method should be overridden if you want to process the message asynchronously.
 
