@@ -33,6 +33,21 @@ default_config = {
             }
         }
     },
+    'domain_default': {
+        'storage': {
+            "type": "internal",  # or "external"
+        },
+        'db': {
+            "db_type": "sqlite",  # or "mysql"
+            "db_name": "bbc_ledger.sqlite",
+            "replication_strategy": "all",  # or "p2p"/"external" (valid only in db_type=mysql)
+            "db_servers": [{"db_addr": "127.0.0.1", "db_port": 3306, "db_user": "user", "db_pass": "pass"}]
+            # valid only in the case of db_type=mysql
+        },
+        'static_nodes': {
+            # id : [ipv4, ipv6, port]
+        },
+    },
     "ethereum": {
         "chain_id": 15,
         "port": 30303,
@@ -42,27 +57,6 @@ default_config = {
         "contract": "BBcAnchor",
         "contract_address": "",
     }
-}
-
-simple_domain_conf = {
-    "storage": {
-        "type": "internal"
-    },
-    "db": {
-        "db_type": "sqlite",
-        "db_name": "bbc_ledger.sqlite",
-        "replication_strategy": "all",
-        "db_servers": [
-            {
-                "db_addr": "127.0.0.1",
-                "db_port": 3306,
-                "db_user": "user",
-                "db_pass": "pass"
-            }
-        ]
-    },
-    "static_nodes": {},
-    "node_id": ""
 }
 
 
@@ -162,7 +156,7 @@ def file_output(filepath, targetobj):
 def write_proc(targetobj, domainhex, k1obj, k2obj, filepath):
     print("------")
     if k1obj['value'] is None and k2obj['value'] is None:
-        targetobj["domains"][domainhex] = simple_domain_conf
+        targetobj["domains"][domainhex] = default_config['domain_default']
         pprint.pprint(targetobj, width=80)
         return file_output(filepath, targetobj)
     if k2obj['key'] is not None and k1obj['key'] is None:

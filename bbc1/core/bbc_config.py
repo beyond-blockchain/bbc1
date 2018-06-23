@@ -35,7 +35,7 @@ DEFAULT_ETHEREUM_GETH_PORT = 30303
 
 TIMEOUT_TIMER = 3
 
-current_config = {
+plain_config = {
     'workingdir': DEFAULT_WORKING_DIR,
     'client': {
         'port': DEFAULT_CORE_PORT,
@@ -64,6 +64,21 @@ current_config = {
             },
         },
     },
+    'domain_default': {
+        'storage': {
+            "type": "internal",  # or "external"
+        },
+        'db': {
+            "db_type": "sqlite",  # or "mysql"
+            "db_name": "bbc_ledger.sqlite",
+            "replication_strategy": "all",  # or "p2p"/"external" (valid only in db_type=mysql)
+            "db_servers": [{"db_addr": "127.0.0.1", "db_port": 3306, "db_user": "user", "db_pass": "pass"}]
+            # valid only in the case of db_type=mysql
+        },
+        'static_nodes': {
+            # id : [ipv4, ipv6, port]
+        },
+    },
     'ethereum': {
         'chain_id': DEFAULT_ETHEREUM_CHAIN_ID,
         'port': DEFAULT_ETHEREUM_GETH_PORT,
@@ -74,6 +89,17 @@ current_config = {
         'contract_address': '',
     },
 }
+
+
+def load_config(filepath):
+    config = dict()
+    with open(filepath, "r") as f:
+        try:
+            config = json.load(f)
+        except:
+            print("config file must be in JSON format")
+            os._exit(1)
+    return config
 
 
 def update_deep(d, u):
@@ -92,8 +118,8 @@ def update_deep(d, u):
 
 class BBcConfig:
     """System configuration"""
-    def __init__(self, directory=None, file=None):
-        self.config = copy.deepcopy(current_config)
+    def __init__(self, directory=None, file=None, default_confpath=None):
+        self.config = copy.deepcopy(plain_config)
         if directory is not None:
             self.working_dir = directory
             self.config['workingdir'] = self.working_dir
@@ -109,18 +135,14 @@ class BBcConfig:
 
         if os.path.isfile(self.config_file):
             update_deep(self.config, self.read_config())
+
+        if default_confpath is not None and os.path.exists(default_confpath):
+            self.config.update(load_config(default_confpath))
         self.update_config()
 
     def read_config(self):
         """Read config file"""
-        config = dict()
-        with open(self.config_file, "r") as f:
-            try:
-                config = json.load(f)
-            except:
-                print("config file must be in JSON format")
-                os._exit(1)
-        return config
+        return load_config(self.config_file)
 
     def update_config(self):
         """Write config to file (config.json)"""
@@ -150,21 +172,7 @@ class BBcConfig:
             self.config['domains'][domain_id_str] = conf['domains'][domain_id_str]
 
         if create_if_new and domain_id_str not in self.config['domains']:
-            self.config['domains'][domain_id_str] = {
-                'storage': {
-                    "type": "internal",  # or "external"
-                },
-                'db': {
-                    "db_type": "sqlite",            # or "mysql"
-                    "db_name": "bbc_ledger.sqlite",
-                    "replication_strategy": "all",  # or "p2p"/"external" (valid only in db_type=mysql)
-                    "db_servers": [{"db_addr": "127.0.0.1", "db_port": 3306, "db_user": "user", "db_pass": "pass"}]
-                    # valid only in the case of db_type=mysql
-                },
-                'static_nodes': {
-                    # id : [ipv4, ipv6, port]
-                },
-            }
+            self.config['domains'][domain_id_str] = self.config['domain_default']
         if domain_id_str in self.config['domains']:
             return self.config['domains'][domain_id_str]
         return None
