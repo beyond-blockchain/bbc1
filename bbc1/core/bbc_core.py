@@ -130,10 +130,10 @@ class BBcCoreService:
     """Base service object of BBc-1"""
     def __init__(self, p2p_port=None, core_port=None, use_domain0=False, ip4addr=None, ip6addr=None,
                  workingdir=".bbc1", configfile=None, use_nodekey=None, use_ledger_subsystem=False,
-                 loglevel="all", logname="-", server_start=True):
+                 default_conffile=None, loglevel="all", logname="-", server_start=True):
         self.logger = logger.get_logger(key="core", level=loglevel, logname=logname)
         self.stats = bbc_stats.BBcStats()
-        self.config = BBcConfig(workingdir, configfile)
+        self.config = BBcConfig(workingdir, configfile, default_conffile)
         conf = self.config.get_config()
         if p2p_port is not None:
             conf['client']['port'] = core_port
@@ -632,9 +632,12 @@ class BBcCoreService:
             if not self._param_check([KeyType.domain_id], dat):
                 self.logger.debug("REQUEST_SETUP_DOMAIN: bad format")
                 return False, None
+            conf = None
+            if KeyType.bbc_configuration in dat:
+                conf = json.loads(dat[KeyType.bbc_configuration])
             retmsg = _make_message_structure(None, MsgType.RESPONSE_SETUP_DOMAIN,
                                              dat[KeyType.source_user_id], dat[KeyType.query_id])
-            retmsg[KeyType.result] = self.networking.create_domain(domain_id=domain_id)
+            retmsg[KeyType.result] = self.networking.create_domain(domain_id=domain_id, config=conf)
             if not retmsg[KeyType.result]:
                 retmsg[KeyType.reason] = "Already exists"
             retmsg[KeyType.domain_id] = domain_id
@@ -1092,6 +1095,7 @@ if __name__ == '__main__':
         use_ledger_subsystem=argresult.ledgersubsystem,
         ip4addr=argresult.ip4addr,
         ip6addr=argresult.ip6addr,
+        default_conffile=argresult.default_config,
         logname=argresult.log,
         loglevel=argresult.verbose_level,
     )
