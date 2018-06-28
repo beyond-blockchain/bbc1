@@ -67,8 +67,7 @@ def create_transaction_object_and_send_sign_req(idx, receiver_user_id, ref_txids
         prev_tx = bbclib.BBcTransaction(deserialize=response_data[KeyType.transaction_data])
         bbclib.add_relation_pointer(txobj, 0, ref_transaction_id=prev_tx.digest())
 
-    sig_mine = txobj.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1, private_key=keypairs[idx].private_key,
-                          public_key=keypairs[idx].public_key)
+    sig_mine = txobj.sign(private_key=keypairs[idx].private_key, public_key=keypairs[idx].public_key)
     txobj.witness.add_signature(user_id=user_ids[idx], signature=sig_mine)
 
     asset_id = txobj.relations[0].asset.asset_id
@@ -174,9 +173,7 @@ class TestFileProofClient(object):
                                   user_id=user_ids[0], asset_body="Owner is 0", asset_file=large_data)
 
         store_transaction.witness.add_witness(user_ids[0])
-        sig = store_transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
-                                     private_key=keypairs[0].private_key,
-                                     public_key=keypairs[0].public_key)
+        sig = store_transaction.sign(private_key=keypairs[0].private_key, public_key=keypairs[0].public_key)
         store_transaction.get_sig_index(user_ids[0])
         store_transaction.add_signature(user_id=user_ids[0], signature=sig)
         store_transaction.digest()
