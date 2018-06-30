@@ -64,8 +64,7 @@ def prepare_transactions():
         else:
             txobj.add(event=evt, relation=rtn, witness=wit)
         wit.add_witness(user_id1)
-        sig = txobj.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
-                         private_key=keypair1.private_key, public_key=keypair1.public_key)
+        sig = txobj.sign(private_key=keypair1.private_key, public_key=keypair1.public_key)
         txobj.add_signature(user_id=user_id1, signature=sig)
         txobj.digest()
         transactions.append(txobj)
