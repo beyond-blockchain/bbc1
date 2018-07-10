@@ -293,10 +293,10 @@ def validate_transaction_object(txobj, asset_files=None):
         tuple: list of valid assets
         tuple: list of invalid assets
     """
-    txid = txobj.transaction_id
+    digest = txobj.digest()
     for i, sig in enumerate(txobj.signatures):
         try:
-            if not sig.verify(txid):
+            if not sig.verify(digest):
                 return False, (), ()
         except:
             return False, (), ()
@@ -742,8 +742,8 @@ class BBcTransaction:
             bytes: transaction_id (or digest)
         """
         target = self.serialize(for_id=True)
-        d = hashlib.sha256(target).digest()[:self.id_length]
-        self.transaction_id = d
+        d = hashlib.sha256(target).digest()
+        self.transaction_id = d[:self.id_length]
         return d
 
     def serialize(self, for_id=False):
@@ -1260,7 +1260,8 @@ class BBcReference:
                 self.sig_indices.append(self.transaction.get_sig_index(dummy_id))
             self.mandatory_approvers = evt.mandatory_approvers
             self.option_approvers = evt.option_approvers
-            self.transaction_id = ref_transaction.digest()
+            ref_transaction.digest()
+            self.transaction_id = ref_transaction.transaction_id
         except Exception as e:
             print(traceback.format_exc())
 
