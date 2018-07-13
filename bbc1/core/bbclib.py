@@ -293,10 +293,10 @@ def validate_transaction_object(txobj, asset_files=None):
         tuple: list of valid assets
         tuple: list of invalid assets
     """
-    txid = txobj.transaction_id
+    digest = txobj.digest()
     for i, sig in enumerate(txobj.signatures):
         try:
-            if not sig.verify(txid):
+            if not sig.verify(digest):
                 return False, (), ()
         except:
             return False, (), ()
@@ -742,8 +742,8 @@ class BBcTransaction:
             bytes: transaction_id (or digest)
         """
         target = self.serialize(for_id=True)
-        d = hashlib.sha256(target).digest()[:self.id_length]
-        self.transaction_id = d
+        d = hashlib.sha256(target).digest()
+        self.transaction_id = d[:self.id_length]
         return d
 
     def serialize(self, for_id=False):
@@ -938,19 +938,34 @@ class BBcTransaction:
                     "tx_base": self.transaction_base_digest,
                     "cross_ref": tx_crossref,
                 })
-        tx_base.update({"cross_ref": tx_crossref})
+        if self.version == 0:
+            tx_base.update({"cross_ref": tx_crossref})
 
         if self.format_type in [BBcFormat.FORMAT_MSGPACK, BBcFormat.FORMAT_MSGPACK_COMPRESS_BZ2,
                                 BBcFormat.FORMAT_MSGPACK_COMPRESS_ZLIB]:
-            dat = msgpack.dumps({
-                "transaction_base": tx_base,
-                "signatures": [sig.serialize() for sig in self.signatures],
-            })
+            if self.version == 0:
+                dat = msgpack.dumps({
+                    "transaction_base": tx_base,
+                    "signatures": [sig.serialize() for sig in self.signatures],
+                })
+            else:
+                dat = msgpack.dumps({
+                    "transaction_base": tx_base,
+                    "cross_ref": tx_crossref,
+                    "signatures": [sig.serialize() for sig in self.signatures],
+                })
         else:
-            dat = bson.dumps({
-                "transaction_base": tx_base,
-                "signatures": [sig.serialize() for sig in self.signatures],
-            })
+            if self.version == 0:
+                dat = bson.dumps({
+                    "transaction_base": tx_base,
+                    "signatures": [sig.serialize() for sig in self.signatures],
+                })
+            else:
+                dat = bson.dumps({
+                    "transaction_base": tx_base,
+                    "cross_ref": tx_crossref,
+                    "signatures": [sig.serialize() for sig in self.signatures],
+                })
         if self.format_type in [BBcFormat.FORMAT_MSGPACK_COMPRESS_BZ2, BBcFormat.FORMAT_BSON_COMPRESS_BZ2]:
             dat = bz2.compress(dat, compresslevel=1)
         elif self.format_type in [BBcFormat.FORMAT_BSON_COMPRESS_ZLIB, BBcFormat.FORMAT_MSGPACK_COMPRESS_ZLIB]:
@@ -1004,7 +1019,10 @@ class BBcTransaction:
             self.witness = BBcWitness(format_type=self.format_type, id_length=self.id_length)
             self.witness.transaction = self
             self.witness.deserialize(wit)
-        cross_ref = tx_base.get("cross_ref", None)
+        if self.version == 0:
+            cross_ref = tx_base.get("cross_ref", None)
+        else:
+            cross_ref = datobj.get("cross_ref", None)
         if cross_ref is None:
             self.cross_ref = None
         else:
@@ -1260,7 +1278,8 @@ class BBcReference:
                 self.sig_indices.append(self.transaction.get_sig_index(dummy_id))
             self.mandatory_approvers = evt.mandatory_approvers
             self.option_approvers = evt.option_approvers
-            self.transaction_id = ref_transaction.digest()
+            ref_transaction.digest()
+            self.transaction_id = ref_transaction.transaction_id
         except Exception as e:
             print(traceback.format_exc())
 
