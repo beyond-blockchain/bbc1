@@ -558,7 +558,7 @@ class BBcSignature:
     def get_dict(self):
         """Serialize this object"""
         if self.not_initialized:
-            return {'key_type': self.key_type}
+            return {'key_type': 0}
         pubkey_len_bit = len(self.pubkey) * 8
         sig_len_bit = len(self.signature) * 8
         return {
@@ -715,7 +715,7 @@ class BBcTransaction:
         """
         if user_id not in self.userid_sigidx_mapping:
             self.userid_sigidx_mapping[user_id] = len(self.userid_sigidx_mapping)
-            self.signatures.append(BBcSignature())
+            self.signatures.append(BBcSignature(format_type=self.format_type))
         return self.userid_sigidx_mapping[user_id]
 
     def add_signature(self, user_id=None, signature=None):
@@ -938,19 +938,34 @@ class BBcTransaction:
                     "tx_base": self.transaction_base_digest,
                     "cross_ref": tx_crossref,
                 })
-        tx_base.update({"cross_ref": tx_crossref})
+        if self.version == 0:
+            tx_base.update({"cross_ref": tx_crossref})
 
         if self.format_type in [BBcFormat.FORMAT_MSGPACK, BBcFormat.FORMAT_MSGPACK_COMPRESS_BZ2,
                                 BBcFormat.FORMAT_MSGPACK_COMPRESS_ZLIB]:
-            dat = msgpack.dumps({
-                "transaction_base": tx_base,
-                "signatures": [sig.serialize() for sig in self.signatures],
-            })
+            if self.version == 0:
+                dat = msgpack.dumps({
+                    "transaction_base": tx_base,
+                    "signatures": [sig.serialize() for sig in self.signatures],
+                })
+            else:
+                dat = msgpack.dumps({
+                    "transaction_base": tx_base,
+                    "cross_ref": tx_crossref,
+                    "signatures": [sig.serialize() for sig in self.signatures],
+                })
         else:
-            dat = bson.dumps({
-                "transaction_base": tx_base,
-                "signatures": [sig.serialize() for sig in self.signatures],
-            })
+            if self.version == 0:
+                dat = bson.dumps({
+                    "transaction_base": tx_base,
+                    "signatures": [sig.serialize() for sig in self.signatures],
+                })
+            else:
+                dat = bson.dumps({
+                    "transaction_base": tx_base,
+                    "cross_ref": tx_crossref,
+                    "signatures": [sig.serialize() for sig in self.signatures],
+                })
         if self.format_type in [BBcFormat.FORMAT_MSGPACK_COMPRESS_BZ2, BBcFormat.FORMAT_BSON_COMPRESS_BZ2]:
             dat = bz2.compress(dat, compresslevel=1)
         elif self.format_type in [BBcFormat.FORMAT_BSON_COMPRESS_ZLIB, BBcFormat.FORMAT_MSGPACK_COMPRESS_ZLIB]:
@@ -1004,7 +1019,10 @@ class BBcTransaction:
             self.witness = BBcWitness(format_type=self.format_type, id_length=self.id_length)
             self.witness.transaction = self
             self.witness.deserialize(wit)
-        cross_ref = tx_base.get("cross_ref", None)
+        if self.version == 0:
+            cross_ref = tx_base.get("cross_ref", None)
+        else:
+            cross_ref = datobj.get("cross_ref", None)
         if cross_ref is None:
             self.cross_ref = None
         else:
@@ -1656,6 +1674,7 @@ class BBcWitness:
                 self.sig_indices.append(idx)
                 if ptr > data_size:
                     return False
+                self.transaction.get_sig_index(uid[:self.id_length])
         except:
             return False
         return True
