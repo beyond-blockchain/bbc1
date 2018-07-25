@@ -211,7 +211,7 @@ client.request_to_repair_asset(asset_group_id, asset_id)
 def proc_notify_inserted(self, dat):
     list_of_asset_group_ids = dat[KeyType.asset_group_ids]
     txid = dat[KeyType.transaction_id]
-    print("Inserted transaction %s with asset_groups %s" % (txid.hex(), [asgid.hex() for asgid in list_of_asset_group_ids])
+    print("Inserted transaction %s with asset_groups %s" % (txid.hex(), [asgid.hex() for asgid in list_of_asset_group_ids]))
 
 
 client.callback.proc_notify_inserted = proc_notify_inserted
