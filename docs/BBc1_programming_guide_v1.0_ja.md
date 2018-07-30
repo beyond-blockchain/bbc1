@@ -44,11 +44,11 @@ client.set_node_key(path_to_node_key_file)
 
 client.register_to_core()
 ```
-user\_idとdomain\_idはいずれも256bitのバイト列である。ここでは適当なバイト列を文字列から生成している。BBcAppClient()によって、core nodeに接続するクライアントオブジェクトが生成される。なおこの時点ですでにTCPコネクションが張られる。set\_domain\_id)()およびset_user\_id()はclient(クライアントオブジェクト)にセットするだけで、これらのメソッドだけではcore nodeには伝わらない。最後のregister\_to\_core()によって、domain\_idを持つdomainに対してuser\_idを登録し、メッセージ授受が可能になる。なお、register\_to\_core()を読んだ時点でcore nodeが指定domainに参加していない場合は、登録に失敗するが失敗メッセージは返答されないので注意が必要である。
+user\_idとdomain\_idはいずれも256bitのバイト列である。ここでは適当なバイト列を文字列から生成している。BBcAppClient()によって、core nodeに接続するクライアントオブジェクトが生成される。なおこの時点ですでにTCPコネクションが張られる。set\_domain\_id()およびset_user\_id()はclient(クライアントオブジェクト)にセットするだけで、これらのメソッドだけではcore nodeには伝わらない。最後のregister\_to\_core()によって、domain\_idを持つdomainに対してuser\_idを登録し、メッセージ授受が可能になる。なお、register\_to\_core()を読んだ時点でcore nodeが指定domainに参加していない場合は、登録に失敗するが失敗メッセージは返答されないので注意が必要である。
 
 keypairはトランザクションに署名する際に利用する。set_keypair()でクライアントオブジェクトに登録しているのは、非同期型メッセージ処理を行う際にコールバックの中で署名を付与する場合があるためである(後述のSIGN\_REQUESTで利用する)。
 
-core nodeとクライアント間のメッセージングの内、システム管理用のメッセージについては、権限を持ったクライアントだけに使用を限定するために、メッセージに署名を付加する必要がある。署名計算用の秘密鍵はbbc\_core.pyが自動生成し、ワーキングディレクトリにnode\_key.pemというファイルとして保存される。上記のpath/to/fileにはそのファイルへのパスを記載する（またはファイル自体を何処かにコピーして、そのパスを記載しても良い）。なお、bbc\_core.pyのコンフィグ（config.json）で"use\_node\_key"をfalseにする、または```bbc\_core.py --no\_nodekey```で起動することで、このnode\_keyを利用しないように設定することも可能である。
+core nodeとクライアント間のメッセージングの内、システム管理用のメッセージについては、権限を持ったクライアントだけに使用を限定するために、メッセージに署名を付加する必要がある。署名計算用の秘密鍵はbbc\_core.pyが自動生成し、ワーキングディレクトリにnode\_key.pemというファイルとして保存される。上記のpath/to/fileにはそのファイルへのパスを記載する（またはファイル自体を何処かにコピーして、そのパスを記載しても良い）。なお、bbc\_core.pyのコンフィグ（config.json）で"use\_node\_key"をfalseにする、または```bbc_core.py --no_nodekey```で起動することで、このnode\_keyを利用しないように設定することも可能である。
 
 
 
@@ -118,7 +118,7 @@ if response_data[KeyType.status] < ESUCCESS:
     print("ERROR: ", response_data[KeyType.reason].decode())
     assert False
 ```
-insert\_transaction()でトランザクションをcore nodeに送り込む。成否について返答メッセージが送られてくるため、callback.synchronize()で応答メッセージを待ち受ける（同期型）。応答メッセージはdictionary型であり、response\_dataに格納れる。なお、失敗するケースとしては、そもそもcore nodeがドメインに参加していないパターンが考えられる。
+insert\_transaction()でトランザクションをcore nodeに送り込む。成否について返答メッセージが送られてくるため、callback.synchronize()で応答メッセージを待ち受ける（同期型）。応答メッセージはdictionary型であり、response\_dataに格納される。なお、失敗するケースとしては、そもそもcore nodeがドメインに参加していないパターンが考えられる。
 
 
 ## トランザクションの検索
@@ -211,7 +211,7 @@ client.request_to_repair_asset(asset_group_id, asset_id)
 def proc_notify_inserted(self, dat):
     list_of_asset_group_ids = dat[KeyType.asset_group_ids]
     txid = dat[KeyType.transaction_id]
-    print("Inserted transaction %s with asset_groups %s" % (txid.hex(), [asgid.hex() for asgid in list_of_asset_group_ids])
+    print("Inserted transaction %s with asset_groups %s" % (txid.hex(), [asgid.hex() for asgid in list_of_asset_group_ids]))
 
 
 client.callback.proc_notify_inserted = proc_notify_inserted
