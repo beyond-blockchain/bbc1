@@ -108,13 +108,15 @@ def _create_search_result(txobj_dict, asset_files_dict):
     for txid, txobj in txobj_dict.items():
         if txid != txobj.transaction_id:
             response_info.setdefault(KeyType.compromised_transactions, list()).append(txobj.transaction_data)
+            response_info.setdefault(KeyType.compromised_transaction_ids, list()).append(txid)
             continue
         txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asset_files_dict)
         if txobj_is_valid:
             response_info.setdefault(KeyType.transactions, list()).append(txobj.transaction_data)
         else:
             response_info.setdefault(KeyType.compromised_transactions, list()).append(txobj.transaction_data)
-
+            response_info.setdefault(KeyType.compromised_transaction_ids, list()).append(txid)
+            
         if len(valid_assets) > 0:
             response_info.setdefault(KeyType.all_asset_files, dict())
             for asgid, asid in valid_assets:
