@@ -641,6 +641,7 @@ class BBcCoreService:
             if not retmsg[KeyType.result]:
                 retmsg[KeyType.reason] = "Already exists"
             retmsg[KeyType.domain_id] = domain_id
+            self.config.update_config()
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_CLOSE_DOMAIN:
