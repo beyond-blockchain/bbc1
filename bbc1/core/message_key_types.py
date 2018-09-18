@@ -326,7 +326,8 @@ class KeyType:
     compromised_transaction_data = to_4byte(0, 0x90)
     compromised_transactions = to_4byte(1, 0x90)
     compromised_asset_files = to_4byte(2, 0x90)
-
+    compromised_transaction_ids = to_4byte(3, 0x90)
+    
     ledger_subsys_manip = to_4byte(0, 0xA0)     # enable/disable ledger_subsystem
     ledger_subsys_register = to_4byte(1, 0xA0)
     ledger_subsys_verify = to_4byte(2, 0xA0)
