@@ -483,8 +483,6 @@ class DataHandler:
                 conditions.append("user_id = %s " % self.db_adaptors[0].placeholder)
             sql += "AND ".join(conditions) + "ORDER BY id %s" % dire
             if count > 0:
-                if count > 20:
-                    count = 20
                 sql += " limit %d" % count
             sql += ";"
             args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id)))
