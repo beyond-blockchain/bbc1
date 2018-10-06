@@ -19,6 +19,7 @@ import time
 import random
 import threading
 import bson
+import msgpack
 
 import os
 import sys
@@ -327,12 +328,10 @@ class Domain0Manager:
             self.networking.domains[domain_id]['repair'].put_message(msg)
             return None
         txobj.digest()
-        if txobj.format_type in [bbclib.BBcFormat.FORMAT_BSON, bbclib.BBcFormat.FORMAT_BSON_COMPRESS_BZ2]:
-            cross_ref_dat = bson.dumps(txobj.cross_ref.serialize())
-            sigdata = bson.dumps(txobj.signatures[0].serialize())
-        else:
-            cross_ref_dat = txobj.cross_ref.serialize()
-            sigdata = txobj.signatures[0].serialize()
+        txobj.cross_ref.format_type = bbclib.BBcFormat.FORMAT_BINARY
+        cross_ref_dat = txobj.cross_ref.serialize()
+        txobj.signatures[0].format_type = bbclib.BBcFormat.FORMAT_BINARY
+        sigdata = txobj.signatures[0].serialize()
         return txobj.transaction_base_digest, cross_ref_dat, sigdata, txobj.format_type
 
     def process_message(self, msg):

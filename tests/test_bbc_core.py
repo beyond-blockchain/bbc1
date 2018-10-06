@@ -180,8 +180,7 @@ class TestBBcCore(object):
         wit = bbclib.BBcWitness()
         transaction.add(relation=rtn, witness=wit)
         wit.add_witness(user_id1)
-        sig = transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
-                               private_key=keypair.private_key, public_key=keypair.public_key)
+        sig = transaction.sign(private_key=keypair.private_key, public_key=keypair.public_key)
         transaction.add_signature(user_id=user_id1, signature=sig)
         transaction.digest()
         asset_files = {

@@ -89,8 +89,7 @@ class TestBBcLib(object):
         witness = BBcWitness(format_type=fmt)
         transaction1.add(witness=witness)
 
-        sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1, private_key=keypair1.private_key,
-                                public_key=keypair1.public_key)
+        sig = transaction1.sign(private_key=keypair1.private_key, public_key=keypair1.public_key)
         if sig is None:
             print(bbclib.error_text)
             assert sig
@@ -137,8 +136,7 @@ class TestBBcLib(object):
         dummy_cross_ref3 = BBcCrossRef(domain_id=domain_id, transaction_id=transaction1_id, format_type=fmt)
         transaction2.add(cross_ref=dummy_cross_ref3)
 
-        sig = transaction2.sign(key_type=KeyType.ECDSA_SECP256k1, private_key=keypair1.private_key,
-                                public_key=keypair1.public_key)
+        sig = transaction2.sign(private_key=keypair1.private_key, public_key=keypair1.public_key)
         if sig is None:
             print(bbclib.error_text)
             assert sig
@@ -165,14 +163,12 @@ class TestBBcLib(object):
         dummy_cross_ref = BBcCrossRef(domain_id=domain_id, transaction_id=transaction1_id, format_type=fmt)
         transaction2.add(cross_ref=dummy_cross_ref)
 
-        sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
-                                private_key=keypair2.private_key, public_key=keypair2.public_key)
+        sig = transaction1.sign(private_key=keypair2.private_key, public_key=keypair2.public_key)
         if sig is None:
             print(bbclib.error_text)
             assert sig
         reference.add_signature(user_id=user_id2, signature=sig)
-        sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
-                                private_key=keypair1.private_key, public_key=keypair1.public_key)
+        sig = transaction1.sign(private_key=keypair1.private_key, public_key=keypair1.public_key)
         if sig is None:
             print(bbclib.error_text)
             assert sig
@@ -191,15 +187,13 @@ class TestBBcLib(object):
         witness.add_witness(user_id)
         witness.add_witness(user_id2)
 
-        sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
-                                private_key=keypair2.private_key, public_key=keypair2.public_key)
+        sig = transaction1.sign(private_key=keypair2.private_key, public_key=keypair2.public_key)
         if sig is None:
             print(bbclib.error_text)
             assert sig
         witness.add_signature(user_id=user_id2, signature=sig)
 
-        sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1,
-                                private_key=keypair1.private_key, public_key=keypair1.public_key)
+        sig = transaction1.sign(private_key=keypair1.private_key, public_key=keypair1.public_key)
         if sig is None:
             print(bbclib.error_text)
             assert sig
@@ -216,15 +210,13 @@ class TestBBcLib(object):
         transaction1.witness.add_witness(user_id)
         transaction1.witness.add_witness(user_id2)
 
-        sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1, private_key=keypair2.private_key,
-                                public_key=keypair2.public_key)
+        sig = transaction1.sign(private_key=keypair2.private_key, public_key=keypair2.public_key)
         if sig is None:
             print(bbclib.error_text)
             assert sig
         transaction1.witness.add_signature(user_id=user_id2, signature=sig)
 
-        sig = transaction1.sign(key_type=KeyType.ECDSA_SECP256k1, private_key=keypair1.private_key,
-                                public_key=keypair1.public_key)
+        sig = transaction1.sign(private_key=keypair1.private_key, public_key=keypair1.public_key)
         if sig is None:
             print(bbclib.error_text)
             assert sig

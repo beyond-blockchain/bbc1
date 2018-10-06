@@ -198,7 +198,7 @@ def create_transaction_object_for_filedata(receiver_name, receiver_user_id, ref_
 
     transaction.witness.add_signature(user_id=result[1], signature=result[2])
 
-    sig_mine = transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1, private_key=key_pair.private_key,
+    sig_mine = transaction.sign(private_key=key_pair.private_key,
                                 public_key=key_pair.public_key)
     transaction.witness.add_signature(user_id=user_id, signature=sig_mine)
     transaction.digest()
@@ -300,7 +300,7 @@ def store_proc(file, txid=None):
         prev_tx = bbclib.BBcTransaction(deserialize=response_data[KeyType.transaction_data])
         bbclib.add_relation_pointer(transaction=store_transaction, relation_idx=0,
                                     ref_transaction_id=prev_tx.transaction_id)
-    sig = store_transaction.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1, private_key=key_pair.private_key,
+    sig = store_transaction.sign(private_key=key_pair.private_key,
                                  public_key=key_pair.public_key)
     store_transaction.get_sig_index(user_id)
     store_transaction.add_signature(user_id=user_id, signature=sig)
