@@ -30,7 +30,10 @@ sig_r = (c_byte * 32)()
 sig_s = (c_byte * 32)()
 sig_r_len = (c_byte * 4)()  # Adjust size according to the expected size of sig_r and sig_s. Default:uint32.
 sig_s_len = (c_byte * 4)()
-print(lib.sign(CURVETYPE, privkey_len, privkey, privkey_len, test_digest, sig_r, sig_s, sig_r_len, sig_s_len))
+ret = lib.sign(CURVETYPE, privkey_len, privkey, privkey_len, test_digest, sig_r, sig_s, sig_r_len, sig_s_len)
+print("sign:", ret)
+assert ret == 1
+
 sig_r_len = int.from_bytes(bytes(sig_r_len), "little")
 sig_s_len = int.from_bytes(bytes(sig_s_len), "little")
 sig_r = binascii.a2b_hex("00" * (32 - sig_r_len) + bytes(sig_r)[:sig_r_len].hex())
@@ -42,6 +45,7 @@ print("# -- output_der()")
 der_data = (c_byte * 512)()     # 256 -> 512
 der_len = lib.output_der(CURVETYPE, privkey_len, privkey, byref(der_data))
 print("DER: len=", der_len, "  dat=", binascii.b2a_hex(bytearray(der_data)[:der_len]))
+assert der_len > 0
 
 print("# -- clear private key")
 privkey = (c_byte * privkey_len.value)()
@@ -51,13 +55,18 @@ print("# -- convert_from_der()")
 lib.convert_from_der(CURVETYPE, der_len, byref(der_data), 0, byref(pubkey_len), pubkey, byref(privkey_len), privkey)
 print("private_key:", binascii.b2a_hex(privkey), ", len=", privkey_len)
 print("public_key:", binascii.b2a_hex(pubkey), ", len=", pubkey_len)
+assert privkey_len.value > 0
+assert pubkey_len.value > 0
 
 print("# -- sign()")
 sig_r = (c_byte * 32)()
 sig_s = (c_byte * 32)()
 sig_r_len = (c_byte * 4)()  # Adjust size according to the expected size of sig_r and sig_s. Default:uint32.
 sig_s_len = (c_byte * 4)()
-print(lib.sign(CURVETYPE, privkey_len, privkey, privkey_len, test_digest, sig_r, sig_s, sig_r_len, sig_s_len))
+ret = lib.sign(CURVETYPE, privkey_len, privkey, privkey_len, test_digest, sig_r, sig_s, sig_r_len, sig_s_len)
+print("sign:", ret)
+assert ret == 1
+
 sig_r_len = int.from_bytes(bytes(sig_r_len), "little")
 sig_s_len = int.from_bytes(bytes(sig_s_len), "little")
 sig_r = binascii.a2b_hex("00" * (32 - sig_r_len) + bytes(sig_r)[:sig_r_len].hex())
@@ -73,6 +82,7 @@ print("public_key:", binascii.b2a_hex(pubkey), ", len=", pubkey_len)
 print("# -- verify with compressed pubkey")
 res = lib.verify(CURVETYPE, pubkey_len, pubkey, 32, test_digest, 64, signature)
 print("result:", res)
+assert res == 1
 
 print("# -- get uncompressed pubkey")
 pubkey = (c_byte * 65)()
@@ -82,8 +92,31 @@ print("public_key:", binascii.b2a_hex(pubkey), ", len=", pubkey_len)
 print("# -- verify with compressed pubkey")
 res = lib.verify(CURVETYPE, pubkey_len, pubkey, 32, test_digest, 64, signature)
 print("result:", res)
+assert res == 1
 
 print("# -- output_pem()")
 pem = (c_char * 512)()      # 256 -> 512
 length = lib.output_pem(CURVETYPE, privkey_len, privkey, byref(pem))
 print("PEM: len=", length, " dat=", pem.value)
+assert length > 0
+
+print("# -- output_public_key_pem()")
+pem = (c_char * 512)()      # 256 -> 512
+length = lib.output_public_key_pem(CURVETYPE, pubkey_len, pubkey, byref(pem))
+print("PEM: len=", length, " dat=", pem.value)
+assert length > 0
+
+print("# -- output_der()")
+der_data = (c_byte * 512)()     # 256 -> 512
+der_len = lib.output_der(CURVETYPE, privkey_len, privkey, byref(der_data))
+print("DER: len=", der_len, "  dat=", binascii.b2a_hex(bytearray(der_data)[:der_len]))
+assert der_len > 0
+
+print("# -- output_public_key_der()")
+der_data = (c_byte * 512)()     # 256 -> 512
+der_len = lib.output_public_key_der(CURVETYPE, pubkey_len, pubkey, byref(der_data))
+print("DER: len=", der_len, "  dat=", binascii.b2a_hex(bytearray(der_data)[:der_len]))
+assert der_len > 0
+
+
+print("******** successfully finished ********")

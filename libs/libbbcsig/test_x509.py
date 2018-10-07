@@ -18,6 +18,9 @@ with open("private.key", "r") as f:
 with open("self-signed.pem", "r") as f:
     pubkey_cert = f.read()
 
+with open("private_expired.key", "r") as f:
+    private_key2 = f.read()
+
 
 privkey_len = c_int32(32)
 privkey     = (c_byte * privkey_len.value)()
@@ -35,12 +38,19 @@ privkey     = (c_byte * privkey_len.value)()
 pubkey_len  = c_int32(65)
 pubkey      = (c_byte * pubkey_len.value)()
 
-print("\n######### read private key and X509 public key cert")
-ret = lib.read_x509(CURVETYPE, create_string_buffer(pubkey_cert.encode()),
-                    create_string_buffer(private_key.encode()),
-                    0, byref(pubkey_len), pubkey, byref(privkey_len), privkey)
-if ret == 0:
-    print("private_key:", binascii.b2a_hex(privkey), ", len=", privkey_len)
-    print("public_key:", binascii.b2a_hex(pubkey), ", len=", pubkey_len)
-else:
-    print("error code:", ret)
+print("\n######### verify X509 public key cert")
+ret = lib.verify_x509(create_string_buffer(pubkey_cert.encode()), None)
+assert ret == 1
+print("verify ok")
+
+print("\n######### verify X509 public key cert and private key")
+ret = lib.verify_x509(create_string_buffer(pubkey_cert.encode()),
+                      create_string_buffer(private_key.encode()))
+assert ret == 1
+print("verify ok")
+
+print("\n######### verify X509 public key cert and different private key")
+ret = lib.verify_x509(create_string_buffer(pubkey_cert.encode()),
+                      create_string_buffer(private_key2.encode()))
+assert ret == -4
+print("invalid key pair (test ok)")
