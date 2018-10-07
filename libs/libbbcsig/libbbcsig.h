@@ -20,6 +20,14 @@ typedef unsigned int uint32_t;
 //#else
 //#endif
 
+
+#define EFAULURE         -1
+#define EBADPRIVATEKEY   -2
+#define EBADCERT         -3
+#define EBADKEYPAIR      -4
+#define EINVALIDCERT     -5
+
+
 /**
  * 
  *
@@ -129,6 +137,22 @@ bool VS_STDCALL convert_from_pem(int curvetype, const char *pem,
 	uint8_t pubkey_type,
 	int *pubkey_len, uint8_t *pubkey,
 	int *privkey_len, uint8_t *privkey);
+
+/**
+ *
+ * @param curvetype
+ * @param pubkey_x509
+ * @param privkey_pem
+ * @param pubkey_type
+ * @param pubkey_len
+ * @param pubkey
+ * @param privkey_len
+ * @param privkey
+ * @return
+ */
+VS_DLL_EXPORT
+int VS_STDCALL read_x509(int curvetype, const char *pubkey_x509, const char *privkey_pem,
+						 uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey, int *privkey_len, uint8_t *privkey);
 
 /**
  *

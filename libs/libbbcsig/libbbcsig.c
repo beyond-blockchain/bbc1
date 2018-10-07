@@ -20,6 +20,7 @@
 
 #include "libbbcsig.h"
 #include <string.h>
+#include <time.h>
 
 #ifndef _WIN32
 #include <strings.h>
@@ -33,7 +34,9 @@
 #include <openssl/evp.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
-
+#include <openssl/x509.h>
+#include <openssl/stack.h>
+#include <openssl/x509_vfy.h>
 
 #include <crypto/ec/ec_lcl.h>
 
@@ -41,16 +44,43 @@
 #define CURVE_TYPE_P256     2
 
 
+bool _init_EC_KEY(int curvetype, EC_KEY *eckey, EC_GROUP *ecgroup)
+{
+    if (NULL == eckey) {
+        return false;
+    }
+
+    if (curvetype == CURVE_TYPE_SECP256) {
+        ecgroup = EC_GROUP_new_by_curve_name(NID_secp256k1);
+    } else if (curvetype == CURVE_TYPE_P256) {
+        ecgroup = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
+    } else {
+        return false;
+    }
+    if (NULL == ecgroup) {
+        EC_KEY_free(eckey);
+        return false;
+    }
+    if (EC_KEY_set_group(eckey, ecgroup) != 1) {
+        EC_GROUP_free(ecgroup);
+        EC_KEY_free(eckey);
+        return false;
+    }
+    return true;
+}
+
+
 VS_DLL_EXPORT
 bool VS_STDCALL sign(int curvetype, int privkey_len, uint8_t *privkey, int hash_len, uint8_t *hash, uint8_t *sig_r, uint8_t *sig_t, uint32_t *sig_r_len, uint32_t *sig_s_len)
 {
     BN_CTX *ctx = BN_CTX_new();
     EC_KEY *eckey = EC_KEY_new();
+    EC_GROUP *ecgroup;
+
     if (NULL == eckey) {
         return false;
     }
 
-    EC_GROUP *ecgroup;
     if (curvetype == CURVE_TYPE_SECP256) {
         ecgroup = EC_GROUP_new_by_curve_name(NID_secp256k1);
     } else if (curvetype == CURVE_TYPE_P256) {
@@ -393,6 +423,128 @@ bool VS_STDCALL convert_from_pem(int curvetype, const char *pem,
     BN_CTX_free(ctx);
     return true;
 }
+
+
+static int cert_verify_callback(int ok, X509_STORE_CTX *ctx)
+{
+    /* Tolerate self-signed certificate */
+    if (X509_STORE_CTX_get_error(ctx) == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) {
+        return 1;
+    }
+
+    /* Otherwise don't override */
+    return ok;
+}
+
+VS_DLL_EXPORT
+int VS_STDCALL read_x509(int curvetype, const char *pubkey_x509, const char *privkey_pem,
+        uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey, int *privkey_len, uint8_t *privkey)
+{
+    BIO *bio = NULL;
+    X509 *x509 = NULL;
+    EVP_PKEY *privateKey = NULL;
+
+    bio = BIO_new(BIO_s_mem());
+    BIO_write(bio, privkey_pem, strlen(privkey_pem));
+    if (PEM_read_bio_PrivateKey( bio, &privateKey, 0, 0 ) == NULL) {
+        BIO_free(bio);
+        return EBADPRIVATEKEY;
+    }
+    BIO_free(bio);
+
+    bio = BIO_new(BIO_s_mem());
+    BIO_write(bio, pubkey_x509, strlen(pubkey_x509));
+    x509 = PEM_read_bio_X509(bio, NULL, NULL, NULL);
+    if (x509 == NULL) {
+        BIO_free(bio);
+        pubkey = NULL;
+        return EBADCERT;
+    }
+
+    int result = X509_check_private_key(x509, privateKey);
+    if (result == 0) {
+        result = EBADKEYPAIR;
+        goto FIN;
+    }
+
+    X509_STORE *cert_store = NULL;
+    X509_STORE_CTX *store_ctx = NULL;
+    STACK_OF(X509) *stack_of_x509 = NULL;    // no need because of treating self-signed cert only
+    time_t check_time;
+    int store_ctx_error;
+    int store_ctx_error_depth;
+
+    if( (cert_store= X509_STORE_new()) == NULL) {
+        result = EFAULURE;
+        goto FIN;
+    }
+    if( (store_ctx= X509_STORE_CTX_new()) == NULL) {
+        result = EFAULURE;
+        X509_STORE_free(cert_store);
+        goto FIN;
+    }
+
+    X509_STORE_set_verify_cb_func(cert_store, cert_verify_callback);
+    if( !X509_STORE_CTX_init(store_ctx, cert_store, NULL, stack_of_x509) ) {
+        result = EFAULURE;
+        goto FIN2;
+    }
+
+    X509_STORE_CTX_set_cert(store_ctx, x509);
+    time(&check_time);
+
+    X509_STORE_CTX_set_time(store_ctx, 0, check_time);
+    X509_STORE_CTX_set_flags(store_ctx, X509_V_FLAG_USE_CHECK_TIME);
+
+    result = X509_verify_cert(store_ctx);
+    if (result < 1) {
+        result = EINVALIDCERT;
+        store_ctx_error = X509_STORE_CTX_get_error(store_ctx);
+        store_ctx_error_depth = X509_STORE_CTX_get_error_depth(store_ctx);
+        printf("Error %d at %d depth: %s\n", store_ctx_error, store_ctx_error_depth, X509_verify_cert_error_string(store_ctx_error));
+        goto FIN2;
+    }
+
+    EC_KEY *eckey_priv = EVP_PKEY_get1_EC_KEY(privateKey);
+    const BIGNUM *private_key = EC_KEY_get0_private_key(eckey_priv);
+    *privkey_len = BN_num_bytes(private_key);
+    BN_bn2bin(private_key, privkey);
+
+    EVP_PKEY *publicKey = X509_get_pubkey(x509);
+    EC_KEY *eckey_pub = EVP_PKEY_get1_EC_KEY(publicKey);
+    const EC_POINT *pubkey_point = EC_KEY_get0_public_key(eckey_pub);
+    EC_GROUP *ecgroup;
+    if (curvetype == CURVE_TYPE_SECP256) {
+        ecgroup = EC_GROUP_new_by_curve_name(NID_secp256k1);
+    } else if (curvetype == CURVE_TYPE_P256) {
+        ecgroup = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
+    } else {
+        return false;
+    }
+    BN_CTX *ctx = BN_CTX_new();
+    if (pubkey_type == 0) {
+        *pubkey_len = 65;
+        EC_POINT_point2oct(ecgroup, pubkey_point, POINT_CONVERSION_UNCOMPRESSED, pubkey, *pubkey_len, ctx);
+    } else {
+        *pubkey_len = 33;
+        EC_POINT_point2oct(ecgroup, pubkey_point, POINT_CONVERSION_COMPRESSED, pubkey, *pubkey_len, ctx);
+    }
+    BN_CTX_free(ctx);
+
+    //sk_X509_pop_free(stack_of_x509, X509_free);  // no need because of treating self-signed cert only
+  FIN2:
+    X509_STORE_CTX_free(store_ctx);
+    X509_STORE_free(cert_store);
+
+  FIN:
+    X509_free(x509);
+    EVP_PKEY_free(privateKey);
+    BIO_free(bio);
+
+    if (result > 0) return 0;
+    return result;
+}
+
 
 VS_DLL_EXPORT
 int VS_STDCALL output_der(int curvetype, int privkey_len, uint8_t *privkey, uint8_t *der_out)
