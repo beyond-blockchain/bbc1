@@ -28,7 +28,7 @@ pubkey_len  = c_int32(65)
 pubkey      = (c_byte * pubkey_len.value)()
 
 print("######### read private key only")
-ret = lib.convert_from_pem(CURVETYPE, create_string_buffer(private_key.encode()), 0, byref(pubkey_len), pubkey, byref(privkey_len), privkey)
+ret = lib.convert_from_pem(create_string_buffer(private_key.encode()), 0, byref(pubkey_len), pubkey, byref(privkey_len), privkey)
 print("private_key:", binascii.b2a_hex(privkey), ", len=", privkey_len.value)
 print("public_key:", binascii.b2a_hex(pubkey), ", len=", pubkey_len.value)
 

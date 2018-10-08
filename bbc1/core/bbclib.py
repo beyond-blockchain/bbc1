@@ -415,13 +415,13 @@ class KeyPair:
         der_len = len(derdat)
         der_data = (c_byte * der_len)()
         memmove(der_data, bytes(derdat), der_len)
-        libbbcsig.convert_from_der(self.curvetype, der_len, byref(der_data), 0,
+        libbbcsig.convert_from_der(der_len, byref(der_data), 0,
                                    byref(self.public_key_len), self.public_key,
                                    byref(self.private_key_len), self.private_key)
 
     def mk_keyobj_from_private_key_pem(self, pemdat_string):
         """Make a keypair object from the private key in PEM format"""
-        libbbcsig.convert_from_pem(self.curvetype, create_string_buffer(pemdat_string.encode()), 0,
+        libbbcsig.convert_from_pem(create_string_buffer(pemdat_string.encode()), 0,
                                    byref(self.public_key_len), self.public_key,
                                    byref(self.private_key_len), self.private_key)
 

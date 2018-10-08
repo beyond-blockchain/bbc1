@@ -52,7 +52,7 @@ privkey = (c_byte * privkey_len.value)()
 print("private_key:", binascii.b2a_hex(privkey), ", len=", privkey_len)
 
 print("# -- convert_from_der()")
-lib.convert_from_der(CURVETYPE, der_len, byref(der_data), 0, byref(pubkey_len), pubkey, byref(privkey_len), privkey)
+lib.convert_from_der(der_len, byref(der_data), 0, byref(pubkey_len), pubkey, byref(privkey_len), privkey)
 print("private_key:", binascii.b2a_hex(privkey), ", len=", privkey_len)
 print("public_key:", binascii.b2a_hex(pubkey), ", len=", pubkey_len)
 assert privkey_len.value > 0
