@@ -141,6 +141,17 @@ bool VS_STDCALL convert_from_pem(const int curvetype, const char *pem,
 /**
  *
  * @param pubkey_x509
+ * @param pubkey_type
+ * @param pubkey_len
+ * @param pubkey
+ * @return
+ */
+VS_DLL_EXPORT
+bool VS_STDCALL read_x509(const char *pubkey_x509, const uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey);
+
+/**
+ *
+ * @param pubkey_x509
  * @param privkey_pem
  * @return
  */

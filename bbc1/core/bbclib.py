@@ -16,6 +16,7 @@ limitations under the License.
 """
 import sys
 import os
+import platform
 import binascii
 import hashlib
 import msgpack
@@ -34,10 +35,12 @@ from bbc1.core.bbc_error import *
 directory, filename = os.path.split(os.path.realpath(__file__))
 from ctypes import *
 
-if os.name == "nt":
-    libbbcsig = CDLL("%s/libbbcsig.dll" % directory)
+if platform.system() == "Windows":
+    lib = windll.LoadLibrary("libbbcsig.dll")
+elif platform.system() == "Darwin":
+    lib = cdll.LoadLibrary("libbbcsig.dylib")
 else:
-    libbbcsig = CDLL("%s/libbbcsig.so" % directory)
+    lib = cdll.LoadLibrary("libbbcsig.so")
 
 
 domain_global_0 = binascii.a2b_hex("0000000000000000000000000000000000000000000000000000000000000000")
@@ -395,9 +398,6 @@ class KeyPair:
             self.public_key_len = c_int32(len(pubkey))
             memmove(self.public_key, bytes(pubkey), self.public_key_len.value)
 
-        if privkey is None and pubkey is None:
-            self.generate()
-
     def generate(self):
         """Generate a new key pair"""
         libbbcsig.generate_keypair(self.curvetype, 0, byref(self.public_key_len), self.public_key,
@@ -424,6 +424,24 @@ class KeyPair:
         libbbcsig.convert_from_pem(self.curvetype, create_string_buffer(pemdat_string.encode()), 0,
                                    byref(self.public_key_len), self.public_key,
                                    byref(self.private_key_len), self.private_key)
+
+    def import_publickey_cert_pem(self, cert_pemstring, privkey_pemstring=None):
+        """Verify and import X509 public key certificate in pem format"""
+        if privkey_pemstring is not None:
+            ret = libbbcsig.verify_x509(create_string_buffer(cert_pemstring.encode()),
+                                        create_string_buffer(privkey_pemstring.encode()))
+        else:
+            ret = libbbcsig.verify_x509(create_string_buffer(cert_pemstring.encode()), None)
+        if ret != 1:
+            return False
+
+        if privkey_pemstring is not None:
+            self.mk_keyobj_from_private_key_pem(privkey_pemstring)
+        else:
+            ret = libbbcsig.read_x509(create_string_buffer(cert_pemstring.encode()), 0, byref(self.public_key_len), self.public_key)
+            if ret != 1:
+                return False
+        return True
 
     def to_binary(self, dat):
         byteval = bytearray()

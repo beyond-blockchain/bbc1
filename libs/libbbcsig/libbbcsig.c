@@ -82,6 +82,21 @@ static inline const BIGNUM * _get_naive_privateKey_from_eckey(EC_KEY *eckey, int
     return private_key;
 }
 
+static inline void _get_naive_pubicKey_from_eckey(EC_KEY *eckey, EC_GROUP *ecgroup, const uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey)
+{
+    BN_CTX *ctx = BN_CTX_new();
+    const EC_POINT *pubkey_point = EC_KEY_get0_public_key(eckey);
+    if (pubkey_type == 0) {
+        *pubkey_len = 65;
+        EC_POINT_point2oct(ecgroup, pubkey_point, POINT_CONVERSION_UNCOMPRESSED, pubkey, *pubkey_len, ctx);
+    } else {
+        *pubkey_len = 33;
+        EC_POINT_point2oct(ecgroup, pubkey_point, POINT_CONVERSION_COMPRESSED, pubkey, *pubkey_len, ctx);
+    }
+    EC_POINT_free((EC_POINT *)pubkey_point);
+    BN_CTX_free(ctx);
+}
+
 static inline void _calculate_publicKey_from_bignum_privateKey(EC_GROUP *ecgroup, const BIGNUM *private_key,
                                                                const uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey)
 {
@@ -206,17 +221,7 @@ bool VS_STDCALL generate_keypair(const int curvetype, const uint8_t pubkey_type,
     EC_KEY_generate_key(eckey);
     const BIGNUM *private_key = _get_naive_privateKey_from_eckey(eckey, privkey_len, privkey);
 
-    BN_CTX *ctx = BN_CTX_new();
-    const EC_POINT *pubkey_point = EC_KEY_get0_public_key(eckey);
-    if (pubkey_type == 0) {
-        *pubkey_len = 65;
-        EC_POINT_point2oct(ecgroup, pubkey_point, POINT_CONVERSION_UNCOMPRESSED, pubkey, *pubkey_len, ctx);
-    } else {
-        *pubkey_len = 33;
-        EC_POINT_point2oct(ecgroup, pubkey_point, POINT_CONVERSION_COMPRESSED, pubkey, *pubkey_len, ctx);
-    }
-    EC_POINT_free((EC_POINT *)pubkey_point);
-    BN_CTX_free(ctx);
+    _get_naive_pubicKey_from_eckey(eckey, ecgroup, pubkey_type, pubkey_len, pubkey);
 
     BN_free((BIGNUM *)private_key);
     EC_GROUP_free(ecgroup);
@@ -296,6 +301,29 @@ static int cert_verify_callback(int ok, X509_STORE_CTX *ctx)
     return ok;
 }
 
+
+VS_DLL_EXPORT
+bool VS_STDCALL read_x509(const char *pubkey_x509, const uint8_t pubkey_type,  int *pubkey_len, uint8_t *pubkey)
+{
+    BIO *bio = BIO_new(BIO_s_mem());
+    BIO_write(bio, pubkey_x509, strlen(pubkey_x509));
+    X509 *x509 = PEM_read_bio_X509(bio, NULL, NULL, NULL);
+    if (x509 == NULL) {
+        BIO_free(bio);
+        return false;
+    }
+    BIO_free(bio);
+
+    EVP_PKEY *public_key = X509_get_pubkey(x509);
+    EC_KEY *eckey = EVP_PKEY_get1_EC_KEY(public_key);
+    macro_init_EC_GROUP(2);  // FIXME: curve type must be obtained from the cert
+
+    _get_naive_pubicKey_from_eckey(eckey, ecgroup, pubkey_type, pubkey_len, pubkey);
+
+    EVP_PKEY_free(public_key);
+    macro_free_EC_KEY;
+    return true;
+}
 
 
 VS_DLL_EXPORT
