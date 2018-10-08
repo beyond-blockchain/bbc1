@@ -36,11 +36,11 @@ directory, filename = os.path.split(os.path.realpath(__file__))
 from ctypes import *
 
 if platform.system() == "Windows":
-    lib = windll.LoadLibrary("libbbcsig.dll")
+    libbbcsig = windll.LoadLibrary(os.path.join(directory, "libbbcsig.dll"))
 elif platform.system() == "Darwin":
-    lib = cdll.LoadLibrary("libbbcsig.dylib")
+    libbbcsig = cdll.LoadLibrary(os.path.join(directory, "libbbcsig.dylib"))
 else:
-    lib = cdll.LoadLibrary("libbbcsig.so")
+    libbbcsig = cdll.LoadLibrary(os.path.join(directory, "libbbcsig.so"))
 
 
 domain_global_0 = binascii.a2b_hex("0000000000000000000000000000000000000000000000000000000000000000")
@@ -385,12 +385,20 @@ DEFAULT_CURVETYPE = KeyType.ECDSA_P256v1
 
 
 class KeyPair:
+    POINT_CONVERSION_COMPRESSED = 2     # same as enum point_conversion_form_t in openssl/crypto/ec.h
+    POINT_CONVERSION_UNCOMPRESSED = 4   # same as enum point_conversion_form_t in openssl/crypto/ec.h
+
     """Key pair container"""
-    def __init__(self, curvetype=DEFAULT_CURVETYPE, privkey=None, pubkey=None):
+    def __init__(self, curvetype=DEFAULT_CURVETYPE, compression=False, privkey=None, pubkey=None):
         self.curvetype = curvetype
         self.private_key_len = c_int32(32)
         self.private_key = (c_byte * self.private_key_len.value)()
-        self.public_key_len = c_int32(65)
+        if compression:
+            self.public_key_len = c_int32(33)
+            self.key_compression = KeyPair.POINT_CONVERSION_COMPRESSED
+        else:
+            self.public_key_len = c_int32(65)
+            self.key_compression = KeyPair.POINT_CONVERSION_UNCOMPRESSED
         self.public_key = (c_byte * self.public_key_len.value)()
         if privkey is not None:
             memmove(self.private_key, bytes(privkey), sizeof(self.private_key))
@@ -400,7 +408,7 @@ class KeyPair:
 
     def generate(self):
         """Generate a new key pair"""
-        libbbcsig.generate_keypair(self.curvetype, 0, byref(self.public_key_len), self.public_key,
+        libbbcsig.generate_keypair(self.curvetype, self.key_compression, byref(self.public_key_len), self.public_key,
                                    byref(self.private_key_len), self.private_key)
 
     def mk_keyobj_from_private_key(self):
@@ -415,13 +423,13 @@ class KeyPair:
         der_len = len(derdat)
         der_data = (c_byte * der_len)()
         memmove(der_data, bytes(derdat), der_len)
-        libbbcsig.convert_from_der(der_len, byref(der_data), 0,
+        libbbcsig.convert_from_der(der_len, byref(der_data), self.key_compression,
                                    byref(self.public_key_len), self.public_key,
                                    byref(self.private_key_len), self.private_key)
 
     def mk_keyobj_from_private_key_pem(self, pemdat_string):
         """Make a keypair object from the private key in PEM format"""
-        libbbcsig.convert_from_pem(create_string_buffer(pemdat_string.encode()), 0,
+        libbbcsig.convert_from_pem(create_string_buffer(pemdat_string.encode()), self.key_compression,
                                    byref(self.public_key_len), self.public_key,
                                    byref(self.private_key_len), self.private_key)
 
@@ -438,7 +446,7 @@ class KeyPair:
         if privkey_pemstring is not None:
             self.mk_keyobj_from_private_key_pem(privkey_pemstring)
         else:
-            ret = libbbcsig.read_x509(create_string_buffer(cert_pemstring.encode()), 0, byref(self.public_key_len), self.public_key)
+            ret = libbbcsig.read_x509(create_string_buffer(cert_pemstring.encode()), self.key_compression, byref(self.public_key_len), self.public_key)
             if ret != 1:
                 return False
         return True

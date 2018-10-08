@@ -82,35 +82,25 @@ static inline const BIGNUM * _get_naive_privateKey_from_eckey(EC_KEY *eckey, int
     return private_key;
 }
 
-static inline void _get_naive_pubicKey_from_eckey(EC_KEY *eckey, EC_GROUP *ecgroup, const uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey)
+static inline void _get_naive_pubicKey_from_eckey(EC_KEY *eckey, EC_GROUP *ecgroup, const uint8_t compression, int *pubkey_len, uint8_t *pubkey)
 {
     BN_CTX *ctx = BN_CTX_new();
     const EC_POINT *pubkey_point = EC_KEY_get0_public_key(eckey);
-    if (pubkey_type == 0) {
-        *pubkey_len = 65;
-        EC_POINT_point2oct(ecgroup, pubkey_point, POINT_CONVERSION_UNCOMPRESSED, pubkey, *pubkey_len, ctx);
-    } else {
-        *pubkey_len = 33;
-        EC_POINT_point2oct(ecgroup, pubkey_point, POINT_CONVERSION_COMPRESSED, pubkey, *pubkey_len, ctx);
-    }
+    *pubkey_len = (compression == POINT_CONVERSION_UNCOMPRESSED) ? 65 : 33;
+    EC_POINT_point2oct(ecgroup, pubkey_point, compression, pubkey, *pubkey_len, ctx);
     EC_POINT_free((EC_POINT *)pubkey_point);
     BN_CTX_free(ctx);
 }
 
 static inline void _calculate_publicKey_from_bignum_privateKey(EC_GROUP *ecgroup, const BIGNUM *private_key,
-                                                               const uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey)
+                                                               const uint8_t compression, int *pubkey_len, uint8_t *pubkey)
 {
     EC_POINT *pubkey_point = EC_POINT_new(ecgroup);
     BN_CTX *ctx = BN_CTX_new();
     EC_POINT_mul(ecgroup, pubkey_point, private_key, NULL, NULL, ctx);
 
-    if (pubkey_type == 0) {
-        *pubkey_len = 65;
-        EC_POINT_point2oct(ecgroup, pubkey_point, POINT_CONVERSION_UNCOMPRESSED, pubkey, *pubkey_len, ctx);
-    } else {
-        *pubkey_len = 33;
-        EC_POINT_point2oct(ecgroup, pubkey_point, POINT_CONVERSION_COMPRESSED, pubkey, *pubkey_len, ctx);
-    }
+    *pubkey_len = (compression == POINT_CONVERSION_UNCOMPRESSED) ? 65 : 33;
+    EC_POINT_point2oct(ecgroup, pubkey_point, compression, pubkey, *pubkey_len, ctx);
 
     BN_free((BIGNUM *)private_key);
     EC_POINT_free(pubkey_point);
@@ -187,7 +177,7 @@ bool VS_STDCALL sign(const int curvetype, int privkey_len, uint8_t *privkey, int
 
 VS_DLL_EXPORT
 int VS_STDCALL verify(const int curvetype, int point_len, const uint8_t *point,
-                      int hash_len,uint8_t *hash, int sig_len, const uint8_t *sig)
+                      int hash_len, uint8_t *hash, int sig_len, const uint8_t *sig)
 {
     macro_init_EC_KEY(curvetype);
 
@@ -213,7 +203,7 @@ int VS_STDCALL verify(const int curvetype, int point_len, const uint8_t *point,
 }
 
 VS_DLL_EXPORT
-bool VS_STDCALL generate_keypair(const int curvetype, const uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey,
+bool VS_STDCALL generate_keypair(const int curvetype, const uint8_t compression, int *pubkey_len, uint8_t *pubkey,
                       int *privkey_len, uint8_t *privkey)
 {
     macro_init_EC_KEY(curvetype);
@@ -221,7 +211,7 @@ bool VS_STDCALL generate_keypair(const int curvetype, const uint8_t pubkey_type,
     EC_KEY_generate_key(eckey);
     const BIGNUM *private_key = _get_naive_privateKey_from_eckey(eckey, privkey_len, privkey);
 
-    _get_naive_pubicKey_from_eckey(eckey, ecgroup, pubkey_type, pubkey_len, pubkey);
+    _get_naive_pubicKey_from_eckey(eckey, ecgroup, compression, pubkey_len, pubkey);
 
     BN_free((BIGNUM *)private_key);
     EC_GROUP_free(ecgroup);
@@ -234,7 +224,7 @@ bool VS_STDCALL get_public_key_uncompressed(const int curvetype, int privkey_len
     macro_init_EC_KEY(curvetype);
 
     const BIGNUM *private_key = BN_bin2bn(privkey, privkey_len, NULL);
-    _calculate_publicKey_from_bignum_privateKey(ecgroup, private_key, 0, pubkey_len, pubkey);
+    _calculate_publicKey_from_bignum_privateKey(ecgroup, private_key, POINT_CONVERSION_UNCOMPRESSED, pubkey_len, pubkey);
 
     macro_free_EC_KEY;
     return true;
@@ -246,14 +236,14 @@ bool VS_STDCALL get_public_key_compressed(const int curvetype, int privkey_len, 
     macro_init_EC_KEY(curvetype);
 
     const BIGNUM *private_key = BN_bin2bn(privkey, privkey_len, NULL);
-    _calculate_publicKey_from_bignum_privateKey(ecgroup, private_key, 1, pubkey_len, pubkey);
+    _calculate_publicKey_from_bignum_privateKey(ecgroup, private_key, POINT_CONVERSION_COMPRESSED, pubkey_len, pubkey);
 
     macro_free_EC_KEY;
     return true;
 }
 
 VS_DLL_EXPORT
-bool VS_STDCALL convert_from_der(long der_len, const unsigned char *der, const uint8_t pubkey_type,
+bool VS_STDCALL convert_from_der(long der_len, const unsigned char *der, const uint8_t compression,
                                  int *pubkey_len, uint8_t *pubkey, int *privkey_len, uint8_t *privkey)
 {
     EC_KEY *eckey = d2i_ECPrivateKey(NULL, &der, der_len); // bug in memory allocation?
@@ -262,7 +252,7 @@ bool VS_STDCALL convert_from_der(long der_len, const unsigned char *der, const u
 
     const BIGNUM *private_key = _get_naive_privateKey_from_eckey(eckey, privkey_len, privkey);
 
-    _calculate_publicKey_from_bignum_privateKey(ecgroup, private_key, pubkey_type, pubkey_len, pubkey);
+    _calculate_publicKey_from_bignum_privateKey(ecgroup, private_key, compression, pubkey_len, pubkey);
 
     EC_GROUP_free(ecgroup);
     return true;
@@ -270,7 +260,7 @@ bool VS_STDCALL convert_from_der(long der_len, const unsigned char *der, const u
 
 
 VS_DLL_EXPORT
-bool VS_STDCALL convert_from_pem(const char *pem, const uint8_t pubkey_type,
+bool VS_STDCALL convert_from_pem(const char *pem, const uint8_t compression,
                                  int *pubkey_len, uint8_t *pubkey, int *privkey_len, uint8_t *privkey)
 {
     EVP_PKEY *privateKey =  _read_privateKey_pem(pem);
@@ -280,7 +270,7 @@ bool VS_STDCALL convert_from_pem(const char *pem, const uint8_t pubkey_type,
     //macro_init_EC_GROUP(curvetype);
     const BIGNUM *private_key = _get_naive_privateKey_from_eckey(eckey, privkey_len, privkey);
 
-    _calculate_publicKey_from_bignum_privateKey(ecgroup, private_key, pubkey_type, pubkey_len, pubkey);
+    _calculate_publicKey_from_bignum_privateKey(ecgroup, private_key, compression, pubkey_len, pubkey);
 
     macro_free_EC_KEY;
     return true;
@@ -300,7 +290,7 @@ static int cert_verify_callback(int ok, X509_STORE_CTX *ctx)
 
 
 VS_DLL_EXPORT
-bool VS_STDCALL read_x509(const char *pubkey_x509, const uint8_t pubkey_type,  int *pubkey_len, uint8_t *pubkey)
+bool VS_STDCALL read_x509(const char *pubkey_x509, const uint8_t compression,  int *pubkey_len, uint8_t *pubkey)
 {
     BIO *bio = BIO_new(BIO_s_mem());
     BIO_write(bio, pubkey_x509, strlen(pubkey_x509));
@@ -315,7 +305,7 @@ bool VS_STDCALL read_x509(const char *pubkey_x509, const uint8_t pubkey_type,  i
     EC_KEY *eckey = EVP_PKEY_get1_EC_KEY(public_key);
     EC_GROUP *ecgroup = eckey->group;
 
-    _get_naive_pubicKey_from_eckey(eckey, ecgroup, pubkey_type, pubkey_len, pubkey);
+    _get_naive_pubicKey_from_eckey(eckey, ecgroup, compression, pubkey_len, pubkey);
 
     EVP_PKEY_free(public_key);
     macro_free_EC_KEY;
@@ -369,7 +359,7 @@ int VS_STDCALL verify_x509(const char *pubkey_x509, const char *privkey_pem)
         result = EINVALIDCERT;
         store_ctx_error = X509_STORE_CTX_get_error(store_ctx);
         store_ctx_error_depth = X509_STORE_CTX_get_error_depth(store_ctx);
-        printf("Error %d at %d depth: %s\n", store_ctx_error, store_ctx_error_depth, X509_verify_cert_error_string(store_ctx_error));
+        //printf("Error %d at %d depth: %s\n", store_ctx_error, store_ctx_error_depth, X509_verify_cert_error_string(store_ctx_error));
         goto FIN2;
     }
 

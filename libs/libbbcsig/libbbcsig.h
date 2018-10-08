@@ -66,7 +66,7 @@ int VS_STDCALL verify(const int curvetype, int point_len, const uint8_t *point,
  *
  *
  * @param [in] curvetype
- * @param [in] pubkey_type
+ * @param [in] compression
  * @param [out] pubkey_len
  * @param [out] pubkey
  * @param [out] privkey_len
@@ -74,7 +74,7 @@ int VS_STDCALL verify(const int curvetype, int point_len, const uint8_t *point,
  * @return bool 
  */
 VS_DLL_EXPORT
-bool VS_STDCALL generate_keypair(const int curvetype, const uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey,
+bool VS_STDCALL generate_keypair(const int curvetype, const uint8_t compression, int *pubkey_len, uint8_t *pubkey,
 	int *privkey_len, uint8_t *privkey);
 
 /**
@@ -108,40 +108,40 @@ bool VS_STDCALL get_public_key_compressed(const int curvetype, int privkey_len, 
  * 
  * @param [in] der_len
  * @param [in] der
- * @param [in] pubkey_type
+ * @param [in] compression
  * @param [out] pubkey_len
  * @param [out] pubkey
  * @param [out] privkey_len
  * @return bool 
  */
 VS_DLL_EXPORT
-bool VS_STDCALL convert_from_der(long der_len, const unsigned char *der, const uint8_t pubkey_type,
+bool VS_STDCALL convert_from_der(long der_len, const unsigned char *der, const uint8_t compression,
 	                             int *pubkey_len, uint8_t *pubkey, int *privkey_len, uint8_t *privkey);
 
 /**
  *
  *
  * @param [in] pem
- * @param [in] pubkey_type
+ * @param [in] compression
  * @param [out] pubkey_len
  * @param [out] pubkey
  * @param [out] privkey_len
  *@return bool
  */
 VS_DLL_EXPORT
-bool VS_STDCALL convert_from_pem(const char *pem, const uint8_t pubkey_type,
+bool VS_STDCALL convert_from_pem(const char *pem, const uint8_t compression,
                                  int *pubkey_len, uint8_t *pubkey, int *privkey_len, uint8_t *privkey);
 
 /**
  *
  * @param pubkey_x509
- * @param pubkey_type
+ * @param compression
  * @param pubkey_len
  * @param pubkey
  * @return
  */
 VS_DLL_EXPORT
-bool VS_STDCALL read_x509(const char *pubkey_x509, const uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey);
+bool VS_STDCALL read_x509(const char *pubkey_x509, const uint8_t compression, int *pubkey_len, uint8_t *pubkey);
 
 /**
  *
