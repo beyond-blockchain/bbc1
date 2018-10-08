@@ -20,6 +20,14 @@ typedef unsigned int uint32_t;
 //#else
 //#endif
 
+
+#define EFAULURE         -1
+#define EBADPRIVATEKEY   -2
+#define EBADCERT         -3
+#define EBADKEYPAIR      -4
+#define EINVALIDCERT     -5
+
+
 /**
  * 
  *
@@ -35,7 +43,7 @@ typedef unsigned int uint32_t;
  * @return bool 
  */
 VS_DLL_EXPORT
-bool VS_STDCALL sign(int curvetype, int privkey_len, uint8_t *privkey, int hash_len, uint8_t *hash, uint8_t *sig_r, uint8_t *sig_t, uint32_t *sig_r_len, uint32_t *sig_s_len);
+bool VS_STDCALL sign(const int curvetype, int privkey_len, uint8_t *privkey, int hash_len, uint8_t *hash, uint8_t *sig_r, uint8_t *sig_t, uint32_t *sig_r_len, uint32_t *sig_s_len);
 
 /**
  *
@@ -50,7 +58,7 @@ bool VS_STDCALL sign(int curvetype, int privkey_len, uint8_t *privkey, int hash_
  * @return int 
  */
 VS_DLL_EXPORT
-int VS_STDCALL verify(int curvetype, int point_len, const uint8_t *point,
+int VS_STDCALL verify(const int curvetype, int point_len, const uint8_t *point,
 	int hash_len, uint8_t *hash,
 	int sig_len, const uint8_t *sig);
 
@@ -58,7 +66,7 @@ int VS_STDCALL verify(int curvetype, int point_len, const uint8_t *point,
  *
  *
  * @param [in] curvetype
- * @param [in] pubkey_type
+ * @param [in] compression
  * @param [out] pubkey_len
  * @param [out] pubkey
  * @param [out] privkey_len
@@ -66,7 +74,7 @@ int VS_STDCALL verify(int curvetype, int point_len, const uint8_t *point,
  * @return bool 
  */
 VS_DLL_EXPORT
-bool VS_STDCALL generate_keypair(int curvetype, uint8_t pubkey_type, int *pubkey_len, uint8_t *pubkey,
+bool VS_STDCALL generate_keypair(const int curvetype, const uint8_t compression, int *pubkey_len, uint8_t *pubkey,
 	int *privkey_len, uint8_t *privkey);
 
 /**
@@ -80,7 +88,7 @@ bool VS_STDCALL generate_keypair(int curvetype, uint8_t pubkey_type, int *pubkey
  * @return bool 
  */
 VS_DLL_EXPORT
-bool VS_STDCALL get_public_key_uncompressed(int curvetype, int privkey_len, uint8_t *privkey, int *pubkey_len, uint8_t *pubkey);
+bool VS_STDCALL get_public_key_uncompressed(const int curvetype, int privkey_len, uint8_t *privkey, int *pubkey_len, uint8_t *pubkey);
 
 /**
  *
@@ -93,42 +101,56 @@ bool VS_STDCALL get_public_key_uncompressed(int curvetype, int privkey_len, uint
  * @return bool
  */
 VS_DLL_EXPORT
-bool VS_STDCALL get_public_key_compressed(int curvetype, int privkey_len, uint8_t *privkey, int *pubkey_len, uint8_t *pubkey);
+bool VS_STDCALL get_public_key_compressed(const int curvetype, int privkey_len, uint8_t *privkey, int *pubkey_len, uint8_t *pubkey);
 
 /**
  *
  * 
- * @param [in] curvetype
  * @param [in] der_len
  * @param [in] der
- * @param [in] pubkey_type
+ * @param [in] compression
  * @param [out] pubkey_len
  * @param [out] pubkey
  * @param [out] privkey_len
  * @return bool 
  */
 VS_DLL_EXPORT
-bool VS_STDCALL convert_from_der(int curvetype, long der_len, const unsigned char *der,
-	uint8_t pubkey_type,
-	int *pubkey_len, uint8_t *pubkey,
-	int *privkey_len, uint8_t *privkey);
+bool VS_STDCALL convert_from_der(long der_len, const unsigned char *der, const uint8_t compression,
+	                             int *pubkey_len, uint8_t *pubkey, int *privkey_len, uint8_t *privkey);
 
 /**
  *
  *
- * @param [in] curvetype
  * @param [in] pem
- * @param [in] pubkey_type
+ * @param [in] compression
  * @param [out] pubkey_len
  * @param [out] pubkey
  * @param [out] privkey_len
  *@return bool
  */
 VS_DLL_EXPORT
-bool VS_STDCALL convert_from_pem(int curvetype, const char *pem,
-	uint8_t pubkey_type,
-	int *pubkey_len, uint8_t *pubkey,
-	int *privkey_len, uint8_t *privkey);
+bool VS_STDCALL convert_from_pem(const char *pem, const uint8_t compression,
+                                 int *pubkey_len, uint8_t *pubkey, int *privkey_len, uint8_t *privkey);
+
+/**
+ *
+ * @param pubkey_x509
+ * @param compression
+ * @param pubkey_len
+ * @param pubkey
+ * @return
+ */
+VS_DLL_EXPORT
+bool VS_STDCALL read_x509(const char *pubkey_x509, const uint8_t compression, int *pubkey_len, uint8_t *pubkey);
+
+/**
+ *
+ * @param pubkey_x509
+ * @param privkey_pem
+ * @return
+ */
+VS_DLL_EXPORT
+int VS_STDCALL verify_x509(const char *pubkey_x509, const char *privkey_pem);
 
 /**
  *
@@ -140,7 +162,7 @@ bool VS_STDCALL convert_from_pem(int curvetype, const char *pem,
  * @return int 
  */
 VS_DLL_EXPORT
-int VS_STDCALL output_der(int curvetype, int privkey_len, uint8_t *privkey, uint8_t *der_out);
+int VS_STDCALL output_der(const int curvetype, int privkey_len, uint8_t *privkey, uint8_t *der_out);
 
 /**
  *
@@ -152,13 +174,13 @@ int VS_STDCALL output_der(int curvetype, int privkey_len, uint8_t *privkey, uint
  * @return int
  */
 VS_DLL_EXPORT
-int VS_STDCALL output_pem(int curvetype, int privkey_len, uint8_t *privkey, uint8_t *pem_out);
+int VS_STDCALL output_pem(const int curvetype, int privkey_len, uint8_t *privkey, uint8_t *pem_out);
 
 
 VS_DLL_EXPORT
-int VS_STDCALL output_public_key_der(int curvetype, int point_len, uint8_t *point, uint8_t *der_out);
+int VS_STDCALL output_public_key_der(const int curvetype, int point_len, uint8_t *point, uint8_t *der_out);
 
 VS_DLL_EXPORT
-int VS_STDCALL output_public_key_pem(int curvetype, int point_len, uint8_t *point, uint8_t *pem_out);
+int VS_STDCALL output_public_key_pem(const int curvetype, int point_len, uint8_t *point, uint8_t *pem_out);
 
 #endif
