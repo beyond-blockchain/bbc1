@@ -171,7 +171,7 @@ class DataHandler:
         else:
             return list(ret)
 
-    def _get_asset_info(self, txobj):
+    def get_asset_info(self, txobj):
         """Retrieve asset information from transaction object
 
         Args:
@@ -270,7 +270,7 @@ class DataHandler:
         if ret is None:
             return False
 
-        for asset_group_id, asset_id, user_id, fileflag, filedigest in self._get_asset_info(txobj):
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
             self.exec_sql(db_num=db_num,
                           sql="INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id) "
                               "VALUES (%s, %s, %s, %s)" % (
@@ -336,7 +336,7 @@ class DataHandler:
         """
         #print("_store_asset_files: for txid =", txobj.transaction_id.hex())
         asset_group_ids = set()
-        for asset_group_id, asset_id, user_id, fileflag, filedigest in self._get_asset_info(txobj):
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
             asset_group_ids.add(asset_group_id)
             if not self.use_external_storage and asset_files is not None and asset_id in asset_files:
                 self.store_in_storage(asset_group_id, asset_id, asset_files[asset_id])
@@ -437,14 +437,15 @@ class DataHandler:
         #print("_remove_asset_files: for txid =", txobj.transaction_id.hex())
         if self.use_external_storage:
             return
-        for asset_group_id, asset_id, user_id, fileflag, filedigest in self._get_asset_info(txobj):
+        for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
             if asset_files is not None:
                 if asset_id in asset_files:
                     self._remove_in_storage(asset_group_id, asset_id)
             else:
                 self._remove_in_storage(asset_group_id, asset_id)
 
-    def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None, count=1, db_num=0):
+    def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None,
+                           direction=0, count=1, db_num=0):
         """Search transaction data
 
         When Multiple conditions are given, they are considered as AND condition.
@@ -454,6 +455,7 @@ class DataHandler:
             asset_group_id (bytes): asset_group_id that target transactions should have
             asset_id (bytes): asset_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
+            direction (int): 0: descend, 1: ascend
             count (int): The maximum number of transactions to retrieve
             db_num (int): index of DB if multiple DBs are used
         Returns:
@@ -468,6 +470,9 @@ class DataHandler:
             if len(txinfo) == 0:
                 return None, None
         else:
+            dire = "DESC"
+            if direction == 1:
+                dire = "ASC"
             sql = "SELECT * from asset_info_table WHERE "
             conditions = list()
             if asset_group_id is not None:
@@ -476,10 +481,8 @@ class DataHandler:
                 conditions.append("asset_id = %s " % self.db_adaptors[0].placeholder)
             if user_id is not None:
                 conditions.append("user_id = %s " % self.db_adaptors[0].placeholder)
-            sql += "AND ".join(conditions) + "ORDER BY id DESC"
+            sql += "AND ".join(conditions) + "ORDER BY id %s" % dire
             if count > 0:
-                if count > 20:
-                    count = 20
                 sql += " limit %d" % count
             sql += ";"
             args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id)))
@@ -498,10 +501,36 @@ class DataHandler:
         for txid, txdata in txinfo:
             txobj = bbclib.BBcTransaction(deserialize=txdata)
             result_txobj[txid] = txobj
-            for asset_group_id, asset_id, user_id, fileflag, filedigest in self._get_asset_info(txobj):
+            for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
                 if fileflag:
                     result_asset_files[asset_id] = self.get_in_storage(asset_group_id, asset_id)
         return result_txobj, result_asset_files
+
+    def count_transactions(self, asset_group_id=None, asset_id=None, user_id=None, db_num=0):
+        """Count transactions that matches the given conditions
+
+        When Multiple conditions are given, they are considered as AND condition.
+
+        Args:
+            asset_group_id (bytes): asset_group_id that target transactions should have
+            asset_id (bytes): asset_id that target transactions should have
+            user_id (bytes): user_id that target transactions should have
+            db_num (int): index of DB if multiple DBs are used
+        Returns:
+            int: the number of transactions
+        """
+        sql = "SELECT count( DISTINCT transaction_id ) from asset_info_table WHERE "
+        conditions = list()
+        if asset_group_id is not None:
+            conditions.append("asset_group_id = %s " % self.db_adaptors[0].placeholder)
+        if asset_id is not None:
+            conditions.append("asset_id = %s " % self.db_adaptors[0].placeholder)
+        if user_id is not None:
+            conditions.append("user_id = %s " % self.db_adaptors[0].placeholder)
+        sql += "AND ".join(conditions)
+        args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id)))
+        ret = self.exec_sql(db_num=db_num, sql=sql, args=args)
+        return ret[0][0]
 
     def search_transaction_topology(self, transaction_id, traverse_to_past=True):
         """Search in topology info
@@ -653,7 +682,7 @@ class DataHandlerDomain0(DataHandler):
     def exec_sql(self, sql, *args):
         pass
 
-    def _get_asset_info(self, txobj):
+    def get_asset_info(self, txobj):
         pass
 
     def _get_topology_info(self, txobj):

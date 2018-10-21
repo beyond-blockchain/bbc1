@@ -54,7 +54,6 @@ DURATION_GIVEUP_GET = 10
 GET_RETRY_COUNT = 3
 INTERVAL_RETRY = 3
 DEFAULT_ANYCAST_TTL = 5
-TX_TRAVERSAL_MAX = 30
 
 ticker = query_management.get_ticker()
 core_service = None
@@ -108,13 +107,15 @@ def _create_search_result(txobj_dict, asset_files_dict):
     for txid, txobj in txobj_dict.items():
         if txid != txobj.transaction_id:
             response_info.setdefault(KeyType.compromised_transactions, list()).append(txobj.transaction_data)
+            response_info.setdefault(KeyType.compromised_transaction_ids, list()).append(txid)
             continue
         txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asset_files_dict)
         if txobj_is_valid:
             response_info.setdefault(KeyType.transactions, list()).append(txobj.transaction_data)
         else:
             response_info.setdefault(KeyType.compromised_transactions, list()).append(txobj.transaction_data)
-
+            response_info.setdefault(KeyType.compromised_transaction_ids, list()).append(txid)
+            
         if len(valid_assets) > 0:
             response_info.setdefault(KeyType.all_asset_files, dict())
             for asgid, asid in valid_assets:
@@ -130,10 +131,10 @@ class BBcCoreService:
     """Base service object of BBc-1"""
     def __init__(self, p2p_port=None, core_port=None, use_domain0=False, ip4addr=None, ip6addr=None,
                  workingdir=".bbc1", configfile=None, use_nodekey=None, use_ledger_subsystem=False,
-                 loglevel="all", logname="-", server_start=True):
+                 default_conffile=None, loglevel="all", logname="-", server_start=True):
         self.logger = logger.get_logger(key="core", level=loglevel, logname=logname)
         self.stats = bbc_stats.BBcStats()
-        self.config = BBcConfig(workingdir, configfile)
+        self.config = BBcConfig(workingdir, configfile, default_conffile)
         conf = self.config.get_config()
         if p2p_port is not None:
             conf['client']['port'] = core_port
@@ -148,6 +149,8 @@ class BBcCoreService:
         if 'use_node_key' in conf['client'] and conf['client']['use_node_key']:
             self._get_node_key()
         self.logger.debug("config = %s" % conf)
+        self.search_max_count = conf['search_config']['max_count']
+        self.traverse_max_count = conf['search_config']['max_traverse']
         self.test_tx_obj = BBcTransaction()
         self.insert_notification_user_list = dict()
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port,
@@ -368,6 +371,7 @@ class BBcCoreService:
                                                             asset_group_id=dat.get(KeyType.asset_group_id, None),
                                                             asset_id=dat.get(KeyType.asset_id, None),
                                                             user_id=dat.get(KeyType.user_id, None),
+                                                            direction=dat.get(KeyType.direction, 0),
                                                             count=dat.get(KeyType.count, 1))
             if txinfo is None or KeyType.transactions not in txinfo:
                 if not self._error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
@@ -375,6 +379,18 @@ class BBcCoreService:
             else:
                 retmsg.update(txinfo)
                 umr.send_message_to_user(retmsg)
+
+        elif cmd == MsgType.REQUEST_COUNT_TRANSACTIONS:
+            if not self._param_check([KeyType.domain_id], dat):
+                self.logger.debug("REQUEST_COUNT_TRANSACTIONS: bad format")
+                return False, None
+            retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_COUNT_TRANSACTIONS,
+                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
+            count = self.count_transactions(domain_id, asset_group_id=dat.get(KeyType.asset_group_id, None),
+                                            asset_id=dat.get(KeyType.asset_id, None),
+                                            user_id=dat.get(KeyType.user_id, None))
+            retmsg[KeyType.count] = count
+            umr.send_message_to_user(retmsg)
 
         elif cmd == MsgType.REQUEST_TRAVERSE_TRANSACTIONS:
             if not self._param_check([KeyType.domain_id, KeyType.transaction_id,
@@ -384,8 +400,13 @@ class BBcCoreService:
             retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_TRAVERSE_TRANSACTIONS,
                                             dat[KeyType.source_user_id], dat[KeyType.query_id])
             retmsg[KeyType.transaction_id] = dat[KeyType.transaction_id]
+            asset_group_id = dat.get(KeyType.asset_group_id, None)
+            user_id = dat.get(KeyType.user_id, None)
             all_included, txtree, asset_files = self._traverse_transactions(domain_id, dat[KeyType.transaction_id],
-                                                                           dat[KeyType.direction], dat[KeyType.hop_count])
+                                                                            asset_group_id=asset_group_id,
+                                                                            user_id=user_id,
+                                                                            direction=dat[KeyType.direction],
+                                                                            hop_count=dat[KeyType.hop_count])
             if txtree is None or len(txtree) == 0:
                 if not self._error_reply(msg=retmsg, err_code=ENOTRANSACTION, txt="Cannot find transaction"):
                     user_message_routing.direct_send_to_user(socket, retmsg)
@@ -614,12 +635,16 @@ class BBcCoreService:
             if not self._param_check([KeyType.domain_id], dat):
                 self.logger.debug("REQUEST_SETUP_DOMAIN: bad format")
                 return False, None
+            conf = None
+            if KeyType.bbc_configuration in dat:
+                conf = json.loads(dat[KeyType.bbc_configuration])
             retmsg = _make_message_structure(None, MsgType.RESPONSE_SETUP_DOMAIN,
                                              dat[KeyType.source_user_id], dat[KeyType.query_id])
-            retmsg[KeyType.result] = self.networking.create_domain(domain_id=domain_id)
+            retmsg[KeyType.result] = self.networking.create_domain(domain_id=domain_id, config=conf)
             if not retmsg[KeyType.result]:
                 retmsg[KeyType.reason] = "Already exists"
             retmsg[KeyType.domain_id] = domain_id
+            self.config.update_config()
             user_message_routing.direct_send_to_user(socket, retmsg)
 
         elif cmd == MsgType.REQUEST_CLOSE_DOMAIN:
@@ -900,7 +925,8 @@ class BBcCoreService:
             del response_info[KeyType.compromised_transactions]
         return response_info
 
-    def search_transaction_with_condition(self, domain_id, asset_group_id=None, asset_id=None, user_id=None, count=1):
+    def search_transaction_with_condition(self, domain_id, asset_group_id=None, asset_id=None, user_id=None,
+                                          direction=0, count=1):
         """Search transactions that match given conditions
 
         When Multiple conditions are given, they are considered as AND condition.
@@ -910,7 +936,8 @@ class BBcCoreService:
             asset_group_id (bytes): asset_group_id that target transactions should have
             asset_id (bytes): asset_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
-            count (int): The maximum number of transactions to retrieve
+            direction (int): 0: descend, 1: ascend
+            count (int): The maximum number of transactions to retrieve (self.search_max_count is the upper bound)
         Returns:
             dict: dictionary having transaction_id, serialized transaction data, asset files
         """
@@ -918,25 +945,51 @@ class BBcCoreService:
             self.logger.error("No such domain")
             return None
 
+        if self.search_max_count < count:
+            count = self.search_max_count
+
         dh = self.networking.domains[domain_id]['data']
-        ret_txobj, ret_asset_files = dh.search_transaction(asset_group_id=asset_group_id,
-                                                           asset_id=asset_id, user_id=user_id, count=count)
+        ret_txobj, ret_asset_files = dh.search_transaction(asset_group_id=asset_group_id, asset_id=asset_id,
+                                                           user_id=user_id, direction=direction, count=count)
         if ret_txobj is None or len(ret_txobj) == 0:
             return None
 
         return _create_search_result(ret_txobj, ret_asset_files)
 
-    def _traverse_transactions(self, domain_id, transaction_id, direction=1, hop_count=3):
-        """Get transaction tree from the specified transaction_id
+    def count_transactions(self, domain_id, asset_group_id=None, asset_id=None, user_id=None):
+        """Count transactions that match given conditions
 
+        When Multiple conditions are given, they are considered as AND condition.
+
+        Args:
+            domain_id (bytes): target domain_id
+            asset_group_id (bytes): asset_group_id that target transactions should have
+            asset_id (bytes): asset_id that target transactions should have
+            user_id (bytes): user_id that target transactions should have
+        Returns:
+            int: the number of transactions
+        """
+        if domain_id is None:
+            self.logger.error("No such domain")
+            return None
+
+        dh = self.networking.domains[domain_id]['data']
+        return dh.count_transactions(asset_group_id=asset_group_id, asset_id=asset_id, user_id=user_id)
+
+    def _traverse_transactions(self, domain_id, transaction_id, asset_group_id=None, user_id=None, direction=1, hop_count=3):
+        """Get transaction tree from the specified transaction_id with given condition
+
+        If both asset_group_id and user_id are specified, they are treated as AND condition.
         Transaction tree in the return values are in the following format:
         [ [list of serialized transactions in 1-hop from the base], [list of serialized transactions in 2-hop from the base],,,,
 
         Args:
             domain_id (bytes): target domain_id
             transaction_id (bytes): the base transaction_id from which traverse starts
+            asset_group_id (bytes): asset_group_id that target transactions should have
+            user_id (bytes): user_id that target transactions should have
             direction (int): 1:backward, non-1:forward
-            hop_count (bytes): hop count to traverse
+            hop_count (bytes): hop count to traverse (self.traverse_max_count is the upper bound)
         Returns:
             list: list of [include_all_flag, transaction tree, asset_files]
         """
@@ -957,14 +1010,13 @@ class BBcCoreService:
         txids = dict()
         current_txids = [transaction_id]
         include_all_flag = True
-        if hop_count > TX_TRAVERSAL_MAX * 2:
-            hop_count = TX_TRAVERSAL_MAX * 2
-            include_all_flag = False
+        if hop_count > self.traverse_max_count * 2:
+            hop_count = self.traverse_max_count * 2
         for i in range(hop_count):
             tx_brothers = list()
             next_txids = list()
             #print("### txcount=%d, len(current_txids)=%d" % (tx_count, len(current_txids)))
-            if tx_count + len(current_txids) > TX_TRAVERSAL_MAX:  # up to 30 entries
+            if tx_count + len(current_txids) > self.traverse_max_count:
                 include_all_flag = False
                 break
             #print("[%d] current_txids:%s" % (i, [d.hex() for d in current_txids]))
@@ -976,6 +1028,18 @@ class BBcCoreService:
                 ret_txobj, ret_asset_files = dh.search_transaction(transaction_id=txid)
                 if ret_txobj is None or len(ret_txobj) == 0:
                     continue
+                if asset_group_id is not None or user_id is not None:
+                    flag = False
+                    for asgid, asset_id, uid, fileflag, filedigest in dh.get_asset_info(ret_txobj[txid]):
+                        flag = True
+                        if asset_group_id is not None and asgid != asset_group_id:
+                            flag = False
+                        if user_id is not None and uid != user_id:
+                            flag = False
+                        if flag:
+                            break
+                    if not flag:
+                        continue
                 tx_brothers.append(ret_txobj[txid].transaction_data)
                 if len(ret_asset_files) > 0:
                     asset_files.update(ret_asset_files)
@@ -1037,6 +1101,7 @@ if __name__ == '__main__':
         use_ledger_subsystem=argresult.ledgersubsystem,
         ip4addr=argresult.ip4addr,
         ip6addr=argresult.ip6addr,
+        default_conffile=argresult.default_config,
         logname=argresult.log,
         loglevel=argresult.verbose_level,
     )

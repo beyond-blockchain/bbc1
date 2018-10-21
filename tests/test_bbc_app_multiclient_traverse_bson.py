@@ -29,8 +29,6 @@ class TestBBcAppClient(object):
 
     def test_00_setup(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        bbc_core.TX_TRAVERSAL_MAX = 11
-
         prepare(core_num=core_num, client_num=client_num, loglevel=LOGLEVEL)
         for i in range(core_num):
             start_core_thread(index=i, core_port_increment=i, p2p_port_increment=i)
@@ -42,6 +40,8 @@ class TestBBcAppClient(object):
 
         global cores, clients
         cores, clients = get_core_client()
+        for core in cores:
+            core.traverse_max_count = 11
 
     def test_01_register(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")

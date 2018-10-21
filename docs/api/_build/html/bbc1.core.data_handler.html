@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.data_handler module &mdash; BBc1 1.0 documentation</title>
+  <title>bbc1.core.data_handler module &mdash; BBc1 1.1 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.0
+                1.1
               </div>
             
           
@@ -240,6 +240,33 @@ limitations under the License.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="bbc1.core.data_handler.DataHandler.count_transactions">
+<code class="descname">count_transactions</code><span class="sig-paren">(</span><em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>db_num=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.count_transactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count transactions that matches the given conditions</p>
+<p>When Multiple conditions are given, they are considered as AND condition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</li>
+<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</li>
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</li>
+<li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the number of transactions</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.exec_sql">
 <code class="descname">exec_sql</code><span class="sig-paren">(</span><em>db_num=0</em>, <em>sql=None</em>, <em>args=()</em>, <em>commit=False</em>, <em>fetch_one=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.exec_sql"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.exec_sql" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute sql sentence</p>
@@ -261,6 +288,24 @@ limitations under the License.</p>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.data_handler.DataHandler.get_asset_info">
+<code class="descname">get_asset_info</code><span class="sig-paren">(</span><em>txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.get_asset_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.get_asset_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve asset information from transaction object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to analyze</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of list [asset_group_id, asset_id, user_id, file_size, file_digest]</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
 </tr>
 </tbody>
 </table>
@@ -396,7 +441,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.search_transaction">
-<code class="descname">search_transaction</code><span class="sig-paren">(</span><em>transaction_id=None</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>count=1</em>, <em>db_num=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="descname">search_transaction</code><span class="sig-paren">(</span><em>transaction_id=None</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>direction=0</em>, <em>count=1</em>, <em>db_num=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search transaction data</p>
 <p>When Multiple conditions are given, they are considered as AND condition.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -408,6 +453,7 @@ limitations under the License.</p>
 <li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</li>
 <li><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</li>
 <li><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</li>
+<li><strong>direction</strong> (<em>int</em>) – 0: descend, 1: ascend</li>
 <li><strong>count</strong> (<em>int</em>) – The maximum number of transactions to retrieve</li>
 <li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
 </ul>
@@ -503,6 +549,24 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.data_handler.DataHandlerDomain0.get_asset_info">
+<code class="descname">get_asset_info</code><span class="sig-paren">(</span><em>txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.get_asset_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.get_asset_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve asset information from transaction object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to analyze</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of list [asset_group_id, asset_id, user_id, file_size, file_digest]</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
 </tr>
 </tbody>
 </table>
@@ -606,6 +670,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</li>
 <li><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</li>
 <li><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</li>
+<li><strong>direction</strong> (<em>int</em>) – 0: descend, 1: ascend</li>
 <li><strong>count</strong> (<em>int</em>) – The maximum number of transactions to retrieve</li>
 <li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
 </ul>
@@ -799,7 +864,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, beyond-blockchain.org.
+        &copy; Copyright 2018, beyond-blockchain.org
 
     </p>
   </div>
@@ -818,20 +883,14 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.0',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

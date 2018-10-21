@@ -65,7 +65,7 @@ def prepare_transaction(asset_group, client, datnum, txid_pointer=None, no_cross
     wit.add_witness(user_id)
     if not no_cross_ref:
         client['app'].include_cross_ref(txobj)
-    sig = txobj.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1, keypair=kp)
+    sig = txobj.sign(keypair=kp)
     txobj.add_signature(user_id=user_id, signature=sig)
     txobj.digest()
     return txobj
@@ -278,9 +278,9 @@ class TestBBcAppClient(object):
             clients[i]['app'].request_verify_by_cross_ref(txid_to_verify)
             dat = msg_processor[i].synchronize()
             assert KeyType.cross_ref_verification_info in dat
-            transaction_base_digest, cross_ref_data, sigdata, tx_format = dat[KeyType.cross_ref_verification_info]
+            transaction_base_digest, cross_ref_data, sigdata, fmt_type = dat[KeyType.cross_ref_verification_info]
             assert bbclib.verify_using_cross_ref(dm, txid_to_verify, transaction_base_digest, cross_ref_data,
-                                                 sigdata, format_type=tx_format)
+                                                 sigdata, format_type=fmt_type)
 
 
 if __name__ == '__main__':

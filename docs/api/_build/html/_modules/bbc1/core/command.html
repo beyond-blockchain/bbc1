@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.command &mdash; BBc1 1.0 documentation</title>
+  <title>bbc1.core.command &mdash; BBc1 1.1 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.0
+                1.1
               </div>
             
           
@@ -173,14 +173,15 @@
 
 <div class="viewcode-block" id="parser"><a class="viewcode-back" href="../../../bbc1.core.command.html#bbc1.core.command.parser">[docs]</a><span class="k">def</span> <span class="nf">parser</span><span class="p">():</span>
     <span class="n">usage</span> <span class="o">=</span> <span class="s1">&#39;python </span><span class="si">{}</span><span class="s1"> [--coreport &lt;number&gt;] [--p2pport &lt;number&gt;] [--workingdir &lt;dir&gt;] &#39;</span> \
-            <span class="s1">&#39;[--config &lt;filename&gt;] [--nodekey] [--no_nodekey] [--domain0] [--ledgersubsystem] &#39;</span> \
-            <span class="s1">&#39;[--ip4addr &lt;IP addr&gt;] [--ip6addr &lt;IPv6 addr&gt;] &#39;</span> \
+            <span class="s1">&#39;[--config &lt;filename&gt;] [--default_config &lt;filename&gt;] [--nodekey] [--no_nodekey] [--domain0] &#39;</span> \
+            <span class="s1">&#39;[--ledgersubsystem] [--ip4addr &lt;IP addr&gt;] [--ip6addr &lt;IPv6 addr&gt;] &#39;</span> \
             <span class="s1">&#39;[--log &lt;filename&gt;] [--verbose_level &lt;string&gt;] [--daemon] [--kill] [--help]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
     <span class="n">argparser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span><span class="n">usage</span><span class="o">=</span><span class="n">usage</span><span class="p">)</span>
     <span class="n">argparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-cp&#39;</span><span class="p">,</span> <span class="s1">&#39;--coreport&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_CORE_PORT</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;waiting TCP port&#39;</span><span class="p">)</span>
     <span class="n">argparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-pp&#39;</span><span class="p">,</span> <span class="s1">&#39;--p2pport&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_P2P_PORT</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;waiting TCP port&#39;</span><span class="p">)</span>
     <span class="n">argparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-w&#39;</span><span class="p">,</span> <span class="s1">&#39;--workingdir&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;.bbc1&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;working directory name&#39;</span><span class="p">)</span>
     <span class="n">argparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--config&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;config file name&#39;</span><span class="p">)</span>
+    <span class="n">argparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--default_config&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;default config file&#39;</span><span class="p">)</span>
     <span class="n">argparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--nodekey&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;use node_key for admin command&#39;</span><span class="p">)</span>
     <span class="n">argparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--no_nodekey&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;don</span><span class="se">\&#39;</span><span class="s1">t use node_key for admin command&#39;</span><span class="p">)</span>
     <span class="n">argparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--domain0&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;connect to domain_global_0&#39;</span><span class="p">)</span>
@@ -206,7 +207,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, beyond-blockchain.org.
+        &copy; Copyright 2018, beyond-blockchain.org
 
     </p>
   </div>
@@ -225,20 +226,14 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'1.0',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

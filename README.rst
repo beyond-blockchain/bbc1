@@ -26,9 +26,9 @@ Some documents are available in docs/.
   * [BBc-trust_ja.pdf](docs/BBc-trust_ja.pdf)
   * [BBc-1_design_paper.pdf](docs/BBc-1_design_paper.pdf)
   * [BBc1_design_document_v1.0_ja.pdf](docs/BBc1_design_document_v1.0_ja.pdf)
-  * [How_BBc1_works_v1.0_ja.pdf](docs/How_BBc1_works_v1.0_ja.pdf)
+  * [How_BBc1_works_v1.0.2_ja.pdf](docs/How_BBc1_works_v1.0.2_ja.pdf)
 * Usage
-    * [How_to_use_BBc1_v1.0_ja.pdf](docs/How_to_use_BBc1_v1.0_ja.pdf)
+    * [How_to_use_BBc1_v1.0.2_ja.pdf](docs/How_to_use_BBc1_v1.0.2_ja.pdf)
     * [BBc1_core_tutorial_installation_ja.md](docs/BBc1_core_tutorial_installation_ja.md)
     * [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
     * [libbbcsig_dll_build_for_Windows_x64_ja.md](docs/libbbcsig_dll_build_for_Windows_x64_ja.md)

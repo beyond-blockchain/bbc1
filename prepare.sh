@@ -1,10 +1,13 @@
 #!/bin/sh
 
-git clone https://github.com/openssl/openssl.git libs/openssl
-cd libs/openssl
-git checkout f70425d3ac5e4ef17cfa116d99f8f03bbac1c7f2
-./config && make
+mkdir -p libs
+git clone -b master https://github.com/beyond-blockchain/libbbcsig.git libs
+cd libs
+sh prepare.sh
 
-cd ../libbbcsig
-make clean
-make
+cd lib
+if [ -f libbbcsig.dylib ]; then
+  cp libbbcsig.dylib ../../bbc1/core/
+elif [ -f libbbcsig.so ]; then
+  cp libbbcsig.so ../../bbc1/core/
+fi

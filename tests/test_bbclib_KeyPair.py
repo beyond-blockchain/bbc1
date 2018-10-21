@@ -33,6 +33,33 @@ else:
     in_pem = in_pem_posix
 
 
+x509cert = """
+-----BEGIN CERTIFICATE-----
+MIIB2zCCAYCgAwIBAgIJAOJGz2S+ZrY7MAoGCCqGSM49BAMCMEgxCzAJBgNVBAYT
+AkpQMQ4wDAYDVQQIDAVUb2t5bzEaMBgGA1UECgwRQmV5b25kLUJsb2NrY2hhaW4x
+DTALBgNVBAMMBGJiYzEwHhcNMTgxMDA4MDI0MjU5WhcNMTgxMDA5MDI0MjU5WjBI
+MQswCQYDVQQGEwJKUDEOMAwGA1UECAwFVG9reW8xGjAYBgNVBAoMEUJleW9uZC1C
+bG9ja2NoYWluMQ0wCwYDVQQDDARiYmMxMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD
+QgAE7nOXqn1SCw/6/U8D5Kk2QyHPb9xXj6+YNGzRiyMwGnnJZEEX9vfjkL3U6ot2
+Vq6m2nSnXnJLWJSSzGaoX2uV0KNTMFEwHQYDVR0OBBYEFFLtWuBaBxDOhVV8JIUT
+Rl2SaV/SMB8GA1UdIwQYMBaAFFLtWuBaBxDOhVV8JIUTRl2SaV/SMA8GA1UdEwEB
+/wQFMAMBAf8wCgYIKoZIzj0EAwIDSQAwRgIhAO0GLZMzwaVKvpBk+jn0FqQKtB6e
+4nW6/pCkFcq8qkqdAiEAgSkQfYYcxw2SAOi/UvdN4de9cnhtyichwPqoNVTeVi8=
+-----END CERTIFICATE-----
+"""
+
+privkey = """
+-----BEGIN EC PARAMETERS-----
+BggqhkjOPQMBBw==
+-----END EC PARAMETERS-----
+-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIOHS8jUsysGXfnWHCEVueroktvddOVIPn1tfU3afA3bIoAoGCCqGSM49
+AwEHoUQDQgAE7nOXqn1SCw/6/U8D5Kk2QyHPb9xXj6+YNGzRiyMwGnnJZEEX9vfj
+kL3U6ot2Vq6m2nSnXnJLWJSSzGaoX2uV0A==
+-----END EC PRIVATE KEY-----
+"""
+
+
 def test_keypair_generate():
     """
     """
@@ -65,14 +92,12 @@ def test_keypair_der():
 
 
 def test_keypair_pem():
-    """
-    """
     keypair = bbclib.KeyPair(curvetype=bbclib.KeyType.ECDSA_SECP256k1, privkey=in_privkey, pubkey=in_pubkey)
 
     pem = keypair.get_private_key_in_pem()
     assert (bytes(pem) == in_pem[:(len(in_pem) - 1)])  # ヌル終端を取り除いて比較する。
 
-    keypair.mk_keyobj_from_private_key_pem(str(pem))   # 文字列化する。
+    keypair.mk_keyobj_from_private_key_pem(pem.decode())   # 文字列化する。
     assert (bytes(keypair.private_key)[:keypair.private_key_len.value] == in_privkey)
     assert (bytes(keypair.public_key)[:keypair.public_key_len.value] == in_pubkey)
 
@@ -95,3 +120,20 @@ def test_keypair_sign_and_verify():
     ret = keypair.verify(not_digest, signature)
     # print("ret = {}".format(ret))
     assert (ret == 0)
+
+
+"""
+def test_import_certificate():
+    # this test always fails because the cert had expired. (put new cert pem in x509cert and privkey!)
+    keypair = bbclib.KeyPair(compression=True)
+    ret = keypair.import_publickey_cert_pem(x509cert, privkey)
+    assert ret
+    assert (keypair.private_key_len.value == 32)
+    assert (keypair.public_key_len.value == 33)
+
+    keypair = bbclib.KeyPair(compression=False)
+    ret = keypair.import_publickey_cert_pem(x509cert, privkey)
+    assert ret
+    assert (keypair.private_key_len.value == 32)
+    assert (keypair.public_key_len.value == 65)
+"""

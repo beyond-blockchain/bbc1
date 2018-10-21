@@ -78,8 +78,7 @@ class TestDataHandler(object):
             wit = bbclib.BBcWitness()
             txobj.add(event=evt, relation=rtn, witness=wit)
             wit.add_witness(user_id1)
-            sig = txobj.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1,
-                             private_key=keypair1.private_key, public_key=keypair1.public_key)
+            sig = txobj.sign(private_key=keypair1.private_key, public_key=keypair1.public_key)
             txobj.add_signature(user_id=user_id1, signature=sig)
             txobj.digest()
             transactions.append(txobj)
@@ -151,6 +150,16 @@ class TestDataHandler(object):
         ret = data_handler.search_transaction_topology(transactions[1].transaction_id, traverse_to_past=False)
         assert len(ret) == 1
         assert ret[0][1] == transactions[2].transaction_id
+
+    def test_10_count_transactions(self):
+        print("\n-----", sys._getframe().f_code.co_name, "-----")
+        ret = data_handler.count_transactions(asset_group_id=asset_group_id1)
+        print("(asset_group_id1) count=", ret)
+        assert ret == 10
+
+        ret = data_handler.count_transactions(user_id=user_id1)
+        print("(user_id1) count=", ret)
+        assert ret == 10
 
 
 if __name__ == '__main__':

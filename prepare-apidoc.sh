@@ -1,5 +1,6 @@
 #!/bin/bash
 
+pipenv install -r requirements.txt
 pipenv install sphinx sphinx_rtd_theme
 
 pipenv run sphinx-apidoc -F -e -o docs/api/ bbc1
