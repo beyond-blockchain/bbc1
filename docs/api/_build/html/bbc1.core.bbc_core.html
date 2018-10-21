@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.bbc_core module &mdash; BBc1 1.0 documentation</title>
+  <title>bbc1.core.bbc_core module &mdash; BBc1 1.1 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.0
+                1.1
               </div>
             
           
@@ -171,9 +171,36 @@
 <p>exec python “$0” “$&#64;”</p>
 <dl class="class">
 <dt id="bbc1.core.bbc_core.BBcCoreService">
-<em class="property">class </em><code class="descclassname">bbc1.core.bbc_core.</code><code class="descname">BBcCoreService</code><span class="sig-paren">(</span><em>p2p_port=None</em>, <em>core_port=None</em>, <em>use_domain0=False</em>, <em>ip4addr=None</em>, <em>ip6addr=None</em>, <em>workingdir='.bbc1'</em>, <em>configfile=None</em>, <em>use_nodekey=None</em>, <em>use_ledger_subsystem=False</em>, <em>loglevel='all'</em>, <em>logname='-'</em>, <em>server_start=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bbc1.core.bbc_core.</code><code class="descname">BBcCoreService</code><span class="sig-paren">(</span><em>p2p_port=None</em>, <em>core_port=None</em>, <em>use_domain0=False</em>, <em>ip4addr=None</em>, <em>ip6addr=None</em>, <em>workingdir='.bbc1'</em>, <em>configfile=None</em>, <em>use_nodekey=None</em>, <em>use_ledger_subsystem=False</em>, <em>default_conffile=None</em>, <em>loglevel='all'</em>, <em>logname='-'</em>, <em>server_start=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Base service object of BBc-1</p>
+<dl class="method">
+<dt id="bbc1.core.bbc_core.BBcCoreService.count_transactions">
+<code class="descname">count_transactions</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.count_transactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count transactions that match given conditions</p>
+<p>When Multiple conditions are given, they are considered as AND condition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</li>
+<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</li>
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the number of transactions</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.insert_transaction">
 <code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>domain_id</em>, <em>txdata</em>, <em>asset_files</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.insert_transaction" title="Permalink to this definition">¶</a></dt>
@@ -227,7 +254,7 @@
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition">
-<code class="descname">search_transaction_with_condition</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>count=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.search_transaction_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition" title="Permalink to this definition">¶</a></dt>
+<code class="descname">search_transaction_with_condition</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>direction=0</em>, <em>count=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.search_transaction_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search transactions that match given conditions</p>
 <p>When Multiple conditions are given, they are considered as AND condition.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -239,7 +266,8 @@
 <li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</li>
 <li><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</li>
 <li><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</li>
-<li><strong>count</strong> (<em>int</em>) – The maximum number of transactions to retrieve</li>
+<li><strong>direction</strong> (<em>int</em>) – 0: descend, 1: ascend</li>
+<li><strong>count</strong> (<em>int</em>) – The maximum number of transactions to retrieve (self.search_max_count is the upper bound)</li>
 </ul>
 </td>
 </tr>
@@ -333,7 +361,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, beyond-blockchain.org.
+        &copy; Copyright 2018, beyond-blockchain.org
 
     </p>
   </div>
@@ -352,20 +380,14 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.0',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

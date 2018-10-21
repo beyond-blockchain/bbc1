@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.bbc_app &mdash; BBc1 1.0 documentation</title>
+  <title>bbc1.core.bbc_app &mdash; BBc1 1.1 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.0
+                1.1
               </div>
             
           
@@ -310,17 +310,17 @@
 <span class="sd">            cmd (bytes): command type defined in bbclib.MsgType class</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">query_id</span> <span class="o">=</span> <span class="p">((</span><span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query_id</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">65536</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">cmd</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MESSAGE_WITH_NO_RESPONSE</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_query_id_based_message_wait</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">query_queue</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">create_queue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query_id</span><span class="p">)</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">:</span> <span class="n">cmd</span><span class="p">,</span>
             <span class="n">KeyType</span><span class="o">.</span><span class="n">domain_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span>
             <span class="n">KeyType</span><span class="o">.</span><span class="n">source_user_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
-            <span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_id</span><span class="p">,</span>
             <span class="n">KeyType</span><span class="o">.</span><span class="n">status</span><span class="p">:</span> <span class="n">ESUCCESS</span><span class="p">,</span>
         <span class="p">}</span>
+        <span class="k">if</span> <span class="n">cmd</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MESSAGE_WITH_NO_RESPONSE</span><span class="p">:</span>
+            <span class="n">msg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_id</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_query_id_based_message_wait</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">query_queue</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">create_queue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query_id</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">msg</span>
 
     <span class="k">def</span> <span class="nf">_send_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
@@ -745,7 +745,7 @@
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BBcAppClient.search_transaction_with_condition"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.search_transaction_with_condition">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction_with_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcAppClient.search_transaction_with_condition"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.search_transaction_with_condition">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction_with_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search transaction data by asset_group_id/asset_id/user_id</span>
 
 <span class="sd">        If multiple conditions are specified, they are considered as AND condition.</span>
@@ -754,6 +754,7 @@
 <span class="sd">            asset_group_id (bytes): asset_group_id in BBcEvent and BBcRelations</span>
 <span class="sd">            asset_id (bytes): asset_id in BBcAsset</span>
 <span class="sd">            user_id (bytes): user_id in BBcAsset that means the owner of the asset</span>
+<span class="sd">            direction (int): 0: descend, 1: ascend</span>
 <span class="sd">            count (int): the number of transactions to retrieve</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            bytes: query_id</span>
@@ -765,6 +766,7 @@
             <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_id</span>
         <span class="k">if</span> <span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_id</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">direction</span><span class="p">]</span> <span class="o">=</span> <span class="n">direction</span>
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
 
@@ -780,7 +782,28 @@
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BBcAppClient.traverse_transactions"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.traverse_transactions">[docs]</a>    <span class="k">def</span> <span class="nf">traverse_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">hop_count</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcAppClient.count_transactions"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.count_transactions">[docs]</a>    <span class="k">def</span> <span class="nf">count_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Count transactions that matches the given conditions</span>
+
+<span class="sd">        If multiple conditions are specified, they are considered as AND condition.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            asset_group_id (bytes): asset_group_id in BBcEvent and BBcRelations</span>
+<span class="sd">            asset_id (bytes): asset_id in BBcAsset</span>
+<span class="sd">            user_id (bytes): user_id in BBcAsset that means the owner of the asset</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            int: the number of transactions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_COUNT_TRANSACTIONS</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">asset_group_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_group_id</span>
+        <span class="k">if</span> <span class="n">asset_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_id</span>
+        <span class="k">if</span> <span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBcAppClient.traverse_transactions"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.traverse_transactions">[docs]</a>    <span class="k">def</span> <span class="nf">traverse_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">hop_count</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search request for transactions</span>
 
 <span class="sd">        The method traverses the transaction graph in the ledger.</span>
@@ -788,6 +811,8 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            transaction_id (bytes): the target transaction to retrieve</span>
+<span class="sd">            asset_group_id (bytes): asset_group_id that target transactions should have</span>
+<span class="sd">            user_id (bytes): user_id that target transactions should have</span>
 <span class="sd">            direction (int): 1:backforward, non-1:forward</span>
 <span class="sd">            hop_count (int): hop count to traverse from the specified origin point</span>
 <span class="sd">        Returns:</span>
@@ -795,6 +820,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_TRAVERSE_TRANSACTIONS</span><span class="p">)</span>
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
+        <span class="k">if</span> <span class="n">asset_group_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_group_id</span>
+        <span class="k">if</span> <span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_id</span>
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">direction</span><span class="p">]</span> <span class="o">=</span> <span class="n">direction</span>
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">hop_count</span><span class="p">]</span> <span class="o">=</span> <span class="n">hop_count</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
@@ -980,6 +1009,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_search_transaction</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_SEARCH_WITH_CONDITIONS</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_search_with_condition</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_COUNT_TRANSACTIONS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_count_transactions</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_TRAVERSE_TRANSACTIONS</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">proc_resp_traverse_transactions</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">==</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GATHER_SIGNATURE</span><span class="p">:</span>
@@ -1147,6 +1178,16 @@
 
 <div class="viewcode-block" id="Callback.proc_resp_search_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_search_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_search_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_SEARCH_TRANSACTION</span>
+
+<span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dat (dict): received message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Callback.proc_resp_count_transactions"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_count_transactions">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_count_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback for message RESPONSE_COUNT_TRANSACTIONS</span>
 
 <span class="sd">        This method should be overridden if you want to process the message asynchronously.</span>
 
@@ -1396,7 +1437,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, beyond-blockchain.org.
+        &copy; Copyright 2018, beyond-blockchain.org
 
     </p>
   </div>
@@ -1415,20 +1456,14 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'1.0',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

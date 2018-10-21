@@ -54,7 +54,6 @@ DURATION_GIVEUP_GET = 10
 GET_RETRY_COUNT = 3
 INTERVAL_RETRY = 3
 DEFAULT_ANYCAST_TTL = 5
-TX_TRAVERSAL_MAX = 30
 
 ticker = query_management.get_ticker()
 core_service = None
@@ -150,6 +149,8 @@ class BBcCoreService:
         if 'use_node_key' in conf['client'] and conf['client']['use_node_key']:
             self._get_node_key()
         self.logger.debug("config = %s" % conf)
+        self.search_max_count = conf['search_config']['max_count']
+        self.traverse_max_count = conf['search_config']['max_traverse']
         self.test_tx_obj = BBcTransaction()
         self.insert_notification_user_list = dict()
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port,
@@ -936,13 +937,16 @@ class BBcCoreService:
             asset_id (bytes): asset_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
             direction (int): 0: descend, 1: ascend
-            count (int): The maximum number of transactions to retrieve
+            count (int): The maximum number of transactions to retrieve (self.search_max_count is the upper bound)
         Returns:
             dict: dictionary having transaction_id, serialized transaction data, asset files
         """
         if domain_id is None:
             self.logger.error("No such domain")
             return None
+
+        if self.search_max_count < count:
+            count = self.search_max_count
 
         dh = self.networking.domains[domain_id]['data']
         ret_txobj, ret_asset_files = dh.search_transaction(asset_group_id=asset_group_id, asset_id=asset_id,
@@ -985,7 +989,7 @@ class BBcCoreService:
             asset_group_id (bytes): asset_group_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
             direction (int): 1:backward, non-1:forward
-            hop_count (bytes): hop count to traverse
+            hop_count (bytes): hop count to traverse (self.traverse_max_count is the upper bound)
         Returns:
             list: list of [include_all_flag, transaction tree, asset_files]
         """
@@ -1006,14 +1010,13 @@ class BBcCoreService:
         txids = dict()
         current_txids = [transaction_id]
         include_all_flag = True
-        if hop_count > TX_TRAVERSAL_MAX * 2:
-            hop_count = TX_TRAVERSAL_MAX * 2
-            include_all_flag = False
+        if hop_count > self.traverse_max_count * 2:
+            hop_count = self.traverse_max_count * 2
         for i in range(hop_count):
             tx_brothers = list()
             next_txids = list()
             #print("### txcount=%d, len(current_txids)=%d" % (tx_count, len(current_txids)))
-            if tx_count + len(current_txids) > TX_TRAVERSAL_MAX:  # up to 30 entries
+            if tx_count + len(current_txids) > self.traverse_max_count:
                 include_all_flag = False
                 break
             #print("[%d] current_txids:%s" % (i, [d.hex() for d in current_txids]))
