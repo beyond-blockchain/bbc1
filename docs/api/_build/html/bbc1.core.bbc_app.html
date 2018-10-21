@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.bbc_app module &mdash; BBc1 1.0 documentation</title>
+  <title>bbc1.core.bbc_app module &mdash; BBc1 1.1 documentation</title>
   
 
   
@@ -29,7 +29,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="bbc1.core.bbc_config module" href="bbc1.core.bbc_config.html" />
-    <link rel="prev" title="bbc1.core.libbbcsig.pybbcsig module" href="bbc1.core.libbbcsig.pybbcsig.html" /> 
+    <link rel="prev" title="bbc1.core package" href="bbc1.core.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.0
+                1.1
               </div>
             
           
@@ -196,6 +196,32 @@ limitations under the License.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.BBcAppClient.count_transactions">
+<code class="descname">count_transactions</code><span class="sig-paren">(</span><em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.count_transactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count transactions that matches the given conditions</p>
+<p>If multiple conditions are specified, they are considered as AND condition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id in BBcEvent and BBcRelations</li>
+<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id in BBcAsset</li>
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id in BBcAsset that means the owner of the asset</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the number of transactions</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -662,7 +688,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.search_transaction_with_condition">
-<code class="descname">search_transaction_with_condition</code><span class="sig-paren">(</span><em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>count=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.search_transaction_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.search_transaction_with_condition" title="Permalink to this definition">¶</a></dt>
+<code class="descname">search_transaction_with_condition</code><span class="sig-paren">(</span><em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>direction=0</em>, <em>count=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.search_transaction_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.search_transaction_with_condition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search transaction data by asset_group_id/asset_id/user_id</p>
 <p>If multiple conditions are specified, they are considered as AND condition.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -673,6 +699,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id in BBcEvent and BBcRelations</li>
 <li><strong>asset_id</strong> (<em>bytes</em>) – asset_id in BBcAsset</li>
 <li><strong>user_id</strong> (<em>bytes</em>) – user_id in BBcAsset that means the owner of the asset</li>
+<li><strong>direction</strong> (<em>int</em>) – 0: descend, 1: ascend</li>
 <li><strong>count</strong> (<em>int</em>) – the number of transactions to retrieve</li>
 </ul>
 </td>
@@ -900,7 +927,7 @@ This method should be used by a system administrator.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.traverse_transactions">
-<code class="descname">traverse_transactions</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>direction=1</em>, <em>hop_count=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.traverse_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.traverse_transactions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">traverse_transactions</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>asset_group_id=None</em>, <em>user_id=None</em>, <em>direction=1</em>, <em>hop_count=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.traverse_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.traverse_transactions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search request for transactions</p>
 <p>The method traverses the transaction graph in the ledger.
 The response from the bbc_core includes the list of transactions.</p>
@@ -910,6 +937,8 @@ The response from the bbc_core includes the list of transactions.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>transaction_id</strong> (<em>bytes</em>) – the target transaction to retrieve</li>
+<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</li>
+<li><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</li>
 <li><strong>direction</strong> (<em>int</em>) – 1:backforward, non-1:forward</li>
 <li><strong>hop_count</strong> (<em>int</em>) – hop count to traverse from the specified origin point</li>
 </ul>
@@ -1022,6 +1051,21 @@ The response from the bbc_core includes the list of transactions.</p>
 <dt id="bbc1.core.bbc_app.Callback.proc_notify_inserted">
 <code class="descname">proc_notify_inserted</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_notify_inserted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_notify_inserted" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message NOTIFY_INSERTED</p>
+<p>This method should be overridden if you want to process the message asynchronously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dat</strong> (<em>dict</em>) – received message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.bbc_app.Callback.proc_resp_count_transactions">
+<code class="descname">proc_resp_count_transactions</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_count_transactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback for message RESPONSE_COUNT_TRANSACTIONS</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1468,7 +1512,7 @@ This method should be overridden if you want to process the message asynchronous
         <a href="bbc1.core.bbc_config.html" class="btn btn-neutral float-right" title="bbc1.core.bbc_config module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="bbc1.core.libbbcsig.pybbcsig.html" class="btn btn-neutral" title="bbc1.core.libbbcsig.pybbcsig module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="bbc1.core.html" class="btn btn-neutral" title="bbc1.core package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -1477,7 +1521,7 @@ This method should be overridden if you want to process the message asynchronous
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, beyond-blockchain.org.
+        &copy; Copyright 2018, beyond-blockchain.org
 
     </p>
   </div>
@@ -1496,20 +1540,14 @@ This method should be overridden if you want to process the message asynchronous
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.0',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
