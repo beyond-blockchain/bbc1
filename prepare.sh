@@ -1,5 +1,6 @@
 #!/bin/sh
 
+mkdir -p libs
 git clone -b master https://github.com/beyond-blockchain/libbbcsig.git libs
 cd libs
 sh prepare.sh

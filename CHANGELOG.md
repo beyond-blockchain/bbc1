@@ -1,6 +1,17 @@
 Change log
 ======
 
+## v1.1
+* ID truncation (ID length less than 256-bit) support
+* X509 certificate for public key
+  * KeyPair class in bbclib.py can receive X509 self-signed certificate
+* ECC Prime-256 v1 support for private/public key
+* libbbcsig is decoupled to https://github.com/beyond-blockchain/libbbcsig
+* default config is introduced
+* search count upper limit is configurable
+* Extend transaction search functions (#94)
+* Buf fixes
+
 ## v1.0.1
 * Bug fixes
   * pip install bug is fixed but pipenv install still has some troubles.
