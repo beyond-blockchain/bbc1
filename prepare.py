@@ -13,6 +13,9 @@ else:
 install_pkg_dir = os.path.join(sitedir, 'bbc1')
 target_dir = os.path.join(install_pkg_dir, 'core')
 os.makedirs(target_dir, exist_ok=True)
-dst_path = os.path.join(target_dir, 'libbbcsig.so')
-shutil.copy('libs/libbbcsig.so', dst_path)
-
+if os.path.exists('bbc1/core/libbbcsig.so'):
+    dst_path = os.path.join(target_dir, 'libbbcsig.so')
+    shutil.copy('bbc1/core/libbbcsig.so', dst_path)
+elif os.path.exists('bbc1/core/libbbcsig.dylib'):
+    dst_path = os.path.join(target_dir, 'libbbcsig.dylib')
+    shutil.copy('bbc1/core/libbbcsig.dylib', dst_path)

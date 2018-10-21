@@ -56,7 +56,7 @@ bbc1_classifiers = [
 
 setup(
     name='bbc1',
-    version='1.0.1',
+    version='1.1',
     description='A core system of Beyond Blockchain One',
     long_description=readme,
     url='https://github.com/beyond-blockchain/bbc1',
