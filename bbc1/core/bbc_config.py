@@ -50,6 +50,10 @@ plain_config = {
         'directory': DEFAULT_WORKING_DIR+"/domain_keys",
         'obsolete_timeout': 300,
     },
+    'search_config': {
+        'max_count': 30,
+        'max_traverse': 30,
+    },
     'domains': {
         '0000000000000000000000000000000000000000000000000000000000000000': {
             'module': 'p2p_domain0',
