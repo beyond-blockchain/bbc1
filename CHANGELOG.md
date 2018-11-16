@@ -1,6 +1,9 @@
 Change log
 ======
 
+## v1.1.1
+* Fix bug on installation with pip in Linux environment
+
 ## v1.1
 * ID truncation (ID length less than 256-bit) support
 * X509 certificate for public key
@@ -10,7 +13,7 @@ Change log
 * default config is introduced
 * search count upper limit is configurable
 * Extend transaction search functions (#94)
-* Buf fixes
+* Bug fixes
 
 ## v1.0.1
 * Bug fixes

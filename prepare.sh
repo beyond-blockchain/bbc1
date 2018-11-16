@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 mkdir -p libs
 git clone -b master https://github.com/beyond-blockchain/libbbcsig.git libs
 cd libs
-sh prepare.sh
+bash prepare.sh
 
 cd lib
 if [ -f libbbcsig.dylib ]; then
