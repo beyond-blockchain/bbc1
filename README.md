@@ -1,6 +1,7 @@
 Core system of BBc-1 (Beyond Blockchain One)
 ===========================================
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Build Status](https://travis-ci.org/beyond-blockchain/bbc1.svg?branch=develop)](https://travis-ci.org/beyond-blockchain/bbc1)
 
 This project is a Python-based reference implementation of BBc-1, a trustable system of record keeping beyond blockchains.
 
