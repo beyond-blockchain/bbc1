@@ -20,9 +20,12 @@ import binascii
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
-from bbc1.core import bbclib
+from bbc1.core import bbclib_core, bbclib, bbclib_wire
 from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
 from bbc1.core import logger
+
+DEFAULT_BBC_FORMAT = bbclib_wire.BBcFormat.FORMAT_PLAIN
+
 
 transaction_tbl_definition = [
     ["transaction_id", "BLOB"], ["transaction_data", "BLOB"],
@@ -74,7 +77,7 @@ class DataHandler:
         self.stats = networking.core.stats
         self.logger = logger.get_logger(key="data_handler", level=loglevel, logname=logname)
         self.domain_id = domain_id
-        self.domain_id_str = bbclib.convert_id_to_string(domain_id)
+        self.domain_id_str = bbclib_core.convert_id_to_string(domain_id)
         self.config = config
         self.working_dir = workingdir
         self.storage_root = os.path.join(self.working_dir, self.domain_id_str)
@@ -210,7 +213,7 @@ class DataHandler:
                 info.append((txobj.transaction_id, pt.transaction_id))  # (base, point_to)
         return info
 
-    def insert_transaction(self, txdata, txobj=None, asset_files=None, no_replication=False):
+    def insert_transaction(self, txdata, txobj=None, fmt_type=DEFAULT_BBC_FORMAT, asset_files=None, no_replication=False):
         """Insert transaction data and its asset files
 
         Either txdata or txobj must be given to insert the transaction.
@@ -218,19 +221,20 @@ class DataHandler:
         Args:
             txdata (bytes): serialized transaction data
             txobj (BBcTransaction): transaction object to insert
+            fmt_type (int): 2-byte value of BBcFormat type
             asset_files (dict): asset files in the transaction
         Returns:
             set: set of asset_group_ids in the transaction
         """
         self.stats.update_stats_increment("data_handler", "insert_transaction", 1)
         if txobj is None:
-            txobj = self.core.validate_transaction(txdata, asset_files=asset_files)
+            txobj, fmt_type = self.core.validate_transaction(txdata, asset_files=asset_files)
             if txobj is None:
                 return None
 
         inserted_count = 0
         for i in range(len(self.db_adaptors)):
-            if self._insert_transaction_into_a_db(i, txobj):
+            if self._insert_transaction_into_a_db(i, txobj, fmt_type):
                 inserted_count += 1
         if inserted_count == 0:
             return None
@@ -251,22 +255,22 @@ class DataHandler:
 
         return asset_group_ids
 
-    def _insert_transaction_into_a_db(self, db_num, txobj):
+    def _insert_transaction_into_a_db(self, db_num, txobj, fmt_type=DEFAULT_BBC_FORMAT):
         """Insert transaction data into the transaction table of the specified DB
 
         Args:
             db_num (int): index of DB if multiple DBs are used
             txobj (BBcTransaction): transaction object to insert
+            fmt_type (int): 2-byte value of BBcFormat type
         Returns:
             bool: True if successful
         """
         #print("_insert_transaction_into_a_db: for txid =", txobj.transaction_id.hex())
-        if txobj.transaction_data is None:
-            txobj.serialize()
+        txdata = bbclib.serialize(txobj, format_type=fmt_type)
         ret = self.exec_sql(db_num=db_num,
                             sql="INSERT INTO transaction_table VALUES (%s,%s)" % (self.db_adaptors[0].placeholder,
                                                                                   self.db_adaptors[0].placeholder),
-                            args=(txobj.transaction_id, txobj.transaction_data), commit=True)
+                            args=(txobj.transaction_id, txdata), commit=True)
         if ret is None:
             return False
 
@@ -401,7 +405,7 @@ class DataHandler:
         if txobj is None:
             txdata = self.exec_sql(sql="SELECT * FROM transaction_table WHERE transaction_id = %s" %
                                    self.db_adaptors[0].placeholder, args=(transaction_id,))
-            txobj = bbclib.BBcTransaction(deserialize=txdata[0][1])
+            txobj, fmt_type = bbclib.deserialize(txdata[0][1])
         elif txobj.transaction_id != transaction_id:
             return
 
@@ -499,7 +503,7 @@ class DataHandler:
         result_txobj = dict()
         result_asset_files = dict()
         for txid, txdata in txinfo:
-            txobj = bbclib.BBcTransaction(deserialize=txdata)
+            txobj, fmt_type = bbclib.deserialize(txdata)
             result_txobj[txid] = txobj
             for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
                 if fileflag:

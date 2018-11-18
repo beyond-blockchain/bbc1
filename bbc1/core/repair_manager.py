@@ -25,7 +25,7 @@ import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core.data_handler import DataHandler
 from bbc1.core.bbc_stats import BBcStats
-from bbc1.core import bbclib
+from bbc1.core import bbclib_core, bbclib
 from bbc1.core.message_key_types import PayloadType, KeyType, InfraMessageCategory
 from bbc1.core import logger
 
@@ -104,8 +104,8 @@ class RepairManager:
             db_nums_with_invalid_data = list()
             for idx in range(1, len(self.data_handler.db_adaptors)):
                 result_txobj, result_asset_files = self.data_handler.search_transaction(transaction_id=transaction_id, db_num=idx)
-                txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(result_txobj[0],
-                                                                                                  result_asset_files)
+                txobj_is_valid, valid_assets, invalid_assets = bbclib_core.validate_transaction_object(result_txobj[0],
+                                                                                                       result_asset_files)
                 if txobj_is_valid and valid_txobj is None:
                     valid_txobj = result_txobj[0]
                 if not txobj_is_valid:
@@ -131,9 +131,9 @@ class RepairManager:
         if self.data_handler.replication_strategy == DataHandler.REPLICATION_EXT:
             return
 
-        random_nonce = bbclib.get_random_value(4)
+        random_nonce = bbclib_core.get_random_value(4)
         while random_nonce in self.requesting_list:
-            random_nonce = bbclib.get_random_value(4)
+            random_nonce = bbclib_core.get_random_value(4)
         self.requesting_list[random_nonce] = {
             "transaction_id": transaction_id.hex(),
             "request_at": int(time.time())
@@ -166,9 +166,9 @@ class RepairManager:
             if asset_file is not None and asset_id == hashlib.sha256(asset_file).digest():
                 return
 
-        random_nonce = bbclib.get_random_value(4)
+        random_nonce = bbclib_core.get_random_value(4)
         while random_nonce in self.requesting_list:
-            random_nonce = bbclib.get_random_value(4)
+            random_nonce = bbclib_core.get_random_value(4)
         self.requesting_list[random_nonce] = {
             "asset_group_id": asset_group_id.hex(),
             "asset_id": asset_id.hex(),
@@ -192,10 +192,10 @@ class RepairManager:
         transaction_id = dat[KeyType.transaction_id]
         for idx in range(len(self.data_handler.db_adaptors)):
             result_txobj, result_asset_files = self.data_handler.search_transaction(transaction_id=transaction_id, db_num=idx)
-            txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(result_txobj[transaction_id])
+            txobj_is_valid, valid_assets, invalid_assets = bbclib_core.validate_transaction_object(result_txobj[transaction_id])
             if txobj_is_valid:
                 dat[KeyType.command] = RepairManager.RESPONSE_TRANSACTION_DATA
-                dat[KeyType.transaction_data] = result_txobj[transaction_id].transaction_data
+                dat[KeyType.transaction_data] = bbclib.serialize(result_txobj[transaction_id])
                 dat[KeyType.destination_node_id] = dat[KeyType.source_node_id]
                 self.network.send_message_in_network(None, domain_id=self.domain_id, msg=dat)
                 return
@@ -214,11 +214,11 @@ class RepairManager:
         asset_files = dict()
         if KeyType.all_asset_files in dat:
             asset_files = dat[KeyType.all_asset_files]
-        txobj = bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data])
+        txobj, fmt_type = bbclib.deserialize(dat[KeyType.transaction_data])
         if txobj.transaction_data is None:
             return
 
-        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asset_files)
+        txobj_is_valid, valid_assets, invalid_assets = bbclib_core.validate_transaction_object(txobj, asset_files)
         if txobj_is_valid:
             self.stats.update_stats_increment("transaction", "success_repair", 1)
             for idx in range(len(self.data_handler.db_adaptors)):
@@ -246,7 +246,7 @@ class RepairManager:
         result_txobj, result_asset_files = self.data_handler.search_transaction(asset_group_id=asset_group_id,
                                                                                 asset_id=asset_id)
         txobj = next(iter(result_txobj.values()))
-        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, result_asset_files)
+        txobj_is_valid, valid_assets, invalid_assets = bbclib_core.validate_transaction_object(txobj, result_asset_files)
 
         if (asset_group_id, asset_id) in valid_assets:
             dat[KeyType.command] = RepairManager.RESPONSE_ASSET_FILE
@@ -278,7 +278,7 @@ class RepairManager:
                                                                                 asset_id=asset_id)
         txobj = next(iter(result_txobj.values()))
 
-        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asset_files)
+        txobj_is_valid, valid_assets, invalid_assets = bbclib_core.validate_transaction_object(txobj, asset_files)
 
         if (asset_group_id, asset_id) in valid_assets:
 

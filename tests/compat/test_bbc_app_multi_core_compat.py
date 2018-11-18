@@ -7,11 +7,11 @@ import random
 
 import os
 import sys
-sys.path.extend(["../"])
-from bbc1.core import bbclib
+sys.path.extend(["../", "../../"])
+from bbc1.core.compat import bbclib
 from bbc1.core.message_key_types import KeyType
 from bbc1.core.bbc_error import *
-from bbc1.core import bbc_app
+from bbc1.core.compat import bbc_app
 from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 
 
@@ -56,7 +56,6 @@ class MessageProcessor(bbc_app.Callback):
             event = objs[reference.transaction_id].events[reference.event_index_in_ref]
             if clients[self.idx]['user_id'] in event.mandatory_approvers:
                 signature = txobj.sign(keypair=clients[self.idx]['keypair'])
-                print("$$$$$$$$$$$$$$$$$$$$$$")
                 clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], txobj.transaction_id,
                                                             i, signature)
                 return
@@ -163,7 +162,7 @@ class TestBBcAppClient(object):
         assert dat[KeyType.transaction_id] == transactions[0].transaction_id
         time.sleep(2)
 
-    def test_14_gather_signature(self):
+    def test_13_gather_signature(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         prev_tx = transactions[0]
         user = clients[1]['user_id']

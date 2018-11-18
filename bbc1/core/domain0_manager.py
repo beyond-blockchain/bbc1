@@ -25,8 +25,8 @@ import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core import query_management, user_message_routing, repair_manager, logger
-from bbc1.core import bbclib
-from bbc1.core.bbclib import MsgType
+from bbc1.core import bbclib_core
+from bbc1.core.bbclib_core import MsgType
 from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
 
 
@@ -319,7 +319,10 @@ class Domain0Manager:
         if transaction_id not in txobjs:
             return None
         txobj = txobjs[transaction_id]
-        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asts)
+        if txobj.WITH_WIRE:
+            self.logger.info("To use cross_reference the transaction object must not be in bson/msgpack format")
+            return None
+        txobj_is_valid, valid_assets, invalid_assets = bbclib_core.validate_transaction_object(txobj, asts)
         if not txobj_is_valid:
             msg = {
                 KeyType.command: repair_manager.RepairManager.REQUEST_REPAIR_TRANSACTION,
@@ -328,11 +331,9 @@ class Domain0Manager:
             self.networking.domains[domain_id]['repair'].put_message(msg)
             return None
         txobj.digest()
-        txobj.cross_ref.format_type = bbclib.BBcFormat.FORMAT_BINARY
         cross_ref_dat = txobj.cross_ref.serialize()
-        txobj.signatures[0].format_type = bbclib.BBcFormat.FORMAT_BINARY
         sigdata = txobj.signatures[0].serialize()
-        return txobj.transaction_base_digest, cross_ref_dat, sigdata, txobj.format_type
+        return txobj.transaction_base_digest, cross_ref_dat, sigdata
 
     def process_message(self, msg):
         """Process received message

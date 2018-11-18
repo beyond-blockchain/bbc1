@@ -36,9 +36,9 @@ import copy
 
 import sys
 sys.path.extend(["../../"])
-from bbc1.core import bbclib
+from bbc1.core import bbclib_core, bbclib
+from bbc1.core.bbclib_core import MsgType
 from bbc1.core.message_key_types import KeyType, to_2byte
-from bbc1.core.bbclib import BBcTransaction, MsgType
 from bbc1.core import bbc_network, user_message_routing, data_handler, repair_manager, message_key_types, logger
 from bbc1.core import domain0_manager, query_management, bbc_stats
 from bbc1.core.bbc_config import BBcConfig
@@ -105,15 +105,16 @@ def _create_search_result(txobj_dict, asset_files_dict):
     """Create transaction search result"""
     response_info = dict()
     for txid, txobj in txobj_dict.items():
+        txdata = bbclib.serialize(txobj)
         if txid != txobj.transaction_id:
-            response_info.setdefault(KeyType.compromised_transactions, list()).append(txobj.transaction_data)
+            response_info.setdefault(KeyType.compromised_transactions, list()).append(txdata)
             response_info.setdefault(KeyType.compromised_transaction_ids, list()).append(txid)
             continue
-        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asset_files_dict)
+        txobj_is_valid, valid_assets, invalid_assets = bbclib_core.validate_transaction_object(txobj, asset_files_dict)
         if txobj_is_valid:
-            response_info.setdefault(KeyType.transactions, list()).append(txobj.transaction_data)
+            response_info.setdefault(KeyType.transactions, list()).append(txdata)
         else:
-            response_info.setdefault(KeyType.compromised_transactions, list()).append(txobj.transaction_data)
+            response_info.setdefault(KeyType.compromised_transactions, list()).append(txdata)
             response_info.setdefault(KeyType.compromised_transaction_ids, list()).append(txid)
             
         if len(valid_assets) > 0:
@@ -151,20 +152,19 @@ class BBcCoreService:
         self.logger.debug("config = %s" % conf)
         self.search_max_count = conf['search_config']['max_count']
         self.traverse_max_count = conf['search_config']['max_traverse']
-        self.test_tx_obj = BBcTransaction()
         self.insert_notification_user_list = dict()
         self.networking = bbc_network.BBcNetwork(self.config, core=self, p2p_port=p2p_port,
                                                  external_ip4addr=ip4addr, external_ip6addr=ip6addr,
                                                  loglevel=loglevel, logname=logname)
         self.ledger_subsystems = dict()
         for domain_id_str in conf['domains'].keys():
-            domain_id = bbclib.convert_idstring_to_bytes(domain_id_str)
-            if not use_domain0 and domain_id == bbclib.domain_global_0:
+            domain_id = bbclib_core.convert_idstring_to_bytes(domain_id_str)
+            if not use_domain0 and domain_id == bbclib_core.domain_global_0:
                 continue
             c = self.config.get_domain_config(domain_id)
             self.networking.create_domain(domain_id=domain_id, config=c)
             for nd, info in c['static_nodes'].items():
-                node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
+                node_id, ipv4, ipv6, port = bbclib_core.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
                 self.networking.add_neighbor(domain_id, node_id, ipv4, ipv6, port, is_static=True)
             if ('use_ledger_subsystem' in c and c['use_ledger_subsystem']) or use_ledger_subsystem:
                 activate_ledgersubsystem()
@@ -259,7 +259,7 @@ class BBcCoreService:
         self.logger.info("The core use node_key to check signature on admin command message")
         keypath = os.path.join(self.config.working_dir, "node_key.pem")
 
-        self.node_key = bbclib.KeyPair()
+        self.node_key = bbclib_core.KeyPair()
         if os.path.exists(keypath):
             try:
                 with open(keypath, "r") as f:
@@ -450,7 +450,9 @@ class BBcCoreService:
             retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_GATHER_SIGNATURE,
                                              dat[KeyType.destination_user_id], dat[KeyType.query_id])
             if KeyType.signature in dat:
-                retmsg[KeyType.transaction_data_format] = dat[KeyType.transaction_data_format]
+                if KeyType.transaction_data_format in dat:
+                    # -- for backward compatibility
+                    retmsg[KeyType.transaction_data_format] = dat[KeyType.transaction_data_format]
                 retmsg[KeyType.signature] = dat[KeyType.signature]
                 retmsg[KeyType.ref_index] = dat[KeyType.ref_index]
             elif KeyType.status not in dat:
@@ -768,24 +770,25 @@ class BBcCoreService:
             asset_files (dict): dictionary of {asset_id: content} for the transaction
         Returns:
             BBcTransaction: if validation fails, None returns.
+            int (short): 2-byte value of BBcFormat type or None
         """
-        txobj = BBcTransaction()
-        if not txobj.deserialize(txdata):
+        txobj, fmt_type = bbclib.deserialize(txdata)
+        if not txobj:
             self.stats.update_stats_increment("transaction", "invalid", 1)
             self.logger.error("Fail to deserialize transaction data")
-            return None
+            return None, None
         txobj.digest()
 
-        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asset_files)
+        txobj_is_valid, valid_assets, invalid_assets = bbclib_core.validate_transaction_object(txobj, asset_files)
         if not txobj_is_valid:
             self.stats.update_stats_increment("transaction", "invalid", 1)
         if len(invalid_assets) > 0:
             self.stats.update_stats_increment("asset_file", "invalid", 1)
 
         if txobj_is_valid and len(invalid_assets) == 0:
-            return txobj
+            return txobj, fmt_type
         else:
-            return None
+            return None, None
 
     def insert_transaction(self, domain_id, txdata, asset_files):
         """Insert transaction into ledger
@@ -802,11 +805,11 @@ class BBcCoreService:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("No such domain")
             return "Set up the domain, first!"
-        if domain_id == bbclib.domain_global_0:
+        if domain_id == bbclib_core.domain_global_0:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("Insert is not allowed in domain_global_0")
             return "Insert is not allowed in domain_global_0"
-        txobj = self.validate_transaction(txdata, asset_files)
+        txobj, fmt_type = self.validate_transaction(txdata, asset_files)
         if txobj is None:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("Bad transaction format")
@@ -814,7 +817,7 @@ class BBcCoreService:
         self.logger.debug("[node:%s] insert_transaction %s" %
                           (self.networking.domains[domain_id]['name'], binascii.b2a_hex(txobj.transaction_id[:4])))
 
-        asset_group_ids = self.networking.domains[domain_id]['data'].insert_transaction(txdata, txobj=txobj,
+        asset_group_ids = self.networking.domains[domain_id]['data'].insert_transaction(txdata, txobj=txobj, fmt_type=fmt_type,
                                                                                         asset_files=asset_files)
         if asset_group_ids is None:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
@@ -1040,7 +1043,7 @@ class BBcCoreService:
                             break
                     if not flag:
                         continue
-                tx_brothers.append(ret_txobj[txid].transaction_data)
+                tx_brothers.append(bbclib.serialize(ret_txobj[txid]))
                 if len(ret_asset_files) > 0:
                     asset_files.update(ret_asset_files)
 
