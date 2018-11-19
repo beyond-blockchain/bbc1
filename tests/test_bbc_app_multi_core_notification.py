@@ -46,13 +46,11 @@ class MessageProcessor(bbc_app.Callback):
 
     def proc_cmd_sign_request(self, dat):
         self.logger.debug("[%i] Recv SIGN_REQUEST from %s" % (self.idx, binascii.b2a_hex(dat[KeyType.source_user_id])))
-        txobj = bbclib.BBcTransaction()
-        txobj.deserialize(dat[KeyType.transaction_data])
+        txobj, fmt_type = bbclib.deserialize(dat[KeyType.transaction_data])
 
         objs = dict()
         for txid, txdata in dat[KeyType.transactions].items():
-            txo = bbclib.BBcTransaction()
-            txo.deserialize(txdata)
+            txo, fmt_type = bbclib.deserialize(txdata)
             objs[txid] = txo
 
         for i, reference in enumerate(txobj.references):

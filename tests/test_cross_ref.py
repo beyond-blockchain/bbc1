@@ -278,9 +278,8 @@ class TestBBcAppClient(object):
             clients[i]['app'].request_verify_by_cross_ref(txid_to_verify)
             dat = msg_processor[i].synchronize()
             assert KeyType.cross_ref_verification_info in dat
-            transaction_base_digest, cross_ref_data, sigdata, fmt_type = dat[KeyType.cross_ref_verification_info]
-            assert bbclib.verify_using_cross_ref(dm, txid_to_verify, transaction_base_digest, cross_ref_data,
-                                                 sigdata, format_type=fmt_type)
+            transaction_base_digest, cross_ref_data, sigdata = dat[KeyType.cross_ref_verification_info]
+            assert bbclib.verify_using_cross_ref(dm, txid_to_verify, transaction_base_digest, cross_ref_data, sigdata)
 
 
 if __name__ == '__main__':

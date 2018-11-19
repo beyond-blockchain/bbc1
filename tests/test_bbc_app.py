@@ -34,7 +34,7 @@ class MessageProcessor(bbc_app.Callback):
     def proc_resp_search_asset(self, dat):
         if KeyType.transaction_data in dat:
             self.logger.info("OK: Asset [%s] is found." % binascii.b2a_hex(dat[KeyType.asset_id]))
-            tx_obj = bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data])
+            tx_obj, fmt_type = bbclib.deserialize(dat[KeyType.transaction_data])
             for evt in tx_obj.events:
                 if evt.asset.asset_body_size > 0:
                     self.logger.info(" [%s] asset_body --> %s" % (binascii.b2a_hex(evt.asset.asset_id[:4]),
@@ -167,8 +167,7 @@ class TestBBcAppClient(object):
         dat = wait_check_result_msg_type(msg_processor[0], bbclib.MsgType.RESPONSE_SEARCH_WITH_CONDITIONS)
         assert dat[KeyType.status] == ESUCCESS
         assert KeyType.transactions in dat
-        transaction_data = dat[KeyType.transactions][0]
-        txobj = bbclib.BBcTransaction(deserialize=transaction_data)
+        txobj, fmt_type = bbclib.deserialize(dat[KeyType.transactions][0])
         print(txobj)
 
     @pytest.mark.unregister

@@ -42,7 +42,7 @@ PUBLIC_KEY = ".public_key"
 domain_id = bbclib.get_new_id("file_proof_test_domain", include_timestamp=False)
 asset_group_id = bbclib.get_new_id("file_proof_asset_group", include_timestamp=False)
 user_name = "user_default"
-user_id = None
+user_id = bbclib.get_new_id(user_name, include_timestamp=False)
 
 key_pair = None
 
@@ -163,10 +163,7 @@ def search_reference_txid_from_mappings(filename):
     return reference_txid
 
 
-def create_transaction_object_for_filedata(receiver_name, receiver_user_id, ref_txids=None, file_data=None,
-                                           bbc_app_client=None):
-    if ref_txids is None or ref_txids[0] is None:
-        ref_txids = []
+def send_signreq(receiver_name, receiver_user_id, ref_txids=None, file_data=None, bbc_app_client=None):
     transaction = bbclib.make_transaction(relation_num=1, witness=True)
 
     user_info_msg = "Ownership is transfered from %s to %s" % (user_name, receiver_name)
@@ -181,7 +178,7 @@ def create_transaction_object_for_filedata(receiver_name, receiver_user_id, ref_
         if response_data[KeyType.status] < ESUCCESS:
             print("ERROR: ", response_data[KeyType.reason].decode())
             sys.exit(0)
-        prev_tx = bbclib.BBcTransaction(deserialize=response_data[KeyType.transaction_data])
+        prev_tx, fmt_type = bbclib.deserialize(response_data[KeyType.transaction_data])
         bbclib.add_relation_pointer(transaction, 0, ref_transaction_id=prev_tx.digest())
 
     asset_id = transaction.relations[0].asset.asset_id
@@ -190,6 +187,10 @@ def create_transaction_object_for_filedata(receiver_name, receiver_user_id, ref_
     if not ret:
         print("Failed to send sign request")
         sys.exit(0)
+    return transaction
+
+
+def wait_for_signs(transaction, bbc_app_client):
     response_data = bbc_app_client.callback.synchronize()
     if response_data[KeyType.status] < ESUCCESS:
         print("Rejected because ", response_data[KeyType.reason].decode(), "")
@@ -205,6 +206,15 @@ def create_transaction_object_for_filedata(receiver_name, receiver_user_id, ref_
     return transaction
 
 
+def create_transaction_object_for_filedata(receiver_name, receiver_user_id, ref_txids=None, file_data=None,
+                                           bbc_app_client=None):
+    if ref_txids is None or ref_txids[0] is None:
+        ref_txids = []
+
+    transaction = send_signreq(receiver_name, receiver_user_id, ref_txids, file_data, bbc_app_client)
+    return wait_for_signs(transaction, bbc_app_client)
+
+
 def insert_signed_transaction_to_bbc_core(transaction=None, bbc_app_client=None, file_name=None):
     print("Insert the transaction into BBc-1")
     ret = bbc_app_client.insert_transaction(transaction)
@@ -213,7 +223,6 @@ def insert_signed_transaction_to_bbc_core(transaction=None, bbc_app_client=None,
     if response_data[KeyType.status] < ESUCCESS:
         print("ERROR: ", response_data[KeyType.reason].decode())
         sys.exit(0)
-    remove_id_mappings(os.path.basename(file_name), asset_group_id)
 
 
 def send_transaction_info_msg(bbc_app_client=None, transaction=None, file_name=None, receiver_user_id=None):
@@ -236,7 +245,7 @@ def wait_for_transaction_msg(bbc_app_client=None):
 
 
 def pick_valid_transaction_info(received_data=None, bbc_app_client=None):
-    transaction = bbclib.BBcTransaction(deserialize=received_data[KeyType.transaction_data])
+    transaction, fmt_type = bbclib.deserialize(received_data[KeyType.transaction_data])
     asset_files = received_data[KeyType.all_asset_files]
     asset_id = transaction.relations[0].asset.asset_id
     if asset_id not in asset_files:
@@ -297,7 +306,7 @@ def store_proc(file, txid=None):
         if response_data[KeyType.status] < ESUCCESS:
             print("ERROR: ", response_data[KeyType.reason].decode())
             sys.exit(0)
-        prev_tx = bbclib.BBcTransaction(deserialize=response_data[KeyType.transaction_data])
+        prev_tx, fmt_type = bbclib.deserialize(response_data[KeyType.transaction_data])
         bbclib.add_relation_pointer(transaction=store_transaction, relation_idx=0,
                                     ref_transaction_id=prev_tx.transaction_id)
     sig = store_transaction.sign(private_key=key_pair.private_key,
@@ -342,7 +351,7 @@ def get_file(file):
         print("ERROR: ", response_data[KeyType.reason].decode())
         sys.exit(0)
 
-    get_transaction = bbclib.BBcTransaction(deserialize=response_data[KeyType.transactions][0])
+    get_transaction, fmt_type = bbclib.deserialize(response_data[KeyType.transactions][0])
     if KeyType.all_asset_files in response_data:
         asset_file_dict = response_data[KeyType.all_asset_files]
         asset_id = get_transaction.relations[0].asset.asset_id
@@ -401,7 +410,7 @@ def verify_file(file):
         print("ERROR: ", response_data[KeyType.reason].decode())
         sys.exit(0)
 
-    transaction = bbclib.BBcTransaction(deserialize=response_data[KeyType.transactions][0])
+    transaction, fmt_type = bbclib.deserialize(response_data[KeyType.transactions][0])
     digest = transaction.digest()
     ret = transaction.signatures[0].verify(digest)
     if not ret:
@@ -461,6 +470,7 @@ def enter_file_send_mode(filename):
     insert_signed_transaction_to_bbc_core(transaction=transfer_transaction,
                                           bbc_app_client=bbc_app_client,
                                           file_name=filename)
+    remove_id_mappings(os.path.basename(filename), asset_group_id)
     send_transaction_info_msg(bbc_app_client=bbc_app_client,
                               transaction=transfer_transaction,
                               file_name=filename,

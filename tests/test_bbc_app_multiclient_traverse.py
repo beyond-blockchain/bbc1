@@ -115,7 +115,7 @@ class TestBBcAppClient(object):
         asset_bodies = list()
         for i, txtree in enumerate(dat[KeyType.transaction_tree]):
             for txdat in txtree:
-                txobj = bbclib.BBcTransaction(deserialize=txdat)
+                txobj, fmt_type = bbclib.deserialize(txdat)
                 asset_body = txobj.relations[0].asset.asset_body
                 print("[%d] asset=%s" % (i, asset_body))
                 asset_bodies.append(asset_body)
@@ -132,7 +132,7 @@ class TestBBcAppClient(object):
         asset_bodies = list()
         for i, txtree in enumerate(dat[KeyType.transaction_tree]):
             for txdat in txtree:
-                txobj = bbclib.BBcTransaction(deserialize=txdat)
+                txobj, fmt_type = bbclib.deserialize(txdat)
                 asset_body = txobj.relations[0].asset.asset_body
                 print("[%d] asset=%s" % (i, asset_body))
                 asset_bodies.append(asset_body)
@@ -150,7 +150,7 @@ class TestBBcAppClient(object):
         asset_bodies = list()
         for i, txtree in enumerate(dat[KeyType.transaction_tree]):
             for txdat in txtree:
-                txobj = bbclib.BBcTransaction(deserialize=txdat)
+                txobj, fmt_type = bbclib.deserialize(txdat)
                 asset_body = txobj.events[0].asset.asset_body
                 print("[%d] asset=%s" % (i, asset_body))
                 asset_bodies.append(asset_body)
@@ -170,7 +170,7 @@ class TestBBcAppClient(object):
         asset_bodies = list()
         for i, txtree in enumerate(dat[KeyType.transaction_tree]):
             for txdat in txtree:
-                txobj = bbclib.BBcTransaction(deserialize=txdat)
+                txobj, fmt_type = bbclib.deserialize(txdat)
                 asset_body = txobj.events[0].asset.asset_body
                 print("[%d] asset=%s" % (i, asset_body))
                 asset_bodies.append(asset_body)

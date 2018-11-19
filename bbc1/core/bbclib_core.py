@@ -665,6 +665,7 @@ class BBcTransaction:
         if user_id not in self.userid_sigidx_mapping:
             return False
         idx = self.userid_sigidx_mapping[user_id]
+        signature.not_initialized = False
         self.signatures[idx] = signature
         return True
 
@@ -1035,10 +1036,6 @@ class BBcReference:
                 return
             user_id = self.option_sig_ids.pop(0)
         self.transaction.add_signature(user_id=user_id, signature=signature)
-
-    def get_referred_transaction(self):
-        """Return referred transaction in serialized format"""
-        return {self.ref_transaction.transaction_id: self.ref_transaction.serialize()}
 
     def get_destinations(self):
         """Return the list of approvers in the referred transaction"""

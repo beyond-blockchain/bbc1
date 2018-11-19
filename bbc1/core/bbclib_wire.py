@@ -42,9 +42,9 @@ class BBcFormat:
             raise Exception("Fallback")
         hdr = format_type.to_bytes(2, 'little')
         if format_type == BBcFormat.FORMAT_PLAIN:
-            return bytes(hdr + txobj.transaction_data)
+            return bytes(hdr + txobj.serialize())
         elif format_type == BBcFormat.FORMAT_ZLIB:
-            return bytes(hdr + zlib.compress(txobj.transaction_data))
+            return bytes(hdr + zlib.compress(txobj.serialize()))
         else:
             return None
 

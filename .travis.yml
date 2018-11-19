@@ -13,12 +13,10 @@ script:
   - pytest test_bbc_app.py
   - pytest test_bbc_app_multi_core.py
   - pytest test_bbc_app_multi_core_many_transactions.py
-  - pytest test_bbc_app_multi_core_many_transactions_bson.py
   - pytest test_bbc_app_multi_core_notification_with_cancelation.py
   - pytest test_bbc_app_multi_core_notification_with_disconnection.py
   - pytest test_bbc_app_multiclient.py
   - pytest test_bbc_app_multiclient_traverse.py
-  - pytest test_bbc_app_multiclient_traverse_bson.py
   - pytest test_bbc_app_admin_tools.py
   - pytest test_bbc_app_multi_core_compromising_data.py
   - pytest test_bbc_app_multi_core_anycast.py
@@ -32,6 +30,12 @@ script:
   - pytest test_data_handler_sqlite.py
   - pytest test_key_exchange_manager.py
   - pytest test_bbclib.py
+  - pytest test_bbclib_core.py
   - pytest test_pending_request.py
   - pytest test_bbc_ping.py
   - pytest test_bbc_stats.py
+  - cd compat
+  - pytest test_bbc_app_multi_core_many_transactions_bson.py
+  - pytest test_bbc_app_multiclient_traverse_bson.py
+  - pytest test_bbc_app_multi_core_compat.py
+  - pytest test_bbclib_bson.py

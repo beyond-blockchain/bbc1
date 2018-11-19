@@ -509,8 +509,7 @@ class BBcAppClient:
             dat[KeyType.is_anycast] = True
         if reference_obj is not None:
             dat[KeyType.destination_user_ids] = reference_obj.get_destinations()
-            referred_transactions = dict()
-            referred_transactions.update(reference_obj.get_referred_transaction())
+            referred_transactions = {reference_obj.transaction_id: bbclib.serialize(reference_obj.ref_transaction)}
             if len(referred_transactions) > 0:
                 dat[KeyType.transactions] = referred_transactions
         elif destinations is not None:

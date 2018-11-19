@@ -34,8 +34,7 @@ class MessageProcessor(bbc_app.Callback):
 
     def proc_cmd_sign_request(self, dat):
         self.logger.debug("[%i] Recv SIGN_REQUEST from %s" % (self.idx, binascii.b2a_hex(dat[KeyType.source_user_id])))
-        txobj = bbclib.BBcTransaction()
-        txobj.deserialize(dat[KeyType.transaction_data])
+        txobj, fmt_type = bbclib.deserialize(dat[KeyType.transaction_data])
         signature = txobj.sign(keypair=clients[self.idx]['keypair'])
         clients[self.idx]['app'].sendback_signature(dat[KeyType.source_user_id], txobj.transaction_id, signature)
 
@@ -49,7 +48,7 @@ class MessageProcessor(bbc_app.Callback):
     def proc_resp_search_asset(self, dat):
         if KeyType.transaction_data in dat:
             self.logger.debug("OK: Asset [%s] is found." % binascii.b2a_hex(dat[KeyType.asset_id]))
-            tx_obj = bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data])
+            tx_obj, fmt_type = bbclib.deserialize(dat[KeyType.transaction_data])
             for evt in tx_obj.events:
                 if evt.asset.asset_body_size > 0:
                     self.logger.debug(" [%s] asset_body --> %s" % (binascii.b2a_hex(evt.asset.asset_id[:4]),
@@ -108,7 +107,7 @@ class TestBBcAppClient(object):
         print(transactions[0])
         transactions[0].digest()
         global transaction_dat
-        transaction_dat = transactions[0].serialize()
+        transaction_dat = bbclib.serialize(transactions[0])
         print("register transaction=", binascii.b2a_hex(transactions[0].transaction_id))
         clients[0]['app'].insert_transaction(transactions[0])
         dat = msg_processor[0].synchronize()
@@ -123,7 +122,7 @@ class TestBBcAppClient(object):
         dat = msg_processor[0].synchronize()
         assert dat[KeyType.status] == 0
         assert KeyType.transactions in dat
-        txobj = bbclib.BBcTransaction(deserialize=dat[KeyType.transactions][0])
+        txobj, fmt_type = bbclib.deserialize(dat[KeyType.transactions][0])
         assert txobj.transaction_id == transactions[0].transaction_id
 
     def test_08_search_asset_failure(self):
@@ -143,19 +142,18 @@ class TestBBcAppClient(object):
         dat = msg_processor[3].synchronize()
         assert dat[KeyType.status] == 0
         assert KeyType.transactions in dat
-        txobj = bbclib.BBcTransaction(deserialize=dat[KeyType.transactions][0])
+        txobj, fmt_type = bbclib.deserialize(dat[KeyType.transactions][0])
         assert txobj.transaction_id == transactions[0].transaction_id
 
     def test_10_search_transaction(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        transactions[0] = bbclib.BBcTransaction()
-        transactions[0].deserialize(transaction_dat)
+        transactions[0], fmt_type = bbclib.deserialize(transaction_dat)
         print("find txid=", binascii.b2a_hex(transactions[0].transaction_id))
         clients[1]['app'].search_transaction(transactions[0].transaction_id)
         dat = msg_processor[1].synchronize()
         assert dat[KeyType.status] == 0
         assert KeyType.transaction_data in dat
-        txobj = bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data])
+        txobj, fmt_type = bbclib.deserialize(dat[KeyType.transaction_data])
         assert txobj.transaction_id == transactions[0].transaction_id
 
     def test_11_search_transaction(self):

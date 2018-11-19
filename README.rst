@@ -19,6 +19,11 @@ The APIs of BBc-1 is defined in bbc\_app.py and bbclib.py. So application develo
 
 For the details, please read documents in docs/ directory. Not only documents but slide decks (PDF) explain the design of the BBc-1 and its implementation.
 
+## Recent changes
+
+bbclib.py is redesigned, resulting in splitting it to two parts; bbclib_core.py and bbclib_wire.py. bbclib.py is just a wrapper for those two scripts. The way of serializing BBc-1 transaction object and deserializing transaction data will change in v1.2.
+
+
 ## Documents
 Some documents are available in docs/.
 * Policy, design and analysis
@@ -148,8 +153,6 @@ The working directory of BBc-1 on the docker container is mounted on docker/data
     - docker environments
 * tests/
     - test codes for pytest
-* libs/
-    - some libraries used by BBc-1
 * docs/
     - docs about BBc-1 and its reference implementation
 * somewhere/.bbc1/

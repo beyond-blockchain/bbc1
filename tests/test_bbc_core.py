@@ -93,7 +93,7 @@ class TestBBcCore(object):
         print("register transaction=", binascii.b2a_hex(transaction.transaction_id))
         asset_file = dict()
         asset_file[transaction.events[1].asset.asset_id] = transaction.events[1].asset.asset_file
-        ret = cores[1].insert_transaction(domain_id, transaction.serialize(), asset_file)
+        ret = cores[1].insert_transaction(domain_id, bbclib.serialize(transaction), asset_file)
         assert ret[KeyType.transaction_id] == transaction.transaction_id
 
     def test_04_1__search_transaction_by_txid(self):
@@ -137,7 +137,7 @@ class TestBBcCore(object):
         print("register transaction=", binascii.b2a_hex(transaction.transaction_id))
         asset_file = dict()
         asset_file[transaction.events[1].asset.asset_id] = transaction.events[1].asset.asset_file
-        ret = cores[2].insert_transaction(domain_id, transaction.serialize(), asset_file)
+        ret = cores[2].insert_transaction(domain_id, bbclib.serialize(transaction), asset_file)
         assert KeyType.transaction_id in ret
         assert ret[KeyType.transaction_id] == transaction.transaction_id
 
@@ -186,7 +186,7 @@ class TestBBcCore(object):
         asset_files = {
             transaction.relations[0].asset.asset_id: transaction.relations[0].asset.asset_file,
         }
-        ret = cores[0].insert_transaction(domain_id, transaction.serialize(), asset_files)
+        ret = cores[0].insert_transaction(domain_id, bbclib.serialize(transaction), asset_files)
         assert ret[KeyType.transaction_id] == transaction.transaction_id
 
         ret = cores[0]._search_transaction_by_txid(domain_id, transaction.transaction_id)
