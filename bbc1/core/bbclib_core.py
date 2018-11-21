@@ -213,9 +213,9 @@ def add_pointer_in_relation(relation, ref_transaction_id=None, ref_asset_id=None
 
 
 def recover_signature_object(data):
-    """Deserialize signature data"""
+    """Unpack signature data"""
     sig = BBcSignature()
-    sig.deserialize(data)
+    sig.unpack(data)
     return sig
 
 
@@ -323,20 +323,20 @@ def verify_using_cross_ref(domain_id, transaction_id, transaction_base_digest, c
         domain_id (bytes): target domain_id
         transaction_id (bytes): target transaction_id of which existence you want to confirm
         transaction_base_digest (bytes): digest obtained from the outer domain
-        cross_ref_data (bytes): serialized BBcCrossRef object
-        sigdata (bytes): serialized signature
+        cross_ref_data (bytes): packed BBcCrossRef object
+        sigdata (bytes): packed signature
     Returns:
         bool: True if valid
     """
-    cross = BBcCrossRef(deserialize=cross_ref_data)
+    cross = BBcCrossRef(unpack=cross_ref_data)
     if cross.domain_id != domain_id or cross.transaction_id != transaction_id:
         return False
     dat = bytearray(transaction_base_digest)
     dat.extend(to_2byte(1))
     dat.extend(to_4byte(len(cross_ref_data)))
-    dat.extend(cross.serialize())
+    dat.extend(cross.pack())
     digest = hashlib.sha256(bytes(dat)).digest()
-    sig = BBcSignature(deserialize=sigdata)
+    sig = BBcSignature(unpack=sigdata)
     return sig.verify(digest) == 1
 
 
@@ -475,15 +475,15 @@ class KeyPair:
 
 class BBcSignature:
     """Signature part in a transaction"""
-    def __init__(self, key_type=DEFAULT_CURVETYPE, deserialize=None):
+    def __init__(self, key_type=DEFAULT_CURVETYPE, unpack=None):
         self.key_type = key_type
         self.signature = None
         self.pubkey = None
         self.keypair = None
         self.not_initialized = True
-        if deserialize is not None:
+        if unpack is not None:
             self.not_initialized = False
-            self.deserialize(deserialize)
+            self.unpack(unpack)
 
     def add(self, signature=None, pubkey=None):
         """Add signature and public key"""
@@ -503,8 +503,8 @@ class BBcSignature:
         ret += "  pubkey: %s\n" % binascii.b2a_hex(self.pubkey)
         return ret
 
-    def serialize(self):
-        """Serialize this object"""
+    def pack(self):
+        """Pack this object"""
         if self.not_initialized:
             dat = bytearray(to_4byte(KeyType.NOT_INITIALIZED))
             return bytes(dat)
@@ -517,11 +517,11 @@ class BBcSignature:
         dat.extend(self.signature)
         return bytes(dat)
 
-    def deserialize(self, data):
-        """Deserialize into this object
+    def unpack(self, data):
+        """Unpack into this object
 
         Args:
-            data (bytes): serialized binary data
+            data (bytes): packed binary data
         Returns:
             bool: True if successful
         """
@@ -565,7 +565,7 @@ class BBcTransaction:
     """Transaction object"""
     WITH_WIRE = False  # for backward compatibility
 
-    def __init__(self, version=1, deserialize=None, id_length=DEFAULT_ID_LEN):
+    def __init__(self, version=1, unpack=None, id_length=DEFAULT_ID_LEN):
         self.id_length = id_length
         self.version = version
         self.timestamp = int(time.time())
@@ -580,8 +580,8 @@ class BBcTransaction:
         self.transaction_base_digest = None
         self.transaction_data = None
         self.asset_group_ids = dict()
-        if deserialize is not None:
-            self.deserialize(deserialize)
+        if unpack is not None:
+            self.unpack(unpack)
 
     def __str__(self):
         ret =  "------- Dump of the transaction data ------\n"
@@ -677,35 +677,35 @@ class BBcTransaction:
         Returns:
             bytes: transaction_id (or digest)
         """
-        target = self.serialize(for_id=True)
+        target = self.pack(for_id=True)
         d = hashlib.sha256(target).digest()
         self.transaction_id = d[:self.id_length]
         return d
 
-    def serialize(self, for_id=False):
-        """Serialize the whole parts"""
+    def pack(self, for_id=False):
+        """Pack the whole parts"""
         dat = bytearray(to_4byte(self.version))
         dat.extend(to_8byte(self.timestamp))
         if self.version != 0:
             dat.extend(to_2byte(self.id_length))
         dat.extend(to_2byte(len(self.events)))
         for i in range(len(self.events)):
-            evt = self.events[i].serialize()
+            evt = self.events[i].pack()
             dat.extend(to_4byte(len(evt)))
             dat.extend(evt)
         dat.extend(to_2byte(len(self.references)))
         for i in range(len(self.references)):
-            refe = self.references[i].serialize()
+            refe = self.references[i].pack()
             dat.extend(to_4byte(len(refe)))
             dat.extend(refe)
         dat.extend(to_2byte(len(self.relations)))
         for i in range(len(self.relations)):
-            rtn = self.relations[i].serialize()
+            rtn = self.relations[i].pack()
             dat.extend(to_4byte(len(rtn)))
             dat.extend(rtn)
         if self.witness is not None:
             dat.extend(to_2byte(1))
-            witness = self.witness.serialize()
+            witness = self.witness.pack()
             dat.extend(to_4byte(len(witness)))
             dat.extend(witness)
         else:
@@ -714,7 +714,7 @@ class BBcTransaction:
 
         dat_cross = bytearray()
         if self.cross_ref is not None:
-            cross = self.cross_ref.serialize()
+            cross = self.cross_ref.pack()
             dat_cross.extend(to_2byte(1))
             dat_cross.extend(to_4byte(len(cross)))
             dat_cross.extend(cross)
@@ -730,17 +730,17 @@ class BBcTransaction:
 
         dat.extend(to_2byte(len(self.signatures)))
         for signature in self.signatures:
-            sig = signature.serialize()
+            sig = signature.pack()
             dat.extend(to_4byte(len(sig)))
             dat.extend(sig)
         self.transaction_data = bytes(dat)
         return self.transaction_data
 
-    def deserialize(self, data):
-        """Deserialize into this object
+    def unpack(self, data):
+        """Unpack into this object
 
         Args:
-            data (bytes): serialized binary data
+            data (bytes): packed binary data
         Returns:
             bool: True if successful
         """
@@ -758,7 +758,7 @@ class BBcTransaction:
                 ptr, size = get_n_byte_int(ptr, 4, data)
                 ptr, evtdata = get_n_bytes(ptr, size, data)
                 evt = BBcEvent(id_length=self.id_length)
-                if not evt.deserialize(evtdata):
+                if not evt.unpack(evtdata):
                     return False
                 self.events.append(evt)
                 if ptr >= data_size:
@@ -771,7 +771,7 @@ class BBcTransaction:
                 ptr, size = get_n_byte_int(ptr, 4, data)
                 ptr, refdata = get_n_bytes(ptr, size, data)
                 refe = BBcReference(None, None, id_length=self.id_length)
-                if not refe.deserialize(refdata):
+                if not refe.unpack(refdata):
                     return False
                 self.references.append(refe)
                 if ptr >= data_size:
@@ -783,7 +783,7 @@ class BBcTransaction:
                 ptr, size = get_n_byte_int(ptr, 4, data)
                 ptr, rtndata = get_n_bytes(ptr, size, data)
                 rtn = BBcRelation(id_length=self.id_length)
-                if not rtn.deserialize(rtndata):
+                if not rtn.unpack(rtndata):
                     return False
                 self.relations.append(rtn)
                 if ptr >= data_size:
@@ -798,7 +798,7 @@ class BBcTransaction:
                 ptr, witnessdata = get_n_bytes(ptr, size, data)
                 self.witness = BBcWitness(id_length=self.id_length)
                 self.witness.transaction = self
-                if not self.witness.deserialize(witnessdata):
+                if not self.witness.unpack(witnessdata):
                     return False
 
             ptr, cross_num = get_n_byte_int(ptr, 2, data)
@@ -808,7 +808,7 @@ class BBcTransaction:
                 ptr, size = get_n_byte_int(ptr, 4, data)
                 ptr, crossdata = get_n_bytes(ptr, size, data)
                 self.cross_ref = BBcCrossRef()
-                if not self.cross_ref.deserialize(crossdata):
+                if not self.cross_ref.unpack(crossdata):
                     return False
 
             ptr, sig_num = get_n_byte_int(ptr, 2, data)
@@ -818,14 +818,14 @@ class BBcTransaction:
                 sig = BBcSignature()
                 if size > 4:
                     ptr, sigdata = get_n_bytes(ptr, size, data)
-                    if not sig.deserialize(sigdata):
+                    if not sig.unpack(sigdata):
                         return False
                 self.signatures.append(sig)
                 if ptr > data_size:
                     return False
             self.digest()
         except Exception as e:
-            print("Transaction data deserialize: %s" % e)
+            print("Transaction data unpack: %s" % e)
             print(traceback.format_exc())
             return False
         return True
@@ -914,11 +914,11 @@ class BBcEvent:
             self.asset = asset
         return True
 
-    def serialize(self):
-        """Serialize this object
+    def pack(self):
+        """Pack this object
 
         Returns:
-            bytes: serialized binary data
+            bytes: packed binary data
         """
         dat = bytearray(to_bigint(self.asset_group_id, size=self.id_length))
         dat.extend(to_2byte(len(self.reference_indices)))
@@ -931,16 +931,16 @@ class BBcEvent:
         dat.extend(to_2byte(self.option_approver_num_denominator))
         for i in range(self.option_approver_num_denominator):
             dat.extend(to_bigint(self.option_approvers[i], size=self.id_length))
-        ast = self.asset.serialize()
+        ast = self.asset.pack()
         dat.extend(to_4byte(len(ast)))
         dat.extend(ast)
         return bytes(dat)
 
-    def deserialize(self, data):
-        """Deserialize into this object
+    def unpack(self, data):
+        """Unpack into this object
 
         Args:
-            data (bytes): serialized binary data
+            data (bytes): packed binary data
         Returns:
             bool: True if successful
         """
@@ -973,7 +973,7 @@ class BBcEvent:
             ptr, astsize = get_n_byte_int(ptr, 4, data)
             ptr, astdata = get_n_bytes(ptr, astsize, data)
             self.asset = BBcAsset(id_length=self.id_length)
-            self.asset.deserialize(astdata)
+            self.asset.unpack(astdata)
         except:
             return False
         return True
@@ -1041,11 +1041,11 @@ class BBcReference:
         """Return the list of approvers in the referred transaction"""
         return self.mandatory_approvers+self.option_approvers
 
-    def serialize(self):
-        """Serialize this object
+    def pack(self):
+        """Pack this object
 
         Returns:
-            bytes: serialized binary data
+            bytes: packed binary data
         """
         dat = bytearray(to_bigint(self.asset_group_id, size=self.id_length))
         dat.extend(to_bigint(self.transaction_id, size=self.id_length))
@@ -1055,11 +1055,11 @@ class BBcReference:
             dat.extend(to_2byte(self.sig_indices[i]))
         return bytes(dat)
 
-    def deserialize(self, data):
-        """Deserialize into this object
+    def unpack(self, data):
+        """unpack into this object
 
         Args:
-            data (bytes): serialized binary data
+            data (bytes): packed binary data
         Returns:
             bool: True if successful
         """
@@ -1115,31 +1115,31 @@ class BBcRelation:
             self.asset = asset
         return True
 
-    def serialize(self):
-        """Serialize this object
+    def pack(self):
+        """Pack this object
 
         Returns:
-            bytes: serialized binary data
+            bytes: packed binary data
         """
         dat = bytearray(to_bigint(self.asset_group_id, size=self.id_length))
         dat.extend(to_2byte(len(self.pointers)))
         for i in range(len(self.pointers)):
-            pt = self.pointers[i].serialize()
+            pt = self.pointers[i].pack()
             dat.extend(to_2byte(len(pt)))
             dat.extend(pt)
         if self.asset is not None:
-            ast = self.asset.serialize()
+            ast = self.asset.pack()
             dat.extend(to_4byte(len(ast)))
             dat.extend(ast)
         else:
             dat.extend(to_4byte(0))
         return bytes(dat)
 
-    def deserialize(self, data):
-        """Deserialize bson data into this object
+    def unpack(self, data):
+        """Unpack data into transaction object
 
         Args:
-            data (dict): bson data
+            data (bytes): packed binary data
         Returns:
             bool: True if successful
         """
@@ -1155,7 +1155,7 @@ class BBcRelation:
                 if ptr >= data_size:
                     return False
                 pt = BBcPointer()
-                if not pt.deserialize(ptdata):
+                if not pt.unpack(ptdata):
                     return False
                 self.pointers.append(pt)
             self.asset = None
@@ -1163,7 +1163,7 @@ class BBcRelation:
             if astsize > 0:
                 self.asset = BBcAsset(id_length=self.id_length)
                 ptr, astdata = get_n_bytes(ptr, astsize, data)
-                if not self.asset.deserialize(astdata):
+                if not self.asset.unpack(astdata):
                     return False
         except:
             return False
@@ -1195,11 +1195,11 @@ class BBcPointer:
         if asset_id is not None:
             self.asset_id = asset_id[:self.id_length]
 
-    def serialize(self):
-        """Serialize this object
+    def pack(self):
+        """Pack this object
 
         Returns:
-            bytes: serialized binary data
+            bytes: packed binary data
         """
         dat = bytearray(to_bigint(self.transaction_id, size=self.id_length))
         if self.asset_id is None:
@@ -1209,11 +1209,11 @@ class BBcPointer:
             dat.extend(to_bigint(self.asset_id, size=self.id_length))
         return bytes(dat)
 
-    def deserialize(self, data):
-        """Deserialize into this object
+    def unpack(self, data):
+        """Unpack into this object
 
         Args:
-            data (bytes): serialized binary data
+            data (bytes): packed binary data
         Returns:
             bool: True if successful
         """
@@ -1260,15 +1260,15 @@ class BBcWitness:
 
         Args:
             user_id (bytes): user_id of the signature owner
-            signature (bytes): signature
+            signature (BBcSignature): signature
         """
         self.transaction.add_signature(user_id=user_id[:self.id_length], signature=signature)
 
-    def serialize(self):
-        """Serialize this object
+    def pack(self):
+        """Pack this object
 
         Returns:
-            bytes: serialized binary data
+            bytes: packed binary data
         """
         dat = bytearray(to_2byte(len(self.sig_indices)))
         for i in range(len(self.sig_indices)):
@@ -1276,11 +1276,11 @@ class BBcWitness:
             dat.extend(to_2byte(self.sig_indices[i]))
         return bytes(dat)
 
-    def deserialize(self, data):
-        """Deserialize into this object
+    def unpack(self, data):
+        """Unpack into this object
 
         Args:
-            data (bytes): serialized binary data
+            data (bytes): packed binary data
         Returns:
             bool: True if successful
         """
@@ -1355,7 +1355,7 @@ class BBcAsset:
         Returns:
             bytes: asset_id (or digest)
         """
-        target = self.serialize(for_digest_calculation=True)
+        target = self.pack(for_digest_calculation=True)
         self.asset_id = hashlib.sha256(target).digest()[:self.id_length]
         return self.asset_id
 
@@ -1379,13 +1379,13 @@ class BBcAsset:
         else:
             return False
 
-    def serialize(self, for_digest_calculation=False):
-        """Serialize this object
+    def pack(self, for_digest_calculation=False):
+        """Pack this object
 
         Args:
             for_digest_calculation (bool): True if digest calculation
         Returns:
-            bytes: serialized binary data
+            bytes: packed binary data
         """
         if for_digest_calculation:
             dat = bytearray(to_bigint(self.user_id, size=self.id_length))
@@ -1425,11 +1425,11 @@ class BBcAsset:
                     dat.extend(self.asset_body)
             return bytes(dat)
 
-    def deserialize(self, data):
-        """Deserialize into this object
+    def unpack(self, data):
+        """Unpack into this object
 
         Args:
-            data (bytes): serialized binary data
+            data (bytes): packed binary data
         Returns:
             bool: True if successful
         """
@@ -1463,11 +1463,11 @@ class BBcAsset:
 
 class BBcCrossRef:
     """CrossRef part in a transaction"""
-    def __init__(self, domain_id=None, transaction_id=None, deserialize=None):
+    def __init__(self, domain_id=None, transaction_id=None, unpack=None):
         self.domain_id = domain_id
         self.transaction_id = transaction_id
-        if deserialize is not None:
-            self.deserialize(deserialize)
+        if unpack is not None:
+            self.unpack(unpack)
 
     def __str__(self):
         ret  = "Cross_Ref:\n"
@@ -1475,21 +1475,21 @@ class BBcCrossRef:
         ret += "  transaction_id: %s\n" % _str_binary(self.transaction_id)
         return ret
 
-    def serialize(self):
-        """Serialize this object
+    def pack(self):
+        """Pack this object
 
         Returns:
-            bytes: serialized binary data
+            bytes: packed binary data
         """
         dat = bytearray(to_bigint(self.domain_id))
         dat.extend(to_bigint(self.transaction_id))
         return bytes(dat)
 
-    def deserialize(self, data):
-        """Deserialize into this object
+    def unpack(self, data):
+        """Unpack into this object
 
         Args:
-            data (bytes): serialized binary data
+            data (bytes): packed binary data
         Returns:
             bool: True if successful
         """

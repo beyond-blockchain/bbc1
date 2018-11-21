@@ -331,8 +331,8 @@ class Domain0Manager:
             self.networking.domains[domain_id]['repair'].put_message(msg)
             return None
         txobj.digest()
-        cross_ref_dat = txobj.cross_ref.serialize()
-        sigdata = txobj.signatures[0].serialize()
+        cross_ref_dat = txobj.cross_ref.pack()
+        sigdata = txobj.signatures[0].pack()
         return txobj.transaction_base_digest, cross_ref_dat, sigdata
 
     def process_message(self, msg):

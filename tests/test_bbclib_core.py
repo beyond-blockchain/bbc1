@@ -46,13 +46,13 @@ class TestBBcLib(object):
         asset1 = BBcAsset(user_id=user_id, asset_body=b'12345678')
         asset2 = BBcAsset(user_id=user_id, asset_file=asset_content)
 
-        # --- for checking serialization function ---
+        # --- for checking pack/unpack function ---
         digest = asset1.digest()
-        dat = asset1.serialize()
+        dat = asset1.pack()
         print("Digest:", binascii.b2a_hex(digest))
         print("Serialized data:", binascii.b2a_hex(dat))
         asset_tmp = BBcAsset()
-        asset_tmp.deserialize(dat)
+        asset_tmp.unpack(dat)
         print("body_len:", asset_tmp.asset_body_size)
         if asset_tmp.asset_body_size > 0:
             print("body:", binascii.b2a_hex(asset_tmp.asset_body))
@@ -67,11 +67,11 @@ class TestBBcLib(object):
         event2 = BBcEvent(asset_group_id=asset_group_id)
         event2.add(asset=asset2, mandatory_approver=user_id)
 
-        # --- for checking serialization function ---
-        dat = event1.serialize()
+        # --- for checking pack/unpack function ---
+        dat = event1.pack()
         print("Serialized data:", binascii.b2a_hex(dat))
         event_tmp = BBcEvent()
-        event_tmp.deserialize(dat)
+        event_tmp.unpack(dat)
         print("mandatory_approvers:", [binascii.b2a_hex(d) for d in event_tmp.mandatory_approvers])
         print("asset_id:", binascii.b2a_hex(event_tmp.asset.asset_id))
 

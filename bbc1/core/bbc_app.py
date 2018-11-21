@@ -536,7 +536,7 @@ class BBcAppClient:
         dat[KeyType.destination_user_id] = dest_user_id
         dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.ref_index] = ref_index
-        dat[KeyType.signature] = signature.serialize()
+        dat[KeyType.signature] = signature.pack()
         if query_id is not None:
             dat[KeyType.query_id] = query_id
         return self._send_msg(dat)

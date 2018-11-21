@@ -34,8 +34,8 @@ def deserialize(txdata):
         int: 2-byte value of BBcFormat type
     """
     try:
-        dat, fmt = bbclib_wire.BBcFormat.strip(txdata)
-        return bbclib_core.BBcTransaction(deserialize=dat), fmt
+        dat, fmt_type = bbclib_wire.BBcFormat.strip(txdata)
+        return bbclib_core.BBcTransaction(unpack=dat), fmt_type
     except:
         # -- for backward compatibility
         txobj = bbclib_compat.BBcTransaction(deserialize=txdata)
@@ -51,7 +51,7 @@ def serialize(txobj, format_type=bbclib_wire.BBcFormat.FORMAT_PLAIN):
     :return: binary
     """
     if txobj.transaction_data is None:
-        txobj.serialize()
+        txobj.pack()
     try:
         return bbclib_wire.BBcFormat.generate(txobj, format_type=format_type)
     except:
