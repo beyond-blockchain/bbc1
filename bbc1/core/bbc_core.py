@@ -36,8 +36,8 @@ import copy
 
 import sys
 sys.path.extend(["../../"])
-from bbc1.core import bbclib_core, bbclib
-from bbc1.core.bbclib_core import MsgType
+from bbc1.core import bbclib
+from bbc1.core.bbclib import MsgType
 from bbc1.core.message_key_types import KeyType, to_2byte
 from bbc1.core import bbc_network, user_message_routing, data_handler, repair_manager, message_key_types, logger
 from bbc1.core import domain0_manager, query_management, bbc_stats
@@ -110,7 +110,7 @@ def _create_search_result(txobj_dict, asset_files_dict):
             response_info.setdefault(KeyType.compromised_transactions, list()).append(txdata)
             response_info.setdefault(KeyType.compromised_transaction_ids, list()).append(txid)
             continue
-        txobj_is_valid, valid_assets, invalid_assets = bbclib_core.validate_transaction_object(txobj, asset_files_dict)
+        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asset_files_dict)
         if txobj_is_valid:
             response_info.setdefault(KeyType.transactions, list()).append(txdata)
         else:
@@ -158,13 +158,13 @@ class BBcCoreService:
                                                  loglevel=loglevel, logname=logname)
         self.ledger_subsystems = dict()
         for domain_id_str in conf['domains'].keys():
-            domain_id = bbclib_core.convert_idstring_to_bytes(domain_id_str)
-            if not use_domain0 and domain_id == bbclib_core.domain_global_0:
+            domain_id = bbclib.convert_idstring_to_bytes(domain_id_str)
+            if not use_domain0 and domain_id == bbclib.domain_global_0:
                 continue
             c = self.config.get_domain_config(domain_id)
             self.networking.create_domain(domain_id=domain_id, config=c)
             for nd, info in c['static_nodes'].items():
-                node_id, ipv4, ipv6, port = bbclib_core.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
+                node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
                 self.networking.add_neighbor(domain_id, node_id, ipv4, ipv6, port, is_static=True)
             if ('use_ledger_subsystem' in c and c['use_ledger_subsystem']) or use_ledger_subsystem:
                 activate_ledgersubsystem()
@@ -259,7 +259,7 @@ class BBcCoreService:
         self.logger.info("The core use node_key to check signature on admin command message")
         keypath = os.path.join(self.config.working_dir, "node_key.pem")
 
-        self.node_key = bbclib_core.KeyPair()
+        self.node_key = bbclib.KeyPair()
         if os.path.exists(keypath):
             try:
                 with open(keypath, "r") as f:
@@ -779,7 +779,7 @@ class BBcCoreService:
             return None, None
         txobj.digest()
 
-        txobj_is_valid, valid_assets, invalid_assets = bbclib_core.validate_transaction_object(txobj, asset_files)
+        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asset_files)
         if not txobj_is_valid:
             self.stats.update_stats_increment("transaction", "invalid", 1)
         if len(invalid_assets) > 0:
@@ -805,7 +805,7 @@ class BBcCoreService:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("No such domain")
             return "Set up the domain, first!"
-        if domain_id == bbclib_core.domain_global_0:
+        if domain_id == bbclib.domain_global_0:
             self.stats.update_stats_increment("transaction", "insert_fail_count", 1)
             self.logger.error("Insert is not allowed in domain_global_0")
             return "Insert is not allowed in domain_global_0"

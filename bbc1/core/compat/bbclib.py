@@ -36,11 +36,11 @@ directory, filename = os.path.split(os.path.realpath(__file__))
 from ctypes import *
 
 if platform.system() == "Windows":
-    libbbcsig = windll.LoadLibrary(os.path.join(directory, "..", "libbbcsig.dll"))
+    libbbcsig = windll.LoadLibrary(os.path.join(directory, "../libs/", "libbbcsig.dll"))
 elif platform.system() == "Darwin":
-    libbbcsig = cdll.LoadLibrary(os.path.join(directory, "..", "libbbcsig.dylib"))
+    libbbcsig = cdll.LoadLibrary(os.path.join(directory, "../libs/", "libbbcsig.dylib"))
 else:
-    libbbcsig = cdll.LoadLibrary(os.path.join(directory, "..", "libbbcsig.so"))
+    libbbcsig = cdll.LoadLibrary(os.path.join(directory, "../libs/", "libbbcsig.so"))
 
 
 domain_global_0 = binascii.a2b_hex("0000000000000000000000000000000000000000000000000000000000000000")

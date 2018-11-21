@@ -27,9 +27,9 @@ import os
 import sys
 sys.path.append("../../")
 
-from bbc1.core import bbclib_core, bbclib
+from bbc1.core import bbclib
 from bbc1.core import message_key_types, logger
-from bbc1.core.bbclib_core import MsgType
+from bbc1.core.bbclib import MsgType
 from bbc1.core.message_key_types import KeyType, PayloadType
 from bbc1.core.bbc_error import *
 
@@ -141,7 +141,7 @@ class BBcAppClient:
         if pem_file is None:
             self.node_keypair = None
         try:
-            self.node_keypair = bbclib_core.KeyPair()
+            self.node_keypair = bbclib.KeyPair()
             with open(pem_file, "r") as f:
                 self.node_keypair.mk_keyobj_from_private_key_pem(f.read())
         except:
@@ -159,7 +159,7 @@ class BBcAppClient:
         """Make a base message structure for sending to the core node
 
         Args:
-            cmd (bytes): command type defined in bbclib_core.MsgType class
+            cmd (bytes): command type defined in bbclib.MsgType class
         """
         self.query_id = ((int.from_bytes(self.query_id, 'little') + 1) % 65536).to_bytes(2, 'little')
         msg = {
@@ -227,7 +227,7 @@ class BBcAppClient:
         dat = self._make_message_structure(MsgType.REQUEST_SETUP_DOMAIN)
         admin_info = {
             KeyType.domain_id: domain_id,
-            KeyType.random: bbclib_core.get_random_value(32)
+            KeyType.random: bbclib.get_random_value(32)
         }
         if config is not None:
             admin_info[KeyType.bbc_configuration] = config
@@ -249,7 +249,7 @@ class BBcAppClient:
         dat = self._make_message_structure(MsgType.REQUEST_CLOSE_DOMAIN)
         admin_info = {
             KeyType.domain_id: domain_id,
-            KeyType.random: bbclib_core.get_random_value(32)
+            KeyType.random: bbclib.get_random_value(32)
         }
         self.include_admin_info(dat, admin_info, self.node_keypair)
         return self._send_msg(dat)
@@ -276,7 +276,7 @@ class BBcAppClient:
         dat = self._make_message_structure(MsgType.REQUEST_GET_NEIGHBORLIST)
         dat[KeyType.domain_id] = domain_id
         admin_info = {
-            KeyType.random: bbclib_core.get_random_value(32)
+            KeyType.random: bbclib.get_random_value(32)
         }
         self.include_admin_info(dat, admin_info, self.node_keypair)
         return self._send_msg(dat)
@@ -341,7 +341,7 @@ class BBcAppClient:
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_CONFIG)
         admin_info = {
-            KeyType.random: bbclib_core.get_random_value(32)
+            KeyType.random: bbclib.get_random_value(32)
         }
         self.include_admin_info(dat, admin_info, self.node_keypair)
         return self._send_msg(dat)
@@ -356,7 +356,7 @@ class BBcAppClient:
         """
         dat = self._make_message_structure(MsgType.NOTIFY_DOMAIN_KEY_UPDATE)
         admin_info = {
-            KeyType.random: bbclib_core.get_random_value(32)
+            KeyType.random: bbclib.get_random_value(32)
         }
         self.include_admin_info(dat, admin_info, self.node_keypair)
         return self._send_msg(dat)
@@ -369,7 +369,7 @@ class BBcAppClient:
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_DOMAINLIST)
         admin_info = {
-            KeyType.random: bbclib_core.get_random_value(32)
+            KeyType.random: bbclib.get_random_value(32)
         }
         self.include_admin_info(dat, admin_info, self.node_keypair)
         return self._send_msg(dat)
@@ -382,7 +382,7 @@ class BBcAppClient:
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_USERS)
         admin_info = {
-            KeyType.random: bbclib_core.get_random_value(32)
+            KeyType.random: bbclib.get_random_value(32)
         }
         self.include_admin_info(dat, admin_info, self.node_keypair)
         return self._send_msg(dat)
@@ -395,7 +395,7 @@ class BBcAppClient:
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_FORWARDING_LIST)
         admin_info = {
-            KeyType.random: bbclib_core.get_random_value(32)
+            KeyType.random: bbclib.get_random_value(32)
         }
         self.include_admin_info(dat, admin_info, self.node_keypair)
         return self._send_msg(dat)
@@ -408,7 +408,7 @@ class BBcAppClient:
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_NOTIFICATION_LIST)
         admin_info = {
-            KeyType.random: bbclib_core.get_random_value(32)
+            KeyType.random: bbclib.get_random_value(32)
         }
         self.include_admin_info(dat, admin_info, self.node_keypair)
         return self._send_msg(dat)
@@ -428,7 +428,7 @@ class BBcAppClient:
         dat[KeyType.domain_id] = domain_id
         admin_info = {
             KeyType.ledger_subsys_manip: enable,
-            KeyType.random: bbclib_core.get_random_value(32)
+            KeyType.random: bbclib.get_random_value(32)
         }
         self.include_admin_info(dat, admin_info, self.node_keypair)
         return self._send_msg(dat)
@@ -758,7 +758,7 @@ class BBcAppClient:
         """
         dat = self._make_message_structure(MsgType.REQUEST_GET_STATS)
         admin_info = {
-            KeyType.random: bbclib_core.get_random_value(32)
+            KeyType.random: bbclib.get_random_value(32)
         }
         self.include_admin_info(dat, admin_info, self.node_keypair)
         return self._send_msg(dat)
@@ -949,7 +949,7 @@ class Callback:
         Args:
             dat (dict): received message
         """
-        cross_ref = bbclib_core.BBcCrossRef(domain_id=dat[KeyType.cross_ref][0], transaction_id=dat[KeyType.cross_ref][1])
+        cross_ref = bbclib.BBcCrossRef(domain_id=dat[KeyType.cross_ref][0], transaction_id=dat[KeyType.cross_ref][1])
         self.client.cross_ref_list.append(cross_ref)
 
     def proc_cmd_sign_request(self, dat):
@@ -983,7 +983,7 @@ class Callback:
         if KeyType.status not in dat or dat[KeyType.status] < ESUCCESS:
             self.queue.put(dat)
             return
-        sig = bbclib_core.recover_signature_object(dat[KeyType.signature])
+        sig = bbclib.recover_signature_object(dat[KeyType.signature])
         self.queue.put({KeyType.status: ESUCCESS, KeyType.result: (dat[KeyType.ref_index], dat[KeyType.source_user_id], sig)})
 
     def proc_resp_insert(self, dat):

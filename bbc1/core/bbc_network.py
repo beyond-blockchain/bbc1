@@ -38,9 +38,8 @@ from bbc1.core.data_handler import DataHandler, DataHandlerDomain0
 from bbc1.core.repair_manager import RepairManager
 from bbc1.core.domain0_manager import Domain0Manager
 from bbc1.core import query_management, message_key_types, logger
-from bbc1.core import bbclib_core
+from bbc1.core import bbclib
 from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
-from bbc1.core.bbc_error import *
 
 TCP_THRESHOLD_SIZE = 1300
 ZEROS = bytes([0] * 32)
@@ -226,11 +225,11 @@ class BBcNetwork:
         if config is not None:
             conf.update(config)
         if 'node_id' not in conf or conf['node_id'] == "":
-            node_id = bbclib_core.get_random_id()
-            conf['node_id'] = bbclib_core.convert_id_to_string(node_id)
+            node_id = bbclib.get_random_id()
+            conf['node_id'] = bbclib.convert_id_to_string(node_id)
             self.config.update_config()
         else:
-            node_id = bbclib_core.convert_idstring_to_bytes(conf.get('node_id'))
+            node_id = bbclib.convert_idstring_to_bytes(conf.get('node_id'))
 
         self.domains[domain_id] = dict()
         self.domains[domain_id]['node_id'] = node_id
@@ -289,7 +288,7 @@ class BBcNetwork:
         }
         admin_info = {
             KeyType.source_node_id: self.domains[domain_id]["neighbor"].my_node_id,
-            KeyType.nonce: bbclib_core.get_random_value(32)   # just for randomization
+            KeyType.nonce: bbclib.get_random_value(32)   # just for randomization
         }
         self.include_admin_info_into_message_if_needed(domain_id, msg, admin_info)
         self.broadcast_message_in_network(domain_id=domain_id, msg=msg)
@@ -316,7 +315,7 @@ class BBcNetwork:
             conf['static_node'] = dict()
             for node_id, nodeinfo in self.domains[domain_id]['neighbor'].nodeinfo_list.items():
                 if nodeinfo.is_static:
-                    nid = bbclib_core.convert_id_to_string(node_id)
+                    nid = bbclib.convert_id_to_string(node_id)
                     info = _convert_to_string([nodeinfo.ipv4, nodeinfo.ipv6, nodeinfo.port])
                     conf['static_node'][nid] = info
         self.config.update_config()
@@ -356,7 +355,7 @@ class BBcNetwork:
             self.domains[domain_id]['keypair'] = None
             return
         domain_id_str = domain_id.hex()
-        keypair = bbclib_core.KeyPair()
+        keypair = bbclib.KeyPair()
         try:
             with open(os.path.join(keyconfig['directory'], domain_id_str+".pem"), "r") as f:
                 keypair.mk_keyobj_from_private_key_pem(f.read())

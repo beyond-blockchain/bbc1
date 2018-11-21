@@ -25,8 +25,8 @@ import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core import query_management, user_message_routing, repair_manager, logger
-from bbc1.core import bbclib_core
-from bbc1.core.bbclib_core import MsgType
+from bbc1.core import bbclib
+from bbc1.core.bbclib import MsgType
 from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
 
 
@@ -322,7 +322,7 @@ class Domain0Manager:
         if txobj.WITH_WIRE:
             self.logger.info("To use cross_reference the transaction object must not be in bson/msgpack format")
             return None
-        txobj_is_valid, valid_assets, invalid_assets = bbclib_core.validate_transaction_object(txobj, asts)
+        txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asts)
         if not txobj_is_valid:
             msg = {
                 KeyType.command: repair_manager.RepairManager.REQUEST_REPAIR_TRANSACTION,

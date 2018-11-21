@@ -20,7 +20,7 @@ import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
-from bbc1.core import bbclib_core
+from bbc1.core import bbclib
 from bbc1.core import query_management, message_key_types, logger
 
 ticker = query_management.get_ticker()
@@ -305,7 +305,7 @@ class UserMessageRouting:
             for i in range(len(self.cross_ref_list)):
                 msg = {
                     KeyType.domain_id: self.domain_id,
-                    KeyType.command: bbclib_core.MsgType.NOTIFY_CROSS_REF,
+                    KeyType.command: bbclib.MsgType.NOTIFY_CROSS_REF,
                     KeyType.destination_user_id: random.choice(tuple(self.registered_users.keys())),
                     KeyType.cross_ref: self.cross_ref_list.pop(0),
                 }
