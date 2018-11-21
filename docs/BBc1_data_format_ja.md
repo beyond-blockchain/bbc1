@@ -4,7 +4,7 @@ Data format of serialized BBc-1 transaction
 BBc-1のトランザクションは、DBに保存したり、他者に送付したりするために、トランザクションデータをシリアライズする必要があります。
 シリアライズされた情報はさらに圧縮等の変換を施してデータ化できる。データの関係性を下図に示す。
 
-![Serialize](images/SerializeDeserialize.png)
+![Serialize](images/BBc1_format.png)
 
 BBcTransactionオブジェクトをpackすると、バイナリフォーマットのデータに変換される（図の真ん中）。バイナリフォーマットのデータをさらに圧縮するなどの変換を施し、ヘッダを付加して、最終的なデータフォーマット (wire-format)とする。
 
@@ -12,8 +12,8 @@ BBcTransactionオブジェクトをpackすると、バイナリフォーマッ�
 
 |数値|内容|
 |----------|-------------|
-|0x0000|無変換(シリアライズされたデータそのまま)|
-|0x0010|シリアライズされたデータをzlibで圧縮|
+|0x0000|無変換(packされたデータそのまま)|
+|0x0010|packされたデータをzlibで圧縮|
 
 ### 非推奨のヘッダ値
 version 1.1.1以前は、ヘッダの値（すなわちBBcFormatの値）として0x0001〜0x0006が定義されており、bson (binary Json)やmsgpackなどの形式を利用できるようになっていた。
