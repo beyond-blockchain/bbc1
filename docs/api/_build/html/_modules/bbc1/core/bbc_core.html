@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.bbc_core &mdash; BBc1 1.1 documentation</title>
+  <title>bbc1.core.bbc_core &mdash; BBc1 1.2 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.1
+                1.2
               </div>
             
           
@@ -185,8 +185,8 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;../../&quot;</span><span class="p">])</span>
 <span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">bbclib</span>
+<span class="kn">from</span> <span class="nn">bbc1.core.bbclib</span> <span class="k">import</span> <span class="n">MsgType</span>
 <span class="kn">from</span> <span class="nn">bbc1.core.message_key_types</span> <span class="k">import</span> <span class="n">KeyType</span><span class="p">,</span> <span class="n">to_2byte</span>
-<span class="kn">from</span> <span class="nn">bbc1.core.bbclib</span> <span class="k">import</span> <span class="n">BBcTransaction</span><span class="p">,</span> <span class="n">MsgType</span>
 <span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">bbc_network</span><span class="p">,</span> <span class="n">user_message_routing</span><span class="p">,</span> <span class="n">data_handler</span><span class="p">,</span> <span class="n">repair_manager</span><span class="p">,</span> <span class="n">message_key_types</span><span class="p">,</span> <span class="n">logger</span>
 <span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">domain0_manager</span><span class="p">,</span> <span class="n">query_management</span><span class="p">,</span> <span class="n">bbc_stats</span>
 <span class="kn">from</span> <span class="nn">bbc1.core.bbc_config</span> <span class="k">import</span> <span class="n">BBcConfig</span>
@@ -253,15 +253,16 @@
     <span class="sd">&quot;&quot;&quot;Create transaction search result&quot;&quot;&quot;</span>
     <span class="n">response_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">txid</span><span class="p">,</span> <span class="n">txobj</span> <span class="ow">in</span> <span class="n">txobj_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">txdata</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">txobj</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">txid</span> <span class="o">!=</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">:</span>
-            <span class="n">response_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">KeyType</span><span class="o">.</span><span class="n">compromised_transactions</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">txobj</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">)</span>
+            <span class="n">response_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">KeyType</span><span class="o">.</span><span class="n">compromised_transactions</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">txdata</span><span class="p">)</span>
             <span class="n">response_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">KeyType</span><span class="o">.</span><span class="n">compromised_transaction_ids</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">txid</span><span class="p">)</span>
             <span class="k">continue</span>
         <span class="n">txobj_is_valid</span><span class="p">,</span> <span class="n">valid_assets</span><span class="p">,</span> <span class="n">invalid_assets</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">validate_transaction_object</span><span class="p">(</span><span class="n">txobj</span><span class="p">,</span> <span class="n">asset_files_dict</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">txobj_is_valid</span><span class="p">:</span>
-            <span class="n">response_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transactions</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">txobj</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">)</span>
+            <span class="n">response_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transactions</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">txdata</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">response_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">KeyType</span><span class="o">.</span><span class="n">compromised_transactions</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">txobj</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">)</span>
+            <span class="n">response_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">KeyType</span><span class="o">.</span><span class="n">compromised_transactions</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">txdata</span><span class="p">)</span>
             <span class="n">response_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">KeyType</span><span class="o">.</span><span class="n">compromised_transaction_ids</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">txid</span><span class="p">)</span>
             
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_assets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -299,7 +300,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;config = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">conf</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">search_max_count</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;search_config&#39;</span><span class="p">][</span><span class="s1">&#39;max_count&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">traverse_max_count</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;search_config&#39;</span><span class="p">][</span><span class="s1">&#39;max_traverse&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">test_tx_obj</span> <span class="o">=</span> <span class="n">BBcTransaction</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">insert_notification_user_list</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">networking</span> <span class="o">=</span> <span class="n">bbc_network</span><span class="o">.</span><span class="n">BBcNetwork</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">core</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">p2p_port</span><span class="o">=</span><span class="n">p2p_port</span><span class="p">,</span>
                                                  <span class="n">external_ip4addr</span><span class="o">=</span><span class="n">ip4addr</span><span class="p">,</span> <span class="n">external_ip6addr</span><span class="o">=</span><span class="n">ip6addr</span><span class="p">,</span>
@@ -598,7 +598,9 @@
             <span class="n">retmsg</span> <span class="o">=</span> <span class="n">_make_message_structure</span><span class="p">(</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">MsgType</span><span class="o">.</span><span class="n">RESPONSE_GATHER_SIGNATURE</span><span class="p">,</span>
                                              <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_id</span><span class="p">],</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
-                <span class="n">retmsg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data_format</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data_format</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data_format</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
+                    <span class="c1"># -- for backward compatibility</span>
+                    <span class="n">retmsg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data_format</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data_format</span><span class="p">]</span>
                 <span class="n">retmsg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">]</span>
                 <span class="n">retmsg</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ref_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ref_index</span><span class="p">]</span>
             <span class="k">elif</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
@@ -916,12 +918,13 @@
 <span class="sd">            asset_files (dict): dictionary of {asset_id: content} for the transaction</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            BBcTransaction: if validation fails, None returns.</span>
+<span class="sd">            int (short): 2-byte value of BBcFormat type or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">txobj</span> <span class="o">=</span> <span class="n">BBcTransaction</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">txobj</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">txdata</span><span class="p">):</span>
+        <span class="n">txobj</span><span class="p">,</span> <span class="n">fmt_type</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">txdata</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">txobj</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span> <span class="s2">&quot;invalid&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Fail to deserialize transaction data&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
         <span class="n">txobj</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
 
         <span class="n">txobj_is_valid</span><span class="p">,</span> <span class="n">valid_assets</span><span class="p">,</span> <span class="n">invalid_assets</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">validate_transaction_object</span><span class="p">(</span><span class="n">txobj</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">)</span>
@@ -931,9 +934,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;asset_file&quot;</span><span class="p">,</span> <span class="s2">&quot;invalid&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">txobj_is_valid</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">invalid_assets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">txobj</span>
+            <span class="k">return</span> <span class="n">txobj</span><span class="p">,</span> <span class="n">fmt_type</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span></div>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="BBcCoreService.insert_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbc_core.html#bbc1.core.bbc_core.BBcCoreService.insert_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">insert_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_id</span><span class="p">,</span> <span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Insert transaction into ledger</span>
@@ -954,7 +957,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span> <span class="s2">&quot;insert_fail_count&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Insert is not allowed in domain_global_0&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="s2">&quot;Insert is not allowed in domain_global_0&quot;</span>
-        <span class="n">txobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_transaction</span><span class="p">(</span><span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">)</span>
+        <span class="n">txobj</span><span class="p">,</span> <span class="n">fmt_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_transaction</span><span class="p">(</span><span class="n">txdata</span><span class="p">,</span> <span class="n">asset_files</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">txobj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span> <span class="s2">&quot;insert_fail_count&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Bad transaction format&quot;</span><span class="p">)</span>
@@ -962,7 +965,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;[node:</span><span class="si">%s</span><span class="s2">] insert_transaction </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
                           <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">[:</span><span class="mi">4</span><span class="p">])))</span>
 
-        <span class="n">asset_group_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">insert_transaction</span><span class="p">(</span><span class="n">txdata</span><span class="p">,</span> <span class="n">txobj</span><span class="o">=</span><span class="n">txobj</span><span class="p">,</span>
+        <span class="n">asset_group_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">networking</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domain_id</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">insert_transaction</span><span class="p">(</span><span class="n">txdata</span><span class="p">,</span> <span class="n">txobj</span><span class="o">=</span><span class="n">txobj</span><span class="p">,</span> <span class="n">fmt_type</span><span class="o">=</span><span class="n">fmt_type</span><span class="p">,</span>
                                                                                         <span class="n">asset_files</span><span class="o">=</span><span class="n">asset_files</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">asset_group_ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">update_stats_increment</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span> <span class="s2">&quot;insert_fail_count&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -1188,7 +1191,7 @@
                             <span class="k">break</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
                         <span class="k">continue</span>
-                <span class="n">tx_brothers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ret_txobj</span><span class="p">[</span><span class="n">txid</span><span class="p">]</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">)</span>
+                <span class="n">tx_brothers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bbclib</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">ret_txobj</span><span class="p">[</span><span class="n">txid</span><span class="p">]))</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret_asset_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">asset_files</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ret_asset_files</span><span class="p">)</span>
 
@@ -1290,7 +1293,6 @@
         <script type="text/javascript" src="../../../_static/jquery.js"></script>
         <script type="text/javascript" src="../../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   
