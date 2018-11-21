@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.data_handler module &mdash; BBc1 1.1 documentation</title>
+  <title>bbc1.core.data_handler module &mdash; BBc1 1.2 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.1
+                1.2
               </div>
             
           
@@ -301,7 +301,7 @@ limitations under the License.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to analyze</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to analyze</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of list [asset_group_id, asset_id, user_id, file_size, file_digest]</td>
 </tr>
@@ -357,7 +357,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.insert_transaction">
-<code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>txdata</em>, <em>txobj=None</em>, <em>asset_files=None</em>, <em>no_replication=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.insert_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>txdata</em>, <em>txobj=None</em>, <em>fmt_type=0</em>, <em>asset_files=None</em>, <em>no_replication=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.insert_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert transaction data and its asset files</p>
 <p>Either txdata or txobj must be given to insert the transaction.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -366,7 +366,8 @@ limitations under the License.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</li>
-<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</li>
+<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</li>
+<li><strong>fmt_type</strong> (<em>int</em>) – 2-byte value of BBcFormat type</li>
 <li><strong>asset_files</strong> (<em>dict</em>) – asset files in the transaction</li>
 </ul>
 </td>
@@ -406,7 +407,7 @@ limitations under the License.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</li>
-<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</li>
+<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</li>
 <li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
 </ul>
 </td>
@@ -562,7 +563,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to analyze</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to analyze</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of list [asset_group_id, asset_id, user_id, file_size, file_digest]</td>
 </tr>
@@ -607,7 +608,8 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</li>
-<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</li>
+<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</li>
+<li><strong>fmt_type</strong> (<em>int</em>) – 2-byte value of BBcFormat type</li>
 <li><strong>asset_files</strong> (<em>dict</em>) – asset files in the transaction</li>
 </ul>
 </td>
@@ -647,7 +649,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</li>
-<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</li>
+<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</li>
 <li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
 </ul>
 </td>
@@ -889,7 +891,6 @@ dict: dictionary of {asset_id: content} for the transaction</p>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   

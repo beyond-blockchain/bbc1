@@ -40,7 +40,6 @@ from bbc1.core.domain0_manager import Domain0Manager
 from bbc1.core import query_management, message_key_types, logger
 from bbc1.core import bbclib
 from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
-from bbc1.core.bbc_error import *
 
 TCP_THRESHOLD_SIZE = 1300
 ZEROS = bytes([0] * 32)

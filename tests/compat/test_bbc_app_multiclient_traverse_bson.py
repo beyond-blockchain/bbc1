@@ -4,10 +4,9 @@ import pytest
 import time
 
 import sys
-sys.path.extend(["../"])
-from bbc1.core import bbclib
+sys.path.extend(["../", "../.."])
+from bbc1.core.compat import bbclib
 from bbc1.core.message_key_types import KeyType
-from bbc1.core import bbc_core
 from testutils import prepare, get_core_client, start_core_thread, make_client, domain_setup_utility
 
 LOGLEVEL = 'debug'

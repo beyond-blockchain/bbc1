@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.repair_manager &mdash; BBc1 1.1 documentation</title>
+  <title>bbc1.core.repair_manager &mdash; BBc1 1.2 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.1
+                1.2
               </div>
             
           
@@ -253,7 +253,7 @@
             <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">db_adaptors</span><span class="p">)):</span>
                 <span class="n">result_txobj</span><span class="p">,</span> <span class="n">result_asset_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">search_transaction</span><span class="p">(</span><span class="n">transaction_id</span><span class="o">=</span><span class="n">transaction_id</span><span class="p">,</span> <span class="n">db_num</span><span class="o">=</span><span class="n">idx</span><span class="p">)</span>
                 <span class="n">txobj_is_valid</span><span class="p">,</span> <span class="n">valid_assets</span><span class="p">,</span> <span class="n">invalid_assets</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">validate_transaction_object</span><span class="p">(</span><span class="n">result_txobj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                                                                                  <span class="n">result_asset_files</span><span class="p">)</span>
+                                                                                                       <span class="n">result_asset_files</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">txobj_is_valid</span> <span class="ow">and</span> <span class="n">valid_txobj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">valid_txobj</span> <span class="o">=</span> <span class="n">result_txobj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">txobj_is_valid</span><span class="p">:</span>
@@ -343,7 +343,7 @@
             <span class="n">txobj_is_valid</span><span class="p">,</span> <span class="n">valid_assets</span><span class="p">,</span> <span class="n">invalid_assets</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">validate_transaction_object</span><span class="p">(</span><span class="n">result_txobj</span><span class="p">[</span><span class="n">transaction_id</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">txobj_is_valid</span><span class="p">:</span>
                 <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">=</span> <span class="n">RepairManager</span><span class="o">.</span><span class="n">RESPONSE_TRANSACTION_DATA</span>
-                <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">result_txobj</span><span class="p">[</span><span class="n">transaction_id</span><span class="p">]</span><span class="o">.</span><span class="n">transaction_data</span>
+                <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">result_txobj</span><span class="p">[</span><span class="n">transaction_id</span><span class="p">])</span>
                 <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_node_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">source_node_id</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">send_message_in_network</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_id</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">dat</span><span class="p">)</span>
                 <span class="k">return</span>
@@ -362,7 +362,7 @@
         <span class="n">asset_files</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
             <span class="n">asset_files</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span><span class="p">]</span>
-        <span class="n">txobj</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcTransaction</span><span class="p">(</span><span class="n">deserialize</span><span class="o">=</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">])</span>
+        <span class="n">txobj</span><span class="p">,</span> <span class="n">fmt_type</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -475,7 +475,6 @@
         <script type="text/javascript" src="../../../_static/jquery.js"></script>
         <script type="text/javascript" src="../../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   

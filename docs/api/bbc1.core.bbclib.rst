@@ -5,7 +5,3 @@ bbc1.core.bbclib module
     :members:
     :undoc-members:
     :show-inheritance:
-
-    .. autosummary::
-        :toctree: _gen
-

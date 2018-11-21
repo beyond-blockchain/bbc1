@@ -319,6 +319,9 @@ class Domain0Manager:
         if transaction_id not in txobjs:
             return None
         txobj = txobjs[transaction_id]
+        if txobj.WITH_WIRE:
+            self.logger.info("To use cross_reference the transaction object must not be in bson/msgpack format")
+            return None
         txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(txobj, asts)
         if not txobj_is_valid:
             msg = {
@@ -328,11 +331,9 @@ class Domain0Manager:
             self.networking.domains[domain_id]['repair'].put_message(msg)
             return None
         txobj.digest()
-        txobj.cross_ref.format_type = bbclib.BBcFormat.FORMAT_BINARY
-        cross_ref_dat = txobj.cross_ref.serialize()
-        txobj.signatures[0].format_type = bbclib.BBcFormat.FORMAT_BINARY
-        sigdata = txobj.signatures[0].serialize()
-        return txobj.transaction_base_digest, cross_ref_dat, sigdata, txobj.format_type
+        cross_ref_dat = txobj.cross_ref.pack()
+        sigdata = txobj.signatures[0].pack()
+        return txobj.transaction_base_digest, cross_ref_dat, sigdata
 
     def process_message(self, msg):
         """Process received message

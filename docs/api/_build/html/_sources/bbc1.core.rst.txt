@@ -6,7 +6,8 @@ Subpackages
 
 .. toctree::
 
-    bbc1.core.libbbcsig
+    bbc1.core.compat
+    bbc1.core.libs
 
 Submodules
 ----------

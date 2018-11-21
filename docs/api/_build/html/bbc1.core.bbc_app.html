@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.bbc_app module &mdash; BBc1 1.1 documentation</title>
+  <title>bbc1.core.bbc_app module &mdash; BBc1 1.2 documentation</title>
   
 
   
@@ -29,7 +29,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="bbc1.core.bbc_config module" href="bbc1.core.bbc_config.html" />
-    <link rel="prev" title="bbc1.core package" href="bbc1.core.html" /> 
+    <link rel="prev" title="bbc1.core.libs.bbclib_witness module" href="bbc1.core.libs.bbclib_witness.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.1
+                1.2
               </div>
             
           
@@ -295,8 +295,8 @@ limitations under the License.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – </li>
-<li><strong>reference_obj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcReference" title="bbc1.core.bbclib.BBcReference"><em>BBcReference</em></a>) – BBcReference object that includes the information about destinations</li>
+<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – </li>
+<li><strong>reference_obj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcReference" title="bbc1.core.compat.bbclib.BBcReference"><em>BBcReference</em></a>) – BBcReference object that includes the information about destinations</li>
 <li><strong>asset_files</strong> (<em>dict</em>) – mapping from asset_id to its file content</li>
 <li><strong>destinations</strong> (<em>list</em>) – list of destination user_ids</li>
 <li><strong>anycast</strong> (<em>bool</em>) – True if this message is for anycasting</li>
@@ -460,7 +460,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – Transaction object to include cross_ref</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – Transaction object to include cross_ref</td>
 </tr>
 </tbody>
 </table>
@@ -468,13 +468,13 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.insert_transaction">
-<code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>tx_obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.insert_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.insert_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Request to insert a legitimate transaction</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tx_obj</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcTransaction" title="bbc1.core.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – Transaction object to insert</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – Transaction object to insert</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">query_id</td>
 </tr>
@@ -806,7 +806,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <li><strong>dest_user_id</strong> (<em>bytes</em>) – destination user_id to send back</li>
 <li><strong>transaction_id</strong> (<em>bytes</em>) – </li>
 <li><strong>ref_index</strong> (<em>int</em>) – (optional) which reference in transaction the signature is for</li>
-<li><strong>signature</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.BBcSignature" title="bbc1.core.bbclib.BBcSignature"><em>BBcSignature</em></a>) – Signature that expresses approval of the transaction with transaction_id</li>
+<li><strong>signature</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcSignature" title="bbc1.core.compat.bbclib.BBcSignature"><em>BBcSignature</em></a>) – Signature that expresses approval of the transaction with transaction_id</li>
 <li><strong>query_id</strong> – The query_id that was in the received SIGN_REQUEST message</li>
 </ul>
 </td>
@@ -886,7 +886,7 @@ This method should be used by a system administrator.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keypair</strong> (<a class="reference internal" href="bbc1.core.bbclib.html#bbc1.core.bbclib.KeyPair" title="bbc1.core.bbclib.KeyPair"><em>KeyPair</em></a>) – KeyPair object for signing</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keypair</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.KeyPair" title="bbc1.core.compat.bbclib.KeyPair"><em>KeyPair</em></a>) – KeyPair object for signing</td>
 </tr>
 </tbody>
 </table>
@@ -1512,7 +1512,7 @@ This method should be overridden if you want to process the message asynchronous
         <a href="bbc1.core.bbc_config.html" class="btn btn-neutral float-right" title="bbc1.core.bbc_config module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="bbc1.core.html" class="btn btn-neutral" title="bbc1.core package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="bbc1.core.libs.bbclib_witness.html" class="btn btn-neutral" title="bbc1.core.libs.bbclib_witness module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -1546,7 +1546,6 @@ This method should be overridden if you want to process the message asynchronous
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   
