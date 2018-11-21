@@ -503,14 +503,13 @@ class BBcAppClient:
         if reference_obj is None and destinations is None:
             return False
         dat = self._make_message_structure(MsgType.REQUEST_GATHER_SIGNATURE)
-        dat[KeyType.transaction_data] = txobj.serialize()
+        dat[KeyType.transaction_data] = bbclib.serialize(txobj)
         dat[KeyType.transaction_id] = txobj.transaction_id
         if anycast:
             dat[KeyType.is_anycast] = True
         if reference_obj is not None:
             dat[KeyType.destination_user_ids] = reference_obj.get_destinations()
-            referred_transactions = dict()
-            referred_transactions.update(reference_obj.get_referred_transaction())
+            referred_transactions = {reference_obj.transaction_id: bbclib.serialize(reference_obj.ref_transaction)}
             if len(referred_transactions) > 0:
                 dat[KeyType.transactions] = referred_transactions
         elif destinations is not None:
@@ -537,12 +536,7 @@ class BBcAppClient:
         dat[KeyType.destination_user_id] = dest_user_id
         dat[KeyType.transaction_id] = transaction_id
         dat[KeyType.ref_index] = ref_index
-        if signature.format_type in [bbclib.BBcFormat.FORMAT_BSON, bbclib.BBcFormat.FORMAT_BSON_COMPRESS_BZ2]:
-            dat[KeyType.signature] = bson.dumps(signature.serialize())
-            dat[KeyType.transaction_data_format] = bbclib.BBcFormat.FORMAT_BSON
-        else:
-            dat[KeyType.signature] = signature.serialize()
-            dat[KeyType.transaction_data_format] = bbclib.BBcFormat.FORMAT_BINARY
+        dat[KeyType.signature] = signature.pack()
         if query_id is not None:
             dat[KeyType.query_id] = query_id
         return self._send_msg(dat)
@@ -569,26 +563,26 @@ class BBcAppClient:
             dat[KeyType.query_id] = query_id
         return self._send_msg(dat)
 
-    def insert_transaction(self, tx_obj):
+    def insert_transaction(self, txobj):
         """Request to insert a legitimate transaction
 
         Args:
-            tx_obj (BBcTransaction): Transaction object to insert
+            txobj (BBcTransaction): Transaction object to insert
         Returns:
             bytes: query_id
         """
-        if tx_obj.transaction_id is None:
-            tx_obj.digest()
+        if txobj.transaction_id is None:
+            txobj.digest()
         dat = self._make_message_structure(MsgType.REQUEST_INSERT)
-        dat[KeyType.transaction_data] = tx_obj.serialize()
+        dat[KeyType.transaction_data] = bbclib.serialize(txobj)
         ast = dict()
-        for evt in tx_obj.events:
+        for evt in txobj.events:
             if evt.asset is None:
                 continue
             asset_digest, content = evt.asset.get_asset_file()
             if content is not None:
                 ast[evt.asset.asset_id] = content
-        for rtn in tx_obj.relations:
+        for rtn in txobj.relations:
             if rtn.asset is None:
                 continue
             asset_digest, content = rtn.asset.get_asset_file()
@@ -819,7 +813,6 @@ class BBcAppClient:
         """
         if len(self.cross_ref_list) > 0:
             txobj.add(cross_ref=self.cross_ref_list.pop(0))
-            txobj.cross_ref.format_type = txobj.format_type
 
 
 class Callback:
@@ -990,12 +983,7 @@ class Callback:
         if KeyType.status not in dat or dat[KeyType.status] < ESUCCESS:
             self.queue.put(dat)
             return
-        format_type = dat[KeyType.transaction_data_format]
-        if format_type in [bbclib.BBcFormat.FORMAT_BSON, bbclib.BBcFormat.FORMAT_BSON_COMPRESS_BZ2]:
-            sigdata = bson.loads(dat[KeyType.signature])
-        else:
-            sigdata = dat[KeyType.signature]
-        sig = bbclib.recover_signature_object(sigdata, format_type=format_type)
+        sig = bbclib.recover_signature_object(dat[KeyType.signature])
         self.queue.put({KeyType.status: ESUCCESS, KeyType.result: (dat[KeyType.ref_index], dat[KeyType.source_user_id], sig)})
 
     def proc_resp_insert(self, dat):

@@ -13,6 +13,7 @@ from bbc1.core.message_key_types import KeyType
 from bbc1.core.bbc_error import *
 from bbc1.core.bbc_config import DEFAULT_CORE_PORT
 from bbc1.core import bbc_app
+from examples.file_proof import file_proof
 import testutils
 from testutils import prepare, start_core_thread
 
@@ -54,7 +55,7 @@ def create_transaction_object_and_send_sign_req(idx, receiver_user_id, ref_txids
 
     txobj = bbclib.make_transaction(relation_num=1, witness=True)
     bbclib.add_relation_asset(txobj, relation_idx=0, asset_group_id=asset_group_id,
-                              user_id=receiver_user_id, asset_body="transferred", asset_file=file_data)
+                                   user_id=receiver_user_id, asset_body="transferred", asset_file=file_data)
     txobj.witness.add_witness(user_ids[idx])
     txobj.witness.add_witness(receiver_user_id)
 
@@ -64,7 +65,7 @@ def create_transaction_object_and_send_sign_req(idx, receiver_user_id, ref_txids
         if response_data[KeyType.status] < ESUCCESS:
             print("ERROR: ", response_data[KeyType.reason].decode())
             sys.exit(0)
-        prev_tx = bbclib.BBcTransaction(deserialize=response_data[KeyType.transaction_data])
+        prev_tx, fmt_type = bbclib.deserialize(response_data[KeyType.transaction_data])
         bbclib.add_relation_pointer(txobj, 0, ref_transaction_id=prev_tx.digest())
 
     sig_mine = txobj.sign(private_key=keypairs[idx].private_key, public_key=keypairs[idx].public_key)
@@ -75,42 +76,6 @@ def create_transaction_object_and_send_sign_req(idx, receiver_user_id, ref_txids
     ret = clients[idx].gather_signatures(txobj, destinations=[receiver_user_id], asset_files=asset_files)
     assert ret
     return txobj
-
-
-def wait_for_transaction_msg(bbc_app_client=None):
-    response_data = bbc_app_client.callback.synchronize()
-    if KeyType.transaction_data not in response_data or KeyType.all_asset_files not in response_data:
-        print("**** Invalid message is received...")
-        print(response_data)
-        bbc_app_client.sendback_denial_of_sign(response_data[KeyType.source_user_id],
-                                               response_data[KeyType.transaction_id],
-                                               "Invalid message is received.")
-        assert False
-    return response_data
-
-
-def pick_valid_transaction_info(received_data=None, bbc_app_client=None):
-    transaction = bbclib.BBcTransaction()
-    transaction.deserialize(received_data[KeyType.transaction_data])
-    asset_files = received_data[KeyType.all_asset_files]
-    asid = transaction.relations[0].asset.asset_id
-    assert asid in asset_files
-    file_to_obtain = asset_files[asid]
-    file_digest = hashlib.sha256(file_to_obtain).digest()
-    print("----------------[Receiver]----------------")
-    print("File digest written in the transaction data:  ",
-          binascii.b2a_hex(transaction.relations[0].asset.asset_file_digest).decode())
-    print("File digest calculated from the received file:", binascii.b2a_hex(file_digest).decode())
-    print("------------------------------------------")
-    return transaction, received_data[KeyType.source_user_id]
-
-
-def insert_signed_transaction_to_bbc_core(tx_obj=None, bbc_app_client=None):
-    print("Insert the transaction into BBc-1")
-    ret = bbc_app_client.insert_transaction(tx_obj)
-    assert ret
-    response_data = bbc_app_client.callback.synchronize()
-    assert response_data[KeyType.status] == ESUCCESS
 
 
 class TestFileProofClient(object):
@@ -196,7 +161,7 @@ class TestFileProofClient(object):
         response_data = clients[1].callback.synchronize()
         assert response_data[KeyType.status] == ESUCCESS
 
-        txobj = bbclib.BBcTransaction(deserialize=response_data[KeyType.transactions][0])
+        txobj, fmt_type = bbclib.deserialize(response_data[KeyType.transactions][0])
         digest = txobj.digest()
         ret = txobj.signatures[0].verify(digest)
         assert ret
@@ -211,23 +176,19 @@ class TestFileProofClient(object):
     def test_20_send_and_wait_file(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
         # -- sender
-        transfer_tx = create_transaction_object_and_send_sign_req(0, user_ids[1],
-                                                                  ref_txids=[transaction_id], file_data=large_data)
+        file_proof.key_pair = keypairs[0]
+        transfer_tx = file_proof.send_signreq("user1", user_ids[1], ref_txids=[transaction_id], file_data=large_data, bbc_app_client=clients[0])
 
         # -- receiver
-        recvdat = wait_for_transaction_msg(bbc_app_client=clients[1])
-        txobj, source_id = pick_valid_transaction_info(received_data=recvdat, bbc_app_client=clients[1])
+        recvdat = file_proof.wait_for_transaction_msg(bbc_app_client=clients[1])
+        txobj, source_id = file_proof.pick_valid_transaction_info(received_data=recvdat, bbc_app_client=clients[1])
         signature = txobj.sign(keypair=keypairs[1])
         clients[1].sendback_signature(source_id, txobj.transaction_id, -1, signature)
 
         # -- sender
-        response_data = clients[0].callback.synchronize()
-        assert response_data[KeyType.status] == ESUCCESS
-        result = response_data[KeyType.result]
-        transfer_tx.witness.add_signature(user_id=result[1], signature=result[2])
-        transfer_tx.digest()
+        transfer_tx = file_proof.wait_for_signs(transfer_tx, clients[0])
 
-        insert_signed_transaction_to_bbc_core(tx_obj=transfer_tx, bbc_app_client=clients[0])
+        file_proof.insert_signed_transaction_to_bbc_core(transaction=transfer_tx, bbc_app_client=clients[0])
         transaction_info = ["testfile", transfer_tx.transaction_id]
         time.sleep(1)
         clients[0].send_message(transaction_info, user_ids[1])

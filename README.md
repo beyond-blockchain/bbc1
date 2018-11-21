@@ -1,6 +1,7 @@
 Core system of BBc-1 (Beyond Blockchain One)
 ===========================================
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Build Status](https://travis-ci.org/beyond-blockchain/bbc1.svg?branch=develop)](https://travis-ci.org/beyond-blockchain/bbc1)
 
 This project is a Python-based reference implementation of BBc-1, a trustable system of record keeping beyond blockchains.
 
@@ -11,14 +12,20 @@ A transaction should be signed by the players who are the stake holders of the d
 BBc-1 can be applied to both private/enterprise use and public use. BBc-1 has a concept of *domain* for determining a region of data management. Any networking implementation (like Kademlia for P2P topology management) can be applied for each domain.
 Although there are many TODOs in BBc-1, this reference implementation includes most of the concept of BBc-1 and would work in private/enterprise systems. When sophisticated P2P algorithms are ready, BBc-1 will be able to support public use cases.
 
-The source codes in this repository is a platform of BBc-1 and bbc\_core.py is the main process of a core node. 
+The source codes in this repository is a platform of BBc-1 and bbc\_core.py is the main process of a core node.
 The APIs of BBc-1 is defined in bbc\_app.py and bbclib.py. So application developers should import them in your apps.
- For building a BBc-1 system, bbc1 package needs to be installed in the hosts and you need to run bbc\_core.py on 
+ For building a BBc-1 system, bbc1 package needs to be installed in the hosts and you need to run bbc\_core.py on
  each host. In order to configure the BBc-1 network, the utilities in utils/ directory are available. They are a kind
   of BBc-1 application, so that you can develop your own management tools.
- 
+
 
 For the details, please read documents in docs/ directory. Not only documents but slide decks (PDF) explain the design of the BBc-1 and its implementation.
+
+## Recent changes regarding bbclib.py
+
+bbclib.py (and the data format) is redesigned, resulting in splitting it to two parts; bbclib_core.py and bbclib_wire.py. bbclib.py is just a wrapper for those two scripts. The way of serializing BBc-1 transaction object and deserializing transaction data will change in v1.2.
+
+Please see [here](docs/BBc1_data_format_ja.md) in detail.
 
 ## Documents
 Some documents are available in docs/.
@@ -34,12 +41,13 @@ Some documents are available in docs/.
     * [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
     * [libbbcsig_dll_build_for_Windows_x64_ja.md](docs/libbbcsig_dll_build_for_Windows_x64_ja.md)
 * Programing
-    * [BBc1_programming_guide_v1.0_ja.md](docs/BBc1_programming_guide_v1.0_ja.md)
+    * [BBc1_programming_guide_v1.2_ja.md](docs/BBc1_programming_guide_v1.2_ja.md)
     * [BBc1_core_tutorial_file_proof_ja.md](docs/BBc1_core_tutorial_file_proof_ja.md)
+    * [BBc1_data_format_ja.md](docs/BBc1_data_format_ja.md)
 * API reference (Coming soon. Currently, something wrong in building docs)
     * [https://bbc-1.readthedocs.io/en/latest/](https://bbc-1.readthedocs.io/en/latest/)
     * You can read API docs in your local host by the following command:
-        ```python
+        ```shell
         cd docs/api/_build/html
         pipenv run python -m http.server
         ```
@@ -52,7 +60,7 @@ Some documents are available in docs/.
     - virtualenv is recommended
         - ```python -mvenv venv```
     - In some environment, [pipenv](https://docs.pipenv.org) does not work well.
-        - Some bugs seems to be in the installation scripts. So, please do not use pipenv now. 
+        - Some bugs seems to be in the installation scripts. So, please do not use pipenv now.
 
 * tools for macOS by Homebrew
     ```
@@ -81,8 +89,8 @@ Some documents are available in docs/.
     python -mvenv venv
     source venv/bin/activate
     pip install -r requirements.txt
-    ``` 
-    
+    ```
+
 6. Start bbc_core.py on a terminal
     ```
     cd core
@@ -149,8 +157,6 @@ The working directory of BBc-1 on the docker container is mounted on docker/data
     - docker environments
 * tests/
     - test codes for pytest
-* libs/
-    - some libraries used by BBc-1
 * docs/
     - docs about BBc-1 and its reference implementation
 * somewhere/.bbc1/

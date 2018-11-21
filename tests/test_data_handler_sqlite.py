@@ -97,7 +97,7 @@ class TestDataHandler(object):
         asset_files = {
             transactions[0].relations[0].asset.asset_id: transactions[0].relations[0].asset.asset_file,
         }
-        ret = data_handler.insert_transaction(transactions[0].serialize(), transactions[0],
+        ret = data_handler.insert_transaction(bbclib.serialize(transactions[0]), transactions[0],
                                               asset_files=asset_files, no_replication=True)
         assert asset_group_id1 in ret and asset_group_id2 in ret
 
@@ -110,7 +110,7 @@ class TestDataHandler(object):
 
     def test_05_insert_transaction_failures(self):
         print("\n-----", sys._getframe().f_code.co_name, "-----")
-        ret = data_handler.insert_transaction(transactions[0].serialize(), transactions[0], no_replication=True)
+        ret = data_handler.insert_transaction(bbclib.serialize(transactions[0]), transactions[0], no_replication=True)
         assert ret is None
 
     def test_06_remove_transaction(self):
@@ -127,7 +127,7 @@ class TestDataHandler(object):
             asset_files = {
                 transactions[i].relations[0].asset.asset_id: transactions[i].relations[0].asset.asset_file,
             }
-            ret = data_handler.insert_transaction(transactions[i].serialize(), transactions[i],
+            ret = data_handler.insert_transaction(bbclib.serialize(transactions[i]), transactions[i],
                                                   asset_files=asset_files, no_replication=True)
             assert asset_group_id1 in ret and asset_group_id2 in ret
 

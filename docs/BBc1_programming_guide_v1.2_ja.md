@@ -1,6 +1,6 @@
-Programming guide for BBc-1 version 1.0
+Programming guide for BBc-1 version 1.2
 ====
-BBc-1のアプリケーションを開発するためのAPIの利用方法について解説する。
+BBc-1のアプリケーションを開発するためのAPIの利用方法について解説する。なお、v1.2からbbclib.pyの構成が変更されたが、後方互換性を保つために以前のコーディングスタイルもしばらく利用可能にしている（[bbclib.pyの後方互換対応](./BBc1_data_format_ja.md)）
 
 BBc-1アプリケーションは、bbc1/core/ディレクトリにあるbbc\_app.pyとbbclib.pyが提供する機能を利用する。クライアントアプリケーションはcore nodeにTCPで接続し、トランザクションの登録や検索などをcore nodeに指示する。まずはcore nodeに接続する方法を解説する。core nodeから応答メッセージを受け取る方法には、同期型と非同期型の方法があるが、以下ではまず同期型を前提に説明する。また細かいエラー処理は省略している。
 
@@ -140,7 +140,7 @@ if response_data[KeyType.transaction_id] != txid:
     assert False
 tx_data = response_data[KeyType.transaction_data]
 asset_files = response_data[KeyType.all_asset_files]
-txobj_obtained = bbclib.BBcTransaction(deserialize=tx_data)
+txobj_obtained, fmt_type = bbclib.deserialize(tx_data)
 
 print(txobj_obtained)
 print("# Content of the asset file:", asset_files[astid])
@@ -160,7 +160,7 @@ if response_data[KeyType.status] < ESUCCESS:
     assert False
 txdata_array = response_data[KeyType.transactions]
 asset_files = response_data[KeyType.all_asset_files]
-txobj_obtained = bbclib.BBcTransaction(deserialize=txdata_array[0])
+txobj_obtained, fmt_type = bbclib.deserialize(txdata_array[0])
 print(txobj_obtained)
 print("# Content of the asset file:", asset_files[astid])
 
@@ -171,7 +171,7 @@ if response_data[KeyType.status] < ESUCCESS:
     assert False
 txdata_array = response_data[KeyType.transactions]
 asset_files = response_data[KeyType.all_asset_files]
-txobj_obtained = bbclib.BBcTransaction(deserialize=txdata_array[0])
+txobj_obtained, fmt_type = bbclib.deserialize(txdata_array[0])
 print(txobj_obtained)
 print("# Content of the asset file:", asset_files[astid])
 ```
@@ -453,8 +453,7 @@ class MessageProcessor(bbc_app.Callback):
             print("Invalid message")
             self.client.sendback_denial_of_sign(dst=dst_user_id, transaction_id=transaction_id, reason_text="Invalid request", query_id=query_id)
             return
-        txobj_received = bbclib.BBcTransaction()
-        txobj_received.deserialize(dat[KeyType.transaction_data])
+        txobj_received, fmt_type = bbclib.deserialize(dat[KeyType.transaction_data])
         # do something
         ...
         sig = txobj_received.sign(keypair=self.client.keypair)
@@ -513,7 +512,7 @@ class MessageProcessor(bbc_app.Callback):
             print("Invalid message (no reference transaction)")
             self.client.sendback_denial_of_sign(dst=dst_user_id, transaction_id=transaction_id, reason_text="Invalid request(no reference transaction)", query_id=query_id)
             return
-        txobj_received = bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data])
+        txobj_received, fmt_type = bbclib.deserialize(dat[KeyType.transaction_data])
 
         objs = dict()
         for txid, txdata in dat[KeyType.transactions].items():
@@ -548,7 +547,7 @@ if KeyType.all_asset_files in response_data:
 if KeyType.transaction_tree in response_data:
     for i, txtree in enumerate(response_data[KeyType.transaction_tree]):
         for txdat in txtree:
-            txobj = bbclib.BBcTransaction(deserialize=txdat)
+            txobj, fmt_type = bbclib.deserialize(txdat)
             asset_body = txobj.events[0].asset.asset_body
             print("[%d] asset=%s" % (i, asset_body))
 ```

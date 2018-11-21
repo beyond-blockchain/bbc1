@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.bbc_app &mdash; BBc1 1.1 documentation</title>
+  <title>bbc1.core.bbc_app &mdash; BBc1 1.2 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.1
+                1.2
               </div>
             
           
@@ -651,14 +651,13 @@
         <span class="k">if</span> <span class="n">reference_obj</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">destinations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_GATHER_SIGNATURE</span><span class="p">)</span>
-        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">txobj</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">txobj</span><span class="p">)</span>
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span>
         <span class="k">if</span> <span class="n">anycast</span><span class="p">:</span>
             <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">is_anycast</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">reference_obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">reference_obj</span><span class="o">.</span><span class="n">get_destinations</span><span class="p">()</span>
-            <span class="n">referred_transactions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="n">referred_transactions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">reference_obj</span><span class="o">.</span><span class="n">get_referred_transaction</span><span class="p">())</span>
+            <span class="n">referred_transactions</span> <span class="o">=</span> <span class="p">{</span><span class="n">reference_obj</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">:</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">reference_obj</span><span class="o">.</span><span class="n">ref_transaction</span><span class="p">)}</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">referred_transactions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transactions</span><span class="p">]</span> <span class="o">=</span> <span class="n">referred_transactions</span>
         <span class="k">elif</span> <span class="n">destinations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -685,12 +684,7 @@
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">destination_user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dest_user_id</span>
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ref_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref_index</span>
-        <span class="k">if</span> <span class="n">signature</span><span class="o">.</span><span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
-            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">]</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">signature</span><span class="o">.</span><span class="n">serialize</span><span class="p">())</span>
-            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data_format</span><span class="p">]</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">]</span> <span class="o">=</span> <span class="n">signature</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
-            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data_format</span><span class="p">]</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BINARY</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">]</span> <span class="o">=</span> <span class="n">signature</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">query_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_id</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
@@ -717,26 +711,26 @@
             <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">query_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_id</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BBcAppClient.insert_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.insert_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">insert_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tx_obj</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcAppClient.insert_transaction"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.insert_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">insert_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Request to insert a legitimate transaction</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            tx_obj (BBcTransaction): Transaction object to insert</span>
+<span class="sd">            txobj (BBcTransaction): Transaction object to insert</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            bytes: query_id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">transaction_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">tx_obj</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">txobj</span><span class="o">.</span><span class="n">transaction_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">txobj</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_message_structure</span><span class="p">(</span><span class="n">MsgType</span><span class="o">.</span><span class="n">REQUEST_INSERT</span><span class="p">)</span>
-        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+        <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">txobj</span><span class="p">)</span>
         <span class="n">ast</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">evt</span> <span class="ow">in</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">evt</span> <span class="ow">in</span> <span class="n">txobj</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">evt</span><span class="o">.</span><span class="n">asset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">asset_digest</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">evt</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">get_asset_file</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">ast</span><span class="p">[</span><span class="n">evt</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span>
-        <span class="k">for</span> <span class="n">rtn</span> <span class="ow">in</span> <span class="n">tx_obj</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">rtn</span> <span class="ow">in</span> <span class="n">txobj</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">rtn</span><span class="o">.</span><span class="n">asset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">asset_digest</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">rtn</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">get_asset_file</span><span class="p">()</span>
@@ -966,8 +960,7 @@
 <span class="sd">            txobj (BBcTransaction): Transaction object to include cross_ref</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_ref_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">txobj</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cross_ref</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_ref_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-            <span class="n">txobj</span><span class="o">.</span><span class="n">cross_ref</span><span class="o">.</span><span class="n">format_type</span> <span class="o">=</span> <span class="n">txobj</span><span class="o">.</span><span class="n">format_type</span></div></div>
+            <span class="n">txobj</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cross_ref</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_ref_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span></div></div>
 
 
 <div class="viewcode-block" id="Callback"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback">[docs]</a><span class="k">class</span> <span class="nc">Callback</span><span class="p">:</span>
@@ -1138,12 +1131,7 @@
         <span class="k">if</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span> <span class="ow">or</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">status</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">ESUCCESS</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
             <span class="k">return</span>
-        <span class="n">format_type</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_data_format</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">format_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON</span><span class="p">,</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">BBcFormat</span><span class="o">.</span><span class="n">FORMAT_BSON_COMPRESS_BZ2</span><span class="p">]:</span>
-            <span class="n">sigdata</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">sigdata</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">]</span>
-        <span class="n">sig</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">recover_signature_object</span><span class="p">(</span><span class="n">sigdata</span><span class="p">,</span> <span class="n">format_type</span><span class="o">=</span><span class="n">format_type</span><span class="p">)</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">bbclib</span><span class="o">.</span><span class="n">recover_signature_object</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">signature</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">({</span><span class="n">KeyType</span><span class="o">.</span><span class="n">status</span><span class="p">:</span> <span class="n">ESUCCESS</span><span class="p">,</span> <span class="n">KeyType</span><span class="o">.</span><span class="n">result</span><span class="p">:</span> <span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">ref_index</span><span class="p">],</span> <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">source_user_id</span><span class="p">],</span> <span class="n">sig</span><span class="p">)})</span></div>
 
 <div class="viewcode-block" id="Callback.proc_resp_insert"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.Callback.proc_resp_insert">[docs]</a>    <span class="k">def</span> <span class="nf">proc_resp_insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
@@ -1462,7 +1450,6 @@
         <script type="text/javascript" src="../../../_static/jquery.js"></script>
         <script type="text/javascript" src="../../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   

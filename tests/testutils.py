@@ -8,9 +8,9 @@ import copy
 
 import sys
 sys.path.extend(["../"])
-from bbc1.core import bbclib
+from bbc1.core import bbclib, bbc_app
 from bbc1.core.message_key_types import KeyType
-from bbc1.core import bbc_core, bbc_app
+from bbc1.core import bbc_core
 from bbc1.core.bbc_config import DEFAULT_CORE_PORT, DEFAULT_P2P_PORT
 
 cores = None

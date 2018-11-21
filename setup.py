@@ -36,7 +36,7 @@ bbc1_requires = [
                  'Flask>=0.10.1,<=1.0.1'
                 ]
 
-bbc1_packages = ['bbc1', 'bbc1.core']
+bbc1_packages = ['bbc1', 'bbc1.core', 'bbc1.core.libs', 'bbc1.core.compat']
 
 bbc1_commands = [
                  'bbc1/core/bbc_core.py',
@@ -56,7 +56,7 @@ bbc1_classifiers = [
 
 setup(
     name='bbc1',
-    version='1.1.1',
+    version='1.2',
     description='A core system of Beyond Blockchain One',
     long_description=readme,
     url='https://github.com/beyond-blockchain/bbc1',

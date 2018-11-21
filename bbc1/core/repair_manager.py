@@ -105,7 +105,7 @@ class RepairManager:
             for idx in range(1, len(self.data_handler.db_adaptors)):
                 result_txobj, result_asset_files = self.data_handler.search_transaction(transaction_id=transaction_id, db_num=idx)
                 txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(result_txobj[0],
-                                                                                                  result_asset_files)
+                                                                                                       result_asset_files)
                 if txobj_is_valid and valid_txobj is None:
                     valid_txobj = result_txobj[0]
                 if not txobj_is_valid:
@@ -195,7 +195,7 @@ class RepairManager:
             txobj_is_valid, valid_assets, invalid_assets = bbclib.validate_transaction_object(result_txobj[transaction_id])
             if txobj_is_valid:
                 dat[KeyType.command] = RepairManager.RESPONSE_TRANSACTION_DATA
-                dat[KeyType.transaction_data] = result_txobj[transaction_id].transaction_data
+                dat[KeyType.transaction_data] = bbclib.serialize(result_txobj[transaction_id])
                 dat[KeyType.destination_node_id] = dat[KeyType.source_node_id]
                 self.network.send_message_in_network(None, domain_id=self.domain_id, msg=dat)
                 return
@@ -214,7 +214,7 @@ class RepairManager:
         asset_files = dict()
         if KeyType.all_asset_files in dat:
             asset_files = dat[KeyType.all_asset_files]
-        txobj = bbclib.BBcTransaction(deserialize=dat[KeyType.transaction_data])
+        txobj, fmt_type = bbclib.deserialize(dat[KeyType.transaction_data])
         if txobj.transaction_data is None:
             return
 

@@ -25,9 +25,9 @@ copyright = '2018, beyond-blockchain.org'
 author = 'beyond-blockchain.org'
 
 # The short X.Y version
-version = '1.1'
+version = '1.2'
 # The full version, including alpha/beta/rc tags
-release = '1.1'
+release = '1.2'
 
 
 # -- General configuration ---------------------------------------------------
@@ -70,7 +70,7 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '../../bbc1/core/libbbcsig/test_*']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
