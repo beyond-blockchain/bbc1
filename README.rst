@@ -19,10 +19,11 @@ The APIs of BBc-1 is defined in bbc\_app.py and bbclib.py. So application develo
 
 For the details, please read documents in docs/ directory. Not only documents but slide decks (PDF) explain the design of the BBc-1 and its implementation.
 
-## Recent changes
+## Recent changes regarding bbclib.py
 
-bbclib.py is redesigned, resulting in splitting it to two parts; bbclib_core.py and bbclib_wire.py. bbclib.py is just a wrapper for those two scripts. The way of serializing BBc-1 transaction object and deserializing transaction data will change in v1.2.
+bbclib.py (and the data format) is redesigned, resulting in splitting it to two parts; bbclib_core.py and bbclib_wire.py. bbclib.py is just a wrapper for those two scripts. The way of serializing BBc-1 transaction object and deserializing transaction data will change in v1.2.
 
+Please see [here](docs/BBc1_data_format_ja.md) in detail.
 
 ## Documents
 Some documents are available in docs/.
