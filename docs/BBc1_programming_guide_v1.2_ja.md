@@ -78,34 +78,6 @@ witness.add\_witness(user\_id)は、user\_id用の署名領域をトランザク
 
 BBcTransactionクラスには__str__メソッドが定義されているので、print文などで文字列としてアクセスすれば、トランザクションデータの内容を取得できる。
 
-### トランザクションのデータフォーマット
-トランザクションのデータフォーマットは、デフォルト設定では独自のバイナリフォーマットである。無駄が少ないためデータサイズは小さくなるが、バイナリ操作を必要とするためjavascript
-などの言語では利用しにくい。そのため、データフォーマットとして、bson (binary JSON)
-およびbzip2で圧縮したbsonフォーマットもサポートする。トランザクションデータの先頭2バイトがフォーマットタイプを表しており、取りうる値はbbclib.pyのBBcFormatクラスに宣言されている。
-なお、圧縮されたbsonフォーマットは解凍後はbsonフォーマットと全く同じものになるため、bbclib.pyの内部では全く同じ処理が行われている（シリアライズの最後のデータ出力じにcompress、デシリアライズの最初のデータ入力時にdecompressするのみである）
-
-データフォーマットが変わると、同じ内容でもtransaction\_idが変わってしまうため、署名結果も変わってしまう。したがって、同一domain内ではデータフォーマットを統一すべきである。
-
-デフォルトのフォーマット以外を利用する際は、各種オブジェクトを生成する際に、format_typeパラメータを指定する必要がある。
-```
-asset_group_id = bbclib.get_new_id("asset_group_id for testing")
-
-keypair = bbclib.Keypair()
-keypair.generate()
-
-txobj = bbclib.make_transaction(relation_num=1, witness=True, format_type=bbclib.BBcFormat.FORMAT_BSON_COMPRESS_BZ2)
-bbclib.add_relation_asset(txobj, relation_idx=0, asset_group_id=asset_group_id,
-                          user_id=user_id, asset_body=b'test asset data', asset_file=b'file content')
-txobj.witness.add_witness(user_id)
-sig = txobj.sign(key_type=bbclib.KeyType.ECDSA_SECP256k1, private_key=keypair.private_key, public_key=keypair.public_key)
-
-txobj.witness.add_signature(user_id=user_id, signature=sig)
-
-print(txobj)
-```
-上記の例では、make\_transaction()のところで、```format_type=bbclib.BBcFormat.FORMAT_BSON_COMPRESS_BZ2```を指定している。
-BBcAssetなどのオブジェクトを直接生成する場合は、それぞれのオブジェクト生成時に同じように```format_type=```を指定する必要がある（不整合が起こるとエラーでinsertできなくなる）。
-
 ## トランザクションの登録
 生成したトランザクションは以下のようにしてcore nodeに登録する。
 ```
