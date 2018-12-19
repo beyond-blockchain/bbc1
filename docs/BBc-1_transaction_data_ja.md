@@ -528,7 +528,7 @@ class BBcRelation:
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-                      図10 BBcEventのpacked data
+                      図10 BBcRelationのpacked data
 ```
 
 num_pointersはBBcPointerオブジェクト群の数を表し、それらのpacked data群をpointersの部分に格納する。最後に、BBcAssetのpacked dataのバイト長とそのpacked dataが格納される。
@@ -734,7 +734,7 @@ class BBcWitness:
    ~~~                       ... (index values)                  ~~~
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
 
-                      図13 BBcPointerのpacked data
+                      図13 BBcWitnessのpacked data
 ```
 
 user_idsとsig_indicesはともに同じ要素数のリストなので、packed dataの冒頭のnum_sig_indicesで両方の要素数を表している。user_idsのリストに続き、要素番号列（sig_indices）が格納される。
@@ -782,7 +782,7 @@ class BBcCrossRef:
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-                     図14 BBcPointerのpacked data
+                     図14 BBcCrossRefのpacked data
 ```
 
 他のドメインと整合を取るため、domain_idとtransaction_idのid_lengthは最大長の32バイト固定とする。短いid_lengthを使っている場合は、下位バイトだけを取得すれば良い。
@@ -849,7 +849,7 @@ class BBcSignature:
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-                        図15 BBcPointerのpacked data
+                        図15 BBcSignatureのpacked data
 ```
 
 key_type=0の場合は、key_length以降すべてのデータを省略する。なお、key_typeの種類はbbclib_keypair.pyで定義されており、2018年12月現在、対応するkey_typeは以下の通りである。
@@ -866,4 +866,4 @@ key_type=0の場合は、key_length以降すべてのデータを省略する。
 
 # 他言語への移植
 
-bbclib、つまりトランザクションデータそのものの操作機能を他のプログラミング言語に移植する場合も、[図1](#fig1)およびその後に示したとおりｍ，packed binary dataとBBcTranactionオブジェクトの変換が行えれば良い。2018年12月現在、[Go言語版](https://github.com/beyond-blockchain/bbclib-go)が存在する。
+bbclib、つまりトランザクションデータそのものの操作機能を他のプログラミング言語に移植する場合も、[図1](#fig1)およびその後に示したとおりに，packed binary dataとBBcTranactionオブジェクトの変換が行えれば良い。2018年12月現在、[Go言語版](https://github.com/beyond-blockchain/bbclib-go)が存在する。
