@@ -18,9 +18,9 @@ BBc-1のトランザクションは、transaction object (BBcTransaction)、pack
 |                    |  unpack   |                  | Deserialize|                  |
 |                    | <-------+ |                  |  <-------+ |                  |
 +--------------------+           +------------------+            +------------------+
-```
 
-<center>図1 フォーマット変換</center>
+                                  図1 フォーマット変換
+```
 
 Serialized dataには2バイトのヘッダが付加されるが、このヘッダ値はPacked binary dataをどのようにしてシリアライズしているかを表す。BBc-1 v1.2時点では2種類のシリアライズ方法をサポートしており、ヘッダ値との対応は以下の通りである。
 
@@ -69,9 +69,9 @@ Packed binary dataは、Length-Value形式を基本とする。ネットワー�
        |  (list of signatures)   |
        |                         |
        +-------------------------+
+       
+        図2 Packed binary data構造
 ```
-
-<center>図2 Packed binary data構造</center>
 
 図2のように、Packed binary dataは複数のパーツから構成される。events、references、relations、signaturesは、それぞれBBcEvent、BBcReference、BBcRelation、BBcSignatureオブジェクト複数を含むリスト構造をバイナリ化(pack)したものである。
 
@@ -186,9 +186,9 @@ class BBcTransaction:
    ~~~                        signatures                         ~~~
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-```
 
-<center>図3 トランザクション全体のPacked data format</center>
+                  図3 トランザクション全体のPacked data format
+```
 
 Packed data内の数値の表現形式はすべて**little endian**とする。またカッコ内の数値はフィールドの長さをバイト数で表したものである（以下すべてのpacked dataの図で同様とする）。
 
@@ -208,9 +208,10 @@ Packed data内の数値の表現形式はすべて**little endian**とする。�
    ~~~                        signatures                         ~~~
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   
+                      図4 num_crossrefが0の場合の例
 ```
 
-<center>図4 num_crossrefが0の場合の例</center>
 
 ### ダイジェストの計算
 
@@ -239,9 +240,9 @@ transaction objectのダイジェストは以下のような手順で計算す�
 +----------------------+
 |       signatures     |
 +----------------------+
-```
 
-<center>図5 ダイジェスト計算手順</center>
+                       図5 ダイジェスト計算手順
+```
 
 ## 共通フォーマット
 
@@ -269,9 +270,9 @@ events、references、relations、witness、cross_ref、signaturesはそれぞ�
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    |                                                               |
    ~~~                                                           ~~~
-```
 
-<center>図6 オブジェクトリストのpacked dataの構成</center>
+                図6 オブジェクトリストのpacked dataの構成
+```
 
 ### ID structure
 
@@ -285,10 +286,9 @@ events、references、relations、witness、cross_ref、signaturesはそれぞ�
    ~~~                          identifier                       ~~~
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                        図7 識別子のpacked dataの構成
 ```
-
-<center>図7 識別子のpacked dataの構成</center>
-
 
 
 ## BBcEvent
@@ -378,9 +378,9 @@ class BBcEvent:
    ~~~                           asset                           ~~~
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-```
 
-<center>図8 BBcEventのpacked data</center>
+                        図8 BBcEventのpacked data
+```
 
 num_reference_indciesはreference_indicesの要素数を表し、その後にその数の数値の列（index value）が並ぶ。num_mandatory_approversもmandatory_approversの要素数を表し、指定された数だけその後にuser_id列が格納される。option_approversについては、opt_num_denominator （option_approver_num_denominator）に指定された数だけ、その後にuser_id列が格納される（格納方法はmandatory_approversと同じ）。
 
@@ -459,9 +459,9 @@ index_in_ref=0, id_length=DEFAULT_ID_LEN):
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
    ~~~                       ... (index values)                  ~~~
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
-```
 
-<center>図9 BBcReferenceのpacked data</center>
+                     図9 BBcReferenceのpacked data
+```
 
 num_sig_indicesはsig_indicesの要素数を表し、その後にその数の数値の列（index value）が並ぶ。
 
@@ -527,9 +527,9 @@ class BBcRelation:
    ~~~                           asset                           ~~~
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-```
 
-<center>図10 BBcEventのpacked data</center>
+                      図10 BBcEventのpacked data
+```
 
 num_pointersはBBcPointerオブジェクト群の数を表し、それらのpacked data群をpointersの部分に格納する。最後に、BBcAssetのpacked dataのバイト長とそのpacked dataが格納される。
 
@@ -589,7 +589,7 @@ class BBcAsset:
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    |                                                               |
-   ~~~                 asset_group_id (ID structure)             ~~~
+   ~~~                    asset_id (ID structure)                ~~~
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    |                                                               |
@@ -603,7 +603,7 @@ class BBcAsset:
    |                      asset_file_size (4)                      |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    |                                                               |
-   ~~~                  asset_file_digest (32)                   ~~~
+   ~~~    asset_file_digest (ID structure, id_length=32 only)    ~~~
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    |        asset_body_size (2)    |      asset_body_type (2)      |
@@ -612,9 +612,9 @@ class BBcAsset:
    ~~~                         asset_body                        ~~~
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-```
 
-<center>図11 BBcAssetのpacked data</center>
+                        図11 BBcAssetのpacked data
+```
 
 外部ファイルが存在しない場合は、asset_file_size=0としてasset_file_digestの部分を省略する。asset_body_sizeはasset_body部分のバイト長である（バイト単位）。asset_body_typeは0または1の値を取り、下記の通りasset_bodyの中身の種類を表す。
 
@@ -677,9 +677,9 @@ class BBcPointer:
    ~~~                   asset_id (ID structure)                 ~~~
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-```
 
-<center>図12 BBcPointerのpacked data</center>
+                       図12 BBcPointerのpacked data
+```
 
 asset_idを省略する場合は、asset_id_existence=0とし、省略しない場合はasset_id_existence=1とする。
 
@@ -733,9 +733,9 @@ class BBcWitness:
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
    ~~~                       ... (index values)                  ~~~
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
-```
 
-<center>図13 BBcPointerのpacked data</center>
+                      図13 BBcPointerのpacked data
+```
 
 user_idsとsig_indicesはともに同じ要素数のリストなので、packed dataの冒頭のnum_sig_indicesで両方の要素数を表している。user_idsのリストに続き、要素番号列（sig_indices）が格納される。
 
@@ -782,10 +782,8 @@ class BBcCrossRef:
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-
+                     図14 BBcPointerのpacked data
 ```
-
-<center>図14 BBcPointerのpacked data</center>
 
 他のドメインと整合を取るため、domain_idとtransaction_idのid_lengthは最大長の32バイト固定とする。短いid_lengthを使っている場合は、下位バイトだけを取得すれば良い。
 
@@ -851,10 +849,8 @@ class BBcSignature:
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-
+                        図15 BBcPointerのpacked data
 ```
-
-<center>図15 BBcPointerのpacked data</center>
 
 key_type=0の場合は、key_length以降すべてのデータを省略する。なお、key_typeの種類はbbclib_keypair.pyで定義されており、2018年12月現在、対応するkey_typeは以下の通りである。
 
