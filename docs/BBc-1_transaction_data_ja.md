@@ -606,7 +606,7 @@ class BBcAsset:
    ~~~    asset_file_digest (ID structure, id_length=32 only)    ~~~
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |        asset_body_size (2)    |      asset_body_type (2)      |
+   |        asset_body_type (2)    |      asset_body_size (2)      |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
    |                                                               |
    ~~~                         asset_body                        ~~~
@@ -616,7 +616,7 @@ class BBcAsset:
                         図11 BBcAssetのpacked data
 ```
 
-外部ファイルが存在しない場合は、asset_file_size=0としてasset_file_digestの部分を省略する。asset_body_sizeはasset_body部分のバイト長である（バイト単位）。asset_body_typeは0または1の値を取り、下記の通りasset_bodyの中身の種類を表す。
+外部ファイルが存在しない場合は、asset_file_size=0としてasset_file_digestの部分を省略する。asset_body_typeは0または1の値を取り、下記の通りasset_bodyの中身の種類を表す。asset_body_sizeはasset_body部分のバイト長である（バイト単位）。
 
 | asset_body_type値 | 説明                           |
 | ----------------- | ------------------------------ |
@@ -726,18 +726,23 @@ class BBcWitness:
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    |      num_sig_indices (2)      |                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
-   ~~~                        user_ids                           ~~~
-   |                   (list of ID structures)                     |
+   ~~~                        user_id                            ~~~
+   |                      (ID structures)                          |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |         index value (2)       |            ....             ~~~
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
-   ~~~                       ... (index values)                  ~~~
+   |         index value (2)       |                               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
+   ~~~                        user_id                            ~~~
+   |                      (ID structures)                          |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         index value (2)       |            ....               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                             ~~~
+   ~~~                       ...                                   |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
 
                       図13 BBcWitnessのpacked data
 ```
 
-user_idsとsig_indicesはともに同じ要素数のリストなので、packed dataの冒頭のnum_sig_indicesで両方の要素数を表している。user_idsのリストに続き、要素番号列（sig_indices）が格納される。
+user_idsとsig_indicesはともに同じ要素数のリストなので、packed dataの冒頭のnum_sig_indicesで両方の要素数を表している。user_idとそのユーザの署名の格納位置（sig_index）のセットがnum_sig_indicesの回数だけ繰り返される。
 
 
 
@@ -785,7 +790,7 @@ class BBcCrossRef:
                      図14 BBcCrossRefのpacked data
 ```
 
-他のドメインと整合を取るため、domain_idとtransaction_idのid_lengthは最大長の32バイト固定とする。短いid_lengthを使っている場合は、下位バイトだけを取得すれば良い。
+他のドメインと整合を取るため、domain_idとtransaction_idのid_lengthは最大長の32バイト固定とする。短いid_lengthを使っている場合は、下位バイトにidを格納し、上位バイトは0で埋めれば良い。
 
 
 
