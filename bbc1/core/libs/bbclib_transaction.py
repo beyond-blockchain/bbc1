@@ -133,6 +133,17 @@ class BBcTransaction:
             self.signatures.append(BBcSignature())
         return self.userid_sigidx_mapping[user_id]
 
+    def set_sig_index(self, user_id, idx):
+        """Map a user_id with the index of signature list
+
+        Args:
+            user_id (bytes): user_id whose signature will be added to the signature part
+            idx (int): index number
+        """
+        if user_id in self.userid_sigidx_mapping:
+            return
+        self.userid_sigidx_mapping[user_id] = idx
+
     def add_signature(self, user_id=None, signature=None):
         """Add signature in the reserved space
 
@@ -250,7 +261,7 @@ class BBcTransaction:
             for i in range(ref_num):
                 ptr, size = bbclib_utils.get_n_byte_int(ptr, 4, data)
                 ptr, refdata = bbclib_utils.get_n_bytes(ptr, size, data)
-                refe = BBcReference(None, None, id_length=self.id_length)
+                refe = BBcReference(None, self, id_length=self.id_length)
                 if not refe.unpack(refdata):
                     return False
                 self.references.append(refe)

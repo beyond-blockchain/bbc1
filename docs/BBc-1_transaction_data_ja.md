@@ -871,4 +871,4 @@ key_type=0の場合は、key_length以降すべてのデータを省略する。
 
 # 他言語への移植
 
-bbclib、つまりトランザクションデータそのものの操作機能を他のプログラミング言語に移植する場合も、[図1](#fig1)およびその後に示したとおりに，packed binary dataとBBcTranactionオブジェクトの変換が行えれば良い。2018年12月現在、[Go言語版](https://github.com/beyond-blockchain/bbclib-go)が存在する。
+bbclib、つまりトランザクションデータそのものの操作機能を他のプログラミング言語に移植する場合も、[図1](#fig1)およびその後に示したとおりに，packed binary dataとBBcTranactionオブジェクトの変換が行えれば良い。2019年1月現在、[Go言語版](https://github.com/beyond-blockchain/bbclib-go)と[Javascript版](https://github.com/beyond-blockchain/js-bbclib)が存在する。

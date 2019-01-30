@@ -30,6 +30,7 @@ script:
   - pytest test_data_handler_sqlite.py
   - pytest test_key_exchange_manager.py
   - pytest test_bbclib.py
+  - pytest test_bbclib_pack_unpack.py
   - pytest test_pending_request.py
   - pytest test_bbc_ping.py
   - pytest test_bbc_stats.py
