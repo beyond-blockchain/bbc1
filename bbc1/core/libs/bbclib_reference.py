@@ -56,12 +56,23 @@ class BBcReference:
         self.ref_transaction = ref_transaction
         try:
             evt = ref_transaction.events[self.event_index_in_ref]
-            for user in evt.mandatory_approvers:
-                self.sig_indices.append(self.transaction.get_sig_index(user))
-            for i in range(evt.option_approver_num_numerator):
-                dummy_id = bbclib_utils.get_random_value(4)
-                self.option_sig_ids.append(dummy_id)
-                self.sig_indices.append(self.transaction.get_sig_index(dummy_id))
+            if len(self.sig_indices) == 0:
+                for user in evt.mandatory_approvers:
+                    self.sig_indices.append(self.transaction.get_sig_index(user))
+                for i in range(evt.option_approver_num_numerator):
+                    dummy_id = bbclib_utils.get_random_value(4)
+                    self.option_sig_ids.append(dummy_id)
+                    self.sig_indices.append(self.transaction.get_sig_index(dummy_id))
+            else:
+                i = 0
+                for user in evt.mandatory_approvers:
+                    self.transaction.set_sig_index(user, self.sig_indices[i])
+                    i += 1
+                for i in range(evt.option_approver_num_numerator):
+                    dummy_id = bbclib_utils.get_random_value(4)
+                    self.option_sig_ids.append(dummy_id)
+                    self.transaction.set_sig_index(dummy_id, self.sig_indices[i])
+                    i += 1
             self.mandatory_approvers = evt.mandatory_approvers
             self.option_approvers = evt.option_approvers
             ref_transaction.digest()
