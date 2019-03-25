@@ -32,7 +32,7 @@ transaction_tbl_definition = [
 
 asset_info_definition = [
     ["id", "INTEGER"],
-    ["transaction_id", "BLOB"], ["asset_group_id", "BLOB"], ["asset_id", "BLOB"], ["user_id", "BLOB"],
+    ["transaction_id", "BLOB"], ["asset_group_id", "BLOB"], ["asset_id", "BLOB"], ["user_id", "BLOB"], ["timestamp", "INTEGER"],
 ]
 
 topology_info_definition = [
@@ -115,7 +115,7 @@ class DataHandler:
         for db in self.db_adaptors:
             db.open_db()
             db.create_table('transaction_table', transaction_tbl_definition, primary_key=0, indices=[0])
-            db.create_table('asset_info_table', asset_info_definition, primary_key=0, indices=[0, 1, 2, 3, 4])
+            db.create_table('asset_info_table', asset_info_definition, primary_key=0, indices=[0, 1, 2, 3, 4, 5])
             db.create_table('topology_table', topology_info_definition, primary_key=0, indices=[0, 1, 2])
             db.create_table('cross_ref_table', cross_ref_tbl_definition, primary_key=0, indices=[1])
             db.create_table('merkle_branch_table', merkle_branch_db_definition, primary_key=0, indices=[1, 2])
@@ -273,13 +273,15 @@ class DataHandler:
         if ret is None:
             return False
 
+        ts = txobj.timestamp
         for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
             self.exec_sql(db_num=db_num,
-                          sql="INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id) "
-                              "VALUES (%s, %s, %s, %s)" % (
+                          sql="INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id, timestamp) "
+                              "VALUES (%s, %s, %s, %s, %s)" % (
                               self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
-                              self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
-                          args=(txobj.transaction_id, asset_group_id, asset_id, user_id), commit=True)
+                              self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
+                              self.db_adaptors[0].placeholder),
+                          args=(txobj.transaction_id, asset_group_id, asset_id, user_id, ts), commit=True)
         for base, point_to in self._get_topology_info(txobj):
             self.exec_sql(db_num=db_num,
                           sql="INSERT INTO topology_table(base, point_to) VALUES (%s, %s)" %
@@ -448,7 +450,7 @@ class DataHandler:
                 self._remove_in_storage(asset_group_id, asset_id)
 
     def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None,
-                           direction=0, count=1, db_num=0):
+                           start_from=None, until=None, direction=0, count=1, db_num=0):
         """Search transaction data
 
         When Multiple conditions are given, they are considered as AND condition.
@@ -458,6 +460,8 @@ class DataHandler:
             asset_group_id (bytes): asset_group_id that target transactions should have
             asset_id (bytes): asset_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
+            start_from (int): the starting timestamp to search
+            until (int): the end timestamp to search
             direction (int): 0: descend, 1: ascend
             count (int): The maximum number of transactions to retrieve
             db_num (int): index of DB if multiple DBs are used
@@ -484,11 +488,15 @@ class DataHandler:
                 conditions.append("asset_id = %s " % self.db_adaptors[0].placeholder)
             if user_id is not None:
                 conditions.append("user_id = %s " % self.db_adaptors[0].placeholder)
+            if start_from is not None:
+                conditions.append("timestamp >= %s " % self.db_adaptors[0].placeholder)
+            if until is not None:
+                conditions.append("timestamp <= %s " % self.db_adaptors[0].placeholder)
             sql += "AND ".join(conditions) + "ORDER BY id %s" % dire
             if count > 0:
                 sql += " limit %d" % count
             sql += ";"
-            args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id)))
+            args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id, start_from, until)))
             ret = self.exec_sql(db_num=db_num, sql=sql, args=args)
             txinfo = list()
             for record in ret:
@@ -509,7 +517,7 @@ class DataHandler:
                     result_asset_files[asset_id] = self.get_in_storage(asset_group_id, asset_id)
         return result_txobj, result_asset_files
 
-    def count_transactions(self, asset_group_id=None, asset_id=None, user_id=None, db_num=0):
+    def count_transactions(self, asset_group_id=None, asset_id=None, user_id=None, start_from=None, until=None, db_num=0):
         """Count transactions that matches the given conditions
 
         When Multiple conditions are given, they are considered as AND condition.
@@ -518,6 +526,8 @@ class DataHandler:
             asset_group_id (bytes): asset_group_id that target transactions should have
             asset_id (bytes): asset_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
+            start_from (int): the starting timestamp to search
+            until (int): the end timestamp to search
             db_num (int): index of DB if multiple DBs are used
         Returns:
             int: the number of transactions
@@ -530,8 +540,12 @@ class DataHandler:
             conditions.append("asset_id = %s " % self.db_adaptors[0].placeholder)
         if user_id is not None:
             conditions.append("user_id = %s " % self.db_adaptors[0].placeholder)
+        if start_from is not None:
+            conditions.append("timestamp >= %s " % self.db_adaptors[0].placeholder)
+        if until is not None:
+            conditions.append("timestamp <= %s " % self.db_adaptors[0].placeholder)
         sql += "AND ".join(conditions)
-        args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id)))
+        args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id, start_from, until)))
         ret = self.exec_sql(db_num=db_num, sql=sql, args=args)
         return ret[0][0]
 
