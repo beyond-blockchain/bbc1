@@ -371,6 +371,8 @@ class BBcCoreService:
                                                             asset_group_id=dat.get(KeyType.asset_group_id, None),
                                                             asset_id=dat.get(KeyType.asset_id, None),
                                                             user_id=dat.get(KeyType.user_id, None),
+                                                            start_from=dat.get(KeyType.start_from, None),
+                                                            until=dat.get(KeyType.until, None),
                                                             direction=dat.get(KeyType.direction, 0),
                                                             count=dat.get(KeyType.count, 1))
             if txinfo is None or KeyType.transactions not in txinfo:
@@ -387,8 +389,8 @@ class BBcCoreService:
             retmsg = _make_message_structure(domain_id, MsgType.RESPONSE_COUNT_TRANSACTIONS,
                                              dat[KeyType.source_user_id], dat[KeyType.query_id])
             count = self.count_transactions(domain_id, asset_group_id=dat.get(KeyType.asset_group_id, None),
-                                            asset_id=dat.get(KeyType.asset_id, None),
-                                            user_id=dat.get(KeyType.user_id, None))
+                                            asset_id=dat.get(KeyType.asset_id, None), user_id=dat.get(KeyType.user_id, None),
+                                            start_from=dat.get(KeyType.start_from, None), until=dat.get(KeyType.until, None))
             retmsg[KeyType.count] = count
             umr.send_message_to_user(retmsg)
 
@@ -405,6 +407,8 @@ class BBcCoreService:
             all_included, txtree, asset_files = self._traverse_transactions(domain_id, dat[KeyType.transaction_id],
                                                                             asset_group_id=asset_group_id,
                                                                             user_id=user_id,
+                                                                            start_from=dat.get(KeyType.start_from, None),
+                                                                            until=dat.get(KeyType.until, None),
                                                                             direction=dat[KeyType.direction],
                                                                             hop_count=dat[KeyType.hop_count])
             if txtree is None or len(txtree) == 0:
@@ -929,7 +933,7 @@ class BBcCoreService:
         return response_info
 
     def search_transaction_with_condition(self, domain_id, asset_group_id=None, asset_id=None, user_id=None,
-                                          direction=0, count=1):
+                                          start_from=None, until=None, direction=0, count=1):
         """Search transactions that match given conditions
 
         When Multiple conditions are given, they are considered as AND condition.
@@ -939,6 +943,8 @@ class BBcCoreService:
             asset_group_id (bytes): asset_group_id that target transactions should have
             asset_id (bytes): asset_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
+            start_from (int): the starting timestamp to search
+            until (int): the end timestamp to search
             direction (int): 0: descend, 1: ascend
             count (int): The maximum number of transactions to retrieve (self.search_max_count is the upper bound)
         Returns:
@@ -953,13 +959,14 @@ class BBcCoreService:
 
         dh = self.networking.domains[domain_id]['data']
         ret_txobj, ret_asset_files = dh.search_transaction(asset_group_id=asset_group_id, asset_id=asset_id,
-                                                           user_id=user_id, direction=direction, count=count)
+                                                           user_id=user_id, start_from=start_from, until=until,
+                                                           direction=direction, count=count)
         if ret_txobj is None or len(ret_txobj) == 0:
             return None
 
         return _create_search_result(ret_txobj, ret_asset_files)
 
-    def count_transactions(self, domain_id, asset_group_id=None, asset_id=None, user_id=None):
+    def count_transactions(self, domain_id, asset_group_id=None, asset_id=None, user_id=None, start_from=None, until=None):
         """Count transactions that match given conditions
 
         When Multiple conditions are given, they are considered as AND condition.
@@ -969,6 +976,8 @@ class BBcCoreService:
             asset_group_id (bytes): asset_group_id that target transactions should have
             asset_id (bytes): asset_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
+            start_from (int): the starting timestamp to search
+            until (int): the end timestamp to search
         Returns:
             int: the number of transactions
         """
@@ -977,9 +986,10 @@ class BBcCoreService:
             return None
 
         dh = self.networking.domains[domain_id]['data']
-        return dh.count_transactions(asset_group_id=asset_group_id, asset_id=asset_id, user_id=user_id)
+        return dh.count_transactions(asset_group_id=asset_group_id, asset_id=asset_id, user_id=user_id, start_from=start_from, until=until)
 
-    def _traverse_transactions(self, domain_id, transaction_id, asset_group_id=None, user_id=None, direction=1, hop_count=3):
+    def _traverse_transactions(self, domain_id, transaction_id, asset_group_id=None, user_id=None,
+                               start_from=None, until=None, direction=1, hop_count=3):
         """Get transaction tree from the specified transaction_id with given condition
 
         If both asset_group_id and user_id are specified, they are treated as AND condition.
@@ -991,6 +1001,8 @@ class BBcCoreService:
             transaction_id (bytes): the base transaction_id from which traverse starts
             asset_group_id (bytes): asset_group_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
+            start_from (int): the starting timestamp to search
+            until (int): the end timestamp to search
             direction (int): 1:backward, non-1:forward
             hop_count (bytes): hop count to traverse (self.traverse_max_count is the upper bound)
         Returns:
@@ -1030,6 +1042,10 @@ class BBcCoreService:
                 txids[txid] = True
                 ret_txobj, ret_asset_files = dh.search_transaction(transaction_id=txid)
                 if ret_txobj is None or len(ret_txobj) == 0:
+                    continue
+                if start_from is not None and traverse_to_past and ret_txobj[txid].timestamp < start_from:
+                    continue
+                if until is not None and not traverse_to_past and ret_txobj[txid].timestamp > until:
                     continue
                 if asset_group_id is not None or user_id is not None:
                     flag = False

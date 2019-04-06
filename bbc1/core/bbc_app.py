@@ -591,7 +591,8 @@ class BBcAppClient:
         dat[KeyType.all_asset_files] = ast
         return self._send_msg(dat)
 
-    def search_transaction_with_condition(self, asset_group_id=None, asset_id=None, user_id=None, direction=0, count=1):
+    def search_transaction_with_condition(self, asset_group_id=None, asset_id=None, user_id=None,
+                                          start_from=None, until=None, direction=0, count=1):
         """Search transaction data by asset_group_id/asset_id/user_id
 
         If multiple conditions are specified, they are considered as AND condition.
@@ -600,6 +601,8 @@ class BBcAppClient:
             asset_group_id (bytes): asset_group_id in BBcEvent and BBcRelations
             asset_id (bytes): asset_id in BBcAsset
             user_id (bytes): user_id in BBcAsset that means the owner of the asset
+            start_from (int): the starting timestamp to search
+            until (int): the end timestamp to search
             direction (int): 0: descend, 1: ascend
             count (int): the number of transactions to retrieve
         Returns:
@@ -612,6 +615,10 @@ class BBcAppClient:
             dat[KeyType.asset_id] = asset_id
         if user_id is not None:
             dat[KeyType.user_id] = user_id
+        if start_from is not None:
+            dat[KeyType.start_from] = start_from
+        if until is not None:
+            dat[KeyType.until] = until
         dat[KeyType.direction] = direction
         dat[KeyType.count] = count
         return self._send_msg(dat)
@@ -628,7 +635,7 @@ class BBcAppClient:
         dat[KeyType.transaction_id] = transaction_id
         return self._send_msg(dat)
 
-    def count_transactions(self, asset_group_id=None, asset_id=None, user_id=None):
+    def count_transactions(self, asset_group_id=None, asset_id=None, user_id=None, start_from=None, until=None):
         """Count transactions that matches the given conditions
 
         If multiple conditions are specified, they are considered as AND condition.
@@ -637,6 +644,8 @@ class BBcAppClient:
             asset_group_id (bytes): asset_group_id in BBcEvent and BBcRelations
             asset_id (bytes): asset_id in BBcAsset
             user_id (bytes): user_id in BBcAsset that means the owner of the asset
+            start_from (int): the starting timestamp to search
+            until (int): the end timestamp to search
         Returns:
             int: the number of transactions
         """
@@ -647,9 +656,13 @@ class BBcAppClient:
             dat[KeyType.asset_id] = asset_id
         if user_id is not None:
             dat[KeyType.user_id] = user_id
+        if start_from is not None:
+            dat[KeyType.start_from] = start_from
+        if until is not None:
+            dat[KeyType.until] = until
         return self._send_msg(dat)
 
-    def traverse_transactions(self, transaction_id, asset_group_id=None, user_id=None, direction=1, hop_count=3):
+    def traverse_transactions(self, transaction_id, asset_group_id=None, user_id=None, start_from=None, until=None, direction=1, hop_count=3):
         """Search request for transactions
 
         The method traverses the transaction graph in the ledger.
@@ -659,6 +672,8 @@ class BBcAppClient:
             transaction_id (bytes): the target transaction to retrieve
             asset_group_id (bytes): asset_group_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
+            start_from (int): the starting timestamp to search
+            until (int): the end timestamp to search
             direction (int): 1:backforward, non-1:forward
             hop_count (int): hop count to traverse from the specified origin point
         Returns:
@@ -670,6 +685,10 @@ class BBcAppClient:
             dat[KeyType.asset_group_id] = asset_group_id
         if user_id is not None:
             dat[KeyType.user_id] = user_id
+        if start_from is not None:
+            dat[KeyType.start_from] = start_from
+        if until is not None:
+            dat[KeyType.until] = until
         dat[KeyType.direction] = direction
         dat[KeyType.hop_count] = hop_count
         return self._send_msg(dat)
