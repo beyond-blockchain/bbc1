@@ -26,13 +26,20 @@ from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMes
 from bbc1.core import logger
 
 
+DB_VERSION = "ver:2"
+
+
+version_tbl_definition = [
+    ["version", "TEXT"]
+]
+
 transaction_tbl_definition = [
     ["transaction_id", "BLOB"], ["transaction_data", "BLOB"],
 ]
 
 asset_info_definition = [
     ["id", "INTEGER"],
-    ["transaction_id", "BLOB"], ["asset_group_id", "BLOB"], ["asset_id", "BLOB"], ["user_id", "BLOB"], ["timestamp", "INTEGER"],
+    ["transaction_id", "BLOB"], ["asset_group_id", "BLOB"], ["asset_id", "BLOB"], ["user_id", "BLOB"], ["timestamp", "BIGINT"],
 ]
 
 topology_info_definition = [
@@ -86,6 +93,7 @@ class DataHandler:
         self.replication_strategy = DataHandler.REPLICATION_ALL
         self.db_adaptors = list()
         self.dbs = list()
+        self.need_update = False
         self._db_setup()
 
     def _db_setup(self):
@@ -114,6 +122,10 @@ class DataHandler:
 
         for db in self.db_adaptors:
             db.open_db()
+            ret = db.create_version_table(DB_VERSION)
+            if not ret:
+                self.need_update = True
+                return
             db.create_table('transaction_table', transaction_tbl_definition, primary_key=0, indices=[0])
             db.create_table('asset_info_table', asset_info_definition, primary_key=0, indices=[0, 1, 2, 3, 4, 5])
             db.create_table('topology_table', topology_info_definition, primary_key=0, indices=[0, 1, 2])
@@ -694,6 +706,7 @@ class DataHandler:
 class DataHandlerDomain0(DataHandler):
     """Data handler for domain_global_0"""
     def __init__(self, networking=None, config=None, workingdir=None, domain_id=None, loglevel="all", logname=None):
+        self.need_update = False
         pass
 
     def exec_sql(self, sql, *args):
@@ -756,6 +769,10 @@ class DbAdaptor:
         """Check whether the table exists or not"""
         pass
 
+    def create_version_table(self, version):
+        """Create version table and check its version"""
+        pass
+
 
 class SqliteAdaptor(DbAdaptor):
     """DB adaptor for SQLite3"""
@@ -793,6 +810,19 @@ class SqliteAdaptor(DbAdaptor):
     def check_table_existence(self, tblname):
         """Check whether the table exists or not"""
         return self.handler.exec_sql(sql="SELECT * FROM sqlite_master WHERE type='table' AND name=?", args=(tblname,))
+
+    def create_version_table(self, version):
+        """Create version table and check its version"""
+        if len(self.check_table_existence("version_table")) > 0:
+            ret = self.handler.exec_sql(sql="SELECT version FROM version_table;")
+            if ret is None or ret[0][0] != version:
+                return False
+            return True
+        self.create_table("version_table", version_tbl_definition)
+        ret = self.handler.exec_sql(sql="INSERT INTO version_table (version) VALUES (\"%s\");" % version, commit=True)
+        if ret is None:
+            return False
+        return True
 
 
 class MysqlAdaptor(DbAdaptor):
@@ -856,3 +886,17 @@ class MysqlAdaptor(DbAdaptor):
         """Check whether the table exists or not"""
         sql = "show tables from %s like '%s';" % (self.db_name, tblname)
         return self.handler.exec_sql(db_num=self.db_num, sql=sql)
+
+    def create_version_table(self, version):
+        """Create version table and check its version"""
+        if len(self.check_table_existence("version_table")) > 0:
+            ret = self.handler.exec_sql(db_num=self.db_num, sql="SELECT version FROM version_table;")
+            if ret is None or ret[0][0] != version:
+                return False
+            return True
+        self.create_table("version_table", version_tbl_definition)
+        ret = self.handler.exec_sql(db_num=self.db_num,
+                                    sql="INSERT INTO version_table (version) VALUES (\"%s\");" % version, commit=True)
+        if ret is None:
+            return False
+        return True
