@@ -46,7 +46,7 @@ from bbc1.core.data_handler import InfraMessageCategory
 from bbc1.core import command
 from bbc1.core.bbc_error import *
 
-VERSION = "core version 1.0"
+VERSION = "core version 1.3"
 
 PID_FILE = "/tmp/bbc1.pid"
 POOL_SIZE = 1000
@@ -157,17 +157,12 @@ class BBcCoreService:
                                                  external_ip4addr=ip4addr, external_ip6addr=ip6addr,
                                                  loglevel=loglevel, logname=logname)
         self.ledger_subsystems = dict()
-        need_db_update = False
         for domain_id_str in conf['domains'].keys():
             domain_id = bbclib.convert_idstring_to_bytes(domain_id_str)
             if not use_domain0 and domain_id == bbclib.domain_global_0:
                 continue
             c = self.config.get_domain_config(domain_id)
             ret = self.networking.create_domain(domain_id=domain_id, config=c)
-            if ret is None:
-                need_db_update = True
-                self.logger.fatal("DB must be upgraded. Use db_migration_tool.py")
-                continue
             for nd, info in c['static_nodes'].items():
                 node_id, ipv4, ipv6, port = bbclib.convert_idstring_to_bytes(nd), info[0], info[1], info[2]
                 self.networking.add_neighbor(domain_id, node_id, ipv4, ipv6, port, is_static=True)
@@ -182,8 +177,6 @@ class BBcCoreService:
                 else:
                     self.logger.info("Failed to load ledger_subsystem module")
 
-        if need_db_update:
-            os._exit(0)
         gevent.signal(signal.SIGINT, self.quit_program)
         if server_start:
             self._start_server(core_port)

@@ -255,8 +255,6 @@ class BBcNetwork:
         self.domains[domain_id]['repair'] = RepairManager(self, domain_id, workingdir=workingdir,
                                                           logname=self.logname, loglevel=self.loglevel)
 
-        if self.domains[domain_id]['data'].need_update:
-            return None
         if self.domain0manager is not None:
             self.domain0manager.update_domain_belong_to()
             for dm in self.domains.keys():

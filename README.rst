@@ -19,11 +19,12 @@ The APIs of BBc-1 is defined in bbc\_app.py and bbclib.py. So application develo
 
 For the details, please read documents in docs/ directory. Not only documents but slide decks (PDF) explain the design of the BBc-1 and its implementation.
 
-## Recent changes regarding bbclib.py
+## Recent changes regarding DB meta table
 
-bbclib.py (and the data format) is redesigned, resulting in splitting it to two parts; bbclib_core.py and bbclib_wire.py. bbclib.py is just a wrapper for those two scripts. The way of serializing BBc-1 transaction object and deserializing transaction data will change in v1.2.
+In the update to v1.3, a meta table of DB is updated to support timestamp-based search. The main table for transaction data itself remains unchanged, so that just updating meta table is need for migration.
+Migration tool is provided by utils/db_migration_tool.py.
 
-Please see [here](docs/BBc1_data_format_ja.md) in detail.
+Please see [here](docs/db_migration_ja.md) in detail.
 
 ## Documents
 Some documents are available in docs/.
@@ -38,13 +39,15 @@ Some documents are available in docs/.
     * [BBc1_core_tutorial_installation_ja.md](docs/BBc1_core_tutorial_installation_ja.md)
     * [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
     * [libbbcsig_dll_build_for_Windows_x64_ja.md](docs/libbbcsig_dll_build_for_Windows_x64_ja.md)
+    * [db_migration_ja.md](docs/db_migration_ja.md)
 * Programing
-    * [BBc1_programming_guide_v1.0_ja.md](docs/BBc1_programming_guide_v1.0_ja.md)
+    * [BBc1_programming_guide_v1.2_ja.md](docs/BBc1_programming_guide_v1.2_ja.md)
     * [BBc1_core_tutorial_file_proof_ja.md](docs/BBc1_core_tutorial_file_proof_ja.md)
+    * [BBc1_data_format_ja.md](docs/BBc1_data_format_ja.md)
 * API reference (Coming soon. Currently, something wrong in building docs)
     * [https://bbc-1.readthedocs.io/en/latest/](https://bbc-1.readthedocs.io/en/latest/)
     * You can read API docs in your local host by the following command:
-        ```python
+        ```shell
         cd docs/api/_build/html
         pipenv run python -m http.server
         ```
