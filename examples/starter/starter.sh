@@ -43,6 +43,7 @@ case ${COMMAND} in
       echo "Usage: $0 create [username]"
       exit
     fi
+    . venv/bin/activate
     echo "# Create a user: ${ARG}"
     mkdir ${ARG}
     [[ $? -gt 0 ]] && exit
