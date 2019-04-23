@@ -11,6 +11,7 @@ case ${COMMAND} in
     python3 -mvenv venv
     . venv/bin/activate
     pip install -r requirements.txt
+    pip --no-cache-dir install bbc1
     ;;
 
   clean)
@@ -80,6 +81,6 @@ case ${COMMAND} in
     ;;
 
   *)
-    echo "Usage: $0 [install|setup]"
+    echo "Usage: $0 [install|clean|setup|core|create|remove|run|show|kill]"
     ;;
 esac

@@ -1,5 +1,4 @@
 asn1crypto==0.24.0
-bbc1==1.2
 bson==0.5.8
 certifi==2019.3.9
 cffi==1.12.2
