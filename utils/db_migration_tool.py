@@ -23,22 +23,10 @@ import argparse
 from gevent import monkey
 monkey.patch_all()
 import os
-import signal
-import hashlib
-import binascii
-import traceback
-import json
-import copy
 
 import sys
 sys.path.extend(["../../bbc1"])
-from bbc1.core import bbclib
-from bbc1.core.bbclib import MsgType
-from bbc1.core.message_key_types import KeyType, to_2byte
 from bbc1.core import bbc_config, data_handler, bbc_stats, logger
-from bbc1.core.data_handler import InfraMessageCategory
-from bbc1.core.bbc_error import *
-
 
 
 def parser():
