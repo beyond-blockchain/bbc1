@@ -183,6 +183,11 @@ class DataHandler:
             self.logger.error(traceback.format_exc())
             traceback.print_exc()
             self.stats.update_stats_increment("data_handler", "fail_exec_sql", 1)
+            if self.db_adaptors[db_num] is not None and self.db_adaptors[db_num].db_cur is not None:
+                self.db_adaptors[db_num].db_cur.close()
+            if self.db_adaptors[db_num] is not None and self.db_adaptors[db_num].db is not None:
+                self.db_adaptors[db_num].db.close()
+            self.db_adaptors[db_num].open_db()
             return None
         if ret is None:
             return []

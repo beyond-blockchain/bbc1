@@ -806,9 +806,11 @@ class BBcAppClient:
     def receiver_loop(self):
         msg_parser = message_key_types.Message()
         try:
-            while True:
+            connected = True
+            while connected:
                 buf = self.connection.recv(8192)
                 if len(buf) == 0:
+                    connected = False
                     break
                 msg_parser.recv(buf)
                 while True:
@@ -819,7 +821,6 @@ class BBcAppClient:
         except Exception as e:
             self.logger.info("TCP disconnect: %s" % e)
             print(traceback.format_exc())
-        self.connection.close()
 
     def include_cross_ref(self, txobj):
         """Include BBcCrossRef from other domains in the transaction

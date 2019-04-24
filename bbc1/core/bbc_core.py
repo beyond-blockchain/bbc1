@@ -225,7 +225,8 @@ class BBcCoreService:
         user_info = None
         msg_parser = message_key_types.Message()
         try:
-            while True:
+            connected = True
+            while connected:
                 wait_read(socket.fileno())
                 buf = socket.recv(8192)
                 if len(buf) == 0:
@@ -237,6 +238,7 @@ class BBcCoreService:
                         break
                     disconnection, new_info = self._process(socket, msg, msg_parser.payload_type)
                     if disconnection:
+                        connected = False
                         break
                     if new_info is not None:
                         user_info = new_info
