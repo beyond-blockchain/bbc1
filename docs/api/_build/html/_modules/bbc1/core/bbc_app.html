@@ -17,32 +17,34 @@
   
 
   
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
-
-  
-  <script src="../../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -739,7 +741,8 @@
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">all_asset_files</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BBcAppClient.search_transaction_with_condition"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.search_transaction_with_condition">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction_with_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcAppClient.search_transaction_with_condition"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.search_transaction_with_condition">[docs]</a>    <span class="k">def</span> <span class="nf">search_transaction_with_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                          <span class="n">start_from</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search transaction data by asset_group_id/asset_id/user_id</span>
 
 <span class="sd">        If multiple conditions are specified, they are considered as AND condition.</span>
@@ -748,6 +751,8 @@
 <span class="sd">            asset_group_id (bytes): asset_group_id in BBcEvent and BBcRelations</span>
 <span class="sd">            asset_id (bytes): asset_id in BBcAsset</span>
 <span class="sd">            user_id (bytes): user_id in BBcAsset that means the owner of the asset</span>
+<span class="sd">            start_from (int): the starting timestamp to search</span>
+<span class="sd">            until (int): the end timestamp to search</span>
 <span class="sd">            direction (int): 0: descend, 1: ascend</span>
 <span class="sd">            count (int): the number of transactions to retrieve</span>
 <span class="sd">        Returns:</span>
@@ -760,6 +765,10 @@
             <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_id</span>
         <span class="k">if</span> <span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_id</span>
+        <span class="k">if</span> <span class="n">start_from</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">start_from</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_from</span>
+        <span class="k">if</span> <span class="n">until</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">until</span><span class="p">]</span> <span class="o">=</span> <span class="n">until</span>
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">direction</span><span class="p">]</span> <span class="o">=</span> <span class="n">direction</span>
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
@@ -776,7 +785,7 @@
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">transaction_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">transaction_id</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BBcAppClient.count_transactions"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.count_transactions">[docs]</a>    <span class="k">def</span> <span class="nf">count_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcAppClient.count_transactions"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.count_transactions">[docs]</a>    <span class="k">def</span> <span class="nf">count_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_from</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Count transactions that matches the given conditions</span>
 
 <span class="sd">        If multiple conditions are specified, they are considered as AND condition.</span>
@@ -785,6 +794,8 @@
 <span class="sd">            asset_group_id (bytes): asset_group_id in BBcEvent and BBcRelations</span>
 <span class="sd">            asset_id (bytes): asset_id in BBcAsset</span>
 <span class="sd">            user_id (bytes): user_id in BBcAsset that means the owner of the asset</span>
+<span class="sd">            start_from (int): the starting timestamp to search</span>
+<span class="sd">            until (int): the end timestamp to search</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            int: the number of transactions</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -795,9 +806,13 @@
             <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_id</span>
         <span class="k">if</span> <span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_id</span>
+        <span class="k">if</span> <span class="n">start_from</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">start_from</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_from</span>
+        <span class="k">if</span> <span class="n">until</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">until</span><span class="p">]</span> <span class="o">=</span> <span class="n">until</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BBcAppClient.traverse_transactions"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.traverse_transactions">[docs]</a>    <span class="k">def</span> <span class="nf">traverse_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">hop_count</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<div class="viewcode-block" id="BBcAppClient.traverse_transactions"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.traverse_transactions">[docs]</a>    <span class="k">def</span> <span class="nf">traverse_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction_id</span><span class="p">,</span> <span class="n">asset_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_from</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">hop_count</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search request for transactions</span>
 
 <span class="sd">        The method traverses the transaction graph in the ledger.</span>
@@ -807,6 +822,8 @@
 <span class="sd">            transaction_id (bytes): the target transaction to retrieve</span>
 <span class="sd">            asset_group_id (bytes): asset_group_id that target transactions should have</span>
 <span class="sd">            user_id (bytes): user_id that target transactions should have</span>
+<span class="sd">            start_from (int): the starting timestamp to search</span>
+<span class="sd">            until (int): the end timestamp to search</span>
 <span class="sd">            direction (int): 1:backforward, non-1:forward</span>
 <span class="sd">            hop_count (int): hop count to traverse from the specified origin point</span>
 <span class="sd">        Returns:</span>
@@ -818,6 +835,10 @@
             <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">asset_group_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asset_group_id</span>
         <span class="k">if</span> <span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_id</span>
+        <span class="k">if</span> <span class="n">start_from</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">start_from</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_from</span>
+        <span class="k">if</span> <span class="n">until</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">until</span><span class="p">]</span> <span class="o">=</span> <span class="n">until</span>
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">direction</span><span class="p">]</span> <span class="o">=</span> <span class="n">direction</span>
         <span class="n">dat</span><span class="p">[</span><span class="n">KeyType</span><span class="o">.</span><span class="n">hop_count</span><span class="p">]</span> <span class="o">=</span> <span class="n">hop_count</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span></div>
@@ -935,9 +956,11 @@
 <div class="viewcode-block" id="BBcAppClient.receiver_loop"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.receiver_loop">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">msg_parser</span> <span class="o">=</span> <span class="n">message_key_types</span><span class="o">.</span><span class="n">Message</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">connected</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">while</span> <span class="n">connected</span><span class="p">:</span>
                 <span class="n">buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">8192</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">connected</span> <span class="o">=</span> <span class="kc">False</span>
                     <span class="k">break</span>
                 <span class="n">msg_parser</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
                 <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
@@ -947,8 +970,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">msg_parser</span><span class="o">.</span><span class="n">payload_type</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TCP disconnect: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+            <span class="nb">print</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="BBcAppClient.include_cross_ref"><a class="viewcode-back" href="../../../bbc1.core.bbc_app.html#bbc1.core.bbc_app.BBcAppClient.include_cross_ref">[docs]</a>    <span class="k">def</span> <span class="nf">include_cross_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txobj</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Include BBcCrossRef from other domains in the transaction</span>
@@ -1442,25 +1464,16 @@
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

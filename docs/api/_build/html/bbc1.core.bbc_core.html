@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="bbc1.core.bbc_error module" href="bbc1.core.bbc_error.html" />
     <link rel="prev" title="bbc1.core.bbc_config module" href="bbc1.core.bbc_config.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -176,54 +178,48 @@
 <p>Base service object of BBc-1</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.count_transactions">
-<code class="descname">count_transactions</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.count_transactions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">count_transactions</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>start_from=None</em>, <em>until=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.count_transactions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count transactions that match given conditions</p>
 <p>When Multiple conditions are given, they are considered as AND condition.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
-<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</li>
-<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</li>
-<li><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</p></li>
+<li><p><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</p></li>
+<li><p><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</p></li>
+<li><p><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</p></li>
+<li><p><strong>start_from</strong> (<em>int</em>) – the starting timestamp to search</p></li>
+<li><p><strong>until</strong> (<em>int</em>) – the end timestamp to search</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the number of transactions</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the number of transactions</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.insert_transaction">
 <code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>domain_id</em>, <em>txdata</em>, <em>asset_files</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.insert_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert transaction into ledger</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
-<li><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</li>
-<li><strong>asset_files</strong> (<em>dict</em>) – dictionary of {asset_id: content} for the transaction</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</p></li>
+<li><p><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</p></li>
+<li><p><strong>asset_files</strong> (<em>dict</em>) – dictionary of {asset_id: content} for the transaction</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">inserted transaction_id or error message</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict|str</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inserted transaction_id or error message</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict|str</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -237,93 +233,79 @@
 <code class="descname">remove_from_notification_list</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.remove_from_notification_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.remove_from_notification_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove entry from insert completion notification list</p>
 <p>This method checks validation only.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
-<li><strong>asset_group_id</strong> (<em>bytes</em>) – target asset_group_id of which you want to get notification about the insertion</li>
-<li><strong>user_id</strong> (<em>bytes</em>) – user_id that registers in the list</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</p></li>
+<li><p><strong>asset_group_id</strong> (<em>bytes</em>) – target asset_group_id of which you want to get notification about the insertion</p></li>
+<li><p><strong>user_id</strong> (<em>bytes</em>) – user_id that registers in the list</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition">
-<code class="descname">search_transaction_with_condition</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>direction=0</em>, <em>count=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.search_transaction_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition" title="Permalink to this definition">¶</a></dt>
+<code class="descname">search_transaction_with_condition</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>start_from=None</em>, <em>until=None</em>, <em>direction=0</em>, <em>count=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.search_transaction_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search transactions that match given conditions</p>
 <p>When Multiple conditions are given, they are considered as AND condition.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
-<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</li>
-<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</li>
-<li><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</li>
-<li><strong>direction</strong> (<em>int</em>) – 0: descend, 1: ascend</li>
-<li><strong>count</strong> (<em>int</em>) – The maximum number of transactions to retrieve (self.search_max_count is the upper bound)</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</p></li>
+<li><p><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</p></li>
+<li><p><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</p></li>
+<li><p><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</p></li>
+<li><p><strong>start_from</strong> (<em>int</em>) – the starting timestamp to search</p></li>
+<li><p><strong>until</strong> (<em>int</em>) – the end timestamp to search</p></li>
+<li><p><strong>direction</strong> (<em>int</em>) – 0: descend, 1: ascend</p></li>
+<li><p><strong>count</strong> (<em>int</em>) – The maximum number of transactions to retrieve (if count &lt;= 0, then self.search_max_count is applied)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dictionary having transaction_id, serialized transaction data, asset files</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary having transaction_id, serialized transaction data, asset files</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.send_inserted_notification">
 <code class="descname">send_inserted_notification</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_ids</em>, <em>transaction_id</em>, <em>only_registered_user=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.send_inserted_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.send_inserted_notification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Broadcast NOTIFY_INSERTED</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</li>
-<li><strong>asset_group_ids</strong> (<em>list</em>) – list of asset_group_ids</li>
-<li><strong>transaction_id</strong> (<em>bytes</em>) – transaction_id that has just inserted</li>
-<li><strong>only_registered_user</strong> (<em>bool</em>) – If True, notification is not sent to other nodes</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>domain_id</strong> (<em>bytes</em>) – target domain_id</p></li>
+<li><p><strong>asset_group_ids</strong> (<em>list</em>) – list of asset_group_ids</p></li>
+<li><p><strong>transaction_id</strong> (<em>bytes</em>) – transaction_id that has just inserted</p></li>
+<li><p><strong>only_registered_user</strong> (<em>bool</em>) – If True, notification is not sent to other nodes</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.validate_transaction">
 <code class="descname">validate_transaction</code><span class="sig-paren">(</span><em>txdata</em>, <em>asset_files=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.validate_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.validate_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate transaction by verifying signature</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</li>
-<li><strong>asset_files</strong> (<em>dict</em>) – dictionary of {asset_id: content} for the transaction</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</p></li>
+<li><p><strong>asset_files</strong> (<em>dict</em>) – dictionary of {asset_id: content} for the transaction</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">if validation fails, None returns.
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>if validation fails, None returns.
 int (short): 2-byte value of BBcFormat type or None</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction">BBcTransaction</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction">BBcTransaction</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -353,7 +335,7 @@ int (short): 2-byte value of BBcFormat type or None</p>
         <a href="bbc1.core.bbc_error.html" class="btn btn-neutral float-right" title="bbc1.core.bbc_error module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="bbc1.core.bbc_config.html" class="btn btn-neutral" title="bbc1.core.bbc_config module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="bbc1.core.bbc_config.html" class="btn btn-neutral float-left" title="bbc1.core.bbc_config module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -379,25 +361,16 @@ int (short): 2-byte value of BBcFormat type or None</p>
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

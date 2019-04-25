@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="bbc1.core.command module" href="bbc1.core.command.html" />
     <link rel="prev" title="bbc1.core.bbc_stats module" href="bbc1.core.bbc_stats.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -172,7 +174,8 @@
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at</p>
 <blockquote>
-<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<div><p><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+</div></blockquote>
 <p>Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an “AS IS” BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -182,38 +185,32 @@ limitations under the License.</p>
 <dt id="bbc1.core.bbclib.deserialize">
 <code class="descclassname">bbc1.core.bbclib.</code><code class="descname">deserialize</code><span class="sig-paren">(</span><em>txdata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.deserialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deserialize binary data with 2-byte wire header</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>txdata</strong> – </td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">BBcTransaction: BBcTransaction object
-int: 2-byte value of BBcFormat type</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>txdata</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>BBcTransaction: BBcTransaction object
+int: 2-byte value of BBcFormat type</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.bbclib.serialize">
 <code class="descclassname">bbc1.core.bbclib.</code><code class="descname">serialize</code><span class="sig-paren">(</span><em>txobj</em>, <em>format_type=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.serialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize transaction object with 2-byte wire header</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>txobj</strong> – BBcTransaction object</li>
-<li><strong>format_type</strong> – value defined in bbclib_wire.BBcFormat</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>txobj</strong> – BBcTransaction object</p></li>
+<li><p><strong>format_type</strong> – value defined in bbclib_wire.BBcFormat</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">binary</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>binary</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -229,7 +226,7 @@ int: 2-byte value of BBcFormat type</td>
         <a href="bbc1.core.command.html" class="btn btn-neutral float-right" title="bbc1.core.command module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="bbc1.core.bbc_stats.html" class="btn btn-neutral" title="bbc1.core.bbc_stats module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="bbc1.core.bbc_stats.html" class="btn btn-neutral float-left" title="bbc1.core.bbc_stats module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -255,25 +252,16 @@ int: 2-byte value of BBcFormat type</td>
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
