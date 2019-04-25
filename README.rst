@@ -72,7 +72,7 @@ Some documents are available in docs/.
 * Python
     - Python 3.5.0 or later
     - virtualenv is recommended
-        - ```python -mvenv venv```
+        - ```python -m venv venv```
     - In some environment, [pipenv](https://docs.pipenv.org) does not work well.
         - Some bugs seems to be in the installation scripts. So, please do not use pipenv now.
 
@@ -100,7 +100,7 @@ Some documents are available in docs/.
     ```
 5. Install dependencies by the following command (in the case of python 3.6)
     ```
-    python -mvenv venv
+    python -m venv venv
     source venv/bin/activate
     pip install -r requirements.txt
     ```
@@ -123,7 +123,7 @@ Some documents are available in docs/.
 2. Install python and pip
 3. Install BBc1 by pip
     ```
-    python -mvenv venv
+    python -m venv venv
     source venv/bin/activate
     pip install bbc1
     ```
