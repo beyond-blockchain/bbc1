@@ -58,7 +58,7 @@ Some documents are available in docs/.
     * [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
     * [libbbcsig_dll_build_for_Windows_x64_ja.md](docs/libbbcsig_dll_build_for_Windows_x64_ja.md)
 * Programing
-    * [BBc1_programming_guide_v1.2_ja.md](docs/BBc1_programming_guide_v1.2_ja.md)
+    * [BBc1_programming_guide_v1.2_ja.md](docs/BBc1_programming_guide_v1.3_ja.md)
     * [BBc1_core_tutorial_file_proof_ja.md](docs/BBc1_core_tutorial_file_proof_ja.md)
     * [BBc1_data_format_ja.md](docs/BBc1_data_format_ja.md)
 * API reference (Coming soon. Currently, something wrong in building docs)
