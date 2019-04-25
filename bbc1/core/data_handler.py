@@ -93,7 +93,6 @@ class DataHandler:
         self.replication_strategy = DataHandler.REPLICATION_ALL
         self.upgraded_from = DB_VERSION
         self.db_adaptors = list()
-        self.dbs = list()
         self._db_setup()
 
     def _db_setup(self):
@@ -122,18 +121,19 @@ class DataHandler:
 
         for db in self.db_adaptors:
             db.open_db()
-            ver = db.get_version()
-            if ver != DB_VERSION:
-                self.logger.fatal("*** DB meta table is upgraded. Run db_migration_tool.py")
-                self.upgraded_from = ver
-                db.update_table_def(ver)
-            db.create_table('transaction_table', transaction_tbl_definition, primary_key=0, indices=[0])
+            flag_created = db.create_table('transaction_table', transaction_tbl_definition, primary_key=0, indices=[0])
             db.create_table('asset_info_table', asset_info_definition, primary_key=0, indices=[0, 1, 2, 3, 4, 5])
             db.create_table('topology_table', topology_info_definition, primary_key=0, indices=[0, 1, 2])
             db.create_table('cross_ref_table', cross_ref_tbl_definition, primary_key=0, indices=[1])
             db.create_table('merkle_branch_table', merkle_branch_db_definition, primary_key=0, indices=[1, 2])
             db.create_table('merkle_leaf_table', merkle_leaf_db_definition, primary_key=0, indices=[1, 2])
             db.create_table('merkle_root_table', merkle_root_db_definition, primary_key=0, indices=[0])
+            ver = db.get_version()
+            if ver != DB_VERSION:
+                if not flag_created:
+                    self.logger.fatal("*** DB meta table is upgraded. Run db_migration_tool.py")
+                    self.upgraded_from = ver
+                db.update_table_def(ver)
 
     def _storage_setup(self):
         """Setup storage"""
@@ -169,17 +169,20 @@ class DataHandler:
                 self.db_adaptors[db_num].db_cur.execute(sql, args)
             else:
                 self.db_adaptors[db_num].db_cur.execute(sql)
+            self.db_adaptors[db_num].db.commit()  # commit is mandatory (even if read access) in that case that multiple client connect to a single mysql server
             if commit:
-                self.db_adaptors[db_num].db.commit()
                 ret = None
             else:
                 if fetch_one:
                     ret = self.db_adaptors[db_num].db_cur.fetchone()
+                    self.db_adaptors[db_num].db.commit()
                 else:
                     if return_cursor:
                         return self.db_adaptors[db_num].db_cur
                     ret = self.db_adaptors[db_num].db_cur.fetchall()
         except:
+            if commit:
+                self.db_adaptors[db_num].db.rollback()
             self.logger.error(traceback.format_exc())
             traceback.print_exc()
             self.stats.update_stats_increment("data_handler", "fail_exec_sql", 1)
@@ -189,6 +192,7 @@ class DataHandler:
                 self.db_adaptors[db_num].db.close()
             self.db_adaptors[db_num].open_db()
             return None
+
         if ret is None:
             return []
         else:
@@ -802,7 +806,6 @@ class DbAdaptor:
 
     def create_ver2_column(self):
         """Create column for version 2 meta table (add timestamp in asset_info_table)"""
-        self.open_db()
         try:
             self.db_cur.execute("ALTER TABLE asset_info_table ADD COLUMN timestamp BIGINT;")
             self.db.commit()
@@ -832,7 +835,7 @@ class SqliteAdaptor(DbAdaptor):
             indices (list): list of indices to create index
         """
         if len(self.check_table_existence(tbl)) > 0:
-            return
+            return False
         sql = "CREATE TABLE %s " % tbl
         sql += "("
         sql += ", ".join(["%s %s" % (d[0],d[1]) for d in tbl_definition])
@@ -842,6 +845,7 @@ class SqliteAdaptor(DbAdaptor):
         for idx in indices:
             self.handler.exec_sql(sql="CREATE INDEX %s_idx_%d ON %s (%s);" % (tbl, idx, tbl, tbl_definition[idx][0]),
                                   commit=True)
+        return True
 
     def check_table_existence(self, tblname):
         """Check whether the table exists or not"""
@@ -881,7 +885,7 @@ class MysqlAdaptor(DbAdaptor):
             indices (list): list of indices to create index
         """
         if len(self.check_table_existence(tbl)) == 1:
-            return
+            return False
         sql = "CREATE TABLE %s " % tbl
         sql += "("
         defs = list()
@@ -904,6 +908,7 @@ class MysqlAdaptor(DbAdaptor):
             else:
                 self.handler.exec_sql(db_num=self.db_num, sql="ALTER TABLE %s ADD INDEX (%s);"
                                                               % (tbl, tbl_definition[idx][0]), commit=True)
+        return True
 
     def check_table_existence(self, tblname):
         """Check whether the table exists or not"""

@@ -49,7 +49,6 @@ class NewDataHandler(data_handler.DataHandler):
         self.upgraded_from = data_handler.DB_VERSION
         self.db_adaptors = list()
         self.dbs = list()
-        self.db_count = 0
         self._db_setup()
 
 
@@ -67,7 +66,7 @@ class MigrationTool:
     def upgrade(self):
         for domain_id_str, dh in self.handlers.items():
             print("*** Try to upgrade DB of domain_id = %s" % domain_id_str)
-            for count in range(dh.db_count+1):
+            for count in range(len(dh.db_adaptors)):
                 print(" -- Upgrade from %s to %s" % (dh.upgraded_from, data_handler.DB_VERSION))
                 print(" -- DB num:", count)
                 ret = dh.exec_sql(db_num=count, sql="SELECT COUNT(*) FROM asset_info_table WHERE timestamp is NULL;")

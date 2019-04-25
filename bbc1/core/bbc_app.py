@@ -592,7 +592,7 @@ class BBcAppClient:
         return self._send_msg(dat)
 
     def search_transaction_with_condition(self, asset_group_id=None, asset_id=None, user_id=None,
-                                          start_from=None, until=None, direction=0, count=1):
+                                          start_from=None, until=None, direction=0, count=0):
         """Search transaction data by asset_group_id/asset_id/user_id
 
         If multiple conditions are specified, they are considered as AND condition.

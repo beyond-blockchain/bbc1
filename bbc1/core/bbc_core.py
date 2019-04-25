@@ -935,7 +935,7 @@ class BBcCoreService:
         return response_info
 
     def search_transaction_with_condition(self, domain_id, asset_group_id=None, asset_id=None, user_id=None,
-                                          start_from=None, until=None, direction=0, count=1):
+                                          start_from=None, until=None, direction=0, count=0):
         """Search transactions that match given conditions
 
         When Multiple conditions are given, they are considered as AND condition.
@@ -948,7 +948,7 @@ class BBcCoreService:
             start_from (int): the starting timestamp to search
             until (int): the end timestamp to search
             direction (int): 0: descend, 1: ascend
-            count (int): The maximum number of transactions to retrieve (self.search_max_count is the upper bound)
+            count (int): The maximum number of transactions to retrieve (if count <= 0, then self.search_max_count is applied)
         Returns:
             dict: dictionary having transaction_id, serialized transaction data, asset files
         """
@@ -956,7 +956,7 @@ class BBcCoreService:
             self.logger.error("No such domain")
             return None
 
-        if self.search_max_count < count:
+        if self.search_max_count < count or count <= 0:
             count = self.search_max_count
 
         dh = self.networking.domains[domain_id]['data']
