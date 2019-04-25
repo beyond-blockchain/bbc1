@@ -51,7 +51,7 @@ plain_config = {
         'obsolete_timeout': 300,
     },
     'search_config': {
-        'max_count': 30,
+        'max_count': 9999999,
         'max_traverse': 30,
     },
     'domains': {
@@ -176,7 +176,7 @@ class BBcConfig:
             self.config['domains'][domain_id_str] = conf['domains'][domain_id_str]
 
         if create_if_new and domain_id_str not in self.config['domains']:
-            self.config['domains'][domain_id_str] = self.config['domain_default']
+            self.config['domains'][domain_id_str] = copy.deepcopy(self.config['domain_default'])
         if domain_id_str in self.config['domains']:
             return self.config['domains'][domain_id_str]
         return None

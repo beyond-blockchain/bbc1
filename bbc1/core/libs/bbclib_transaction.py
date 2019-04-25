@@ -48,7 +48,7 @@ class BBcTransaction:
     def __init__(self, version=1, unpack=None, id_length=DEFAULT_ID_LEN):
         self.id_length = id_length
         self.version = version
-        self.timestamp = int(time.time())
+        self.timestamp = int(time.time() * 1000)  # milliseconds
         self.events = []
         self.references = []
         self.relations = []

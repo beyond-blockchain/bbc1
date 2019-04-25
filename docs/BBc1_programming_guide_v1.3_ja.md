@@ -72,7 +72,7 @@ print(txobj)
 ```
 asset\_group\_idも他のidと同様に256bitのバイト列である。keypairは秘密鍵と公開鍵のペアを保存するオブジェクトである。一般的なアプリケーションでは鍵を外部ファイルに保存しておき、それを読み込んでKeyPairオブジェクトを作成するが上記の例では、その場で鍵ペアを生成している。
 
-make\_transaction()はトランザクションデータ構造を生成するためのユーティリティであり、relation\_numやevent\_num等で、トランザクション内にどの項目を何個埋め込むかを指定できる。上記の例では、Relationを1つとWitnessをトランザクションに含めることになる。add\_relation\_asset()は生成されたトランザクションオブジェクトにAssetを登録するためのユーティリティである。relation\_idxで何番目のRelationに情報を格納するかを指定している。ここでは、トランザクションデータ構造の中に直接埋め込まれる情報(b'test asset data')とアセットファイルとして分離して管理される情報(b'file content')が登録される。
+make\_transaction()はトランザクションデータ構造を生成するためのユーティリティであり、relation\_numやevent\_num等で、トランザクション内にどの項目を何個埋め込むかを指定できる。上記の例では、Relationを1つとWitnessをトランザクションに含めることになる。add\_relation\_asset()は生成されたトランザクションオブジェクトにAssetを登録するためのユーティリティである。relation\_idxで何番目のRelationに情報を格納するかを指定している。ここでは、トランザクションデータ構造の中に直接埋め込まれる情報(b'test asset data')とアセットファイルとして分離して管理される情報(b'file content')が登録される。また、make\_transaction()の中でBBcTransactionオブジェクトが生成されているが、その初期化中に、timestampが自動設定される（UNIXTIMEで、version 1.3ではミリ秒単位、それ以前は秒単位）。自分自身でtimestampを設定したい場合は、BBcTransactionオブジェクト内のtimestampメンバを直接編集すればよい。
 
 witness.add\_witness(user\_id)は、user\_id用の署名領域をトランザクション内に確保する。その後、witness.add\_signature()によって、実際の署名オブジェクトをトランザクションに格納する。署名オブジェクトはトランザクションオブジェクト(txobj)のsign()に鍵を指定すれば得られる。
 
@@ -123,7 +123,7 @@ search_transaction()はtransaction_idが判明している場合に、トラン�
 
 
 ### transaction\_idが判明していない場合
-asset\_group\_idやasset\_id、user\_idで検索できる。(以下は、asset\_group\_idとasset\_idの例）
+asset\_group\_idやasset\_id、user\_id、timestamp(start\_from, until)で検索できる。(以下は、asset\_group\_idとasset\_idの例）
 ```
 client.search_transaction_with_condition(asset_group_id=asset_group_id, count=10)  # the default value of "count" is 1
 response_data = client.callback.synchronize()
@@ -148,6 +148,12 @@ print(txobj_obtained)
 print("# Content of the asset file:", asset_files[astid])
 ```
 前半はasset\_group\_idを指定した検索、後半はasset\_idを指定した検索で、いずれもsearch\_transaction\_with\_condition()によって行う。複数のトランザクションが見つかる可能性があるため、返答する最大のトランザクション数をcountで指定する。複数の項目(asset\_group\_id、asset\_id、user\_id)を指定することもできる。複数指定した場合は条件はANDで絞り込まれる。search\_transaction\_with\_condition()で検索した場合、結果は複数のトランザクションを含む可能性があるため、前述のsearch\_transaction()の場合と異なりKeyType.transactionsがキーとなる。この例では、検索に合致するトランザクションが1つしかないことがわかっているので、txdata\_array\[0\]のように決め打ちで指定している。
+
+トランザクションの中に格納されているtimestampを検索条件にしたい場合は、
+```
+client.search_transaction_with_condition(asset_group_id=asset_group_id, start_from=1556213431000, until=1556213459999) 
+```
+のように、開始をstart\_from、修了をuntilにセットすれば良い。なお、version 1.3のbbclibでは、特に明示しない限りミリ秒単位のUNIXTIMEがトランザクション生成時に設定されている（version1.2以前は秒単位）。
 
 
 ### トランザクションまたはアセットが改ざんされた場合(改ざんからの復旧)

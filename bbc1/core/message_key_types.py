@@ -308,6 +308,8 @@ class KeyType:
     direction = to_4byte(6, 0x60)
     hop_count = to_4byte(7, 0x60)
     all_included = to_4byte(8, 0x60)
+    start_from = to_4byte(9, 0x60)
+    until = to_4byte(10, 0x60)
 
     transaction_data = to_4byte(0, 0x70)
     transactions = to_4byte(1, 0x70)

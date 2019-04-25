@@ -46,6 +46,7 @@ bbc1_commands = [
                  'utils/bbc_ping.py',
                  'utils/domain_key_setup.py',
                  'utils/id_create.py',
+                 'utils/db_migration_tool.py',
                  'examples/file_proof/file_proof.py']
 
 bbc1_classifiers = [
@@ -56,7 +57,7 @@ bbc1_classifiers = [
 
 setup(
     name='bbc1',
-    version='1.2',
+    version='1.3',
     description='A core system of Beyond Blockchain One',
     long_description=readme,
     url='https://github.com/beyond-blockchain/bbc1',
