@@ -26,13 +26,20 @@ from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMes
 from bbc1.core import logger
 
 
+DB_VERSION = "ver=2"
+
+
+version_tbl_definition = [
+    ["version", "TEXT"]
+]
+
 transaction_tbl_definition = [
     ["transaction_id", "BLOB"], ["transaction_data", "BLOB"],
 ]
 
 asset_info_definition = [
     ["id", "INTEGER"],
-    ["transaction_id", "BLOB"], ["asset_group_id", "BLOB"], ["asset_id", "BLOB"], ["user_id", "BLOB"],
+    ["transaction_id", "BLOB"], ["asset_group_id", "BLOB"], ["asset_id", "BLOB"], ["user_id", "BLOB"], ["timestamp", "BIGINT"],
 ]
 
 topology_info_definition = [
@@ -84,8 +91,8 @@ class DataHandler:
             os.makedirs(self.storage_root, exist_ok=True)
         self.use_external_storage = self._storage_setup()
         self.replication_strategy = DataHandler.REPLICATION_ALL
+        self.upgraded_from = DB_VERSION
         self.db_adaptors = list()
-        self.dbs = list()
         self._db_setup()
 
     def _db_setup(self):
@@ -114,13 +121,19 @@ class DataHandler:
 
         for db in self.db_adaptors:
             db.open_db()
-            db.create_table('transaction_table', transaction_tbl_definition, primary_key=0, indices=[0])
-            db.create_table('asset_info_table', asset_info_definition, primary_key=0, indices=[0, 1, 2, 3, 4])
+            flag_created = db.create_table('transaction_table', transaction_tbl_definition, primary_key=0, indices=[0])
+            db.create_table('asset_info_table', asset_info_definition, primary_key=0, indices=[0, 1, 2, 3, 4, 5])
             db.create_table('topology_table', topology_info_definition, primary_key=0, indices=[0, 1, 2])
             db.create_table('cross_ref_table', cross_ref_tbl_definition, primary_key=0, indices=[1])
             db.create_table('merkle_branch_table', merkle_branch_db_definition, primary_key=0, indices=[1, 2])
             db.create_table('merkle_leaf_table', merkle_leaf_db_definition, primary_key=0, indices=[1, 2])
             db.create_table('merkle_root_table', merkle_root_db_definition, primary_key=0, indices=[0])
+            ver = db.get_version()
+            if ver != DB_VERSION:
+                if not flag_created:
+                    self.logger.fatal("*** DB meta table is upgraded. Run db_migration_tool.py")
+                    self.upgraded_from = ver
+                db.update_table_def(ver)
 
     def _storage_setup(self):
         """Setup storage"""
@@ -133,7 +146,7 @@ class DataHandler:
         os.makedirs(self.storage_root, exist_ok=True)
         return False
 
-    def exec_sql(self, db_num=0, sql=None, args=(), commit=False, fetch_one=False):
+    def exec_sql(self, db_num=0, sql=None, args=(), commit=False, fetch_one=False, return_cursor=False):
         """Execute sql sentence
 
         Args:
@@ -142,6 +155,7 @@ class DataHandler:
             args (list): Args for the SQL
             commit (bool): If True, commit is performed
             fetch_one (bool): If True, fetch just one record
+            return_cursor (bool): If True (and fetch_one is False), return db_cur (iterator)
         Returns:
             list: list of records
         """
@@ -155,19 +169,30 @@ class DataHandler:
                 self.db_adaptors[db_num].db_cur.execute(sql, args)
             else:
                 self.db_adaptors[db_num].db_cur.execute(sql)
+            self.db_adaptors[db_num].db.commit()  # commit is mandatory (even if read access) in that case that multiple client connect to a single mysql server
             if commit:
-                self.db_adaptors[db_num].db.commit()
                 ret = None
             else:
                 if fetch_one:
                     ret = self.db_adaptors[db_num].db_cur.fetchone()
+                    self.db_adaptors[db_num].db.commit()
                 else:
+                    if return_cursor:
+                        return self.db_adaptors[db_num].db_cur
                     ret = self.db_adaptors[db_num].db_cur.fetchall()
         except:
+            if commit:
+                self.db_adaptors[db_num].db.rollback()
             self.logger.error(traceback.format_exc())
             traceback.print_exc()
             self.stats.update_stats_increment("data_handler", "fail_exec_sql", 1)
+            if self.db_adaptors[db_num] is not None and self.db_adaptors[db_num].db_cur is not None:
+                self.db_adaptors[db_num].db_cur.close()
+            if self.db_adaptors[db_num] is not None and self.db_adaptors[db_num].db is not None:
+                self.db_adaptors[db_num].db.close()
+            self.db_adaptors[db_num].open_db()
             return None
+
         if ret is None:
             return []
         else:
@@ -273,13 +298,15 @@ class DataHandler:
         if ret is None:
             return False
 
+        ts = txobj.timestamp
         for asset_group_id, asset_id, user_id, fileflag, filedigest in self.get_asset_info(txobj):
             self.exec_sql(db_num=db_num,
-                          sql="INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id) "
-                              "VALUES (%s, %s, %s, %s)" % (
+                          sql="INSERT INTO asset_info_table(transaction_id, asset_group_id, asset_id, user_id, timestamp) "
+                              "VALUES (%s, %s, %s, %s, %s)" % (
                               self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
-                              self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder),
-                          args=(txobj.transaction_id, asset_group_id, asset_id, user_id), commit=True)
+                              self.db_adaptors[0].placeholder, self.db_adaptors[0].placeholder,
+                              self.db_adaptors[0].placeholder),
+                          args=(txobj.transaction_id, asset_group_id, asset_id, user_id, ts), commit=True)
         for base, point_to in self._get_topology_info(txobj):
             self.exec_sql(db_num=db_num,
                           sql="INSERT INTO topology_table(base, point_to) VALUES (%s, %s)" %
@@ -448,7 +475,7 @@ class DataHandler:
                 self._remove_in_storage(asset_group_id, asset_id)
 
     def search_transaction(self, transaction_id=None, asset_group_id=None, asset_id=None, user_id=None,
-                           direction=0, count=1, db_num=0):
+                           start_from=None, until=None, direction=0, count=1, db_num=0):
         """Search transaction data
 
         When Multiple conditions are given, they are considered as AND condition.
@@ -458,6 +485,8 @@ class DataHandler:
             asset_group_id (bytes): asset_group_id that target transactions should have
             asset_id (bytes): asset_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
+            start_from (int): the starting timestamp to search
+            until (int): the end timestamp to search
             direction (int): 0: descend, 1: ascend
             count (int): The maximum number of transactions to retrieve
             db_num (int): index of DB if multiple DBs are used
@@ -484,11 +513,15 @@ class DataHandler:
                 conditions.append("asset_id = %s " % self.db_adaptors[0].placeholder)
             if user_id is not None:
                 conditions.append("user_id = %s " % self.db_adaptors[0].placeholder)
+            if start_from is not None:
+                conditions.append("timestamp >= %s " % self.db_adaptors[0].placeholder)
+            if until is not None:
+                conditions.append("timestamp <= %s " % self.db_adaptors[0].placeholder)
             sql += "AND ".join(conditions) + "ORDER BY id %s" % dire
             if count > 0:
                 sql += " limit %d" % count
             sql += ";"
-            args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id)))
+            args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id, start_from, until)))
             ret = self.exec_sql(db_num=db_num, sql=sql, args=args)
             txinfo = list()
             for record in ret:
@@ -509,7 +542,7 @@ class DataHandler:
                     result_asset_files[asset_id] = self.get_in_storage(asset_group_id, asset_id)
         return result_txobj, result_asset_files
 
-    def count_transactions(self, asset_group_id=None, asset_id=None, user_id=None, db_num=0):
+    def count_transactions(self, asset_group_id=None, asset_id=None, user_id=None, start_from=None, until=None, db_num=0):
         """Count transactions that matches the given conditions
 
         When Multiple conditions are given, they are considered as AND condition.
@@ -518,6 +551,8 @@ class DataHandler:
             asset_group_id (bytes): asset_group_id that target transactions should have
             asset_id (bytes): asset_id that target transactions should have
             user_id (bytes): user_id that target transactions should have
+            start_from (int): the starting timestamp to search
+            until (int): the end timestamp to search
             db_num (int): index of DB if multiple DBs are used
         Returns:
             int: the number of transactions
@@ -530,8 +565,12 @@ class DataHandler:
             conditions.append("asset_id = %s " % self.db_adaptors[0].placeholder)
         if user_id is not None:
             conditions.append("user_id = %s " % self.db_adaptors[0].placeholder)
+        if start_from is not None:
+            conditions.append("timestamp >= %s " % self.db_adaptors[0].placeholder)
+        if until is not None:
+            conditions.append("timestamp <= %s " % self.db_adaptors[0].placeholder)
         sql += "AND ".join(conditions)
-        args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id)))
+        args = list(filter(lambda a: a is not None, (asset_group_id, asset_id, user_id, start_from, until)))
         ret = self.exec_sql(db_num=db_num, sql=sql, args=args)
         return ret[0][0]
 
@@ -742,6 +781,37 @@ class DbAdaptor:
         """Check whether the table exists or not"""
         pass
 
+    def get_version(self):
+        """get_version of the DB
+
+        Returns:
+            str: version string
+        """
+        if len(self.check_table_existence("version_table")) == 0:
+            return "ver=1"
+        ret = self.handler.exec_sql(db_num=self.db_num, sql="SELECT version FROM version_table;")
+        if ret is None or len(ret) == 0:
+            return "ver=1"
+        return ret[0][0]
+
+    def update_table_def(self, from_ver):
+        """Update table definition"""
+        self.create_table("version_table", version_tbl_definition)
+        ret = self.handler.exec_sql(db_num=self.db_num, sql="INSERT INTO version_table (version) VALUES (\"%s\");" % DB_VERSION, commit=True)
+        if ret is None:
+            print("XXXX Cannot create version_table in DB")
+            sys.exit(1)
+        if from_ver == "ver=1":
+            self.create_ver2_column()
+
+    def create_ver2_column(self):
+        """Create column for version 2 meta table (add timestamp in asset_info_table)"""
+        try:
+            self.db_cur.execute("ALTER TABLE asset_info_table ADD COLUMN timestamp BIGINT;")
+            self.db.commit()
+        except:
+            pass
+
 
 class SqliteAdaptor(DbAdaptor):
     """DB adaptor for SQLite3"""
@@ -765,7 +835,7 @@ class SqliteAdaptor(DbAdaptor):
             indices (list): list of indices to create index
         """
         if len(self.check_table_existence(tbl)) > 0:
-            return
+            return False
         sql = "CREATE TABLE %s " % tbl
         sql += "("
         sql += ", ".join(["%s %s" % (d[0],d[1]) for d in tbl_definition])
@@ -775,6 +845,7 @@ class SqliteAdaptor(DbAdaptor):
         for idx in indices:
             self.handler.exec_sql(sql="CREATE INDEX %s_idx_%d ON %s (%s);" % (tbl, idx, tbl, tbl_definition[idx][0]),
                                   commit=True)
+        return True
 
     def check_table_existence(self, tblname):
         """Check whether the table exists or not"""
@@ -814,7 +885,7 @@ class MysqlAdaptor(DbAdaptor):
             indices (list): list of indices to create index
         """
         if len(self.check_table_existence(tbl)) == 1:
-            return
+            return False
         sql = "CREATE TABLE %s " % tbl
         sql += "("
         defs = list()
@@ -837,6 +908,7 @@ class MysqlAdaptor(DbAdaptor):
             else:
                 self.handler.exec_sql(db_num=self.db_num, sql="ALTER TABLE %s ADD INDEX (%s);"
                                                               % (tbl, tbl_definition[idx][0]), commit=True)
+        return True
 
     def check_table_existence(self, tblname):
         """Check whether the table exists or not"""

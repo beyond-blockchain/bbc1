@@ -176,3 +176,13 @@ If you want to get random ID string, -r generate such a string.
 ```
 python id_create.py -r
 ```
+
+## db\_migration\_tool.py
+
+This tool upgrades the DB meta table.
+
+```
+python db_migration_tool.py -w "working_dir"
+```
+
+The tool scan all domains in the specified working_dir and perform meta data migration on the fly (bbc_core.py can be running during migration, but note that new feature by the new meta table cannot be used completely before finishing migration.)

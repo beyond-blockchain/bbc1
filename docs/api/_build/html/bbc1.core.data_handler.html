@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="bbc1.core.domain0_manager module" href="bbc1.core.domain0_manager.html" />
     <link rel="prev" title="bbc1.core.command module" href="bbc1.core.command.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -172,7 +174,8 @@
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at</p>
 <blockquote>
-<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<div><p><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+</div></blockquote>
 <p>Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an “AS IS” BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -241,118 +244,104 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.count_transactions">
-<code class="descname">count_transactions</code><span class="sig-paren">(</span><em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>db_num=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.count_transactions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">count_transactions</code><span class="sig-paren">(</span><em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>start_from=None</em>, <em>until=None</em>, <em>db_num=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.count_transactions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count transactions that matches the given conditions</p>
 <p>When Multiple conditions are given, they are considered as AND condition.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</li>
-<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</li>
-<li><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</li>
-<li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</p></li>
+<li><p><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</p></li>
+<li><p><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</p></li>
+<li><p><strong>start_from</strong> (<em>int</em>) – the starting timestamp to search</p></li>
+<li><p><strong>until</strong> (<em>int</em>) – the end timestamp to search</p></li>
+<li><p><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the number of transactions</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the number of transactions</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.exec_sql">
-<code class="descname">exec_sql</code><span class="sig-paren">(</span><em>db_num=0</em>, <em>sql=None</em>, <em>args=()</em>, <em>commit=False</em>, <em>fetch_one=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.exec_sql"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.exec_sql" title="Permalink to this definition">¶</a></dt>
+<code class="descname">exec_sql</code><span class="sig-paren">(</span><em>db_num=0</em>, <em>sql=None</em>, <em>args=()</em>, <em>commit=False</em>, <em>fetch_one=False</em>, <em>return_cursor=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.exec_sql"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.exec_sql" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute sql sentence</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
-<li><strong>sql</strong> (<em>str</em>) – SQL string</li>
-<li><strong>args</strong> (<em>list</em>) – Args for the SQL</li>
-<li><strong>commit</strong> (<em>bool</em>) – If True, commit is performed</li>
-<li><strong>fetch_one</strong> (<em>bool</em>) – If True, fetch just one record</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</p></li>
+<li><p><strong>sql</strong> (<em>str</em>) – SQL string</p></li>
+<li><p><strong>args</strong> (<em>list</em>) – Args for the SQL</p></li>
+<li><p><strong>commit</strong> (<em>bool</em>) – If True, commit is performed</p></li>
+<li><p><strong>fetch_one</strong> (<em>bool</em>) – If True, fetch just one record</p></li>
+<li><p><strong>return_cursor</strong> (<em>bool</em>) – If True (and fetch_one is False), return db_cur (iterator)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of records</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of records</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.get_asset_info">
 <code class="descname">get_asset_info</code><span class="sig-paren">(</span><em>txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.get_asset_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.get_asset_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve asset information from transaction object</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to analyze</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of list [asset_group_id, asset_id, user_id, file_size, file_digest]</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to analyze</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of list [asset_group_id, asset_id, user_id, file_size, file_digest]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.get_in_storage">
 <code class="descname">get_in_storage</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.get_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.get_in_storage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the asset file with the asset_id from local storage</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id of the asset</li>
-<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id of the asset</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id of the asset</p></li>
+<li><p><strong>asset_id</strong> (<em>bytes</em>) – asset_id of the asset</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the file content</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes or None</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the file content</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bytes or None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.insert_cross_ref">
 <code class="descname">insert_cross_ref</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>outer_domain_id</em>, <em>txid_having_cross_ref</em>, <em>no_replication=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.insert_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.insert_cross_ref" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert cross_ref information into cross_ref_table</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</li>
-<li><strong>outer_domain_id</strong> (<em>bytes</em>) – domain_id that holds cross_ref about the transaction_id</li>
-<li><strong>txid_having_cross_ref</strong> (<em>bytes</em>) – transaction_id in the outer_domain that includes the cross_ref</li>
-<li><strong>no_replication</strong> (<em>bool</em>) – If False, the replication is sent to other nodes in the domain</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</p></li>
+<li><p><strong>outer_domain_id</strong> (<em>bytes</em>) – domain_id that holds cross_ref about the transaction_id</p></li>
+<li><p><strong>txid_having_cross_ref</strong> (<em>bytes</em>) – transaction_id in the outer_domain that includes the cross_ref</p></li>
+<li><p><strong>no_replication</strong> (<em>bool</em>) – If False, the replication is sent to other nodes in the domain</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -360,40 +349,33 @@ limitations under the License.</p>
 <code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>txdata</em>, <em>txobj=None</em>, <em>fmt_type=0</em>, <em>asset_files=None</em>, <em>no_replication=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.insert_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert transaction data and its asset files</p>
 <p>Either txdata or txobj must be given to insert the transaction.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</li>
-<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</li>
-<li><strong>fmt_type</strong> (<em>int</em>) – 2-byte value of BBcFormat type</li>
-<li><strong>asset_files</strong> (<em>dict</em>) – asset files in the transaction</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</p></li>
+<li><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</p></li>
+<li><p><strong>fmt_type</strong> (<em>int</em>) – 2-byte value of BBcFormat type</p></li>
+<li><p><strong>asset_files</strong> (<em>dict</em>) – asset files in the transaction</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">set of asset_group_ids in the transaction</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">set</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>set of asset_group_ids in the transaction</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>set</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.process_message">
 <code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.process_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process received message</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<em>dict</em>) – received message</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msg</strong> (<em>dict</em>) – received message</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -401,19 +383,15 @@ limitations under the License.</p>
 <code class="descname">remove</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>txobj=None</em>, <em>db_num=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete all data regarding the specified transaction_id</p>
 <p>This method requires either transaction_id or txobj.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</li>
-<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</li>
-<li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</p></li>
+<li><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</p></li>
+<li><p><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -426,99 +404,88 @@ limitations under the License.</p>
 <dt id="bbc1.core.data_handler.DataHandler.search_domain_having_cross_ref">
 <code class="descname">search_domain_having_cross_ref</code><span class="sig-paren">(</span><em>transaction_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_domain_having_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_domain_having_cross_ref" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search domain_id that holds cross_ref about the specified transaction_id</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">records of cross_ref_tables [“id”,”transaction_id”, “outer_domain_id”, “txid_having_cross_ref”]</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>records of cross_ref_tables [“id”,”transaction_id”, “outer_domain_id”, “txid_having_cross_ref”]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.search_transaction">
-<code class="descname">search_transaction</code><span class="sig-paren">(</span><em>transaction_id=None</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>direction=0</em>, <em>count=1</em>, <em>db_num=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="descname">search_transaction</code><span class="sig-paren">(</span><em>transaction_id=None</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>start_from=None</em>, <em>until=None</em>, <em>direction=0</em>, <em>count=1</em>, <em>db_num=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search transaction data</p>
 <p>When Multiple conditions are given, they are considered as AND condition.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</li>
-<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</li>
-<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</li>
-<li><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</li>
-<li><strong>direction</strong> (<em>int</em>) – 0: descend, 1: ascend</li>
-<li><strong>count</strong> (<em>int</em>) – The maximum number of transactions to retrieve</li>
-<li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</p></li>
+<li><p><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</p></li>
+<li><p><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</p></li>
+<li><p><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</p></li>
+<li><p><strong>start_from</strong> (<em>int</em>) – the starting timestamp to search</p></li>
+<li><p><strong>until</strong> (<em>int</em>) – the end timestamp to search</p></li>
+<li><p><strong>direction</strong> (<em>int</em>) – 0: descend, 1: ascend</p></li>
+<li><p><strong>count</strong> (<em>int</em>) – The maximum number of transactions to retrieve</p></li>
+<li><p><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">mapping from transaction_id to serialized transaction data
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>mapping from transaction_id to serialized transaction data
 dict: dictionary of {asset_id: content} for the transaction</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.search_transaction_topology">
 <code class="descname">search_transaction_topology</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>traverse_to_past=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_transaction_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_transaction_topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search in topology info</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transaction_id</strong> (<em>bytes</em>) – base transaction_id</li>
-<li><strong>traverse_to_past</strong> (<em>bool</em>) – True: search backward (to past), False: search forward (to future)</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transaction_id</strong> (<em>bytes</em>) – base transaction_id</p></li>
+<li><p><strong>traverse_to_past</strong> (<em>bool</em>) – True: search backward (to past), False: search forward (to future)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of records of topology table</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of records of topology table</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.store_in_storage">
 <code class="descname">store_in_storage</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em>, <em>content</em>, <em>do_overwrite=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.store_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.store_in_storage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store asset file in local storage</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id of the asset</li>
-<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id of the asset</li>
-<li><strong>content</strong> (<em>bytes</em>) – the content of the asset file</li>
-<li><strong>do_overwrite</strong> (<em>bool</em>) – If True, file is overwritten</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id of the asset</p></li>
+<li><p><strong>asset_id</strong> (<em>bytes</em>) – asset_id of the asset</p></li>
+<li><p><strong>content</strong> (<em>bytes</em>) – the content of the asset file</p></li>
+<li><p><strong>do_overwrite</strong> (<em>bool</em>) – If True, file is overwritten</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if successful</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if successful</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -532,69 +499,61 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.exec_sql">
 <code class="descname">exec_sql</code><span class="sig-paren">(</span><em>sql</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.exec_sql"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.exec_sql" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute sql sentence</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
-<li><strong>sql</strong> (<em>str</em>) – SQL string</li>
-<li><strong>args</strong> (<em>list</em>) – Args for the SQL</li>
-<li><strong>commit</strong> (<em>bool</em>) – If True, commit is performed</li>
-<li><strong>fetch_one</strong> (<em>bool</em>) – If True, fetch just one record</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</p></li>
+<li><p><strong>sql</strong> (<em>str</em>) – SQL string</p></li>
+<li><p><strong>args</strong> (<em>list</em>) – Args for the SQL</p></li>
+<li><p><strong>commit</strong> (<em>bool</em>) – If True, commit is performed</p></li>
+<li><p><strong>fetch_one</strong> (<em>bool</em>) – If True, fetch just one record</p></li>
+<li><p><strong>return_cursor</strong> (<em>bool</em>) – If True (and fetch_one is False), return db_cur (iterator)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of records</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of records</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.get_asset_info">
 <code class="descname">get_asset_info</code><span class="sig-paren">(</span><em>txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.get_asset_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.get_asset_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve asset information from transaction object</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to analyze</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of list [asset_group_id, asset_id, user_id, file_size, file_digest]</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to analyze</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of list [asset_group_id, asset_id, user_id, file_size, file_digest]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.get_in_storage">
 <code class="descname">get_in_storage</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.get_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.get_in_storage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the asset file with the asset_id from local storage</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id of the asset</li>
-<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id of the asset</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id of the asset</p></li>
+<li><p><strong>asset_id</strong> (<em>bytes</em>) – asset_id of the asset</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the file content</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bytes or None</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the file content</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bytes or None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -602,40 +561,33 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>txdata</em>, <em>txobj=None</em>, <em>asset_files=None</em>, <em>no_replication=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.insert_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert transaction data and its asset files</p>
 <p>Either txdata or txobj must be given to insert the transaction.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</li>
-<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</li>
-<li><strong>fmt_type</strong> (<em>int</em>) – 2-byte value of BBcFormat type</li>
-<li><strong>asset_files</strong> (<em>dict</em>) – asset files in the transaction</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</p></li>
+<li><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</p></li>
+<li><p><strong>fmt_type</strong> (<em>int</em>) – 2-byte value of BBcFormat type</p></li>
+<li><p><strong>asset_files</strong> (<em>dict</em>) – asset files in the transaction</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">set of asset_group_ids in the transaction</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">set</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>set of asset_group_ids in the transaction</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>set</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.process_message">
 <code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.process_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process received message</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<em>dict</em>) – received message</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msg</strong> (<em>dict</em>) – received message</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -643,19 +595,15 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <code class="descname">remove</code><span class="sig-paren">(</span><em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete all data regarding the specified transaction_id</p>
 <p>This method requires either transaction_id or txobj.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</li>
-<li><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</li>
-<li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</p></li>
+<li><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</p></li>
+<li><p><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -663,80 +611,70 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <code class="descname">search_transaction</code><span class="sig-paren">(</span><em>transaction_id=None</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>count=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.search_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search transaction data</p>
 <p>When Multiple conditions are given, they are considered as AND condition.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</li>
-<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</li>
-<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</li>
-<li><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</li>
-<li><strong>direction</strong> (<em>int</em>) – 0: descend, 1: ascend</li>
-<li><strong>count</strong> (<em>int</em>) – The maximum number of transactions to retrieve</li>
-<li><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</p></li>
+<li><p><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id that target transactions should have</p></li>
+<li><p><strong>asset_id</strong> (<em>bytes</em>) – asset_id that target transactions should have</p></li>
+<li><p><strong>user_id</strong> (<em>bytes</em>) – user_id that target transactions should have</p></li>
+<li><p><strong>start_from</strong> (<em>int</em>) – the starting timestamp to search</p></li>
+<li><p><strong>until</strong> (<em>int</em>) – the end timestamp to search</p></li>
+<li><p><strong>direction</strong> (<em>int</em>) – 0: descend, 1: ascend</p></li>
+<li><p><strong>count</strong> (<em>int</em>) – The maximum number of transactions to retrieve</p></li>
+<li><p><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">mapping from transaction_id to serialized transaction data
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>mapping from transaction_id to serialized transaction data
 dict: dictionary of {asset_id: content} for the transaction</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.search_transaction_topology">
 <code class="descname">search_transaction_topology</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>reverse_link=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.search_transaction_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.search_transaction_topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search in topology info</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transaction_id</strong> (<em>bytes</em>) – base transaction_id</li>
-<li><strong>traverse_to_past</strong> (<em>bool</em>) – True: search backward (to past), False: search forward (to future)</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transaction_id</strong> (<em>bytes</em>) – base transaction_id</p></li>
+<li><p><strong>traverse_to_past</strong> (<em>bool</em>) – True: search backward (to past), False: search forward (to future)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of records of topology table</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of records of topology table</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.store_in_storage">
 <code class="descname">store_in_storage</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em>, <em>content</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.store_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.store_in_storage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store asset file in local storage</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id of the asset</li>
-<li><strong>asset_id</strong> (<em>bytes</em>) – asset_id of the asset</li>
-<li><strong>content</strong> (<em>bytes</em>) – the content of the asset file</li>
-<li><strong>do_overwrite</strong> (<em>bool</em>) – If True, file is overwritten</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asset_group_id</strong> (<em>bytes</em>) – asset_group_id of the asset</p></li>
+<li><p><strong>asset_id</strong> (<em>bytes</em>) – asset_id of the asset</p></li>
+<li><p><strong>content</strong> (<em>bytes</em>) – the content of the asset file</p></li>
+<li><p><strong>do_overwrite</strong> (<em>bool</em>) – If True, file is overwritten</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if successful</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if successful</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -759,9 +697,35 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="bbc1.core.data_handler.DbAdaptor.create_ver2_column">
+<code class="descname">create_ver2_column</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.create_ver2_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.create_ver2_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create column for version 2 meta table (add timestamp in asset_info_table)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.data_handler.DbAdaptor.get_version">
+<code class="descname">get_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.get_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.get_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>get_version of the DB</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>version string</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="bbc1.core.data_handler.DbAdaptor.open_db">
 <code class="descname">open_db</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.open_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.open_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Open the DB</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbc1.core.data_handler.DbAdaptor.update_table_def">
+<code class="descname">update_table_def</code><span class="sig-paren">(</span><em>from_ver</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.update_table_def"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.update_table_def" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update table definition</p>
 </dd></dl>
 
 </dd></dl>
@@ -781,20 +745,16 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dt id="bbc1.core.data_handler.MysqlAdaptor.create_table">
 <code class="descname">create_table</code><span class="sig-paren">(</span><em>tbl</em>, <em>tbl_definition</em>, <em>primary_key=0</em>, <em>indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#MysqlAdaptor.create_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.MysqlAdaptor.create_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a table</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tbl</strong> (<em>str</em>) – table name</li>
-<li><strong>tbl_definition</strong> (<em>list</em>) – schema of the table [[“column_name”, “data type”],[“colmun_name”, “data type”],,]</li>
-<li><strong>primary_key</strong> (<em>int</em>) – index (column) of the primary key of the table</li>
-<li><strong>indices</strong> (<em>list</em>) – list of indices to create index</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tbl</strong> (<em>str</em>) – table name</p></li>
+<li><p><strong>tbl_definition</strong> (<em>list</em>) – schema of the table [[“column_name”, “data type”],[“colmun_name”, “data type”],,]</p></li>
+<li><p><strong>primary_key</strong> (<em>int</em>) – index (column) of the primary key of the table</p></li>
+<li><p><strong>indices</strong> (<em>list</em>) – list of indices to create index</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -820,20 +780,16 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 <dt id="bbc1.core.data_handler.SqliteAdaptor.create_table">
 <code class="descname">create_table</code><span class="sig-paren">(</span><em>tbl</em>, <em>tbl_definition</em>, <em>primary_key=0</em>, <em>indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#SqliteAdaptor.create_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.SqliteAdaptor.create_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a table</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tbl</strong> (<em>str</em>) – table name</li>
-<li><strong>tbl_definition</strong> (<em>list</em>) – schema of the table [[“column_name”, “data type”],[“colmun_name”, “data type”],,]</li>
-<li><strong>primary_key</strong> (<em>int</em>) – index (column) of the primary key of the table</li>
-<li><strong>indices</strong> (<em>list</em>) – list of indices to create index</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tbl</strong> (<em>str</em>) – table name</p></li>
+<li><p><strong>tbl_definition</strong> (<em>list</em>) – schema of the table [[“column_name”, “data type”],[“colmun_name”, “data type”],,]</p></li>
+<li><p><strong>primary_key</strong> (<em>int</em>) – index (column) of the primary key of the table</p></li>
+<li><p><strong>indices</strong> (<em>list</em>) – list of indices to create index</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -857,7 +813,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
         <a href="bbc1.core.domain0_manager.html" class="btn btn-neutral float-right" title="bbc1.core.domain0_manager module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="bbc1.core.command.html" class="btn btn-neutral" title="bbc1.core.command module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="bbc1.core.command.html" class="btn btn-neutral float-left" title="bbc1.core.command module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -883,25 +839,16 @@ dict: dictionary of {asset_id: content} for the transaction</p>
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

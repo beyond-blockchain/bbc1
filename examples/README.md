@@ -10,26 +10,12 @@ This app allows a user to do the following:
 * verify a file
 * send/receive a file to another user through bbc_core and transfer the possession of it
 
-
-# Estate escrow
-The app consists of four scripts, which allow a user to do the following:
-- land.py
-    * Register the information of land, such as address and size, to the bbc_core
-    * Transfer the owner of the land by updating the land information in bbc_core
-- coin.py
-    * Generate coin asset in bbc_core
-    * Transfer coin owner in bbc_core
-- LegalAffairsBureau.py
-    * Check double spending of land by third-party (like a legal affairs bureau).
-- escrow.py
-    * Escrow land and coin to a third-party program (this script) to execute an atomic exchange between land and coin automatically.
-
-
-# Payment with a digital currency
-This app allows a user to do the following:
-* define and switch among users
-* define and switch among currencies
-* create currency tokens for a user
-* delete currency tokens
-* transfer currency tokens from the user to another user
-* show status (balances, etc.) of currencies
+# Starter example
+This example includes setup scripts and application.
+* install modules
+* create bbc1 configuration
+* create a domain
+* run a single bbc_core.py
+* create and register a transaction
+* search transactions and show the list
+* search a transaction and print the dump of the transaction

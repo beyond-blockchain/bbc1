@@ -91,7 +91,7 @@ class BBcWitness:
                 self.sig_indices.append(idx)
                 if ptr > data_size:
                     return False
-                self.transaction.get_sig_index(uid[:self.id_length])
+                self.transaction.set_sig_index(uid[:self.id_length], idx)
         except:
             return False
         return True

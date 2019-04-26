@@ -30,8 +30,9 @@ from bbc1.core.libs.bbclib_config import DEFAULT_ID_LEN
 
 class BBcAsset:
     """Asset part in a transaction"""
-    def __init__(self, user_id=None, asset_file=None, asset_body=None, id_length=DEFAULT_ID_LEN):
+    def __init__(self, user_id=None, asset_file=None, asset_body=None, id_length=DEFAULT_ID_LEN, version=2):
         self.id_length = id_length
+        self.version = version
         self.asset_id = None
         if user_id is not None and id_length < 32:
             self.user_id = user_id[:id_length]
@@ -64,7 +65,7 @@ class BBcAsset:
         if asset_file is not None:
             self.asset_file = asset_file
             self.asset_file_size = len(asset_file)
-            self.asset_file_digest = hashlib.sha256(bytes(asset_file)).digest()[:self.id_length]
+            self.asset_file_digest = hashlib.sha256(bytes(asset_file)).digest()
         if asset_body is not None:
             self.asset_body = asset_body
             if isinstance(asset_body, str):
@@ -95,9 +96,9 @@ class BBcAsset:
             return None, None
         return self.asset_file_digest, self.asset_file
 
-    def recover_asset_file(self, asset_file, id_length=DEFAULT_ID_LEN):
+    def recover_asset_file(self, asset_file):
         """Recover asset file info from the given raw content"""
-        digest = hashlib.sha256(asset_file).digest()[:id_length]
+        digest = hashlib.sha256(asset_file).digest()
         if digest == self.asset_file_digest:
             self.asset_file = asset_file
             return True
@@ -112,43 +113,26 @@ class BBcAsset:
         Returns:
             bytes: packed binary data
         """
-        if for_digest_calculation:
-            dat = bytearray(bbclib_utils.to_bigint(self.user_id, size=self.id_length))
-            dat.extend(bbclib_utils.to_2byte(len(self.nonce)))
-            dat.extend(self.nonce)
-            dat.extend(bbclib_utils.to_4byte(self.asset_file_size))
-            if self.asset_file_size > 0:
-                dat.extend(self.asset_file_digest)
-            if isinstance(self.asset_body, dict):
-                dat.extend(bbclib_utils.to_2byte(1))
-                astbdy = msgpack.dumps(self.asset_body)
-                dat.extend(bbclib_utils.to_2byte(len(astbdy)))
-                dat.extend(astbdy)
-            else:
-                dat.extend(bbclib_utils.to_2byte(0))
-                dat.extend(bbclib_utils.to_2byte(self.asset_body_size))
-                if self.asset_body_size > 0:
-                    dat.extend(self.asset_body)
-            return bytes(dat)
+        dat = bytearray()
+        if not for_digest_calculation:
+            dat.extend(bbclib_utils.to_bigint(self.asset_id, size=self.id_length))
+        dat.extend(bbclib_utils.to_bigint(self.user_id, size=self.id_length))
+        dat.extend(bbclib_utils.to_2byte(len(self.nonce)))
+        dat.extend(self.nonce)
+        dat.extend(bbclib_utils.to_4byte(self.asset_file_size))
+        if self.asset_file_size > 0:
+            dat.extend(bbclib_utils.to_bigint(self.asset_file_digest))
+        if isinstance(self.asset_body, dict):
+            dat.extend(bbclib_utils.to_2byte(1))
+            astbdy = msgpack.dumps(self.asset_body)
+            dat.extend(bbclib_utils.to_2byte(len(astbdy)))
+            dat.extend(astbdy)
         else:
-            dat = bytearray(bbclib_utils.to_bigint(self.asset_id, size=self.id_length))
-            dat.extend(bbclib_utils.to_bigint(self.user_id, size=self.id_length))
-            dat.extend(bbclib_utils.to_2byte(len(self.nonce)))
-            dat.extend(self.nonce)
-            dat.extend(bbclib_utils.to_4byte(self.asset_file_size))
-            if self.asset_file_size > 0:
-                dat.extend(bbclib_utils.to_bigint(self.asset_file_digest, size=self.id_length))
-            if isinstance(self.asset_body, dict):
-                dat.extend(bbclib_utils.to_2byte(1))
-                astbdy = msgpack.dumps(self.asset_body)
-                dat.extend(bbclib_utils.to_2byte(len(astbdy)))
-                dat.extend(astbdy)
-            else:
-                dat.extend(bbclib_utils.to_2byte(0))
-                dat.extend(bbclib_utils.to_2byte(self.asset_body_size))
-                if self.asset_body_size > 0:
-                    dat.extend(self.asset_body)
-            return bytes(dat)
+            dat.extend(bbclib_utils.to_2byte(0))
+            dat.extend(bbclib_utils.to_2byte(self.asset_body_size))
+            if self.asset_body_size > 0:
+                dat.extend(self.asset_body)
+        return bytes(dat)
 
     def unpack(self, data):
         """Unpack into this object
