@@ -1,6 +1,18 @@
 Change log
 ======
 
+## v1.3
+* Support timestamp-based transaction search
+  * search_transaction_with_condition() method in bbc_app.py is upgraded to include start\_from and until params
+  * DB meta table (asset_info_table) is upgraded (timestamp column is added)
+  * Migration tool is implemented (utils/db_migration_tool.py)
+* Add a new step-by-step style example in github (examples/starter)
+* Bug fixes
+
+## v1.2
+* Re-design and refactor bbclib.py
+  * serializing transaction object consists of packing object into binary and serializing it into wire format. (new format types are 0x0000 and 0x0010)
+ 
 ## v1.1.1
 * Fix bug on installation with pip in Linux environment
 
