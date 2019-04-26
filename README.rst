@@ -42,12 +42,13 @@ In the case of high transaction rate, some records might remain unchanged. In th
 Note that you have to perform step 1 and 2 for each working directory because the process reads config file in the working directory and upgrades the DBs specified in the config.
 
 ## Documents
-Some documents are available in docs/.
 * Policy, design and analysis
   * [BBc-trust.pdf](docs/BBc-trust.pdf)
   * [BBc-trust_ja.pdf](docs/BBc-trust_ja.pdf)
   * [BBc-1_design_paper.pdf](docs/BBc-1_design_paper.pdf)
   * [BBc1_design_document_v1.0_ja.pdf](docs/BBc1_design_document_v1.0_ja.pdf)
+  * [BBc1_system_design_guide_v1.0_ja.pdf](docs/BBc1_system_design_guide_v1.0_ja.pdf)
+  * [BBc1_consensus_consideration_v1.0_ja.pdf](docs/BBc1_consensus_consideration_v1.0_ja.pdf)
   * [How_BBc1_works_v1.0.2_ja.pdf](docs/How_BBc1_works_v1.0.2_ja.pdf)
 * Usage
     * [How_to_use_BBc1_v1.0.2_ja.pdf](docs/How_to_use_BBc1_v1.0.2_ja.pdf)
@@ -55,7 +56,7 @@ Some documents are available in docs/.
     * [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
     * [libbbcsig_dll_build_for_Windows_x64_ja.md](docs/libbbcsig_dll_build_for_Windows_x64_ja.md)
 * Programing
-    * [BBc1_programming_guide_v1.2_ja.md](docs/BBc1_programming_guide_v1.2_ja.md)
+    * [BBc1_programming_guide_v1.3_ja.md](docs/BBc1_programming_guide_v1.3_ja.md)
     * [BBc1_core_tutorial_file_proof_ja.md](docs/BBc1_core_tutorial_file_proof_ja.md)
     * [BBc1_data_format_ja.md](docs/BBc1_data_format_ja.md)
 * API reference (Coming soon. Currently, something wrong in building docs)

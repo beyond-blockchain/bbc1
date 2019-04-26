@@ -46,7 +46,7 @@ from bbc1.core.data_handler import InfraMessageCategory
 from bbc1.core import command
 from bbc1.core.bbc_error import *
 
-VERSION = "core version 1.3"
+VERSION = "version 1.3"
 
 PID_FILE = "/tmp/bbc1.pid"
 POOL_SIZE = 1000
@@ -134,6 +134,7 @@ class BBcCoreService:
                  workingdir=".bbc1", configfile=None, use_nodekey=None, use_ledger_subsystem=False,
                  default_conffile=None, loglevel="all", logname="-", server_start=True):
         self.logger = logger.get_logger(key="core", level=loglevel, logname=logname)
+        self.logger.info("bbc_core %s" % VERSION)
         self.stats = bbc_stats.BBcStats()
         self.config = BBcConfig(workingdir, configfile, default_conffile)
         conf = self.config.get_config()
