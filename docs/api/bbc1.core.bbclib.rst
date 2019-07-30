@@ -2,6 +2,6 @@ bbc1.core.bbclib module
 =======================
 
 .. automodule:: bbc1.core.bbclib
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

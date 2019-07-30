@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.topology_manager module &mdash; BBc1 1.2 documentation</title>
+  <title>bbc1.core.topology_manager module &mdash; BBc1 1.4 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.2
+                1.4
               </div>
             
           
@@ -89,7 +89,6 @@
 <li class="toctree-l1 current"><a class="reference internal" href="bbc1.html">bbc1 package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="bbc1.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="bbc1.core.html">bbc1.core package</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="bbc1.core.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#module-bbc1.core">Module contents</a></li>
 </ul>
@@ -183,7 +182,7 @@ See the License for the specific language governing permissions and
 limitations under the License.</p>
 <dl class="class">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase">
-<em class="property">class </em><code class="descclassname">bbc1.core.topology_manager.</code><code class="descname">TopologyManagerBase</code><span class="sig-paren">(</span><em>network=None</em>, <em>config=None</em>, <em>domain_id=None</em>, <em>node_id=None</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.topology_manager.</code><code class="sig-name descname">TopologyManagerBase</code><span class="sig-paren">(</span><em class="sig-param">network=None</em>, <em class="sig-param">config=None</em>, <em class="sig-param">domain_id=None</em>, <em class="sig-param">node_id=None</em>, <em class="sig-param">loglevel='all'</em>, <em class="sig-param">logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Network topology management for a domain</p>
 <p>This class defines how to create topology, meaning that who should be neighbors and provides very simple topology
@@ -192,23 +191,23 @@ to upgrade functions.
 This class does not manage the neighbor list itself (It’s in BBcNetwork)</p>
 <dl class="attribute">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL">
-<code class="descname">NEIGHBOR_LIST_REFRESH_INTERVAL</code><em class="property"> = 300</em><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">NEIGHBOR_LIST_REFRESH_INTERVAL</code><em class="property"> = 300</em><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.NEIGHBOR_LIST_REFRESH_INTERVAL" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.NOTIFY_NEIGHBOR_LIST">
-<code class="descname">NOTIFY_NEIGHBOR_LIST</code><em class="property"> = b'\x00\x00'</em><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.NOTIFY_NEIGHBOR_LIST" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">NOTIFY_NEIGHBOR_LIST</code><em class="property"> = b'\x00\x00'</em><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.NOTIFY_NEIGHBOR_LIST" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.make_neighbor_list">
-<code class="descname">make_neighbor_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.make_neighbor_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.make_neighbor_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">make_neighbor_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.make_neighbor_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.make_neighbor_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>make nodelist binary for advertising</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.notify_neighbor_update">
-<code class="descname">notify_neighbor_update</code><span class="sig-paren">(</span><em>node_id</em>, <em>is_new=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.notify_neighbor_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.notify_neighbor_update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">notify_neighbor_update</code><span class="sig-paren">(</span><em class="sig-param">node_id</em>, <em class="sig-param">is_new=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.notify_neighbor_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.notify_neighbor_update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update expiration timer for the notified node_id</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -222,7 +221,7 @@ This class does not manage the neighbor list itself (It’s in BBcNetwork)</p>
 
 <dl class="method">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.process_message">
-<code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.process_message" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">process_message</code><span class="sig-paren">(</span><em class="sig-param">msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.process_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process received message</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -233,13 +232,13 @@ This class does not manage the neighbor list itself (It’s in BBcNetwork)</p>
 
 <dl class="method">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.stop_all_timers">
-<code class="descname">stop_all_timers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.stop_all_timers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.stop_all_timers" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stop_all_timers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.stop_all_timers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.stop_all_timers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Invalidate all running timers</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.topology_manager.TopologyManagerBase.update_refresh_timer_entry">
-<code class="descname">update_refresh_timer_entry</code><span class="sig-paren">(</span><em>new_entry=True</em>, <em>force_refresh_time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.update_refresh_timer_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.update_refresh_timer_entry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_refresh_timer_entry</code><span class="sig-paren">(</span><em class="sig-param">new_entry=True</em>, <em class="sig-param">force_refresh_time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/topology_manager.html#TopologyManagerBase.update_refresh_timer_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.topology_manager.TopologyManagerBase.update_refresh_timer_entry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update expiration timer</p>
 </dd></dl>
 

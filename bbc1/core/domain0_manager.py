@@ -25,8 +25,8 @@ import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core import query_management, user_message_routing, repair_manager, logger
-from bbc1.core import bbclib
-from bbc1.core.bbclib import MsgType
+import bbclib
+from bbclib import MsgType
 from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
 
 

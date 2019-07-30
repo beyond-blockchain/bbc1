@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.data_handler module &mdash; BBc1 1.2 documentation</title>
+  <title>bbc1.core.data_handler module &mdash; BBc1 1.4 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.2
+                1.4
               </div>
             
           
@@ -89,7 +89,6 @@
 <li class="toctree-l1 current"><a class="reference internal" href="bbc1.html">bbc1 package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="bbc1.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="bbc1.core.html">bbc1.core package</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="bbc1.core.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#module-bbc1.core">Module contents</a></li>
 </ul>
@@ -183,68 +182,68 @@ See the License for the specific language governing permissions and
 limitations under the License.</p>
 <dl class="class">
 <dt id="bbc1.core.data_handler.DataHandler">
-<em class="property">class </em><code class="descclassname">bbc1.core.data_handler.</code><code class="descname">DataHandler</code><span class="sig-paren">(</span><em>networking=None</em>, <em>config=None</em>, <em>workingdir=None</em>, <em>domain_id=None</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.data_handler.</code><code class="sig-name descname">DataHandler</code><span class="sig-paren">(</span><em class="sig-param">networking=None</em>, <em class="sig-param">config=None</em>, <em class="sig-param">workingdir=None</em>, <em class="sig-param">domain_id=None</em>, <em class="sig-param">loglevel='all'</em>, <em class="sig-param">logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>DB and storage handler</p>
 <dl class="attribute">
 <dt id="bbc1.core.data_handler.DataHandler.NOTIFY_INSERTED">
-<code class="descname">NOTIFY_INSERTED</code><em class="property"> = b'\x00\x04'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.NOTIFY_INSERTED" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">NOTIFY_INSERTED</code><em class="property"> = b'\x00\x04'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.NOTIFY_INSERTED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.data_handler.DataHandler.REPAIR_TRANSACTION_DATA">
-<code class="descname">REPAIR_TRANSACTION_DATA</code><em class="property"> = b'\x00\x05'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REPAIR_TRANSACTION_DATA" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">REPAIR_TRANSACTION_DATA</code><em class="property"> = b'\x00\x05'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REPAIR_TRANSACTION_DATA" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.data_handler.DataHandler.REPLICATION_ALL">
-<code class="descname">REPLICATION_ALL</code><em class="property"> = 0</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REPLICATION_ALL" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">REPLICATION_ALL</code><em class="property"> = 0</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REPLICATION_ALL" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.data_handler.DataHandler.REPLICATION_CROSS_REF">
-<code class="descname">REPLICATION_CROSS_REF</code><em class="property"> = b'\x00\x06'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REPLICATION_CROSS_REF" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">REPLICATION_CROSS_REF</code><em class="property"> = b'\x00\x06'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REPLICATION_CROSS_REF" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.data_handler.DataHandler.REPLICATION_EXT">
-<code class="descname">REPLICATION_EXT</code><em class="property"> = 2</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REPLICATION_EXT" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">REPLICATION_EXT</code><em class="property"> = 2</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REPLICATION_EXT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.data_handler.DataHandler.REPLICATION_P2P">
-<code class="descname">REPLICATION_P2P</code><em class="property"> = 1</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REPLICATION_P2P" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">REPLICATION_P2P</code><em class="property"> = 1</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REPLICATION_P2P" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.data_handler.DataHandler.REQUEST_REPLICATION_INSERT">
-<code class="descname">REQUEST_REPLICATION_INSERT</code><em class="property"> = b'\x00\x00'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REQUEST_REPLICATION_INSERT" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">REQUEST_REPLICATION_INSERT</code><em class="property"> = b'\x00\x00'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REQUEST_REPLICATION_INSERT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.data_handler.DataHandler.REQUEST_SEARCH">
-<code class="descname">REQUEST_SEARCH</code><em class="property"> = b'\x00\x02'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REQUEST_SEARCH" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">REQUEST_SEARCH</code><em class="property"> = b'\x00\x02'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.REQUEST_SEARCH" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.data_handler.DataHandler.RESPONSE_REPLICATION_INSERT">
-<code class="descname">RESPONSE_REPLICATION_INSERT</code><em class="property"> = b'\x00\x01'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.RESPONSE_REPLICATION_INSERT" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">RESPONSE_REPLICATION_INSERT</code><em class="property"> = b'\x00\x01'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.RESPONSE_REPLICATION_INSERT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.data_handler.DataHandler.RESPONSE_SEARCH">
-<code class="descname">RESPONSE_SEARCH</code><em class="property"> = b'\x00\x03'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.RESPONSE_SEARCH" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">RESPONSE_SEARCH</code><em class="property"> = b'\x00\x03'</em><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.RESPONSE_SEARCH" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.count_domain_in_cross_ref">
-<code class="descname">count_domain_in_cross_ref</code><span class="sig-paren">(</span><em>outer_domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.count_domain_in_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.count_domain_in_cross_ref" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">count_domain_in_cross_ref</code><span class="sig-paren">(</span><em class="sig-param">outer_domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.count_domain_in_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.count_domain_in_cross_ref" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count the number of domains in the cross_ref table</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.count_transactions">
-<code class="descname">count_transactions</code><span class="sig-paren">(</span><em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>start_from=None</em>, <em>until=None</em>, <em>db_num=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.count_transactions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">count_transactions</code><span class="sig-paren">(</span><em class="sig-param">asset_group_id=None</em>, <em class="sig-param">asset_id=None</em>, <em class="sig-param">user_id=None</em>, <em class="sig-param">start_from=None</em>, <em class="sig-param">until=None</em>, <em class="sig-param">db_num=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.count_transactions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count transactions that matches the given conditions</p>
 <p>When Multiple conditions are given, they are considered as AND condition.</p>
 <dl class="field-list simple">
@@ -269,7 +268,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.exec_sql">
-<code class="descname">exec_sql</code><span class="sig-paren">(</span><em>db_num=0</em>, <em>sql=None</em>, <em>args=()</em>, <em>commit=False</em>, <em>fetch_one=False</em>, <em>return_cursor=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.exec_sql"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.exec_sql" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">exec_sql</code><span class="sig-paren">(</span><em class="sig-param">db_num=0</em>, <em class="sig-param">sql=None</em>, <em class="sig-param">args=()</em>, <em class="sig-param">commit=False</em>, <em class="sig-param">fetch_one=False</em>, <em class="sig-param">return_cursor=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.exec_sql"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.exec_sql" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute sql sentence</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -293,11 +292,11 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.get_asset_info">
-<code class="descname">get_asset_info</code><span class="sig-paren">(</span><em>txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.get_asset_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.get_asset_info" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_asset_info</code><span class="sig-paren">(</span><em class="sig-param">txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.get_asset_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.get_asset_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve asset information from transaction object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to analyze</p>
+<dd class="field-odd"><p><strong>txobj</strong> (<em>BBcTransaction</em>) – transaction object to analyze</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>list of list [asset_group_id, asset_id, user_id, file_size, file_digest]</p>
@@ -310,7 +309,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.get_in_storage">
-<code class="descname">get_in_storage</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.get_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.get_in_storage" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_in_storage</code><span class="sig-paren">(</span><em class="sig-param">asset_group_id</em>, <em class="sig-param">asset_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.get_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.get_in_storage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the asset file with the asset_id from local storage</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -330,7 +329,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.insert_cross_ref">
-<code class="descname">insert_cross_ref</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>outer_domain_id</em>, <em>txid_having_cross_ref</em>, <em>no_replication=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.insert_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.insert_cross_ref" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">insert_cross_ref</code><span class="sig-paren">(</span><em class="sig-param">transaction_id</em>, <em class="sig-param">outer_domain_id</em>, <em class="sig-param">txid_having_cross_ref</em>, <em class="sig-param">no_replication=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.insert_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.insert_cross_ref" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert cross_ref information into cross_ref_table</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -346,14 +345,14 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.insert_transaction">
-<code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>txdata</em>, <em>txobj=None</em>, <em>fmt_type=0</em>, <em>asset_files=None</em>, <em>no_replication=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.insert_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">insert_transaction</code><span class="sig-paren">(</span><em class="sig-param">txdata</em>, <em class="sig-param">txobj=None</em>, <em class="sig-param">fmt_type=0</em>, <em class="sig-param">asset_files=None</em>, <em class="sig-param">no_replication=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.insert_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert transaction data and its asset files</p>
 <p>Either txdata or txobj must be given to insert the transaction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</p></li>
-<li><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</p></li>
+<li><p><strong>txobj</strong> (<em>BBcTransaction</em>) – transaction object to insert</p></li>
 <li><p><strong>fmt_type</strong> (<em>int</em>) – 2-byte value of BBcFormat type</p></li>
 <li><p><strong>asset_files</strong> (<em>dict</em>) – asset files in the transaction</p></li>
 </ul>
@@ -369,7 +368,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.process_message">
-<code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.process_message" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">process_message</code><span class="sig-paren">(</span><em class="sig-param">msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.process_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process received message</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -380,14 +379,14 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>txobj=None</em>, <em>db_num=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.remove" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove</code><span class="sig-paren">(</span><em class="sig-param">transaction_id</em>, <em class="sig-param">txobj=None</em>, <em class="sig-param">db_num=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete all data regarding the specified transaction_id</p>
 <p>This method requires either transaction_id or txobj.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</p></li>
-<li><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</p></li>
+<li><p><strong>txobj</strong> (<em>BBcTransaction</em>) – transaction object to remove</p></li>
 <li><p><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</p></li>
 </ul>
 </dd>
@@ -396,13 +395,13 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.restore_transaction_data">
-<code class="descname">restore_transaction_data</code><span class="sig-paren">(</span><em>db_num</em>, <em>transaction_id</em>, <em>txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.restore_transaction_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.restore_transaction_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">restore_transaction_data</code><span class="sig-paren">(</span><em class="sig-param">db_num</em>, <em class="sig-param">transaction_id</em>, <em class="sig-param">txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.restore_transaction_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.restore_transaction_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove and insert a transaction</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.search_domain_having_cross_ref">
-<code class="descname">search_domain_having_cross_ref</code><span class="sig-paren">(</span><em>transaction_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_domain_having_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_domain_having_cross_ref" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">search_domain_having_cross_ref</code><span class="sig-paren">(</span><em class="sig-param">transaction_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_domain_having_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_domain_having_cross_ref" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search domain_id that holds cross_ref about the specified transaction_id</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -419,7 +418,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.search_transaction">
-<code class="descname">search_transaction</code><span class="sig-paren">(</span><em>transaction_id=None</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>start_from=None</em>, <em>until=None</em>, <em>direction=0</em>, <em>count=1</em>, <em>db_num=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">search_transaction</code><span class="sig-paren">(</span><em class="sig-param">transaction_id=None</em>, <em class="sig-param">asset_group_id=None</em>, <em class="sig-param">asset_id=None</em>, <em class="sig-param">user_id=None</em>, <em class="sig-param">start_from=None</em>, <em class="sig-param">until=None</em>, <em class="sig-param">direction=0</em>, <em class="sig-param">count=1</em>, <em class="sig-param">db_num=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search transaction data</p>
 <p>When Multiple conditions are given, they are considered as AND condition.</p>
 <dl class="field-list simple">
@@ -448,7 +447,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.search_transaction_topology">
-<code class="descname">search_transaction_topology</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>traverse_to_past=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_transaction_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_transaction_topology" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">search_transaction_topology</code><span class="sig-paren">(</span><em class="sig-param">transaction_id</em>, <em class="sig-param">traverse_to_past=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.search_transaction_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.search_transaction_topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search in topology info</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -468,7 +467,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandler.store_in_storage">
-<code class="descname">store_in_storage</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em>, <em>content</em>, <em>do_overwrite=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.store_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.store_in_storage" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">store_in_storage</code><span class="sig-paren">(</span><em class="sig-param">asset_group_id</em>, <em class="sig-param">asset_id</em>, <em class="sig-param">content</em>, <em class="sig-param">do_overwrite=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandler.store_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandler.store_in_storage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store asset file in local storage</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -492,12 +491,12 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="class">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0">
-<em class="property">class </em><code class="descclassname">bbc1.core.data_handler.</code><code class="descname">DataHandlerDomain0</code><span class="sig-paren">(</span><em>networking=None</em>, <em>config=None</em>, <em>workingdir=None</em>, <em>domain_id=None</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.data_handler.</code><code class="sig-name descname">DataHandlerDomain0</code><span class="sig-paren">(</span><em class="sig-param">networking=None</em>, <em class="sig-param">config=None</em>, <em class="sig-param">workingdir=None</em>, <em class="sig-param">domain_id=None</em>, <em class="sig-param">loglevel='all'</em>, <em class="sig-param">logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bbc1.core.data_handler.DataHandler" title="bbc1.core.data_handler.DataHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbc1.core.data_handler.DataHandler</span></code></a></p>
 <p>Data handler for domain_global_0</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.exec_sql">
-<code class="descname">exec_sql</code><span class="sig-paren">(</span><em>sql</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.exec_sql"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.exec_sql" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">exec_sql</code><span class="sig-paren">(</span><em class="sig-param">sql</em>, <em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.exec_sql"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.exec_sql" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute sql sentence</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -521,11 +520,11 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.get_asset_info">
-<code class="descname">get_asset_info</code><span class="sig-paren">(</span><em>txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.get_asset_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.get_asset_info" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_asset_info</code><span class="sig-paren">(</span><em class="sig-param">txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.get_asset_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.get_asset_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve asset information from transaction object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to analyze</p>
+<dd class="field-odd"><p><strong>txobj</strong> (<em>BBcTransaction</em>) – transaction object to analyze</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>list of list [asset_group_id, asset_id, user_id, file_size, file_digest]</p>
@@ -538,7 +537,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.get_in_storage">
-<code class="descname">get_in_storage</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.get_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.get_in_storage" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_in_storage</code><span class="sig-paren">(</span><em class="sig-param">asset_group_id</em>, <em class="sig-param">asset_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.get_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.get_in_storage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the asset file with the asset_id from local storage</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -558,14 +557,14 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.insert_transaction">
-<code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>txdata</em>, <em>txobj=None</em>, <em>asset_files=None</em>, <em>no_replication=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.insert_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">insert_transaction</code><span class="sig-paren">(</span><em class="sig-param">txdata</em>, <em class="sig-param">txobj=None</em>, <em class="sig-param">asset_files=None</em>, <em class="sig-param">no_replication=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.insert_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert transaction data and its asset files</p>
 <p>Either txdata or txobj must be given to insert the transaction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>txdata</strong> (<em>bytes</em>) – serialized transaction data</p></li>
-<li><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to insert</p></li>
+<li><p><strong>txobj</strong> (<em>BBcTransaction</em>) – transaction object to insert</p></li>
 <li><p><strong>fmt_type</strong> (<em>int</em>) – 2-byte value of BBcFormat type</p></li>
 <li><p><strong>asset_files</strong> (<em>dict</em>) – asset files in the transaction</p></li>
 </ul>
@@ -581,7 +580,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.process_message">
-<code class="descname">process_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.process_message" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">process_message</code><span class="sig-paren">(</span><em class="sig-param">msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.process_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process received message</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -592,14 +591,14 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.remove" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove</code><span class="sig-paren">(</span><em class="sig-param">transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete all data regarding the specified transaction_id</p>
 <p>This method requires either transaction_id or txobj.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>transaction_id</strong> (<em>bytes</em>) – target transaction_id</p></li>
-<li><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – transaction object to remove</p></li>
+<li><p><strong>txobj</strong> (<em>BBcTransaction</em>) – transaction object to remove</p></li>
 <li><p><strong>db_num</strong> (<em>int</em>) – index of DB if multiple DBs are used</p></li>
 </ul>
 </dd>
@@ -608,7 +607,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.search_transaction">
-<code class="descname">search_transaction</code><span class="sig-paren">(</span><em>transaction_id=None</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>count=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.search_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">search_transaction</code><span class="sig-paren">(</span><em class="sig-param">transaction_id=None</em>, <em class="sig-param">asset_group_id=None</em>, <em class="sig-param">asset_id=None</em>, <em class="sig-param">user_id=None</em>, <em class="sig-param">count=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.search_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search transaction data</p>
 <p>When Multiple conditions are given, they are considered as AND condition.</p>
 <dl class="field-list simple">
@@ -637,7 +636,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.search_transaction_topology">
-<code class="descname">search_transaction_topology</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>reverse_link=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.search_transaction_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.search_transaction_topology" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">search_transaction_topology</code><span class="sig-paren">(</span><em class="sig-param">transaction_id</em>, <em class="sig-param">reverse_link=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.search_transaction_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.search_transaction_topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search in topology info</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -657,7 +656,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DataHandlerDomain0.store_in_storage">
-<code class="descname">store_in_storage</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em>, <em>content</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.store_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.store_in_storage" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">store_in_storage</code><span class="sig-paren">(</span><em class="sig-param">asset_group_id</em>, <em class="sig-param">asset_id</em>, <em class="sig-param">content</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DataHandlerDomain0.store_in_storage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DataHandlerDomain0.store_in_storage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store asset file in local storage</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -681,30 +680,30 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="class">
 <dt id="bbc1.core.data_handler.DbAdaptor">
-<em class="property">class </em><code class="descclassname">bbc1.core.data_handler.</code><code class="descname">DbAdaptor</code><span class="sig-paren">(</span><em>handler=None</em>, <em>db_name=None</em>, <em>db_num=0</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.data_handler.</code><code class="sig-name descname">DbAdaptor</code><span class="sig-paren">(</span><em class="sig-param">handler=None</em>, <em class="sig-param">db_name=None</em>, <em class="sig-param">db_num=0</em>, <em class="sig-param">loglevel='all'</em>, <em class="sig-param">logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Base class for DB adaptor</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.DbAdaptor.check_table_existence">
-<code class="descname">check_table_existence</code><span class="sig-paren">(</span><em>tblname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.check_table_existence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.check_table_existence" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">check_table_existence</code><span class="sig-paren">(</span><em class="sig-param">tblname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.check_table_existence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.check_table_existence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether the table exists or not</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DbAdaptor.create_table">
-<code class="descname">create_table</code><span class="sig-paren">(</span><em>tbl</em>, <em>tbl_definition</em>, <em>primary_key=0</em>, <em>indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.create_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.create_table" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><em class="sig-param">tbl</em>, <em class="sig-param">tbl_definition</em>, <em class="sig-param">primary_key=0</em>, <em class="sig-param">indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.create_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.create_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a table</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DbAdaptor.create_ver2_column">
-<code class="descname">create_ver2_column</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.create_ver2_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.create_ver2_column" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_ver2_column</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.create_ver2_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.create_ver2_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create column for version 2 meta table (add timestamp in asset_info_table)</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DbAdaptor.get_version">
-<code class="descname">get_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.get_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.get_version" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.get_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.get_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>get_version of the DB</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -718,13 +717,13 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DbAdaptor.open_db">
-<code class="descname">open_db</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.open_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.open_db" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">open_db</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.open_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.open_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Open the DB</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.DbAdaptor.update_table_def">
-<code class="descname">update_table_def</code><span class="sig-paren">(</span><em>from_ver</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.update_table_def"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.update_table_def" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_table_def</code><span class="sig-paren">(</span><em class="sig-param">from_ver</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#DbAdaptor.update_table_def"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.DbAdaptor.update_table_def" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update table definition</p>
 </dd></dl>
 
@@ -732,18 +731,18 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="class">
 <dt id="bbc1.core.data_handler.MysqlAdaptor">
-<em class="property">class </em><code class="descclassname">bbc1.core.data_handler.</code><code class="descname">MysqlAdaptor</code><span class="sig-paren">(</span><em>handler=None</em>, <em>db_name=None</em>, <em>db_num=None</em>, <em>server_info=None</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#MysqlAdaptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.MysqlAdaptor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.data_handler.</code><code class="sig-name descname">MysqlAdaptor</code><span class="sig-paren">(</span><em class="sig-param">handler=None</em>, <em class="sig-param">db_name=None</em>, <em class="sig-param">db_num=None</em>, <em class="sig-param">server_info=None</em>, <em class="sig-param">loglevel='all'</em>, <em class="sig-param">logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#MysqlAdaptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.MysqlAdaptor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bbc1.core.data_handler.DbAdaptor" title="bbc1.core.data_handler.DbAdaptor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbc1.core.data_handler.DbAdaptor</span></code></a></p>
 <p>DB adaptor for MySQL</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.MysqlAdaptor.check_table_existence">
-<code class="descname">check_table_existence</code><span class="sig-paren">(</span><em>tblname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#MysqlAdaptor.check_table_existence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.MysqlAdaptor.check_table_existence" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">check_table_existence</code><span class="sig-paren">(</span><em class="sig-param">tblname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#MysqlAdaptor.check_table_existence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.MysqlAdaptor.check_table_existence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether the table exists or not</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.MysqlAdaptor.create_table">
-<code class="descname">create_table</code><span class="sig-paren">(</span><em>tbl</em>, <em>tbl_definition</em>, <em>primary_key=0</em>, <em>indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#MysqlAdaptor.create_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.MysqlAdaptor.create_table" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><em class="sig-param">tbl</em>, <em class="sig-param">tbl_definition</em>, <em class="sig-param">primary_key=0</em>, <em class="sig-param">indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#MysqlAdaptor.create_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.MysqlAdaptor.create_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a table</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -759,7 +758,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.MysqlAdaptor.open_db">
-<code class="descname">open_db</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#MysqlAdaptor.open_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.MysqlAdaptor.open_db" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">open_db</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#MysqlAdaptor.open_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.MysqlAdaptor.open_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Open the DB</p>
 </dd></dl>
 
@@ -767,18 +766,18 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="class">
 <dt id="bbc1.core.data_handler.SqliteAdaptor">
-<em class="property">class </em><code class="descclassname">bbc1.core.data_handler.</code><code class="descname">SqliteAdaptor</code><span class="sig-paren">(</span><em>handler=None</em>, <em>db_name=None</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#SqliteAdaptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.SqliteAdaptor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.data_handler.</code><code class="sig-name descname">SqliteAdaptor</code><span class="sig-paren">(</span><em class="sig-param">handler=None</em>, <em class="sig-param">db_name=None</em>, <em class="sig-param">loglevel='all'</em>, <em class="sig-param">logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#SqliteAdaptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.SqliteAdaptor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bbc1.core.data_handler.DbAdaptor" title="bbc1.core.data_handler.DbAdaptor"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbc1.core.data_handler.DbAdaptor</span></code></a></p>
 <p>DB adaptor for SQLite3</p>
 <dl class="method">
 <dt id="bbc1.core.data_handler.SqliteAdaptor.check_table_existence">
-<code class="descname">check_table_existence</code><span class="sig-paren">(</span><em>tblname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#SqliteAdaptor.check_table_existence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.SqliteAdaptor.check_table_existence" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">check_table_existence</code><span class="sig-paren">(</span><em class="sig-param">tblname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#SqliteAdaptor.check_table_existence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.SqliteAdaptor.check_table_existence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether the table exists or not</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.SqliteAdaptor.create_table">
-<code class="descname">create_table</code><span class="sig-paren">(</span><em>tbl</em>, <em>tbl_definition</em>, <em>primary_key=0</em>, <em>indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#SqliteAdaptor.create_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.SqliteAdaptor.create_table" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><em class="sig-param">tbl</em>, <em class="sig-param">tbl_definition</em>, <em class="sig-param">primary_key=0</em>, <em class="sig-param">indices=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#SqliteAdaptor.create_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.SqliteAdaptor.create_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a table</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -794,7 +793,7 @@ dict: dictionary of {asset_id: content} for the transaction</p>
 
 <dl class="method">
 <dt id="bbc1.core.data_handler.SqliteAdaptor.open_db">
-<code class="descname">open_db</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#SqliteAdaptor.open_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.SqliteAdaptor.open_db" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">open_db</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/data_handler.html#SqliteAdaptor.open_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.data_handler.SqliteAdaptor.open_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Open the DB (create DB file if not exists)</p>
 </dd></dl>
 
