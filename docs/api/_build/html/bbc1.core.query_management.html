@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.query_management module &mdash; BBc1 1.2 documentation</title>
+  <title>bbc1.core.query_management module &mdash; BBc1 1.4 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.2
+                1.4
               </div>
             
           
@@ -89,7 +89,6 @@
 <li class="toctree-l1 current"><a class="reference internal" href="bbc1.html">bbc1 package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="bbc1.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="bbc1.core.html">bbc1.core package</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="bbc1.core.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#module-bbc1.core">Module contents</a></li>
 </ul>
@@ -183,30 +182,30 @@ See the License for the specific language governing permissions and
 limitations under the License.</p>
 <dl class="class">
 <dt id="bbc1.core.query_management.QueryEntry">
-<em class="property">class </em><code class="descclassname">bbc1.core.query_management.</code><code class="descname">QueryEntry</code><span class="sig-paren">(</span><em>expire_after=30</em>, <em>callback_expire=None</em>, <em>callback=None</em>, <em>callback_error=None</em>, <em>interval=0</em>, <em>data={}</em>, <em>retry_count=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.query_management.</code><code class="sig-name descname">QueryEntry</code><span class="sig-paren">(</span><em class="sig-param">expire_after=30</em>, <em class="sig-param">callback_expire=None</em>, <em class="sig-param">callback=None</em>, <em class="sig-param">callback_error=None</em>, <em class="sig-param">interval=0</em>, <em class="sig-param">data={}</em>, <em class="sig-param">retry_count=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Callback manager</p>
 <dl class="method">
 <dt id="bbc1.core.query_management.QueryEntry.callback">
-<code class="descname">callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.callback" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call a callback function for successful case</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.query_management.QueryEntry.callback_error">
-<code class="descname">callback_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.callback_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.callback_error" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">callback_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.callback_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.callback_error" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call a callback function for failure case</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.query_management.QueryEntry.deactivate">
-<code class="descname">deactivate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.deactivate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.deactivate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">deactivate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.deactivate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.deactivate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deactivate the entry</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.query_management.QueryEntry.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>fire_after=None</em>, <em>expire_after=None</em>, <em>callback=None</em>, <em>callback_error=None</em>, <em>init=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">fire_after=None</em>, <em class="sig-param">expire_after=None</em>, <em class="sig-param">callback=None</em>, <em class="sig-param">callback_error=None</em>, <em class="sig-param">init=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the entry information</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -223,7 +222,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.query_management.QueryEntry.update_expiration_time">
-<code class="descname">update_expiration_time</code><span class="sig-paren">(</span><em>expire_after</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.update_expiration_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.update_expiration_time" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_expiration_time</code><span class="sig-paren">(</span><em class="sig-param">expire_after</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#QueryEntry.update_expiration_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.QueryEntry.update_expiration_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the expire timer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -236,18 +235,18 @@ limitations under the License.</p>
 
 <dl class="class">
 <dt id="bbc1.core.query_management.Ticker">
-<em class="property">class </em><code class="descclassname">bbc1.core.query_management.</code><code class="descname">Ticker</code><span class="sig-paren">(</span><em>tick_interval=0.049</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#Ticker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.Ticker" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.query_management.</code><code class="sig-name descname">Ticker</code><span class="sig-paren">(</span><em class="sig-param">tick_interval=0.049</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#Ticker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.Ticker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Clock ticker for query timers</p>
 <dl class="method">
 <dt id="bbc1.core.query_management.Ticker.del_entry">
-<code class="descname">del_entry</code><span class="sig-paren">(</span><em>nonce</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#Ticker.del_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.Ticker.del_entry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">del_entry</code><span class="sig-paren">(</span><em class="sig-param">nonce</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#Ticker.del_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.Ticker.del_entry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete an entry from the scheduler identified by nonce</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.query_management.Ticker.get_entry">
-<code class="descname">get_entry</code><span class="sig-paren">(</span><em>nonce</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#Ticker.get_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.Ticker.get_entry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_entry</code><span class="sig-paren">(</span><em class="sig-param">nonce</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#Ticker.get_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.Ticker.get_entry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get an entry identified by nonce</p>
 </dd></dl>
 
@@ -255,7 +254,7 @@ limitations under the License.</p>
 
 <dl class="function">
 <dt id="bbc1.core.query_management.get_ticker">
-<code class="descclassname">bbc1.core.query_management.</code><code class="descname">get_ticker</code><span class="sig-paren">(</span><em>tick_interval=0.049</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#get_ticker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.get_ticker" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">bbc1.core.query_management.</code><code class="sig-name descname">get_ticker</code><span class="sig-paren">(</span><em class="sig-param">tick_interval=0.049</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/query_management.html#get_ticker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.query_management.get_ticker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

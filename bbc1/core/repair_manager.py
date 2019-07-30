@@ -25,7 +25,7 @@ import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core.data_handler import DataHandler
 from bbc1.core.bbc_stats import BBcStats
-from bbc1.core import bbclib
+import bbclib
 from bbc1.core.message_key_types import PayloadType, KeyType, InfraMessageCategory
 from bbc1.core import logger
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.bbc_config module &mdash; BBc1 1.2 documentation</title>
+  <title>bbc1.core.bbc_config module &mdash; BBc1 1.4 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.2
+                1.4
               </div>
             
           
@@ -89,7 +89,6 @@
 <li class="toctree-l1 current"><a class="reference internal" href="bbc1.html">bbc1 package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="bbc1.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="bbc1.core.html">bbc1.core package</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="bbc1.core.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#module-bbc1.core">Module contents</a></li>
 </ul>
@@ -183,42 +182,42 @@ See the License for the specific language governing permissions and
 limitations under the License.</p>
 <dl class="class">
 <dt id="bbc1.core.bbc_config.BBcConfig">
-<em class="property">class </em><code class="descclassname">bbc1.core.bbc_config.</code><code class="descname">BBcConfig</code><span class="sig-paren">(</span><em>directory=None</em>, <em>file=None</em>, <em>default_confpath=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.bbc_config.</code><code class="sig-name descname">BBcConfig</code><span class="sig-paren">(</span><em class="sig-param">directory=None</em>, <em class="sig-param">file=None</em>, <em class="sig-param">default_confpath=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>System configuration</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_config.BBcConfig.get_config">
-<code class="descname">get_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.get_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.get_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return config dictionary</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_config.BBcConfig.get_domain_config">
-<code class="descname">get_domain_config</code><span class="sig-paren">(</span><em>domain_id</em>, <em>create_if_new=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.get_domain_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.get_domain_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_domain_config</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">create_if_new=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.get_domain_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.get_domain_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the part of specified domain_id in the config dictionary</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_config.BBcConfig.get_json_config">
-<code class="descname">get_json_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.get_json_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.get_json_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_json_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.get_json_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.get_json_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get config in json format</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_config.BBcConfig.read_config">
-<code class="descname">read_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.read_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.read_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">read_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.read_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.read_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read config file</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_config.BBcConfig.remove_domain_config">
-<code class="descname">remove_domain_config</code><span class="sig-paren">(</span><em>domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.remove_domain_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.remove_domain_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove_domain_config</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.remove_domain_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.remove_domain_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove the part of specified domain_id in the config dictionary</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_config.BBcConfig.update_config">
-<code class="descname">update_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.update_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.update_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#BBcConfig.update_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.BBcConfig.update_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write config to file (config.json)</p>
 </dd></dl>
 
@@ -226,12 +225,12 @@ limitations under the License.</p>
 
 <dl class="function">
 <dt id="bbc1.core.bbc_config.load_config">
-<code class="descclassname">bbc1.core.bbc_config.</code><code class="descname">load_config</code><span class="sig-paren">(</span><em>filepath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.load_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">bbc1.core.bbc_config.</code><code class="sig-name descname">load_config</code><span class="sig-paren">(</span><em class="sig-param">filepath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.load_config" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.bbc_config.update_deep">
-<code class="descclassname">bbc1.core.bbc_config.</code><code class="descname">update_deep</code><span class="sig-paren">(</span><em>d</em>, <em>u</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#update_deep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.update_deep" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">bbc1.core.bbc_config.</code><code class="sig-name descname">update_deep</code><span class="sig-paren">(</span><em class="sig-param">d</em>, <em class="sig-param">u</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_config.html#update_deep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_config.update_deep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility for updating nested dictionary</p>
 </dd></dl>
 

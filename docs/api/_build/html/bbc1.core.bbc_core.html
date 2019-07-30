@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.bbc_core module &mdash; BBc1 1.2 documentation</title>
+  <title>bbc1.core.bbc_core module &mdash; BBc1 1.4 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.2
+                1.4
               </div>
             
           
@@ -89,7 +89,6 @@
 <li class="toctree-l1 current"><a class="reference internal" href="bbc1.html">bbc1 package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="bbc1.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="bbc1.core.html">bbc1.core package</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="bbc1.core.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#module-bbc1.core">Module contents</a></li>
 </ul>
@@ -173,12 +172,12 @@
 <p>exec python “$0” “$&#64;”</p>
 <dl class="class">
 <dt id="bbc1.core.bbc_core.BBcCoreService">
-<em class="property">class </em><code class="descclassname">bbc1.core.bbc_core.</code><code class="descname">BBcCoreService</code><span class="sig-paren">(</span><em>p2p_port=None</em>, <em>core_port=None</em>, <em>use_domain0=False</em>, <em>ip4addr=None</em>, <em>ip6addr=None</em>, <em>workingdir='.bbc1'</em>, <em>configfile=None</em>, <em>use_nodekey=None</em>, <em>use_ledger_subsystem=False</em>, <em>default_conffile=None</em>, <em>loglevel='all'</em>, <em>logname='-'</em>, <em>server_start=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.bbc_core.</code><code class="sig-name descname">BBcCoreService</code><span class="sig-paren">(</span><em class="sig-param">p2p_port=None</em>, <em class="sig-param">core_port=None</em>, <em class="sig-param">use_domain0=False</em>, <em class="sig-param">ip4addr=None</em>, <em class="sig-param">ip6addr=None</em>, <em class="sig-param">workingdir='.bbc1'</em>, <em class="sig-param">configfile=None</em>, <em class="sig-param">use_nodekey=None</em>, <em class="sig-param">use_ledger_subsystem=False</em>, <em class="sig-param">default_conffile=None</em>, <em class="sig-param">loglevel='all'</em>, <em class="sig-param">logname='-'</em>, <em class="sig-param">server_start=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Base service object of BBc-1</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.count_transactions">
-<code class="descname">count_transactions</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>start_from=None</em>, <em>until=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.count_transactions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">count_transactions</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">asset_group_id=None</em>, <em class="sig-param">asset_id=None</em>, <em class="sig-param">user_id=None</em>, <em class="sig-param">start_from=None</em>, <em class="sig-param">until=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.count_transactions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count transactions that match given conditions</p>
 <p>When Multiple conditions are given, they are considered as AND condition.</p>
 <dl class="field-list simple">
@@ -203,7 +202,7 @@
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.insert_transaction">
-<code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>domain_id</em>, <em>txdata</em>, <em>asset_files</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.insert_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">insert_transaction</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">txdata</em>, <em class="sig-param">asset_files</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.insert_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert transaction into ledger</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -224,13 +223,13 @@
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.quit_program">
-<code class="descname">quit_program</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.quit_program"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.quit_program" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">quit_program</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.quit_program"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.quit_program" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processes when quiting program</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.remove_from_notification_list">
-<code class="descname">remove_from_notification_list</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id</em>, <em>user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.remove_from_notification_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.remove_from_notification_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove_from_notification_list</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">asset_group_id</em>, <em class="sig-param">user_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.remove_from_notification_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.remove_from_notification_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove entry from insert completion notification list</p>
 <p>This method checks validation only.</p>
 <dl class="field-list simple">
@@ -246,7 +245,7 @@
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition">
-<code class="descname">search_transaction_with_condition</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>start_from=None</em>, <em>until=None</em>, <em>direction=0</em>, <em>count=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.search_transaction_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">search_transaction_with_condition</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">asset_group_id=None</em>, <em class="sig-param">asset_id=None</em>, <em class="sig-param">user_id=None</em>, <em class="sig-param">start_from=None</em>, <em class="sig-param">until=None</em>, <em class="sig-param">direction=0</em>, <em class="sig-param">count=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.search_transaction_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.search_transaction_with_condition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search transactions that match given conditions</p>
 <p>When Multiple conditions are given, they are considered as AND condition.</p>
 <dl class="field-list simple">
@@ -273,7 +272,7 @@
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.send_inserted_notification">
-<code class="descname">send_inserted_notification</code><span class="sig-paren">(</span><em>domain_id</em>, <em>asset_group_ids</em>, <em>transaction_id</em>, <em>only_registered_user=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.send_inserted_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.send_inserted_notification" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">send_inserted_notification</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">asset_group_ids</em>, <em class="sig-param">transaction_id</em>, <em class="sig-param">only_registered_user=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.send_inserted_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.send_inserted_notification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Broadcast NOTIFY_INSERTED</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -289,7 +288,7 @@
 
 <dl class="method">
 <dt id="bbc1.core.bbc_core.BBcCoreService.validate_transaction">
-<code class="descname">validate_transaction</code><span class="sig-paren">(</span><em>txdata</em>, <em>asset_files=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.validate_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.validate_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">validate_transaction</code><span class="sig-paren">(</span><em class="sig-param">txdata</em>, <em class="sig-param">asset_files=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#BBcCoreService.validate_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.BBcCoreService.validate_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate transaction by verifying signature</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -303,7 +302,7 @@
 int (short): 2-byte value of BBcFormat type or None</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction">BBcTransaction</a></p>
+<dd class="field-odd"><p>BBcTransaction</p>
 </dd>
 </dl>
 </dd></dl>
@@ -312,13 +311,13 @@ int (short): 2-byte value of BBcFormat type or None</p>
 
 <dl class="function">
 <dt id="bbc1.core.bbc_core.activate_ledgersubsystem">
-<code class="descclassname">bbc1.core.bbc_core.</code><code class="descname">activate_ledgersubsystem</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#activate_ledgersubsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.activate_ledgersubsystem" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">bbc1.core.bbc_core.</code><code class="sig-name descname">activate_ledgersubsystem</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#activate_ledgersubsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.activate_ledgersubsystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load module of ledger_subsystem if installed</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="bbc1.core.bbc_core.daemonize">
-<code class="descclassname">bbc1.core.bbc_core.</code><code class="descname">daemonize</code><span class="sig-paren">(</span><em>pidfile='/tmp/bbc1.pid'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#daemonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.daemonize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">bbc1.core.bbc_core.</code><code class="sig-name descname">daemonize</code><span class="sig-paren">(</span><em class="sig-param">pidfile='/tmp/bbc1.pid'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_core.html#daemonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_core.daemonize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run in background</p>
 </dd></dl>
 

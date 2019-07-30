@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.bbc_app module &mdash; BBc1 1.2 documentation</title>
+  <title>bbc1.core.bbc_app module &mdash; BBc1 1.4 documentation</title>
   
 
   
@@ -36,7 +36,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="bbc1.core.bbc_config module" href="bbc1.core.bbc_config.html" />
-    <link rel="prev" title="bbc1.core.libs.bbclib_witness module" href="bbc1.core.libs.bbclib_witness.html" /> 
+    <link rel="prev" title="bbc1.core package" href="bbc1.core.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.2
+                1.4
               </div>
             
           
@@ -89,7 +89,6 @@
 <li class="toctree-l1 current"><a class="reference internal" href="bbc1.html">bbc1 package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="bbc1.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="bbc1.core.html">bbc1.core package</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="bbc1.core.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#module-bbc1.core">Module contents</a></li>
 </ul>
@@ -183,12 +182,12 @@ See the License for the specific language governing permissions and
 limitations under the License.</p>
 <dl class="class">
 <dt id="bbc1.core.bbc_app.BBcAppClient">
-<em class="property">class </em><code class="descclassname">bbc1.core.bbc_app.</code><code class="descname">BBcAppClient</code><span class="sig-paren">(</span><em>host='127.0.0.1'</em>, <em>port=9000</em>, <em>multiq=True</em>, <em>logname='-'</em>, <em>loglevel='none'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.bbc_app.</code><code class="sig-name descname">BBcAppClient</code><span class="sig-paren">(</span><em class="sig-param">host='127.0.0.1'</em>, <em class="sig-param">port=9000</em>, <em class="sig-param">multiq=True</em>, <em class="sig-param">logname='-'</em>, <em class="sig-param">loglevel='none'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Basic functions for a client of bbc_core</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.cancel_insert_completion_notification">
-<code class="descname">cancel_insert_completion_notification</code><span class="sig-paren">(</span><em>asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.cancel_insert_completion_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.cancel_insert_completion_notification" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cancel_insert_completion_notification</code><span class="sig-paren">(</span><em class="sig-param">asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.cancel_insert_completion_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.cancel_insert_completion_notification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cancel notification when a transaction has been inserted (as a copy of transaction)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -205,7 +204,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.count_transactions">
-<code class="descname">count_transactions</code><span class="sig-paren">(</span><em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>start_from=None</em>, <em>until=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.count_transactions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">count_transactions</code><span class="sig-paren">(</span><em class="sig-param">asset_group_id=None</em>, <em class="sig-param">asset_id=None</em>, <em class="sig-param">user_id=None</em>, <em class="sig-param">start_from=None</em>, <em class="sig-param">until=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.count_transactions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count transactions that matches the given conditions</p>
 <p>If multiple conditions are specified, they are considered as AND condition.</p>
 <dl class="field-list simple">
@@ -229,7 +228,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.domain_close">
-<code class="descname">domain_close</code><span class="sig-paren">(</span><em>domain_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.domain_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.domain_close" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">domain_close</code><span class="sig-paren">(</span><em class="sig-param">domain_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.domain_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.domain_close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close domain leading to remove_domain in the core</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -246,7 +245,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.domain_setup">
-<code class="descname">domain_setup</code><span class="sig-paren">(</span><em>domain_id</em>, <em>config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.domain_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.domain_setup" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">domain_setup</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.domain_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.domain_setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set up domain with the specified network module and storage</p>
 <p>This method should be used by a system administrator.</p>
 <dl class="field-list simple">
@@ -267,7 +266,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.exchange_key">
-<code class="descname">exchange_key</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.exchange_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.exchange_key" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">exchange_key</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.exchange_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.exchange_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform ECDH (key exchange algorithm)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -281,13 +280,13 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.gather_signatures">
-<code class="descname">gather_signatures</code><span class="sig-paren">(</span><em>txobj</em>, <em>reference_obj=None</em>, <em>asset_files=None</em>, <em>destinations=None</em>, <em>anycast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.gather_signatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.gather_signatures" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">gather_signatures</code><span class="sig-paren">(</span><em class="sig-param">txobj</em>, <em class="sig-param">reference_obj=None</em>, <em class="sig-param">asset_files=None</em>, <em class="sig-param">destinations=None</em>, <em class="sig-param">anycast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.gather_signatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.gather_signatures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Request to gather signatures from the specified user_ids</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – </p></li>
-<li><p><strong>reference_obj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcReference" title="bbc1.core.compat.bbclib.BBcReference"><em>BBcReference</em></a>) – BBcReference object that includes the information about destinations</p></li>
+<li><p><strong>txobj</strong> (<em>BBcTransaction</em>) – </p></li>
+<li><p><strong>reference_obj</strong> (<em>BBcReference</em>) – BBcReference object that includes the information about destinations</p></li>
 <li><p><strong>asset_files</strong> (<em>dict</em>) – mapping from asset_id to its file content</p></li>
 <li><p><strong>destinations</strong> (<em>list</em>) – list of destination user_ids</p></li>
 <li><p><strong>anycast</strong> (<em>bool</em>) – True if this message is for anycasting</p></li>
@@ -304,7 +303,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_bbc_config">
-<code class="descname">get_bbc_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_bbc_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_bbc_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_bbc_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_bbc_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_bbc_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get config file of bbc_core</p>
 <p>This method should be used by a system administrator.</p>
 <dl class="field-list simple">
@@ -319,7 +318,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_domain_list">
-<code class="descname">get_domain_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_domain_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_domain_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_domain_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_domain_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_domain_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get domain_id list in bbc_core</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -333,7 +332,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_domain_neighborlist">
-<code class="descname">get_domain_neighborlist</code><span class="sig-paren">(</span><em>domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_domain_neighborlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_domain_neighborlist" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_domain_neighborlist</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_domain_neighborlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_domain_neighborlist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get peer list of the domain from the core node</p>
 <p>This method should be used by a system administrator.</p>
 <dl class="field-list simple">
@@ -351,7 +350,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_forwarding_list">
-<code class="descname">get_forwarding_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_forwarding_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_forwarding_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_forwarding_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_forwarding_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_forwarding_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get forwarding_list of the domain in the core node</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -365,7 +364,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_node_id">
-<code class="descname">get_node_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_node_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_node_id" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_node_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_node_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_node_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get node_id of the connecting core node</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -379,7 +378,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_notification_list">
-<code class="descname">get_notification_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_notification_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_notification_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_notification_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_notification_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_notification_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get notification_list of the core node</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -393,7 +392,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_stats">
-<code class="descname">get_stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_stats" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get statistics of bbc_core</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -407,7 +406,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.get_user_list">
-<code class="descname">get_user_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_user_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_user_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_user_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.get_user_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.get_user_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get user_ids in the domain that are connecting to the core node</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -421,29 +420,29 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.include_admin_info">
-<code class="descname">include_admin_info</code><span class="sig-paren">(</span><em>dat</em>, <em>admin_info</em>, <em>keypair</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.include_admin_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.include_admin_info" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">include_admin_info</code><span class="sig-paren">(</span><em class="sig-param">dat</em>, <em class="sig-param">admin_info</em>, <em class="sig-param">keypair</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.include_admin_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.include_admin_info" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.include_cross_ref">
-<code class="descname">include_cross_ref</code><span class="sig-paren">(</span><em>txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.include_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.include_cross_ref" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">include_cross_ref</code><span class="sig-paren">(</span><em class="sig-param">txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.include_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.include_cross_ref" title="Permalink to this definition">¶</a></dt>
 <dd><p>Include BBcCrossRef from other domains in the transaction</p>
 <p>If the client object has one or more cross_ref objects, one of them is included in the given transaction.
 This method should be voluntarily called for inter-domain weak collaboration.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – Transaction object to include cross_ref</p>
+<dd class="field-odd"><p><strong>txobj</strong> (<em>BBcTransaction</em>) – Transaction object to include cross_ref</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.insert_transaction">
-<code class="descname">insert_transaction</code><span class="sig-paren">(</span><em>txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.insert_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">insert_transaction</code><span class="sig-paren">(</span><em class="sig-param">txobj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.insert_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.insert_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Request to insert a legitimate transaction</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>txobj</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcTransaction" title="bbc1.core.compat.bbclib.BBcTransaction"><em>BBcTransaction</em></a>) – Transaction object to insert</p>
+<dd class="field-odd"><p><strong>txobj</strong> (<em>BBcTransaction</em>) – Transaction object to insert</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>query_id</p>
@@ -456,7 +455,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.manipulate_ledger_subsystem">
-<code class="descname">manipulate_ledger_subsystem</code><span class="sig-paren">(</span><em>enable=False</em>, <em>domain_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.manipulate_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.manipulate_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">manipulate_ledger_subsystem</code><span class="sig-paren">(</span><em class="sig-param">enable=False</em>, <em class="sig-param">domain_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.manipulate_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.manipulate_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start/stop ledger_subsystem on the bbc_core</p>
 <p>This method should be used by a system administrator.</p>
 <dl class="field-list simple">
@@ -477,7 +476,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.notify_domain_key_update">
-<code class="descname">notify_domain_key_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.notify_domain_key_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.notify_domain_key_update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">notify_domain_key_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.notify_domain_key_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.notify_domain_key_update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Notify update of bbc_core</p>
 <p>This method should be used by a system administrator.</p>
 <dl class="field-list simple">
@@ -492,12 +491,12 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.receiver_loop">
-<code class="descname">receiver_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.receiver_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.receiver_loop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">receiver_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.receiver_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.receiver_loop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.register_in_ledger_subsystem">
-<code class="descname">register_in_ledger_subsystem</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.register_in_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.register_in_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">register_in_ledger_subsystem</code><span class="sig-paren">(</span><em class="sig-param">asset_group_id</em>, <em class="sig-param">transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.register_in_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.register_in_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register transaction_id in the ledger_subsystem</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -517,7 +516,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.register_to_core">
-<code class="descname">register_to_core</code><span class="sig-paren">(</span><em>on_multiple_nodes=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.register_to_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.register_to_core" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">register_to_core</code><span class="sig-paren">(</span><em class="sig-param">on_multiple_nodes=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.register_to_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.register_to_core" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register the client (user_id) to the core node</p>
 <p>After that, the client can communicate with the core node.</p>
 <dl class="field-list simple">
@@ -535,7 +534,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.request_cross_ref_holders_list">
-<code class="descname">request_cross_ref_holders_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_cross_ref_holders_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_cross_ref_holders_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">request_cross_ref_holders_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_cross_ref_holders_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_cross_ref_holders_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Request the list of transaction_ids that are registered as cross_ref in outer domains</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -549,7 +548,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.request_insert_completion_notification">
-<code class="descname">request_insert_completion_notification</code><span class="sig-paren">(</span><em>asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_insert_completion_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_insert_completion_notification" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">request_insert_completion_notification</code><span class="sig-paren">(</span><em class="sig-param">asset_group_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_insert_completion_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_insert_completion_notification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Request notification when a transaction has been inserted (as a copy of transaction)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -566,7 +565,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.request_to_repair_asset">
-<code class="descname">request_to_repair_asset</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>asset_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_to_repair_asset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_to_repair_asset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">request_to_repair_asset</code><span class="sig-paren">(</span><em class="sig-param">asset_group_id</em>, <em class="sig-param">asset_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_to_repair_asset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_to_repair_asset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Request to repair compromised asset file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -586,7 +585,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.request_to_repair_transaction">
-<code class="descname">request_to_repair_transaction</code><span class="sig-paren">(</span><em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_to_repair_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_to_repair_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">request_to_repair_transaction</code><span class="sig-paren">(</span><em class="sig-param">transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_to_repair_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_to_repair_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Request to repair compromised transaction data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -603,7 +602,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.request_verify_by_cross_ref">
-<code class="descname">request_verify_by_cross_ref</code><span class="sig-paren">(</span><em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_verify_by_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_verify_by_cross_ref" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">request_verify_by_cross_ref</code><span class="sig-paren">(</span><em class="sig-param">transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.request_verify_by_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.request_verify_by_cross_ref" title="Permalink to this definition">¶</a></dt>
 <dd><p>Request to verify the transaction by Cross_ref in transaction of outer domain</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -620,7 +619,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.search_transaction">
-<code class="descname">search_transaction</code><span class="sig-paren">(</span><em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.search_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">search_transaction</code><span class="sig-paren">(</span><em class="sig-param">transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.search_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search request for a transaction</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -637,7 +636,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.search_transaction_with_condition">
-<code class="descname">search_transaction_with_condition</code><span class="sig-paren">(</span><em>asset_group_id=None</em>, <em>asset_id=None</em>, <em>user_id=None</em>, <em>start_from=None</em>, <em>until=None</em>, <em>direction=0</em>, <em>count=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.search_transaction_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.search_transaction_with_condition" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">search_transaction_with_condition</code><span class="sig-paren">(</span><em class="sig-param">asset_group_id=None</em>, <em class="sig-param">asset_id=None</em>, <em class="sig-param">user_id=None</em>, <em class="sig-param">start_from=None</em>, <em class="sig-param">until=None</em>, <em class="sig-param">direction=0</em>, <em class="sig-param">count=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.search_transaction_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.search_transaction_with_condition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search transaction data by asset_group_id/asset_id/user_id</p>
 <p>If multiple conditions are specified, they are considered as AND condition.</p>
 <dl class="field-list simple">
@@ -663,7 +662,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.send_domain_ping">
-<code class="descname">send_domain_ping</code><span class="sig-paren">(</span><em>domain_id</em>, <em>ipv4=None</em>, <em>ipv6=None</em>, <em>port=6641</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.send_domain_ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.send_domain_ping" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">send_domain_ping</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">ipv4=None</em>, <em class="sig-param">ipv6=None</em>, <em class="sig-param">port=6641</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.send_domain_ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.send_domain_ping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send domain ping to notify the existence of the node</p>
 <p>This method should be used by a system administrator.</p>
 <dl class="field-list simple">
@@ -686,7 +685,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.send_message">
-<code class="descname">send_message</code><span class="sig-paren">(</span><em>msg</em>, <em>dst_user_id</em>, <em>is_anycast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.send_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.send_message" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">send_message</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">dst_user_id</em>, <em class="sig-param">is_anycast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.send_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.send_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a message to the specified user_id</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -707,7 +706,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.sendback_denial_of_sign">
-<code class="descname">sendback_denial_of_sign</code><span class="sig-paren">(</span><em>dest_user_id=None</em>, <em>transaction_id=None</em>, <em>reason_text=None</em>, <em>query_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.sendback_denial_of_sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.sendback_denial_of_sign" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sendback_denial_of_sign</code><span class="sig-paren">(</span><em class="sig-param">dest_user_id=None</em>, <em class="sig-param">transaction_id=None</em>, <em class="sig-param">reason_text=None</em>, <em class="sig-param">query_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.sendback_denial_of_sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.sendback_denial_of_sign" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send back the denial of sign the transaction</p>
 <p>This method is called if the receiver (signer) denies the transaction.</p>
 <dl class="field-list simple">
@@ -730,7 +729,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.sendback_signature">
-<code class="descname">sendback_signature</code><span class="sig-paren">(</span><em>dest_user_id=None</em>, <em>transaction_id=None</em>, <em>ref_index=-1</em>, <em>signature=None</em>, <em>query_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.sendback_signature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.sendback_signature" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sendback_signature</code><span class="sig-paren">(</span><em class="sig-param">dest_user_id=None</em>, <em class="sig-param">transaction_id=None</em>, <em class="sig-param">ref_index=-1</em>, <em class="sig-param">signature=None</em>, <em class="sig-param">query_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.sendback_signature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.sendback_signature" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send back the signed transaction to the source</p>
 <p>This method is called if the receiver (signer) approves the transaction.</p>
 <dl class="field-list simple">
@@ -739,7 +738,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 <li><p><strong>dest_user_id</strong> (<em>bytes</em>) – destination user_id to send back</p></li>
 <li><p><strong>transaction_id</strong> (<em>bytes</em>) – </p></li>
 <li><p><strong>ref_index</strong> (<em>int</em>) – (optional) which reference in transaction the signature is for</p></li>
-<li><p><strong>signature</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.BBcSignature" title="bbc1.core.compat.bbclib.BBcSignature"><em>BBcSignature</em></a>) – Signature that expresses approval of the transaction with transaction_id</p></li>
+<li><p><strong>signature</strong> (<em>BBcSignature</em>) – Signature that expresses approval of the transaction with transaction_id</p></li>
 <li><p><strong>query_id</strong> – The query_id that was in the received SIGN_REQUEST message</p></li>
 </ul>
 </dd>
@@ -754,7 +753,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.set_callback">
-<code class="descname">set_callback</code><span class="sig-paren">(</span><em>callback_obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_callback" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_callback</code><span class="sig-paren">(</span><em class="sig-param">callback_obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set callback object that implements message processing functions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -765,7 +764,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.set_domain_id">
-<code class="descname">set_domain_id</code><span class="sig-paren">(</span><em>domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_domain_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_domain_id" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_domain_id</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_domain_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_domain_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set domain_id to this client to include it in all messages</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -776,7 +775,7 @@ This method should be voluntarily called for inter-domain weak collaboration.</p
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.set_domain_static_node">
-<code class="descname">set_domain_static_node</code><span class="sig-paren">(</span><em>domain_id</em>, <em>node_id</em>, <em>ipv4</em>, <em>ipv6</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_domain_static_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_domain_static_node" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_domain_static_node</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">node_id</em>, <em class="sig-param">ipv4</em>, <em class="sig-param">ipv6</em>, <em class="sig-param">port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_domain_static_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_domain_static_node" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set static node to the core node</p>
 <p>IPv6 is used for socket communication if both IPv4 and IPv6 is specified.
 This method should be used by a system administrator.</p>
@@ -801,18 +800,18 @@ This method should be used by a system administrator.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.set_keypair">
-<code class="descname">set_keypair</code><span class="sig-paren">(</span><em>keypair</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_keypair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_keypair" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_keypair</code><span class="sig-paren">(</span><em class="sig-param">keypair</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_keypair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_keypair" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set keypair for the user</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>keypair</strong> (<a class="reference internal" href="bbc1.core.compat.bbclib.html#bbc1.core.compat.bbclib.KeyPair" title="bbc1.core.compat.bbclib.KeyPair"><em>KeyPair</em></a>) – KeyPair object for signing</p>
+<dd class="field-odd"><p><strong>keypair</strong> (<em>KeyPair</em>) – KeyPair object for signing</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.set_node_key">
-<code class="descname">set_node_key</code><span class="sig-paren">(</span><em>pem_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_node_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_node_key" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_node_key</code><span class="sig-paren">(</span><em class="sig-param">pem_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_node_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_node_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set node_key to this client</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -823,7 +822,7 @@ This method should be used by a system administrator.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.set_user_id">
-<code class="descname">set_user_id</code><span class="sig-paren">(</span><em>identifier</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_user_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_user_id" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_user_id</code><span class="sig-paren">(</span><em class="sig-param">identifier</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.set_user_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.set_user_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set user_id of the object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -834,12 +833,12 @@ This method should be used by a system administrator.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.start_receiver_loop">
-<code class="descname">start_receiver_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.start_receiver_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.start_receiver_loop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">start_receiver_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.start_receiver_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.start_receiver_loop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.traverse_transactions">
-<code class="descname">traverse_transactions</code><span class="sig-paren">(</span><em>transaction_id</em>, <em>asset_group_id=None</em>, <em>user_id=None</em>, <em>start_from=None</em>, <em>until=None</em>, <em>direction=1</em>, <em>hop_count=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.traverse_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.traverse_transactions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">traverse_transactions</code><span class="sig-paren">(</span><em class="sig-param">transaction_id</em>, <em class="sig-param">asset_group_id=None</em>, <em class="sig-param">user_id=None</em>, <em class="sig-param">start_from=None</em>, <em class="sig-param">until=None</em>, <em class="sig-param">direction=1</em>, <em class="sig-param">hop_count=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.traverse_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.traverse_transactions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search request for transactions</p>
 <p>The method traverses the transaction graph in the ledger.
 The response from the bbc_core includes the list of transactions.</p>
@@ -866,7 +865,7 @@ The response from the bbc_core includes the list of transactions.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.unregister_from_core">
-<code class="descname">unregister_from_core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.unregister_from_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.unregister_from_core" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">unregister_from_core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.unregister_from_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.unregister_from_core" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unregister and disconnect from the core node</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -880,7 +879,7 @@ The response from the bbc_core includes the list of transactions.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.BBcAppClient.verify_in_ledger_subsystem">
-<code class="descname">verify_in_ledger_subsystem</code><span class="sig-paren">(</span><em>asset_group_id</em>, <em>transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.verify_in_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.verify_in_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">verify_in_ledger_subsystem</code><span class="sig-paren">(</span><em class="sig-param">asset_group_id</em>, <em class="sig-param">transaction_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#BBcAppClient.verify_in_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.BBcAppClient.verify_in_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verify transaction_id in the ledger_subsystem</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -902,28 +901,28 @@ The response from the bbc_core includes the list of transactions.</p>
 
 <dl class="class">
 <dt id="bbc1.core.bbc_app.Callback">
-<em class="property">class </em><code class="descclassname">bbc1.core.bbc_app.</code><code class="descname">Callback</code><span class="sig-paren">(</span><em>log=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.bbc_app.</code><code class="sig-name descname">Callback</code><span class="sig-paren">(</span><em class="sig-param">log=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Set of callback functions for processing received message</p>
 <p>If you want to implement your own way to process messages, inherit this class.</p>
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.create_queue">
-<code class="descname">create_queue</code><span class="sig-paren">(</span><em>query_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.create_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.create_queue" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_queue</code><span class="sig-paren">(</span><em class="sig-param">query_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.create_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.create_queue" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.dispatch">
-<code class="descname">dispatch</code><span class="sig-paren">(</span><em>dat</em>, <em>payload_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.dispatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.dispatch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dispatch</code><span class="sig-paren">(</span><em class="sig-param">dat</em>, <em class="sig-param">payload_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.dispatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.dispatch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.get_from_queue">
-<code class="descname">get_from_queue</code><span class="sig-paren">(</span><em>query_id</em>, <em>timeout=None</em>, <em>no_delete=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.get_from_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.get_from_queue" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_from_queue</code><span class="sig-paren">(</span><em class="sig-param">query_id</em>, <em class="sig-param">timeout=None</em>, <em class="sig-param">no_delete=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.get_from_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.get_from_queue" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_cmd_sign_request">
-<code class="descname">proc_cmd_sign_request</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_cmd_sign_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_cmd_sign_request" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_cmd_sign_request</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_cmd_sign_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_cmd_sign_request" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message REQUEST_SIGNATURE</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -935,7 +934,7 @@ The response from the bbc_core includes the list of transactions.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_notify_cross_ref">
-<code class="descname">proc_notify_cross_ref</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_notify_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_notify_cross_ref" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_notify_cross_ref</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_notify_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_notify_cross_ref" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message NOTIFY_CROSS_REF</p>
 <p>This method must not be overridden.</p>
 <dl class="field-list simple">
@@ -947,7 +946,7 @@ The response from the bbc_core includes the list of transactions.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_notify_inserted">
-<code class="descname">proc_notify_inserted</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_notify_inserted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_notify_inserted" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_notify_inserted</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_notify_inserted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_notify_inserted" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message NOTIFY_INSERTED</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -959,7 +958,7 @@ The response from the bbc_core includes the list of transactions.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_count_transactions">
-<code class="descname">proc_resp_count_transactions</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_count_transactions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_count_transactions</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_count_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_count_transactions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_COUNT_TRANSACTIONS</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -971,7 +970,7 @@ The response from the bbc_core includes the list of transactions.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_cross_ref_list">
-<code class="descname">proc_resp_cross_ref_list</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_cross_ref_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_cross_ref_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_cross_ref_list</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_cross_ref_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_cross_ref_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_CROSS_REF_LIST</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -983,7 +982,7 @@ The response from the bbc_core includes the list of transactions.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_domain_close">
-<code class="descname">proc_resp_domain_close</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_domain_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_domain_close" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_domain_close</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_domain_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_domain_close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_CLOSE_DOMAIN</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -995,7 +994,7 @@ The response from the bbc_core includes the list of transactions.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_domain_setup">
-<code class="descname">proc_resp_domain_setup</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_domain_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_domain_setup" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_domain_setup</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_domain_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_domain_setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_SETUP_DOMAIN</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1007,7 +1006,7 @@ The response from the bbc_core includes the list of transactions.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_ecdh_key_exchange">
-<code class="descname">proc_resp_ecdh_key_exchange</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_ecdh_key_exchange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_ecdh_key_exchange" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_ecdh_key_exchange</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_ecdh_key_exchange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_ecdh_key_exchange" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_ECDH_KEY_EXCHANGE</p>
 <p>This method must not be overridden.</p>
 <dl class="field-list simple">
@@ -1019,7 +1018,7 @@ The response from the bbc_core includes the list of transactions.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_gather_signature">
-<code class="descname">proc_resp_gather_signature</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_gather_signature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_gather_signature" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_gather_signature</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_gather_signature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_gather_signature" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_GATHER_SIGNATURE</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1031,7 +1030,7 @@ The response from the bbc_core includes the list of transactions.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_get_config">
-<code class="descname">proc_resp_get_config</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_get_config</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_GET_CONFIG</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1043,7 +1042,7 @@ The response from the bbc_core includes the list of transactions.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_get_domainlist">
-<code class="descname">proc_resp_get_domainlist</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_domainlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_domainlist" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_get_domainlist</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_domainlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_domainlist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_GET_DOMAINLIST</p>
 <p>List of domain_ids is queued rather than message itself.
 This method should be overridden if you want to process the message asynchronously.</p>
@@ -1056,7 +1055,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_get_forwardinglist">
-<code class="descname">proc_resp_get_forwardinglist</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_forwardinglist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_forwardinglist" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_get_forwardinglist</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_forwardinglist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_forwardinglist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_GET_FORWARDING_LIST</p>
 <p>List of user_ids in other core nodes is queued rather than message itself.
 This method should be overridden if you want to process the message asynchronously.</p>
@@ -1069,7 +1068,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_get_neighborlist">
-<code class="descname">proc_resp_get_neighborlist</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_neighborlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_neighborlist" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_get_neighborlist</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_neighborlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_neighborlist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_GET_NEIGHBORLIST</p>
 <p>List of neighbor node info (the first one is that of the connecting core) is queued rather than message itself.
 This method must not be overridden.</p>
@@ -1082,7 +1081,7 @@ This method must not be overridden.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_get_node_id">
-<code class="descname">proc_resp_get_node_id</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_node_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_node_id" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_get_node_id</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_node_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_node_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_GET_NODEID</p>
 <p>Node_id is queued rather than message itself.
 This method should be overridden if you want to process the message asynchronously.</p>
@@ -1095,7 +1094,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_get_notificationlist">
-<code class="descname">proc_resp_get_notificationlist</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_notificationlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_notificationlist" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_get_notificationlist</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_notificationlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_notificationlist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_GET_NOTIFICATION_LIST</p>
 <p>List of user_ids in other core nodes is queued rather than message itself.
 This method should be overridden if you want to process the message asynchronously.</p>
@@ -1108,7 +1107,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_get_stats">
-<code class="descname">proc_resp_get_stats</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_stats" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_get_stats</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_GET_STATS</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1120,7 +1119,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_get_userlist">
-<code class="descname">proc_resp_get_userlist</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_userlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_userlist" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_get_userlist</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_get_userlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_get_userlist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_GET_USERS</p>
 <p>List of user_ids is queued rather than message itself.
 This method should be overridden if you want to process the message asynchronously.</p>
@@ -1133,7 +1132,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_insert">
-<code class="descname">proc_resp_insert</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_insert" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_insert</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_INSERT</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1145,7 +1144,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_ledger_subsystem">
-<code class="descname">proc_resp_ledger_subsystem</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_ledger_subsystem</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_ledger_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_ledger_subsystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_MANIP_LEDGER_SUBSYS</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1157,7 +1156,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_register_hash">
-<code class="descname">proc_resp_register_hash</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_register_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_register_hash" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_register_hash</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_register_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_register_hash" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_REGISTER_HASH_IN_SUBSYS</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1169,7 +1168,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_search_transaction">
-<code class="descname">proc_resp_search_transaction</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_search_transaction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_search_transaction</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_search_transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_search_transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_SEARCH_TRANSACTION</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1181,7 +1180,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_search_with_condition">
-<code class="descname">proc_resp_search_with_condition</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_search_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_search_with_condition" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_search_with_condition</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_search_with_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_search_with_condition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_SEARCH_WITH_CONDITIONS</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1193,7 +1192,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_set_neighbor">
-<code class="descname">proc_resp_set_neighbor</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_set_neighbor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_set_neighbor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_set_neighbor</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_set_neighbor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_set_neighbor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_SET_STATIC_NODE</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1205,7 +1204,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_sign_request">
-<code class="descname">proc_resp_sign_request</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_sign_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_sign_request" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_sign_request</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_sign_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_sign_request" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_SIGNATURE</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1217,7 +1216,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_traverse_transactions">
-<code class="descname">proc_resp_traverse_transactions</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_traverse_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_traverse_transactions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_traverse_transactions</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_traverse_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_traverse_transactions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_TRAVERSE_TRANSACTIONS</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1229,7 +1228,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_verify_cross_ref">
-<code class="descname">proc_resp_verify_cross_ref</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_verify_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_verify_cross_ref" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_verify_cross_ref</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_verify_cross_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_verify_cross_ref" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_CROSS_REF_VERIFY</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1241,7 +1240,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_resp_verify_hash">
-<code class="descname">proc_resp_verify_hash</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_verify_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_verify_hash" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_resp_verify_hash</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_resp_verify_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_resp_verify_hash" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message RESPONSE_VERIFY_HASH_IN_SUBSYS</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1253,7 +1252,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.proc_user_message">
-<code class="descname">proc_user_message</code><span class="sig-paren">(</span><em>dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_user_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_user_message" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proc_user_message</code><span class="sig-paren">(</span><em class="sig-param">dat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.proc_user_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.proc_user_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback for message MESSAGE</p>
 <p>This method should be overridden if you want to process the message asynchronously.</p>
 <dl class="field-list simple">
@@ -1265,17 +1264,17 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.set_client">
-<code class="descname">set_client</code><span class="sig-paren">(</span><em>client</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.set_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.set_client" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_client</code><span class="sig-paren">(</span><em class="sig-param">client</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.set_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.set_client" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.set_logger">
-<code class="descname">set_logger</code><span class="sig-paren">(</span><em>log</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.set_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.set_logger" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_logger</code><span class="sig-paren">(</span><em class="sig-param">log</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.set_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.set_logger" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.sync_by_queryid">
-<code class="descname">sync_by_queryid</code><span class="sig-paren">(</span><em>query_id</em>, <em>timeout=None</em>, <em>no_delete_q=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.sync_by_queryid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.sync_by_queryid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sync_by_queryid</code><span class="sig-paren">(</span><em class="sig-param">query_id</em>, <em class="sig-param">timeout=None</em>, <em class="sig-param">no_delete_q=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.sync_by_queryid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.sync_by_queryid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wait for the message with specified query_id</p>
 <p>This method creates a queue for the query_id and waits for the response</p>
 <dl class="field-list simple">
@@ -1297,7 +1296,7 @@ This method should be overridden if you want to process the message asynchronous
 
 <dl class="method">
 <dt id="bbc1.core.bbc_app.Callback.synchronize">
-<code class="descname">synchronize</code><span class="sig-paren">(</span><em>timeout=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.synchronize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.synchronize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">synchronize</code><span class="sig-paren">(</span><em class="sig-param">timeout=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_app.html#Callback.synchronize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_app.Callback.synchronize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wait for receiving message with a common queue</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1327,7 +1326,7 @@ This method should be overridden if you want to process the message asynchronous
         <a href="bbc1.core.bbc_config.html" class="btn btn-neutral float-right" title="bbc1.core.bbc_config module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="bbc1.core.libs.bbclib_witness.html" class="btn btn-neutral float-left" title="bbc1.core.libs.bbclib_witness module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="bbc1.core.html" class="btn btn-neutral float-left" title="bbc1.core package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

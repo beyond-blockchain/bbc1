@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.bbclib module &mdash; BBc1 1.2 documentation</title>
+  <title>bbc1.core.bbclib module &mdash; BBc1 1.4 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.2
+                1.4
               </div>
             
           
@@ -89,7 +89,6 @@
 <li class="toctree-l1 current"><a class="reference internal" href="bbc1.html">bbc1 package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="bbc1.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="bbc1.core.html">bbc1.core package</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="bbc1.core.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#module-bbc1.core">Module contents</a></li>
 </ul>
@@ -181,38 +180,6 @@ distributed under the License is distributed on an “AS IS” BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.</p>
-<dl class="function">
-<dt id="bbc1.core.bbclib.deserialize">
-<code class="descclassname">bbc1.core.bbclib.</code><code class="descname">deserialize</code><span class="sig-paren">(</span><em>txdata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.deserialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deserialize binary data with 2-byte wire header</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>txdata</strong> – </p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>BBcTransaction: BBcTransaction object
-int: 2-byte value of BBcFormat type</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="bbc1.core.bbclib.serialize">
-<code class="descclassname">bbc1.core.bbclib.</code><code class="descname">serialize</code><span class="sig-paren">(</span><em>txobj</em>, <em>format_type=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbclib.html#serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbclib.serialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Serialize transaction object with 2-byte wire header</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>txobj</strong> – BBcTransaction object</p></li>
-<li><p><strong>format_type</strong> – value defined in bbclib_wire.BBcFormat</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>binary</p>
-</dd>
-</dl>
-</dd></dl>
-
 </div>
 
 

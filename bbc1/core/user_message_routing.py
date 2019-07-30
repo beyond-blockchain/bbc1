@@ -20,7 +20,7 @@ import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
 from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
-from bbc1.core import bbclib
+import bbclib
 from bbc1.core import query_management, message_key_types, logger
 
 ticker = query_management.get_ticker()

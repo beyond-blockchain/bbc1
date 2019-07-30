@@ -14,13 +14,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-import sys
-import os
+
 import binascii
-
-current_dir = os.path.abspath(os.path.dirname(__file__))
-sys.path.append(os.path.join(current_dir, "../.."))
-
 import bbc1.core.bbc_error as bbc_error
 
 
@@ -30,20 +25,20 @@ error_code = -1
 error_text = ""
 
 
-import bbc1.core.libs.bbclib_utils as bbclib_utils
-import bbc1.core.libs.bbclib_transaction as bbclib_transaction
-import bbc1.core.libs.bbclib_signature as bbclib_signature
-import bbc1.core.libs.bbclib_keypair as bbclib_keypair
-import bbc1.core.libs.bbclib_asset as bbclib_asset
-import bbc1.core.libs.bbclib_crossref as bbclib_crossref
-import bbc1.core.libs.bbclib_event as bbclib_event
-import bbc1.core.libs.bbclib_msgtype as bbclib_msgtype
-import bbc1.core.libs.bbclib_pointer as bbclib_pointer
-import bbc1.core.libs.bbclib_relation as bbclib_relation
-import bbc1.core.libs.bbclib_reference as bbclib_reference
-import bbc1.core.libs.bbclib_witness as bbclib_witness
-import bbc1.core.compat.bbclib as bbclib_compat
-import bbc1.core.libs.bbclib_wire as bbclib_wire
+import bbclib.libs.bbclib_utils as bbclib_utils
+import bbclib.libs.bbclib_transaction as bbclib_transaction
+import bbclib.libs.bbclib_signature as bbclib_signature
+import bbclib.libs.bbclib_keypair as bbclib_keypair
+import bbclib.libs.bbclib_asset as bbclib_asset
+import bbclib.libs.bbclib_crossref as bbclib_crossref
+import bbclib.libs.bbclib_event as bbclib_event
+import bbclib.libs.bbclib_msgtype as bbclib_msgtype
+import bbclib.libs.bbclib_pointer as bbclib_pointer
+import bbclib.libs.bbclib_relation as bbclib_relation
+import bbclib.libs.bbclib_reference as bbclib_reference
+import bbclib.libs.bbclib_witness as bbclib_witness
+import bbclib.compat.bbclib as bbclib_compat
+import bbclib
 
 
 def _set_error(code=-1, txt=""):
@@ -58,41 +53,6 @@ def _reset_error():
     global error_text
     error_code = bbc_error.ESUCCESS
     error_text = ""
-
-
-def deserialize(txdata):
-    """
-    Deserialize binary data with 2-byte wire header
-
-    :param txdata:
-    :returns:
-        BBcTransaction: BBcTransaction object
-        int: 2-byte value of BBcFormat type
-    """
-    try:
-        dat, fmt_type = bbclib_wire.BBcFormat.strip(txdata)
-        return bbclib_transaction.BBcTransaction(unpack=dat), fmt_type
-    except:
-        # -- for backward compatibility
-        txobj = bbclib_compat.BBcTransaction(deserialize=txdata)
-        return txobj, txobj.format_type
-
-
-def serialize(txobj, format_type=bbclib_wire.BBcFormat.FORMAT_PLAIN):
-    """
-    Serialize transaction object with 2-byte wire header
-
-    :param txobj: BBcTransaction object
-    :param format_type: value defined in bbclib_wire.BBcFormat
-    :return: binary
-    """
-    if txobj.transaction_data is None:
-        txobj.pack()
-    try:
-        return bbclib_wire.BBcFormat.generate(txobj, format_type=format_type)
-    except:
-        # -- for backward compatibility
-        return txobj.transaction_data
 
 
 # ----
@@ -117,6 +77,9 @@ add_pointer_in_relation = bbclib_utils.add_pointer_in_relation
 recover_signature_object = bbclib_utils.recover_signature_object
 validate_transaction_object = bbclib_utils.validate_transaction_object
 verify_using_cross_ref = bbclib_utils.verify_using_cross_ref
+
+serialize = bbclib.serialize
+deserialize = bbclib.deserialize
 
 KeyType = bbclib_keypair.KeyType
 MsgType = bbclib_msgtype.MsgType

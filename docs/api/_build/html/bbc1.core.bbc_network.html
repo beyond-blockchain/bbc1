@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.bbc_network module &mdash; BBc1 1.2 documentation</title>
+  <title>bbc1.core.bbc_network module &mdash; BBc1 1.4 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.2
+                1.4
               </div>
             
           
@@ -89,7 +89,6 @@
 <li class="toctree-l1 current"><a class="reference internal" href="bbc1.html">bbc1 package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="bbc1.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="bbc1.core.html">bbc1.core package</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="bbc1.core.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="bbc1.core.html#module-bbc1.core">Module contents</a></li>
 </ul>
@@ -183,32 +182,32 @@ See the License for the specific language governing permissions and
 limitations under the License.</p>
 <dl class="class">
 <dt id="bbc1.core.bbc_network.BBcNetwork">
-<em class="property">class </em><code class="descclassname">bbc1.core.bbc_network.</code><code class="descname">BBcNetwork</code><span class="sig-paren">(</span><em>config</em>, <em>core=None</em>, <em>p2p_port=None</em>, <em>external_ip4addr=None</em>, <em>external_ip6addr=None</em>, <em>loglevel='all'</em>, <em>logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.bbc_network.</code><code class="sig-name descname">BBcNetwork</code><span class="sig-paren">(</span><em class="sig-param">config</em>, <em class="sig-param">core=None</em>, <em class="sig-param">p2p_port=None</em>, <em class="sig-param">external_ip4addr=None</em>, <em class="sig-param">external_ip6addr=None</em>, <em class="sig-param">loglevel='all'</em>, <em class="sig-param">logname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Socket and thread management for infrastructure layers</p>
 <dl class="attribute">
 <dt id="bbc1.core.bbc_network.BBcNetwork.CONFIRM_KEY_EXCHANGE">
-<code class="descname">CONFIRM_KEY_EXCHANGE</code><em class="property"> = b'\x00\x03'</em><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.CONFIRM_KEY_EXCHANGE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">CONFIRM_KEY_EXCHANGE</code><em class="property"> = b'\x00\x03'</em><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.CONFIRM_KEY_EXCHANGE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.bbc_network.BBcNetwork.NOTIFY_LEAVE">
-<code class="descname">NOTIFY_LEAVE</code><em class="property"> = b'\x00\x00'</em><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.NOTIFY_LEAVE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">NOTIFY_LEAVE</code><em class="property"> = b'\x00\x00'</em><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.NOTIFY_LEAVE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.bbc_network.BBcNetwork.REQUEST_KEY_EXCHANGE">
-<code class="descname">REQUEST_KEY_EXCHANGE</code><em class="property"> = b'\x00\x01'</em><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.REQUEST_KEY_EXCHANGE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">REQUEST_KEY_EXCHANGE</code><em class="property"> = b'\x00\x01'</em><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.REQUEST_KEY_EXCHANGE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.bbc_network.BBcNetwork.RESPONSE_KEY_EXCHANGE">
-<code class="descname">RESPONSE_KEY_EXCHANGE</code><em class="property"> = b'\x00\x02'</em><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.RESPONSE_KEY_EXCHANGE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">RESPONSE_KEY_EXCHANGE</code><em class="property"> = b'\x00\x02'</em><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.RESPONSE_KEY_EXCHANGE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.add_neighbor">
-<code class="descname">add_neighbor</code><span class="sig-paren">(</span><em>domain_id</em>, <em>node_id</em>, <em>ipv4=None</em>, <em>ipv6=None</em>, <em>port=None</em>, <em>is_static=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.add_neighbor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.add_neighbor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_neighbor</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">node_id</em>, <em class="sig-param">ipv4=None</em>, <em class="sig-param">ipv6=None</em>, <em class="sig-param">port=None</em>, <em class="sig-param">is_static=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.add_neighbor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.add_neighbor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add node in the neighbor list</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -232,7 +231,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.broadcast_message_in_network">
-<code class="descname">broadcast_message_in_network</code><span class="sig-paren">(</span><em>domain_id</em>, <em>payload_type=1</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.broadcast_message_in_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.broadcast_message_in_network" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">broadcast_message_in_network</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">payload_type=1</em>, <em class="sig-param">msg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.broadcast_message_in_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.broadcast_message_in_network" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send message to all neighbor nodes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -253,7 +252,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.check_admin_signature">
-<code class="descname">check_admin_signature</code><span class="sig-paren">(</span><em>domain_id</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.check_admin_signature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.check_admin_signature" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">check_admin_signature</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.check_admin_signature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.check_admin_signature" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check admin signature in the message</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -273,7 +272,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.create_domain">
-<code class="descname">create_domain</code><span class="sig-paren">(</span><em>domain_id=b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'</em>, <em>config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.create_domain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.create_domain" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_domain</code><span class="sig-paren">(</span><em class="sig-param">domain_id=b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'</em>, <em class="sig-param">config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.create_domain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.create_domain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create domain and register user in the domain</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -293,7 +292,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.get_domain_keypair">
-<code class="descname">get_domain_keypair</code><span class="sig-paren">(</span><em>domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.get_domain_keypair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.get_domain_keypair" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_domain_keypair</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.get_domain_keypair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.get_domain_keypair" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get domain_keys (private key and public key)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -304,13 +303,13 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.include_admin_info_into_message_if_needed">
-<code class="descname">include_admin_info_into_message_if_needed</code><span class="sig-paren">(</span><em>domain_id</em>, <em>msg</em>, <em>admin_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.include_admin_info_into_message_if_needed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.include_admin_info_into_message_if_needed" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">include_admin_info_into_message_if_needed</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">msg</em>, <em class="sig-param">admin_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.include_admin_info_into_message_if_needed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.include_admin_info_into_message_if_needed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize admin info into one binary object and add signature</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.remove_domain">
-<code class="descname">remove_domain</code><span class="sig-paren">(</span><em>domain_id=b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.remove_domain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.remove_domain" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove_domain</code><span class="sig-paren">(</span><em class="sig-param">domain_id=b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.remove_domain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.remove_domain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Leave the domain and remove it</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -327,13 +326,13 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.save_all_static_node_list">
-<code class="descname">save_all_static_node_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.save_all_static_node_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.save_all_static_node_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">save_all_static_node_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.save_all_static_node_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.save_all_static_node_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save all static nodes in the config file</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.send_domain_ping">
-<code class="descname">send_domain_ping</code><span class="sig-paren">(</span><em>domain_id</em>, <em>ipv4</em>, <em>ipv6</em>, <em>port</em>, <em>is_static=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.send_domain_ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.send_domain_ping" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">send_domain_ping</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">ipv4</em>, <em class="sig-param">ipv6</em>, <em class="sig-param">port</em>, <em class="sig-param">is_static=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.send_domain_ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.send_domain_ping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send domain ping to the specified node</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -356,13 +355,13 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.send_key_exchange_message">
-<code class="descname">send_key_exchange_message</code><span class="sig-paren">(</span><em>domain_id</em>, <em>node_id</em>, <em>command</em>, <em>pubkey</em>, <em>nonce</em>, <em>random_val</em>, <em>key_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.send_key_exchange_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.send_key_exchange_message" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">send_key_exchange_message</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">node_id</em>, <em class="sig-param">command</em>, <em class="sig-param">pubkey</em>, <em class="sig-param">nonce</em>, <em class="sig-param">random_val</em>, <em class="sig-param">key_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.send_key_exchange_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.send_key_exchange_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send ECDH key exchange message</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.send_message_in_network">
-<code class="descname">send_message_in_network</code><span class="sig-paren">(</span><em>nodeinfo=None</em>, <em>payload_type=1</em>, <em>domain_id=None</em>, <em>msg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.send_message_in_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.send_message_in_network" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">send_message_in_network</code><span class="sig-paren">(</span><em class="sig-param">nodeinfo=None</em>, <em class="sig-param">payload_type=1</em>, <em class="sig-param">domain_id=None</em>, <em class="sig-param">msg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.send_message_in_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.send_message_in_network" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send message over a domain network</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -384,7 +383,7 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.send_message_to_a_domain0_manager">
-<code class="descname">send_message_to_a_domain0_manager</code><span class="sig-paren">(</span><em>domain_id</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.send_message_to_a_domain0_manager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.send_message_to_a_domain0_manager" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">send_message_to_a_domain0_manager</code><span class="sig-paren">(</span><em class="sig-param">domain_id</em>, <em class="sig-param">msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.send_message_to_a_domain0_manager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.send_message_to_a_domain0_manager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Choose one of domain0_managers and send msg to it</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -398,25 +397,25 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.setup_tcp_server">
-<code class="descname">setup_tcp_server</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.setup_tcp_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.setup_tcp_server" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">setup_tcp_server</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.setup_tcp_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.setup_tcp_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start tcp server</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.setup_udp_socket">
-<code class="descname">setup_udp_socket</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.setup_udp_socket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.setup_udp_socket" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">setup_udp_socket</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.setup_udp_socket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.setup_udp_socket" title="Permalink to this definition">¶</a></dt>
 <dd><p>Setup UDP socket</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.tcpserver_loop">
-<code class="descname">tcpserver_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.tcpserver_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.tcpserver_loop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">tcpserver_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.tcpserver_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.tcpserver_loop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Message loop for TCP socket</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.BBcNetwork.udp_message_loop">
-<code class="descname">udp_message_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.udp_message_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.udp_message_loop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">udp_message_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#BBcNetwork.udp_message_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.BBcNetwork.udp_message_loop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Message loop for UDP socket</p>
 </dd></dl>
 
@@ -424,40 +423,40 @@ limitations under the License.</p>
 
 <dl class="class">
 <dt id="bbc1.core.bbc_network.NeighborInfo">
-<em class="property">class </em><code class="descclassname">bbc1.core.bbc_network.</code><code class="descname">NeighborInfo</code><span class="sig-paren">(</span><em>network=None</em>, <em>domain_id=None</em>, <em>node_id=None</em>, <em>my_info=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NeighborInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.bbc_network.</code><code class="sig-name descname">NeighborInfo</code><span class="sig-paren">(</span><em class="sig-param">network=None</em>, <em class="sig-param">domain_id=None</em>, <em class="sig-param">node_id=None</em>, <em class="sig-param">my_info=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NeighborInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Manage information of neighbor nodes</p>
 <dl class="attribute">
 <dt id="bbc1.core.bbc_network.NeighborInfo.NODEINFO_LIFETIME">
-<code class="descname">NODEINFO_LIFETIME</code><em class="property"> = 900</em><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo.NODEINFO_LIFETIME" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">NODEINFO_LIFETIME</code><em class="property"> = 900</em><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo.NODEINFO_LIFETIME" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.bbc_network.NeighborInfo.PURGE_INTERVAL_SEC">
-<code class="descname">PURGE_INTERVAL_SEC</code><em class="property"> = 300</em><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo.PURGE_INTERVAL_SEC" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">PURGE_INTERVAL_SEC</code><em class="property"> = 300</em><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo.PURGE_INTERVAL_SEC" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.NeighborInfo.add">
-<code class="descname">add</code><span class="sig-paren">(</span><em>node_id</em>, <em>ipv4=None</em>, <em>ipv6=None</em>, <em>port=None</em>, <em>is_static=False</em>, <em>domain0=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NeighborInfo.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo.add" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param">node_id</em>, <em class="sig-param">ipv4=None</em>, <em class="sig-param">ipv6=None</em>, <em class="sig-param">port=None</em>, <em class="sig-param">is_static=False</em>, <em class="sig-param">domain0=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NeighborInfo.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add or update an neighbor node entry</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.NeighborInfo.purge">
-<code class="descname">purge</code><span class="sig-paren">(</span><em>query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NeighborInfo.purge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo.purge" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">purge</code><span class="sig-paren">(</span><em class="sig-param">query_entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NeighborInfo.purge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo.purge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Purge obsoleted entry in nodeinfo_list</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.NeighborInfo.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><em>node_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NeighborInfo.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo.remove" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove</code><span class="sig-paren">(</span><em class="sig-param">node_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NeighborInfo.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove entry in the nodeinfo_list</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.NeighborInfo.show_list">
-<code class="descname">show_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NeighborInfo.show_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo.show_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">show_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NeighborInfo.show_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NeighborInfo.show_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return nodeinfo list in human readable format</p>
 </dd></dl>
 
@@ -465,32 +464,32 @@ limitations under the License.</p>
 
 <dl class="class">
 <dt id="bbc1.core.bbc_network.NodeInfo">
-<em class="property">class </em><code class="descclassname">bbc1.core.bbc_network.</code><code class="descname">NodeInfo</code><span class="sig-paren">(</span><em>node_id=None</em>, <em>ipv4=None</em>, <em>ipv6=None</em>, <em>port=None</em>, <em>is_static=False</em>, <em>domain0=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NodeInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">bbc1.core.bbc_network.</code><code class="sig-name descname">NodeInfo</code><span class="sig-paren">(</span><em class="sig-param">node_id=None</em>, <em class="sig-param">ipv4=None</em>, <em class="sig-param">ipv6=None</em>, <em class="sig-param">port=None</em>, <em class="sig-param">is_static=False</em>, <em class="sig-param">domain0=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NodeInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Node information entry</p>
 <dl class="attribute">
 <dt id="bbc1.core.bbc_network.NodeInfo.SECURITY_STATE_CONFIRMING">
-<code class="descname">SECURITY_STATE_CONFIRMING</code><em class="property"> = 2</em><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.SECURITY_STATE_CONFIRMING" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">SECURITY_STATE_CONFIRMING</code><em class="property"> = 2</em><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.SECURITY_STATE_CONFIRMING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.bbc_network.NodeInfo.SECURITY_STATE_ESTABLISHED">
-<code class="descname">SECURITY_STATE_ESTABLISHED</code><em class="property"> = 3</em><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.SECURITY_STATE_ESTABLISHED" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">SECURITY_STATE_ESTABLISHED</code><em class="property"> = 3</em><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.SECURITY_STATE_ESTABLISHED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.bbc_network.NodeInfo.SECURITY_STATE_NONE">
-<code class="descname">SECURITY_STATE_NONE</code><em class="property"> = 0</em><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.SECURITY_STATE_NONE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">SECURITY_STATE_NONE</code><em class="property"> = 0</em><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.SECURITY_STATE_NONE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="bbc1.core.bbc_network.NodeInfo.SECURITY_STATE_REQUESTING">
-<code class="descname">SECURITY_STATE_REQUESTING</code><em class="property"> = 1</em><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.SECURITY_STATE_REQUESTING" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">SECURITY_STATE_REQUESTING</code><em class="property"> = 1</em><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.SECURITY_STATE_REQUESTING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.NodeInfo.get_nodeinfo">
-<code class="descname">get_nodeinfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NodeInfo.get_nodeinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.get_nodeinfo" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_nodeinfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NodeInfo.get_nodeinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.get_nodeinfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of node info</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -504,12 +503,12 @@ limitations under the License.</p>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.NodeInfo.touch">
-<code class="descname">touch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NodeInfo.touch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.touch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">touch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NodeInfo.touch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.touch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbc1.core.bbc_network.NodeInfo.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>ipv4=None</em>, <em>ipv6=None</em>, <em>port=None</em>, <em>seq=None</em>, <em>domain0=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NodeInfo.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">ipv4=None</em>, <em class="sig-param">ipv6=None</em>, <em class="sig-param">port=None</em>, <em class="sig-param">seq=None</em>, <em class="sig-param">domain0=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#NodeInfo.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.NodeInfo.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the entry</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -534,7 +533,7 @@ limitations under the License.</p>
 
 <dl class="function">
 <dt id="bbc1.core.bbc_network.is_less_than">
-<code class="descclassname">bbc1.core.bbc_network.</code><code class="descname">is_less_than</code><span class="sig-paren">(</span><em>val_a</em>, <em>val_b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#is_less_than"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.is_less_than" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">bbc1.core.bbc_network.</code><code class="sig-name descname">is_less_than</code><span class="sig-paren">(</span><em class="sig-param">val_a</em>, <em class="sig-param">val_b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbc1/core/bbc_network.html#is_less_than"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbc1.core.bbc_network.is_less_than" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if val_a is less than val_b (evaluate as integer)</p>
 </dd></dl>
 

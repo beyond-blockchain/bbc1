@@ -20,8 +20,8 @@ import binascii
 import os
 import sys
 sys.path.extend(["../../", os.path.abspath(os.path.dirname(__file__))])
-from bbc1.core import bbclib
-import bbc1.core.libs.bbclib_config as bbclib_config
+import bbclib
+import bbclib.libs.bbclib_config as bbclib_config
 from bbc1.core.message_key_types import to_2byte, PayloadType, KeyType, InfraMessageCategory
 from bbc1.core import logger
 
