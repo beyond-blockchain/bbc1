@@ -10,7 +10,7 @@ fi
 # do not detach (-D), log to stderr (-e), passthrough other arguments
 /usr/sbin/sshd -D -e &
 
-source /root/.pythonenv/bin/activate
+. /root/.pythonenv/bin/activate
 if [ -e /root/bbc1 ]; then
   cd /root/bbc1/bbc1/core
   exec python bbc_core.py -w /root/.bbc1

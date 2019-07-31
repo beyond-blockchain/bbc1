@@ -1,14 +1,6 @@
 bbc1.core package
 =================
 
-Subpackages
------------
-
-.. toctree::
-
-    bbc1.core.compat
-    bbc1.core.libs
-
 Submodules
 ----------
 
@@ -36,6 +28,6 @@ Module contents
 ---------------
 
 .. automodule:: bbc1.core
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

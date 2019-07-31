@@ -13,7 +13,6 @@ with open('README.rst') as f:
 class MyInstall(install):
     def run(self):
         try:
-            subprocess.call(['/bin/sh', 'prepare.sh'], cwd=here)
             subprocess.call(['python', 'prepare.py'], cwd=here)
         except Exception as e:
             print(e)
@@ -31,12 +30,13 @@ bbc1_requires = [
                  'pytest<=3.2.*,>=3.0.5',
                  'msgpack-python>=0.4.8',
                  'mysql-connector-python>=8.0.5',
+                 'py-bbclib>=1.4.1',
                  'greenlet',
                  'bson',
                  'Flask>=0.10.1,<=1.0.1'
                 ]
 
-bbc1_packages = ['bbc1', 'bbc1.core', 'bbc1.core.libs', 'bbc1.core.compat']
+bbc1_packages = ['bbc1', 'bbc1.core']
 
 bbc1_commands = [
                  'bbc1/core/bbc_core.py',
@@ -57,7 +57,7 @@ bbc1_classifiers = [
 
 setup(
     name='bbc1',
-    version='1.3',
+    version='1.4',
     description='A core system of Beyond Blockchain One',
     long_description=readme,
     url='https://github.com/beyond-blockchain/bbc1',

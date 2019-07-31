@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.user_message_routing &mdash; BBc1 1.2 documentation</title>
+  <title>bbc1.core.user_message_routing &mdash; BBc1 1.4 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.2
+                1.4
               </div>
             
           
@@ -170,7 +170,7 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;../../&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))])</span>
 <span class="kn">from</span> <span class="nn">bbc1.core.message_key_types</span> <span class="k">import</span> <span class="n">to_2byte</span><span class="p">,</span> <span class="n">PayloadType</span><span class="p">,</span> <span class="n">KeyType</span><span class="p">,</span> <span class="n">InfraMessageCategory</span>
-<span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">bbclib</span>
+<span class="kn">import</span> <span class="nn">bbclib</span>
 <span class="kn">from</span> <span class="nn">bbc1.core</span> <span class="k">import</span> <span class="n">query_management</span><span class="p">,</span> <span class="n">message_key_types</span><span class="p">,</span> <span class="n">logger</span>
 
 <span class="n">ticker</span> <span class="o">=</span> <span class="n">query_management</span><span class="o">.</span><span class="n">get_ticker</span><span class="p">()</span>

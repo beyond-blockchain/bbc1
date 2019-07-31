@@ -10,8 +10,6 @@ The files in this directory is the main codes of BBc-1.
     - Base interface for BBc-1 application
     - bbc_app connects to bbc_core to send/receive messages
     - All applications and management tools are based on it
-* bbclib.py
-    - The core library for treating transaction data
 * bbc_network.py
     - Communication management between other bbc_core nodes
     - BBcNetwork provides an interface to BBcCoreService to encapsulate the network layer functions, such as P2P topology management and message forwarding.

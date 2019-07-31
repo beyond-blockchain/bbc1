@@ -5,14 +5,9 @@ include LICENSE.python
 include MANIFEST.in
 include package.json
 include *.rst
-include prepare.sh
 include prepare.py
-graft django
-prune django/contrib/admin/bin
-graft docs
-graft extras
-graft js_tests
 graft scripts
-graft tests
+prune tests
+prune docs
 global-exclude __pycache__
 global-exclude *.py[co]

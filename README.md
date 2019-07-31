@@ -21,6 +21,42 @@ The APIs of BBc-1 is defined in bbc\_app.py and bbclib.py. So application develo
 
 For the details, please read documents in docs/ directory. Not only documents but slide decks (PDF) explain the design of the BBc-1 and its implementation.
 
+
+# Trouble shooting
+
+Installing bbc1 through pip sometimes fails owing to pip cache trouble. It might occur in the case that you terminate the install process during libbbcsig building process.
+This leads to a defect in the pip cache of libbbcsig module, and resulting in fail installing forever.
+
+To solve the problem, you need to remove pip cache or pip install without using cache. How to solve it is explained below.
+
+### Solution 1
+Removing pip cache directory is a fundamental solution to this problem. The cache directories in various OS platform are as follows:
+
+
+* Linux and Unix
+  - ~/.cache/pip
+* macOS
+  - ~/Library/Caches/pip
+* Windows
+  - %LocalAppData%\pip\Cache
+
+After removing the cache directory, install py-bbclib module again.
+
+```bash
+python3 -mvenv venv
+. venv/bin/activate
+pip install py-bbclib
+```
+
+### Solution 2
+Disabling cache and re-installing the module is another solution, which is easier way.
+```bash
+python3 -mvenv venv
+. venv/bin/activate
+pip --no-cache-dir install -I py-bbclib 
+```
+
+
 ## Recent changes regarding DB meta table
 
 In the update to v1.3, a meta table of DB is updated to support timestamp-based search. The main table for transaction data itself remains unchanged, so that just updating meta table is need for migration. 
@@ -60,6 +96,7 @@ Some documents are available in docs/.
     * [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
     * [libbbcsig_dll_build_for_Windows_x64_ja.md](docs/libbbcsig_dll_build_for_Windows_x64_ja.md)
 * Programing
+    * [BBc1_pybbclib_programming_guide_v1.4.1_ja.md](docs/BBc1_pybbclib_programming_guide_v1.4.1_ja.md)
     * [BBc1_programming_guide_v1.3_ja.md](docs/BBc1_programming_guide_v1.3_ja.md)
     * [BBc1_core_tutorial_file_proof_ja.md](docs/BBc1_core_tutorial_file_proof_ja.md)
     * [BBc1_data_format_ja.md](docs/BBc1_data_format_ja.md)
@@ -83,13 +120,14 @@ Some documents are available in docs/.
 
 * tools for macOS by Homebrew
     ```
-    brew install libtool automake python3 pipenv
+    brew install libtool automake python3
+    pip3 install virtualenv
     ```
 
-* tools for Linux (Ubuntu 16.04 LTS)
+* tools for Linux (Ubuntu 16.04 LTS, 18.04 LTS)
     ```
-    sudo apt-get install -y git tzdata openssh-server python3 python3-dev libffi-dev net-tools autoconf automake libtool libssl-dev make
-    pip install pipenv
+    sudo apt-get update
+    sudo apt-get install -y git tzdata openssh-server python3 python3-dev python3-pip python3-venv libffi-dev net-tools autoconf automake libtool libssl-dev make
     ```
 
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>bbc1.core.bbclib &mdash; BBc1 1.2 documentation</title>
+  <title>bbc1.core.bbclib &mdash; BBc1 1.4 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                1.2
+                1.4
               </div>
             
           
@@ -164,13 +164,8 @@
 <span class="sd">See the License for the specific language governing permissions and</span>
 <span class="sd">limitations under the License.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">os</span>
+
 <span class="kn">import</span> <span class="nn">binascii</span>
-
-<span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s2">&quot;../..&quot;</span><span class="p">))</span>
-
 <span class="kn">import</span> <span class="nn">bbc1.core.bbc_error</span> <span class="k">as</span> <span class="nn">bbc_error</span>
 
 
@@ -180,20 +175,20 @@
 <span class="n">error_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 
-<span class="kn">import</span> <span class="nn">bbc1.core.libs.bbclib_utils</span> <span class="k">as</span> <span class="nn">bbclib_utils</span>
-<span class="kn">import</span> <span class="nn">bbc1.core.libs.bbclib_transaction</span> <span class="k">as</span> <span class="nn">bbclib_transaction</span>
-<span class="kn">import</span> <span class="nn">bbc1.core.libs.bbclib_signature</span> <span class="k">as</span> <span class="nn">bbclib_signature</span>
-<span class="kn">import</span> <span class="nn">bbc1.core.libs.bbclib_keypair</span> <span class="k">as</span> <span class="nn">bbclib_keypair</span>
-<span class="kn">import</span> <span class="nn">bbc1.core.libs.bbclib_asset</span> <span class="k">as</span> <span class="nn">bbclib_asset</span>
-<span class="kn">import</span> <span class="nn">bbc1.core.libs.bbclib_crossref</span> <span class="k">as</span> <span class="nn">bbclib_crossref</span>
-<span class="kn">import</span> <span class="nn">bbc1.core.libs.bbclib_event</span> <span class="k">as</span> <span class="nn">bbclib_event</span>
-<span class="kn">import</span> <span class="nn">bbc1.core.libs.bbclib_msgtype</span> <span class="k">as</span> <span class="nn">bbclib_msgtype</span>
-<span class="kn">import</span> <span class="nn">bbc1.core.libs.bbclib_pointer</span> <span class="k">as</span> <span class="nn">bbclib_pointer</span>
-<span class="kn">import</span> <span class="nn">bbc1.core.libs.bbclib_relation</span> <span class="k">as</span> <span class="nn">bbclib_relation</span>
-<span class="kn">import</span> <span class="nn">bbc1.core.libs.bbclib_reference</span> <span class="k">as</span> <span class="nn">bbclib_reference</span>
-<span class="kn">import</span> <span class="nn">bbc1.core.libs.bbclib_witness</span> <span class="k">as</span> <span class="nn">bbclib_witness</span>
-<span class="kn">import</span> <span class="nn">bbc1.core.compat.bbclib</span> <span class="k">as</span> <span class="nn">bbclib_compat</span>
-<span class="kn">import</span> <span class="nn">bbc1.core.libs.bbclib_wire</span> <span class="k">as</span> <span class="nn">bbclib_wire</span>
+<span class="kn">import</span> <span class="nn">bbclib.libs.bbclib_utils</span> <span class="k">as</span> <span class="nn">bbclib_utils</span>
+<span class="kn">import</span> <span class="nn">bbclib.libs.bbclib_transaction</span> <span class="k">as</span> <span class="nn">bbclib_transaction</span>
+<span class="kn">import</span> <span class="nn">bbclib.libs.bbclib_signature</span> <span class="k">as</span> <span class="nn">bbclib_signature</span>
+<span class="kn">import</span> <span class="nn">bbclib.libs.bbclib_keypair</span> <span class="k">as</span> <span class="nn">bbclib_keypair</span>
+<span class="kn">import</span> <span class="nn">bbclib.libs.bbclib_asset</span> <span class="k">as</span> <span class="nn">bbclib_asset</span>
+<span class="kn">import</span> <span class="nn">bbclib.libs.bbclib_crossref</span> <span class="k">as</span> <span class="nn">bbclib_crossref</span>
+<span class="kn">import</span> <span class="nn">bbclib.libs.bbclib_event</span> <span class="k">as</span> <span class="nn">bbclib_event</span>
+<span class="kn">import</span> <span class="nn">bbclib.libs.bbclib_msgtype</span> <span class="k">as</span> <span class="nn">bbclib_msgtype</span>
+<span class="kn">import</span> <span class="nn">bbclib.libs.bbclib_pointer</span> <span class="k">as</span> <span class="nn">bbclib_pointer</span>
+<span class="kn">import</span> <span class="nn">bbclib.libs.bbclib_relation</span> <span class="k">as</span> <span class="nn">bbclib_relation</span>
+<span class="kn">import</span> <span class="nn">bbclib.libs.bbclib_reference</span> <span class="k">as</span> <span class="nn">bbclib_reference</span>
+<span class="kn">import</span> <span class="nn">bbclib.libs.bbclib_witness</span> <span class="k">as</span> <span class="nn">bbclib_witness</span>
+<span class="kn">import</span> <span class="nn">bbclib.compat.bbclib</span> <span class="k">as</span> <span class="nn">bbclib_compat</span>
+<span class="kn">import</span> <span class="nn">bbclib.libs.bbclib_wire</span> <span class="k">as</span> <span class="nn">bbclib_wire</span>
 
 
 <span class="k">def</span> <span class="nf">_set_error</span><span class="p">(</span><span class="n">code</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>

@@ -36,8 +36,8 @@ import copy
 
 import sys
 sys.path.extend(["../../"])
-from bbc1.core import bbclib
-from bbc1.core.bbclib import MsgType
+import bbclib
+from bbclib import MsgType
 from bbc1.core.message_key_types import KeyType, to_2byte
 from bbc1.core import bbc_network, user_message_routing, data_handler, repair_manager, message_key_types, logger
 from bbc1.core import domain0_manager, query_management, bbc_stats
@@ -46,7 +46,7 @@ from bbc1.core.data_handler import InfraMessageCategory
 from bbc1.core import command
 from bbc1.core.bbc_error import *
 
-VERSION = "version 1.3"
+VERSION = "version 1.4"
 
 PID_FILE = "/tmp/bbc1.pid"
 POOL_SIZE = 1000
