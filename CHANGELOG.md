@@ -1,6 +1,11 @@
 Change log
 ======
 
+## v1.4
+* Decouple bbclib from bbc1/core
+  * import py-bbclib
+  * Skip signature verification if no public key included in BBcSignature 
+
 ## v1.3
 * Support timestamp-based transaction search
   * search_transaction_with_condition() method in bbc_app.py is upgraded to include start\_from and until params
