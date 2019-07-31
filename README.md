@@ -40,12 +40,12 @@ Removing pip cache directory is a fundamental solution to this problem. The cach
 * Windows
   - %LocalAppData%\pip\Cache
 
-After removing the cache directory, install py-bbclib module again.
+After removing the cache directory, install bbc1 module again.
 
 ```bash
 python3 -mvenv venv
 . venv/bin/activate
-pip install py-bbclib
+pip install bbc1
 ```
 
 ### Solution 2
@@ -53,7 +53,7 @@ Disabling cache and re-installing the module is another solution, which is easie
 ```bash
 python3 -mvenv venv
 . venv/bin/activate
-pip --no-cache-dir install -I py-bbclib 
+pip --no-cache-dir install -I bbc1 
 ```
 
 
