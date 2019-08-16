@@ -1,8 +1,11 @@
 import subprocess
+import sys
+import os
 from os import path
 from setuptools import setup
 from setuptools.command.install import install
 
+VERSION = "1.4"
 
 here = path.abspath(path.dirname(__file__))
 
@@ -20,6 +23,21 @@ class MyInstall(install):
             exit(1)
         else:
             install.run(self)
+
+
+class VerifyVersionCommand(install):
+    """Custom command to verify that the git tag matches our version"""
+    description = 'verify that the git tag matches our version'
+
+    def run(self):
+        tag = os.getenv('CIRCLE_TAG')
+
+        if tag != "v%s" % VERSION:
+            info = "Git tag: {0} does not match the version of this app: {1}".format(
+                tag, "v%s" % VERSION
+            )
+            sys.exit(info)
+
 
 bbc1_requires = [
                  'pyOpenSSL>=16.2.0',
@@ -53,11 +71,12 @@ bbc1_classifiers = [
                     'Development Status :: 4 - Beta',
                     'Programming Language :: Python :: 3.5',
                     'Programming Language :: Python :: 3.6',
+                    'Programming Language :: Python :: 3.7',
                     'Topic :: Software Development']
 
 setup(
     name='bbc1',
-    version='1.4',
+    version=VERSION,
     description='A core system of Beyond Blockchain One',
     long_description=readme,
     url='https://github.com/beyond-blockchain/bbc1',
@@ -65,7 +84,7 @@ setup(
     author_email='bbc1-dev@beyond-blockchain.org',
     license='Apache License 2.0',
     classifiers=bbc1_classifiers,
-    cmdclass={'install': MyInstall},
+    cmdclass={'install': MyInstall, 'verify': VerifyVersionCommand},
     packages=bbc1_packages,
     scripts=bbc1_commands,
     install_requires=bbc1_requires,
