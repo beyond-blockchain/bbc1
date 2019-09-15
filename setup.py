@@ -78,6 +78,7 @@ setup(
     name='bbc1',
     version=VERSION,
     description='A core system of Beyond Blockchain One',
+    long_description_content_type='text/markdown',
     long_description=readme,
     url='https://github.com/beyond-blockchain/bbc1',
     author='beyond-blockchain.org',
