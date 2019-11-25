@@ -312,7 +312,7 @@ def store_proc(file, txid=None):
     sig = store_transaction.sign(private_key=key_pair.private_key,
                                  public_key=key_pair.public_key)
     store_transaction.get_sig_index(user_id)
-    store_transaction.add_signature(user_id=user_id, signature=sig)
+    store_transaction.add_signature_object(user_id=user_id, signature=sig)
     store_transaction.digest()
     print(store_transaction)
 
