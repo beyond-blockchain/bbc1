@@ -96,6 +96,8 @@ Some documents are available in docs/.
     * [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
     * [libbbcsig_dll_build_for_Windows_x64_ja.md](docs/libbbcsig_dll_build_for_Windows_x64_ja.md)
 * Programing
+    * [BBc1_pybbclib_programming_guide_v1.6_ja.md](https://github.com/beyond-blockchain/py-bbclib/blob/develop/docs/BBc1_pybbclib_programming_guide_v1.6_ja.md)
+    * [BBc1_pybbclib_utility_functions_v1.6_ja.md](https://github.com/beyond-blockchain/py-bbclib/blob/develop/docs/BBc1_pybbclib_utility_functions_v1.6_ja.md)
     * [BBc1_pybbclib_programming_guide_v1.4.1_ja.md](docs/BBc1_pybbclib_programming_guide_v1.4.1_ja.md)
     * [BBc1_programming_guide_v1.3_ja.md](docs/BBc1_programming_guide_v1.3_ja.md)
     * [BBc1_core_tutorial_file_proof_ja.md](docs/BBc1_core_tutorial_file_proof_ja.md)
