@@ -153,6 +153,7 @@ class TopologyManagerBase:
             ipv4 = socket.inet_ntop(socket.AF_INET, binary_data[base + 32:base + 36])
             ipv6 = socket.inet_ntop(socket.AF_INET6, binary_data[base + 36:base + 52])
             port = socket.ntohs(int.from_bytes(binary_data[base + 52:base + 54], 'big'))
+            print("++++++ receive ipv4=%s, ipv6=%s, port=%d" % (ipv4, ipv6, port))
             domain0 = True if binary_data[base + 54] == 0x01 else False
             updated_at = int.from_bytes(binary_data[base + 55:base + 63], 'big')
             if not self.neighbors.add(node_id=node_id, ipv4=ipv4, ipv6=ipv6, port=port, domain0=domain0):

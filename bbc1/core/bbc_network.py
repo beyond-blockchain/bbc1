@@ -72,6 +72,7 @@ def _check_my_IPaddresses(target4='8.8.8.8', target6='2001:4860:4860::8888', por
             s.close()
         except OSError:
             ip6 = None
+    print(">>>>>>>>>", ip4, "......", ip6, "<<<<<")
     return ip4, ip6
 
 
@@ -648,6 +649,7 @@ class BBcNetwork:
             self.add_neighbor(domain_id, msg[KeyType.source_node_id], ipv4, ipv6, port)
             self.domains[domain_id]['user'].process_message(msg)
         elif msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_DATA:
+            print("========>>>>>>", ipv4, ipv6, port)
             self.add_neighbor(domain_id, msg[KeyType.source_node_id], ipv4, ipv6, port)
             self.domains[domain_id]['data'].process_message(msg)
         elif msg[KeyType.infra_msg_type] == InfraMessageCategory.CATEGORY_TOPOLOGY:
@@ -918,6 +920,8 @@ class NodeInfo:
                 self.ipv6 = ipv6.decode()
             else:
                 self.ipv6 = ipv6
+        print("=====node add IPv4>", self.ipv4)
+        print("=====node add IPv6>", self.ipv6)
         self.port = port
         self.admin_sequence_number = 0
         self.is_static = is_static
@@ -995,6 +999,8 @@ class NodeInfo:
             change_flag = True
         self.updated_at = time.time()
         self.is_alive = True
+        print("********************ipv4=", self.ipv4)
+        print("********************ipv6=", self.ipv6)
         return change_flag
 
     def get_nodeinfo(self):
@@ -1003,6 +1009,9 @@ class NodeInfo:
         Returns:
             list: [node_id, ipv4, ipv6, port, domain0_flag, update_at]
         """
+        print("******self>>>", self)
+        print("*****IPv4>>>>", self.ipv4)
+        print("*****IPv6>>>>", self.ipv6)
         if self.ipv4 is not None:
             ipv4 = socket.inet_pton(socket.AF_INET, self.ipv4)
         else:
