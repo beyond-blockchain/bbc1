@@ -87,7 +87,6 @@ jobs:
           name: verify version
           command: |
             . venv/bin/activate
-            cd python/
             python setup.py verify
       - run:
           name: init .pypirc
