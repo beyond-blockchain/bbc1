@@ -749,7 +749,7 @@ class BBcNetwork:
                     ipv6 = None
                     if sock is self.socket_udp:
                         data, addr = self.socket_udp.recvfrom(1500)
-                        ipv6 = addr[0]
+                        ipv4 = addr[0]
                         port = addr[1]
                     elif sock is self.socket_udp6:
                         data, addr = self.socket_udp6.recvfrom(1500)
