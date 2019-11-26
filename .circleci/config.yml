@@ -72,11 +72,6 @@ jobs:
             pytest test_pending_request.py
             pytest test_bbc_ping.py
             pytest test_bbc_stats.py
-            cd compat
-            pytest test_bbc_app_multi_core_many_transactions_bson.py
-            pytest test_bbc_app_multiclient_traverse_bson.py
-            pytest test_bbc_app_multi_core_compat.py
-            pytest test_bbclib_bson.py
       - save_cache:
           key: v1-dependency-cache-{{ checksum "setup.py" }}
           paths:

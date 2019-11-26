@@ -1,6 +1,10 @@
 Change log
 ======
 
+## v1.5
+* Support BBcAssetRaw and BBcAssetHash defined in py-bbclib v1.5 or later
+* bug fix
+
 ## v1.4
 * Decouple bbclib from bbc1/core
   * import py-bbclib

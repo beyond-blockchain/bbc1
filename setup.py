@@ -5,7 +5,7 @@ from os import path
 from setuptools import setup
 from setuptools.command.install import install
 
-VERSION = "1.4"
+VERSION = "1.5"
 
 here = path.abspath(path.dirname(__file__))
 
@@ -45,10 +45,10 @@ bbc1_requires = [
                  'requests>=2.12.4',
                  'gevent>=1.2.1',
                  'cryptography>=2.1.4',
-                 'pytest<=3.2.*,>=3.0.5',
+                 'pytest>=5.3.0',
                  'msgpack-python>=0.4.8',
                  'mysql-connector-python>=8.0.5',
-                 'py-bbclib>=1.4.1',
+                 'py-bbclib>=1.6',
                  'greenlet',
                  'bson',
                  'Flask>=0.10.1,<=1.0.1'
