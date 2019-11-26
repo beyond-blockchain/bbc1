@@ -5,7 +5,7 @@ gevent>=1.2.1
 greenlet
 cryptography>=2.1.4
 pytest<=3.2.*,>=3.0.5
-py-bbclib>=1.4.2
+py-bbclib>=1.6
 msgpack-python>=0.4.8
 mysql-connector-python>=8.0.5
 bson
