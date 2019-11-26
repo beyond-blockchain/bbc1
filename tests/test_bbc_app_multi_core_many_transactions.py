@@ -109,7 +109,7 @@ class TestBBcAppClient(object):
 
             transactions[i].witness.add_witness(user_id=cl['user_id'])
             sig = transactions[i].sign(keypair=cl['keypair'])
-            transactions[i].add_signature(user_id=cl['user_id'], signature=sig)
+            transactions[i].add_signature_object(user_id=cl['user_id'], signature=sig)
 
             transactions[i].digest()
             print("register transaction=", binascii.b2a_hex(transactions[i].transaction_id))

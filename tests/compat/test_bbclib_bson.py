@@ -93,7 +93,7 @@ class TestBBcLib(object):
         if sig is None:
             print(bbclib.error_text)
             assert sig
-        transaction1.add_signature(signature=sig)
+        transaction1.add_signature_object(signature=sig)
 
         # --- for checking serialization function ---
         digest = transaction1.digest()
@@ -140,7 +140,7 @@ class TestBBcLib(object):
         if sig is None:
             print(bbclib.error_text)
             assert sig
-        reference2.add_signature(user_id=user_id, signature=sig)
+        reference2.add_signature_object(user_id=user_id, signature=sig)
 
         print(transaction2)
 
@@ -167,12 +167,12 @@ class TestBBcLib(object):
         if sig is None:
             print(bbclib.error_text)
             assert sig
-        reference.add_signature(user_id=user_id2, signature=sig)
+        reference.add_signature_object(user_id=user_id2, signature=sig)
         sig = transaction1.sign(private_key=keypair1.private_key, public_key=keypair1.public_key)
         if sig is None:
             print(bbclib.error_text)
             assert sig
-        reference.add_signature(user_id=user_id, signature=sig)
+        reference.add_signature_object(user_id=user_id, signature=sig)
 
         print(transaction1)
 

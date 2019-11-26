@@ -38,8 +38,7 @@ def make_transaction(user_id, keypair):
                               asset_body="data=%d" % random.randint(1, 10000),
                               asset_file=asset_file_content)
     txobj.witness.add_witness(user_id)
-    sig = txobj.sign(keypair=keypair)
-    txobj.add_signature(user_id, sig)
+    txobj.add_signature(user_id, keypair=keypair)
     txobj.digest()
     return txobj
 

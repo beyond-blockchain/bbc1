@@ -69,7 +69,7 @@ def create_transaction_object_and_send_sign_req(idx, receiver_user_id, ref_txids
         bbclib.add_relation_pointer(txobj, 0, ref_transaction_id=prev_tx.digest())
 
     sig_mine = txobj.sign(private_key=keypairs[idx].private_key, public_key=keypairs[idx].public_key)
-    txobj.witness.add_signature(user_id=user_ids[idx], signature=sig_mine)
+    txobj.witness.add_signature_object(user_id=user_ids[idx], signature=sig_mine)
 
     asset_id = txobj.relations[0].asset.asset_id
     asset_files = {asset_id: file_data}
@@ -140,7 +140,7 @@ class TestFileProofClient(object):
         store_transaction.witness.add_witness(user_ids[0])
         sig = store_transaction.sign(private_key=keypairs[0].private_key, public_key=keypairs[0].public_key)
         store_transaction.get_sig_index(user_ids[0])
-        store_transaction.add_signature(user_id=user_ids[0], signature=sig)
+        store_transaction.add_signature_object(user_id=user_ids[0], signature=sig)
         store_transaction.digest()
         print(store_transaction)
 

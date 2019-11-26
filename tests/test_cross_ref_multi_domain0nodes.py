@@ -65,8 +65,7 @@ def prepare_transaction(asset_group, client, datnum, txid_pointer=None, no_cross
     wit.add_witness(user_id)
     if not no_cross_ref:
         client['app'].include_cross_ref(txobj)
-    sig = txobj.sign(keypair=kp)
-    txobj.add_signature(user_id=user_id, signature=sig)
+    txobj.add_signature(user_id=user_id, keypair=kp)
     txobj.digest()
     return txobj
 

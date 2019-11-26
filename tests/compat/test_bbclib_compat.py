@@ -92,7 +92,7 @@ class TestBBcLib(object):
         if sig is None:
             print(bbclib.error_text)
             assert sig
-        transaction1.add_signature(signature=sig)
+        transaction1.add_signature_object(signature=sig)
 
         # --- for checking serialization function ---
         digest = transaction1.digest()
