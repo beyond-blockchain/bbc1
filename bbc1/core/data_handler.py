@@ -213,10 +213,15 @@ class DataHandler:
                 info.append((evt.asset_group_id, ast.asset_id, ast.user_id, ast.asset_file_size>0,
                              ast.asset_file_digest))
         for idx, rtn in enumerate(txobj.relations):
-            ast = rtn.asset
             if rtn.asset is not None:
-                info.append((rtn.asset_group_id, ast.asset_id, ast.user_id, ast.asset_file_size>0,
-                             ast.asset_file_digest))
+                info.append((rtn.asset_group_id, rtn.asset.asset_id, rtn.asset.user_id, rtn.asset.asset_file_size>0,
+                             rtn.asset.asset_file_digest))
+            if txobj.version >= 2 and rtn.asset_raw is not None:
+                info.append((rtn.asset_group_id, rtn.asset_raw.asset_id, None, 0, None))
+            if txobj.version >= 2 and rtn.asset_hash is not None:
+                for asid in rtn.asset_hash.asset_ids:
+                    info.append((rtn.asset_group_id, asid, None, 0, None))
+
         return info
 
     def _get_topology_info(self, txobj):

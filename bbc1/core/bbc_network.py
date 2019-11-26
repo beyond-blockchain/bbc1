@@ -746,9 +746,13 @@ class BBcNetwork:
                     ipv4 = None
                     ipv6 = None
                     if sock is self.socket_udp:
-                        data, (ipv4, port) = self.socket_udp.recvfrom(1500)
+                        data, addr = self.socket_udp.recvfrom(1500)
+                        ipv4 = addr[0]
+                        port = addr[1]
                     elif sock is self.socket_udp6:
-                        data, (ipv6, port) = self.socket_udp6.recvfrom(1500)
+                        data, addr = self.socket_udp6.recvfrom(1500)
+                        ipv6 = addr[0]
+                        port = addr[1]
                     if data is not None:
                         self.stats.update_stats_increment("network", "packets_received_by_udp", 1)
                         msg_parser.recv(data)

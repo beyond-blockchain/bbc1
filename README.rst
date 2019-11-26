@@ -1,7 +1,7 @@
 Core system of BBc-1 (Beyond Blockchain One)
 ===========================================
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Build Status](https://travis-ci.org/beyond-blockchain/bbc1.svg?branch=develop)](https://travis-ci.org/beyond-blockchain/bbc1)
+[![CircleCI](https://circleci.com/gh/beyond-blockchain/bbc1.svg?style=shield)](https://circleci.com/gh/beyond-blockchain/bbc1)
 
 This project is a Python-based reference implementation of BBc-1, a trustable system of record keeping beyond blockchains.
 
@@ -40,12 +40,12 @@ Removing pip cache directory is a fundamental solution to this problem. The cach
 * Windows
   - %LocalAppData%\pip\Cache
 
-After removing the cache directory, install py-bbclib module again.
+After removing the cache directory, install bbc1 module again.
 
 ```bash
 python3 -mvenv venv
 . venv/bin/activate
-pip install py-bbclib
+pip install bbc1
 ```
 
 ### Solution 2
@@ -53,7 +53,7 @@ Disabling cache and re-installing the module is another solution, which is easie
 ```bash
 python3 -mvenv venv
 . venv/bin/activate
-pip --no-cache-dir install -I py-bbclib 
+pip --no-cache-dir install -I bbc1 
 ```
 
 
@@ -96,6 +96,8 @@ Some documents are available in docs/.
     * [how_to_use_in_nat_environment.md](docs/how_to_use_in_nat_environment.md)
     * [libbbcsig_dll_build_for_Windows_x64_ja.md](docs/libbbcsig_dll_build_for_Windows_x64_ja.md)
 * Programing
+    * [BBc1_pybbclib_programming_guide_v1.6_ja.md](https://github.com/beyond-blockchain/py-bbclib/blob/develop/docs/BBc1_pybbclib_programming_guide_v1.6_ja.md)
+    * [BBc1_pybbclib_utility_functions_v1.6_ja.md](https://github.com/beyond-blockchain/py-bbclib/blob/develop/docs/BBc1_pybbclib_utility_functions_v1.6_ja.md)
     * [BBc1_pybbclib_programming_guide_v1.4.1_ja.md](docs/BBc1_pybbclib_programming_guide_v1.4.1_ja.md)
     * [BBc1_programming_guide_v1.3_ja.md](docs/BBc1_programming_guide_v1.3_ja.md)
     * [BBc1_core_tutorial_file_proof_ja.md](docs/BBc1_core_tutorial_file_proof_ja.md)

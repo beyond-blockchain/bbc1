@@ -64,7 +64,7 @@ def prepare_transactions():
             txobj.add(event=evt, relation=rtn, witness=wit)
         wit.add_witness(user_id1)
         sig = txobj.sign(private_key=keypair1.private_key, public_key=keypair1.public_key)
-        txobj.add_signature(user_id=user_id1, signature=sig)
+        txobj.add_signature_object(user_id=user_id1, signature=sig)
         txobj.digest()
         transactions.append(txobj)
 

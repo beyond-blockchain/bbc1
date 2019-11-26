@@ -171,9 +171,10 @@ class RepairManager:
             random_nonce = bbclib.get_random_value(4)
         self.requesting_list[random_nonce] = {
             "asset_group_id": asset_group_id.hex(),
-            "asset_id": asset_id.hex(),
             "request_at": int(time.time())
         }
+        if asset_id is not None:
+            self.requesting_list[random_nonce]["asset_id"] = asset_id.hex()
         msg = {
             KeyType.domain_id: self.domain_id,
             KeyType.infra_msg_type: InfraMessageCategory.CATEGORY_DATA,

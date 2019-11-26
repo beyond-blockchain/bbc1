@@ -150,7 +150,7 @@ class TestBBcAppClient(object):
             print(bbclib.error_text)
             import os
             os._exit(1)
-        transactions[0].add_signature(user_id=user, signature=sig)
+        transactions[0].add_signature_object(user_id=user, signature=sig)
         print(transactions[0])
         transactions[0].digest()
         global transaction_dat
