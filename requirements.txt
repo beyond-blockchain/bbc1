@@ -7,5 +7,5 @@ cryptography==2.8
 pytest==5.3.2
 py-bbclib==1.6
 msgpack-python==0.5.6
-mysql-connector-python==8.0.18
+mysql-connector-python==8.0.19
 bson
