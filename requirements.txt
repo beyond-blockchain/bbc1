@@ -1,7 +1,7 @@
 pyOpenSSL==19.1.0
 jinja2==2.11.1
 requests==2.23.0
-gevent==1.4.0
+gevent==1.5.0
 greenlet
 cryptography==2.8
 pytest==5.3.5
