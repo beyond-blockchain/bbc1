@@ -1,4 +1,4 @@
-pyOpenSSL==19.1.0
+pyOpenSSL==20.0.1
 jinja2==2.11.2
 requests==2.23.0
 gevent==1.4.0
