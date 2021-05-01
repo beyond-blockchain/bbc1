@@ -1,6 +1,10 @@
 Change log
 ======
 
+## v1.5.1
+* Fix problem regarding new version of gevent
+* Fix codes in deprecated usage
+
 ## v1.5
 * Support BBcAssetRaw and BBcAssetHash defined in py-bbclib v1.5 or later
 * bug fix
