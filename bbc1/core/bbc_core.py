@@ -178,7 +178,7 @@ class BBcCoreService:
                 else:
                     self.logger.info("Failed to load ledger_subsystem module")
 
-        gevent.signal(signal.SIGINT, self.quit_program)
+        gevent.signal_handler(signal.SIGINT, self.quit_program)
         if server_start:
             self._start_server(core_port)
 

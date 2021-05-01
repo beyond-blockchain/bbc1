@@ -2,13 +2,7 @@ version: 2.1
 workflows:
   build_and_deploy:
     jobs:
-      - build:
-          filters:
-            tags:
-              only: /.*/
       - test:
-          requires:
-            - build
           filters:
             tags:
               only: /.*/
@@ -21,30 +15,17 @@ workflows:
             branches:
               ignore: /.*/
 jobs:
-  build:
+  test:
     docker:
       - image: circleci/python:3.7
     steps:
       - checkout
-      - restore_cache:
-          key: v1-dependency-cache-{{ checksum "setup.py" }}
       - run:
           name: install python dependencies
           command: |
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
-      - save_cache:
-          key: v1-dependency-cache-{{ checksum "setup.py" }}
-          paths:
-            - "venv"
-  test:
-    docker:
-      - image: circleci/python:3.7
-    steps:
-      - checkout
-      - restore_cache:
-          key: v1-dependency-cache-{{ checksum "setup.py" }}
       - run:
           name: Perform test
           command: |
@@ -87,7 +68,6 @@ jobs:
           name: verify version
           command: |
             . venv/bin/activate
-            cd python/
             python setup.py verify
       - run:
           name: init .pypirc

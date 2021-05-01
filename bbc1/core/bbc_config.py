@@ -17,8 +17,7 @@ limitations under the License.
 import os
 import json
 import copy
-from threading import RLock
-from collections import Mapping
+from collections.abc import Mapping
 
 import sys
 sys.path.extend(["../../"])
