@@ -19,7 +19,7 @@ import threading
 import msgpack
 import struct
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import _serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -158,7 +158,7 @@ def get_ECDH_parameters():
     """Utility for initialization of ECDH parameters"""
     global encryptors, decryptors
     private_key = ec.generate_private_key(ec.SECP384R1(), default_backend())
-    serialized_pubkey = private_key.public_key().public_numbers().encode_point()
+    serialized_pubkey = private_key.public_key().public_bytes(_serialization.Encoding.X962, _serialization.PublicFormat.UncompressedPoint)
     key_name = None
     while key_name is None:
         key_name = os.urandom(4)
@@ -171,8 +171,7 @@ def get_ECDH_parameters():
 
 def derive_shared_key(private_key, serialized_pubkey, shared_info):
     """Utility for deriving shared key in ECDH procedure"""
-    deserialized_public_numbers = ec.EllipticCurvePublicNumbers.from_encoded_point(ec.SECP384R1(), serialized_pubkey)
-    deserialized_pubkey = deserialized_public_numbers.public_key(default_backend())
+    deserialized_pubkey = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP384R1(), serialized_pubkey)
     shared_key = private_key.exchange(ec.ECDH(), deserialized_pubkey)
     derived_key = HKDF(algorithm=hashes.SHA256(), length=32, salt=None,
                        info=shared_info, backend=default_backend()).derive(shared_key)
