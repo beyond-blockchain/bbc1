@@ -1,4 +1,4 @@
-attrs==20.3.0
+attrs==21.1.0
 bson==0.5.10
 certifi==2020.12.5
 cffi==1.14.5
