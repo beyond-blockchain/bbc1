@@ -7,7 +7,7 @@ click==7.1.2
 cryptography==3.4.7
 Flask==1.1.2
 gevent==21.1.2
-greenlet==1.0.0
+greenlet==1.1.0
 idna==2.10
 iniconfig==1.1.1
 itsdangerous==1.1.0
