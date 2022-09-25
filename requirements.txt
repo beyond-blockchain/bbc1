@@ -29,6 +29,6 @@ requests==2.25.1
 six==1.16.0
 toml==0.10.2
 urllib3==1.26.4
-Werkzeug==1.0.1
+Werkzeug==2.2.2
 zope.event==4.5.0
 zope.interface==5.4.0
