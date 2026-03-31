@@ -6,7 +6,7 @@ chardet==4.0.0
 click==7.1.2
 cryptography==3.4.7
 Flask==1.1.2
-gevent==21.1.2
+gevent==23.9.0
 greenlet==1.1.0
 idna==2.10
 iniconfig==1.1.1
