@@ -51,7 +51,7 @@ bbc1_requires = [
                  'py-bbclib>=1.6',
                  'greenlet',
                  'bson',
-                 'Flask>=0.10.1,<=1.0.1'
+                 'Flask>=1.1.4,<=1.1.4'
                 ]
 
 bbc1_packages = ['bbc1', 'bbc1.core']
