@@ -20,7 +20,7 @@ pluggy==0.13.1
 protobuf==3.16.0
 py==1.10.0
 py-bbclib==1.6.1
-pycparser==2.20
+pycparser==2.23
 pyOpenSSL==20.0.1
 pyparsing==2.4.7
 pytest==6.2.4
